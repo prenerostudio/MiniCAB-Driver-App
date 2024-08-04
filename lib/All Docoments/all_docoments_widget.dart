@@ -1,0 +1,1560 @@
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'all_docoments_model.dart';
+export 'all_docoments_model.dart';
+
+class AllDocomentsWidget extends StatefulWidget {
+  const AllDocomentsWidget({super.key});
+
+  @override
+  State<AllDocomentsWidget> createState() => _AllDocomentsWidgetState();
+}
+
+class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
+    with TickerProviderStateMixin {
+  late AllDocomentsModel _model;
+  File? selectedImage;
+  File? selectedImageV;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    fornt();
+    back();
+    addressProof();
+    addressProofSec();
+    pco();
+    insurance();
+    dvla();
+    extra();
+    logBook();
+    motCertificate();
+    vPCO();
+    vPicFornt();
+    vPicBack();
+    vRental();
+    vRoad();
+    vInsurance();
+    insuranceSchedule();
+    _model = createModel(context, () => AllDocomentsModel());
+
+    _model.tabBarController = TabController(
+      vsync: this,
+      length: 2,
+      initialIndex: 0,
+    )..addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  void _showToastMessage(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      textColor: Colors.white,
+    );
+  }
+
+  Future<void> document(ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final pickedFile = await picker.getImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+  Future<void> vDocument(ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final pickedFile = await picker.getImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          selectedImageV = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          key: scaffoldKey,
+          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          appBar: AppBar(
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+            automaticallyImplyLeading: false,
+            leading: FlutterFlowIconButton(
+              borderColor: Colors.transparent,
+              borderRadius: 30,
+              borderWidth: 1,
+              buttonSize: 60,
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: FlutterFlowTheme.of(context).secondaryText,
+                size: 30,
+              ),
+              onPressed: () async {
+                context.pushNamed('Home');
+              },
+            ),
+            title: Text(
+              'Documents',
+              style: FlutterFlowTheme.of(context).headlineMedium.override(
+                    fontFamily: 'Open Sans',
+                    color: FlutterFlowTheme.of(context).secondaryText,
+                    fontSize: 22,
+                  ),
+            ),
+            actions: [],
+            centerTitle: true,
+            elevation: 2,
+          ),
+          body: SafeArea(
+            top: true,
+            child: Align(
+              alignment: AlignmentDirectional(0, -1),
+              child: Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                        child: Container(
+                          width: double.infinity,
+                          height: MediaQuery.sizeOf(context).height * 1,
+                          decoration: BoxDecoration(
+                            color:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                            borderRadius: BorderRadius.circular(0),
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context)
+                                  .primaryBackground,
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment(0, 0),
+                                child: TabBar(
+                                  isScrollable: true,
+                                  labelColor:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  unselectedLabelColor:
+                                      FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                  labelPadding: EdgeInsetsDirectional.fromSTEB(
+                                      15, 0, 15, 0),
+                                  labelStyle:
+                                      FlutterFlowTheme.of(context).titleMedium,
+                                  unselectedLabelStyle: TextStyle(),
+                                  indicatorColor:
+                                      FlutterFlowTheme.of(context).primary,
+                                  indicatorWeight: 3,
+                                  tabs: [
+                                    Tab(
+                                      text: 'Driving License\n    Verification',
+                                    ),
+                                    Tab(
+                                      text: '  Vehicle\nVerification',
+                                    ),
+                                  ],
+                                  controller: _model.tabBarController,
+                                  onTap: (i) async {
+                                    [() async {}, () async {}][i]();
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: TabBarView(
+                                  controller: _model.tabBarController,
+                                  children: [
+                                    // tap1
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(10, 20, 10, 30),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Container(
+                                              width: double.infinity,
+                                              height: 60,
+                                              decoration: BoxDecoration(
+                                                color: FlutterFlowTheme.of(context).secondaryText,
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Document Name',
+                                                      style: FlutterFlowTheme.of(context).titleMedium,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                      EdgeInsetsDirectional.fromSTEB(50, 0, 0, 0),
+                                                      child: Text(
+                                                        'Status',
+                                                        style: FlutterFlowTheme.of(context).titleMedium,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Driving Licence Photo\nCard (Front)',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: Text(
+                                                      '${Fornt == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                      style: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .override(
+                                                        fontFamily: 'Readex Pro',
+                                                        fontSize: 12.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('DrivingLicenceCardFornt');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Driving Licence Photo\nCard (Back)',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${Back == "" ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('DrivingLicenceCardBack');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Proof of Address One ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${AddressProof == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('ProofofAddressOne');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Proof of Address Two ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${AddressProofsec == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('ProofofAddressTwo');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'PCO Licence               ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ), Text(
+                                                    '${PCO == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('DriverPCOLicense');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'DVLA Check Code      ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${DVLA == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('DvlaCheckCode');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Proof of National        \n Insurance',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${Insurance == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('NationalInsuranceNumber');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Extra                          ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${Extra == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('ExtaOne');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                                                    child: FFButtonWidget(
+                                                      onPressed: () async {
+                                                        context.pushNamed('Login');
+                                                      },
+                                                      text: 'Submit Application',
+                                                      options: FFButtonOptions(
+                                                        height: 40,
+                                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                                            24, 0, 24, 0),
+                                                        iconPadding:
+                                                        EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                        color: FlutterFlowTheme.of(context).primary,
+                                                        textStyle: FlutterFlowTheme.of(context)
+                                                            .titleSmall
+                                                            .override(
+                                                          fontFamily: 'Readex Pro',
+                                                          color: Colors.white,
+                                                        ),
+                                                        elevation: 3,
+                                                        borderSide: BorderSide(
+                                                          color: Colors.transparent,
+                                                          width: 1,
+                                                        ),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+
+                                    // tap2
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(10, 20, 10, 30),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Container(
+                                              width: double.infinity,
+                                              height: 60,
+                                              decoration: BoxDecoration(
+                                                color: FlutterFlowTheme.of(context).secondaryText,
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Document Name',
+                                                      style: FlutterFlowTheme.of(context).titleMedium,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                      EdgeInsetsDirectional.fromSTEB(50, 0, 0, 0),
+                                                      child: Text(
+                                                        'Status',
+                                                        style: FlutterFlowTheme.of(context).titleMedium,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Log Book                ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: Text(
+                                                      '${LogBook == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                      style: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .override(
+                                                        fontFamily: 'Readex Pro',
+                                                        fontSize: 12.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehicleLogBook');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Mot Certificate      ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${MotCertificate == "" ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehicleMotcertificate');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle PCO                       ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${Vpco == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehiclePCO');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Picture Fornt        ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${vFornt == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehiclePicture');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Picture Back         ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ), Text(
+                                                    '${vBack == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehiclePictureBack');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Road Tax              ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${roadTax == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehicleRoadTax');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Rental Agreement',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${VRental == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehicleRentalAgreement');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Insurance Schedule          ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${InsuranceSchedule == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('InsuranceSchedule');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                              EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'Vehicle Insurance            ',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${VInsurance== '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context.pushNamed('VehicleInsurance');
+                                                      },
+                                                      child: Text(
+                                                        'View Upload',
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                            fontFamily: 'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color:  FlutterFlowTheme.of(context).primary
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                    EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                                                    child: FFButtonWidget(
+                                                      onPressed: () async {
+                                                        context.pushNamed('Login');
+                                                      },
+                                                      text: 'Submit Application',
+                                                      options: FFButtonOptions(
+                                                        height: 40,
+                                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                                            24, 0, 24, 0),
+                                                        iconPadding:
+                                                        EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                        color: FlutterFlowTheme.of(context).primary,
+                                                        textStyle: FlutterFlowTheme.of(context)
+                                                            .titleSmall
+                                                            .override(
+                                                          fontFamily: 'Readex Pro',
+                                                          color: Colors.white,
+                                                        ),
+                                                        elevation: 3,
+                                                        borderSide: BorderSide(
+                                                          color: Colors.transparent,
+                                                          width: 1,
+                                                        ),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+    );
+  }
+  String? Fornt;
+
+  Future<String?> fornt() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-d-license-front.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        Fornt = jsonResponse[''][0]['d_license_front'];
+      });
+
+      return Fornt;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? Back;
+
+  Future<String?> back() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-d-license-back.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        Back = jsonResponse[''][0]['d_license_back'];
+
+      });
+      return Back;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? AddressProof;
+
+  Future<String?> addressProof() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-address-proof-1.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        AddressProof = jsonResponse[''][0]['address_proof_1'];
+
+      });
+      return AddressProof;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? AddressProofsec;
+
+  Future<String?> addressProofSec() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-address-proof-2.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        AddressProofsec = jsonResponse[''][0]['address_proof_2'];
+      });
+      return AddressProofsec;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+
+  String? PCO;
+
+  Future<String?> pco() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-pco-license.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        PCO = jsonResponse[''][0]['pco_license'];
+
+      });
+      return PCO;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? DVLA;
+
+  Future<String?> dvla() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-dvla-code.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        DVLA = jsonResponse[''][0]['dvla_check_code'];
+      });
+      return DVLA;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? Insurance;
+
+  Future<String?> insurance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-national-insurance.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        Insurance = jsonResponse[''][0]['national_insurance'];
+      });
+      return Insurance;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? Extra;
+
+  Future<String?> extra() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-extra-document.php'));
+    request.fields.addAll({'d_id': dId});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        Extra = jsonResponse[''][0]['extra'];
+      });
+      return Extra;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+
+  // Vehicle Docments
+
+  String? LogBook;
+
+  Future<String?> logBook() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-log-book.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        LogBook = jsonResponse[''][0]['log_book'];
+      });
+      return LogBook;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? MotCertificate;
+
+  Future<String?> motCertificate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-mot-certificate.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        MotCertificate = jsonResponse[''][0]['mot_certificate'];
+      });
+      return MotCertificate;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? Vpco;
+
+  Future<String?> vPCO() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-pco.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        Vpco = jsonResponse[''][0]['pco'];
+      });
+      return Vpco;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? vFornt;
+
+  Future<String?> vPicFornt() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-v-pic-front.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        vFornt = jsonResponse[''][0]['vehicle_picture_front'];
+      });
+      return  vFornt;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? vBack;
+
+  Future<String?> vPicBack() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-v-pic-back.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        vBack = jsonResponse[''][0]['vehicle_picture_back'];
+      });
+      return  vBack;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? roadTax;
+
+  Future<String?> vRoad() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-road-tax.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        roadTax = jsonResponse[''][0]['road_tax'];
+      });
+      return  roadTax;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? VRental;
+
+  Future<String?> vRental() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-rental-agreement.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        VRental = jsonResponse[''][0]['rental_agreement'];
+      });
+      return  VRental;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? InsuranceSchedule;
+
+  Future<String?> insuranceSchedule() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-insurance-schedule.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        InsuranceSchedule = jsonResponse[''][0]['insurance_schedule'];
+      });
+      return  InsuranceSchedule;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+  String? VInsurance;
+
+  Future<String?> vInsurance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String dId = prefs.getString('d_id') ?? '';
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://minicaboffice.com/api/driver/check-insurance.php'));
+    request.fields.addAll({'d_id': dId});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      String responseString = await response.stream.bytesToString();
+      Map<String, dynamic> jsonResponse = json.decode(responseString);
+      setState(() {
+        VInsurance = jsonResponse[''][0]['insurance'];
+      });
+      return  VInsurance;
+    } else {
+      throw Exception('Failed to load d_license_back');
+    }
+  }
+
+
+
+
+}

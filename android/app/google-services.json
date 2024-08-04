@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "864049452046",
+    "project_id": "minicab-driver-404513",
+    "storage_bucket": "minicab-driver-404513.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864049452046:android:3b2bfd1691e5becd3d585f",
+        "android_client_info": {
+          "package_name": "com.mycompany.driverminicab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlAPDuBXXlEDRqTwgRpHsxQnoMfvF9SFg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
