@@ -200,7 +200,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
               },
             ),
             title: Text(
-              'Upcomming Booking',
+              'Upcoming Booking',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
                     fontFamily: 'Outfit',
                     color: FlutterFlowTheme.of(context).primary,

@@ -48,7 +48,7 @@ dependencies:
   google_sign_in_ios: 5.6.4
   google_sign_in_platform_interface: 2.4.2
   google_sign_in_web: 0.12.1
-  intl: 0.19.0
+  intl: 0.18.1
   json_path: 0.6.2
   page_transition: 2.1.0
   path_provider: 2.0.14
@@ -110,7 +110,6 @@ dependencies:
   flutter_background_service: ^5.0.5
   root_checker_plus: ^0.0.3
   system_alert_window: ^2.0.0
-  share_plus: ^9.0.0
   stop_watch_timer: ^3.1.1
 
 

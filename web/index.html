@@ -8,7 +8,7 @@
     The path provided below has to start and end with a slash "/" in order for
     it to work correctly.
 
-    For more details:
+    Fore more details:
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
   -->
   <base href="/">
@@ -20,6 +20,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="MiniCab">
+
+  
 
   <meta name="robots" content="noindex" />
 
@@ -38,25 +40,29 @@
   <title> MiniCab </title>
   <meta name="description" content="Built with FlutterFlow." />
     
+
   <!-- Status Bar color in Safari browser (iOS) and PWA -->
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f4f8">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1d2428">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#1d2428">
 
   <link rel="manifest" href="manifest.json">
-  <!-- The value below is injected by flutter build, do not touch. -->
   <script>
-    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = null;
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
+  
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA"></script>
-
+  
+  
+  
   <script>
     window.addEventListener('load', function (ev) {
       // Download main.dart.js
-      _flutter.loader.load({
+      _flutter.loader.loadEntrypoint({
         entrypointUrl: 'main.dart.js',
         serviceWorker: {
           serviceWorkerUrl: 'flutter_service_worker.js?v=',

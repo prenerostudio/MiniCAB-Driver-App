@@ -7,6 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:mini_cab/flutter_flow/flutter_flow_util.dart';
+import 'package:mini_cab/index.dart';
+import 'package:mini_cab/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 import 'package:vibration/vibration.dart';
@@ -19,6 +21,7 @@ import 'package:http/http.dart' as http;
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
 
+
 class Alarts {
   late BuildContext _context;
 
@@ -30,6 +33,7 @@ class Alarts {
   double? pickupLat;
   double? pickupLng;
   int? switchValue1;
+  bool visiblecontainer=false;
 
   Future<void> _loadSwitchStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -38,6 +42,7 @@ class Alarts {
 
   Future<List<Job>> jobDetailsFuture() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     String? dId = prefs.getString('d_id');
     print(dId);
     final response = await http.post(
@@ -49,6 +54,7 @@ class Alarts {
 
     if (response.statusCode == 200) {
       final parsedResponse = json.decode(response.body);
+
       print(parsedResponse);
 
       if (parsedResponse['data'] is List) {
@@ -99,9 +105,9 @@ class Alarts {
                   color: Colors.transparent,
                   child: Center(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: EdgeInsets.symmetric(horizontal: 5.0),
                       child: AnimatedGradientBorder(
-                        borderSize: 4,
+                        borderSize: 8,
                         glowSize: 0,
                         gradientColors: [
                           Colors.transparent,
@@ -149,8 +155,7 @@ class Alarts {
                                       children: [
                                         Padding(
                                           padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0, 0, 0, 8),
+                                              EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -602,45 +607,51 @@ class Alarts {
                                             ),
                                             FFButtonWidget(
                                               onPressed: () async {
-                                                acceptJob('${jobItem.jobId}', closeOverlay);
+                                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                prefs.setBool('visiblecontainer', true);
+
+                                                // Call acceptJob function
+                                                await acceptJob('${jobItem.jobId}', closeOverlay);
+
+                                                // Navigate to NavBarPage with index 0
+                                                Navigator.of(context).pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                    builder: (context) => NavBarPage(page:HomeWidget(),), // Set initialPage to 0
+                                                  ),
+                                                      (Route<dynamic> route) => false, // Remove all previous routes
+                                                );
                                               },
-                                              text: 'Accepted',
+                                              text: 'Accept',
                                               icon: Icon(
                                                 Icons.east,
                                                 size: 15,
                                               ),
                                               options: FFButtonOptions(
                                                 height: 50,
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(24, 0, 24, 0),
-                                                iconPadding:
-                                                    EdgeInsetsDirectional
-                                                        .fromSTEB(0, 0, 0, 0),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                textStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .titleSmall
-                                                        .override(
-                                                            fontFamily:
-                                                                'Open Sans',
-                                                            color: Colors.white,
-                                                            fontSize: 10),
+                                                padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
+                                                iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                                color: FlutterFlowTheme.of(context).primary,
+                                                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                  fontFamily: 'Open Sans',
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                ),
                                                 elevation: 3,
                                                 borderSide: BorderSide(
                                                   color: Colors.transparent,
                                                   width: 1,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
                                             ),
+
+
+
                                           ],
                                         ),
                                       ]
-                                          .divide(SizedBox(height: 4))
-                                          .addToEnd(SizedBox(height: 12)),
+                                          // .divide(SizedBox(height: 4))
+                                          // .addToEnd(SizedBox(height: 12)),
                                     );
                                   },
                                 );
@@ -692,11 +703,13 @@ class Alarts {
   }
 
   Future<void> acceptJob(String jobId, Function closeOverlay) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
 
+      String? dId = prefs.getString('d_id');
       var fields = {
         'job_id': jobId.toString(),
-
+         'd_id': dId.toString(),
 
       };
       var uri = Uri.parse('https://www.minicaboffice.com/api/driver/accept-job.php');
@@ -708,7 +721,11 @@ class Alarts {
 
       if (response.statusCode == 200) {
         print('Job accepted successfully');
+
+
+        print('object0');
         closeOverlay();
+
       } else {
         print('Failed to accept job. Status Code: ${response.statusCode}');
         print('Reason: ${response.reasonPhrase}');

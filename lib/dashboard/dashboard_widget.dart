@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../Acount Statements/acount_statements_widget.dart';
 import '../components/changepaymentmethod/changepaymentmethod_widget.dart';
 import '../components/upcommingjob_Accepted_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
@@ -41,7 +42,6 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
 class DashboardWidget extends StatefulWidget {
@@ -1861,7 +1861,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () async {
-                              context.pushNamed('AcountStatements');
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>AcountStatementsWidget()));
                             },
                             child: Container(
                               width: MediaQuery.sizeOf(context).width * 0.4,

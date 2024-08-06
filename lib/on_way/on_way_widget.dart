@@ -35,7 +35,7 @@ class OnWayWidget extends StatefulWidget {
     Key? key,
     required this.did,
     required this.jobid,
-    required this.pickup,
+    // required this.pickup,
     required this.dropoff,
     required this.cName,
     required this.fare,
@@ -51,7 +51,7 @@ class OnWayWidget extends StatefulWidget {
 
   final String? did;
   final String? jobid;
-  final String? pickup;
+  // final String? pickup;
   final String? dropoff;
   final String? cName;
   final String? fare;
@@ -114,15 +114,43 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     });
   }
 
+  statuscheck(String book_id)async{
+    final response= await http.post(Uri.parse('https://www.minicaboffice.com/api/driver/check-job-status.php'));
+    if (response.statusCode==200){
+      var data =jsonDecode(response.body.toString());
+      if (data['status']=true){
+        Fluttertoast.showToast(
+          msg: 'Bookings have been recovered from you',
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        print('booking is  recoverd ');
+      }else{ print('booking not  recoverd ');}
+    }
+  }
   @override
   void initState() {
     super.initState();
+    recive_bookid();
     wayToPickup();
+
+    statuscheck(bookid);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _setupMarkersAndPolylines();
     _model = createModel(context, () => OnWayModel());
   }
+
+  recive_bookid()async{
+SharedPreferences prefs= await SharedPreferences.getInstance() as SharedPreferences;
+
+bookid= prefs.getString('bookingid')??'';
+// setState(() {
+//
+// });
+  }
+
+  String bookid='';
 
   @override
   void dispose() {
@@ -319,7 +347,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                         ),
                       ),
                       Align(
-                        alignment: AlignmentDirectional(0.00, 1.00),
+                        alignment: AlignmentDirectional(0.00, 1.35),
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 0.0, 0.0),
@@ -329,9 +357,10 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                               Container(
                                 width: MediaQuery.sizeOf(context).width * 1.0,
                                 height:
-                                    MediaQuery.sizeOf(context).height * 0.37,
+                                    MediaQuery.sizeOf(context).height * 0.4,
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
+                                  color:
+                                  FlutterFlowTheme.of(context)
                                       .secondaryBackground,
                                 ),
                                 child: Column(
@@ -617,10 +646,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                           ),
                                         ],
                                       ),
-                                    ),
+                                    ),SizedBox(height: 10,),
                                     Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          15, 20, 15, 0),
+                                      padding:  EdgeInsets.only(left:20,right: 20),
                                       child: SwipeButton(
                                         thumbPadding: EdgeInsets.all(3),
                                         thumb: Icon(
