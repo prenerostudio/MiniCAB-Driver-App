@@ -509,7 +509,7 @@ class Alarts {
                                                                 EdgeInsets.only(
                                                                     left: 8),
                                                             child: Text(
-                                                              '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Mailes ${jobItem.journeyType}',
+                                                              '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${jobItem.journeyType}',
                                                                  overflow: TextOverflow.ellipsis,
                                                               maxLines: 1,
                                                               style: FlutterFlowTheme

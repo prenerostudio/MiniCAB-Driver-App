@@ -10,6 +10,8 @@ import '../components/dropoff_widget.dart';
 import '../components/waydetails_widget.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_timer.dart';
+import '../home/home_widget.dart';
+import '../main.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -35,7 +37,7 @@ class OnWayWidget extends StatefulWidget {
     Key? key,
     required this.did,
     required this.jobid,
-    // required this.pickup,
+    required this.pickup,
     required this.dropoff,
     required this.cName,
     required this.fare,
@@ -50,8 +52,8 @@ class OnWayWidget extends StatefulWidget {
   }) : super(key: key);
 
   final String? did;
-  final String? jobid;
-  // final String? pickup;
+  final String jobid;
+  final String? pickup;
   final String? dropoff;
   final String? cName;
   final String? fare;
@@ -93,7 +95,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   bool isLoading = false;
   bool isWaiting = false;
   bool isRideStarted = false;
-
+  Timer? Apitimer;
   Timer? _timer;
   int _start = 0;
 
@@ -113,47 +115,67 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       }
     });
   }
-
-  statuscheck(String book_id)async{
-    final response= await http.post(Uri.parse('https://www.minicaboffice.com/api/driver/check-job-status.php'));
-    if (response.statusCode==200){
-      var data =jsonDecode(response.body.toString());
-      if (data['status']=true){
+String jobId='';
+  statuscheck(String jobid) async {
+    final response = await http.post(Uri.parse(
+        'https://www.minicaboffice.com/api/driver/check-job-status.php'));
+    print('statusresponse  ${response.statusCode}');
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body.toString());
+      print('joooooobiddddd ${widget.jobid}');
+      if (data['status'] == false) {
         Fluttertoast.showToast(
-          msg: 'Bookings have been recovered from you',
-          textColor: Colors.white,
-          fontSize: 16.0,
+          msg: data['message'],
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
         );
-        print('booking is  recoverd ');
-      }else{ print('booking not  recoverd ');}
+        Navigator.push(
+            context as BuildContext,
+            MaterialPageRoute(
+                builder: (context) => NavBarPage(
+                  page: HomeWidget(),
+                )));
+      }
+      Apitimer?.cancel();
+
+
+
     }
   }
+
   @override
   void initState() {
     super.initState();
-    recive_bookid();
+    recive_jobidid;
     wayToPickup();
 
-    statuscheck(bookid);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _setupMarkersAndPolylines();
-    _model = createModel(context, () => OnWayModel());
+    _model = createModel(context as BuildContext, () => OnWayModel());
   }
 
-  recive_bookid()async{
-SharedPreferences prefs= await SharedPreferences.getInstance() as SharedPreferences;
+  recive_jobidid() async {
+    SharedPreferences prefs =
+        await SharedPreferences.getInstance() as SharedPreferences;
 
-bookid= prefs.getString('bookingid')??'';
-// setState(() {
-//
-// });
+    jobId=widget.jobid.toString();
+    Apitimer = Timer.periodic(Duration(seconds: 3), (timer) {
+      statuscheck(jobId);
+
+    });
+
+
+
+
+    setState(() {});
   }
 
-  String bookid='';
+  String job = '';
 
   @override
   void dispose() {
+    Apitimer?.cancel();
     _model.dispose();
 
     super.dispose();
@@ -161,11 +183,8 @@ bookid= prefs.getString('bookingid')??'';
 
   static const String _baseUrl =
       'https://maps.googleapis.com/maps/api/directions/json';
-  void checkDriverProximity(
-      double currentLatitude,
-      double currentLongitude,
-      double pickupLatitude,
-      double pickupLongitude,
+  void checkDriverProximity(double currentLatitude, double currentLongitude,
+      double pickupLatitude, double pickupLongitude,
       {double precision = 0.00030}) {
     print(currentLatitude);
     print(pickupLatitude);
@@ -182,6 +201,7 @@ bookid= prefs.getString('bookingid')??'';
       );
     }
   }
+
   late GoogleMapController _mapController;
   @override
   Widget build(BuildContext context) {
@@ -356,11 +376,9 @@ bookid= prefs.getString('bookingid')??'';
                             children: [
                               Container(
                                 width: MediaQuery.sizeOf(context).width * 1.0,
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.4,
+                                height: MediaQuery.sizeOf(context).height * 0.4,
                                 decoration: BoxDecoration(
-                                  color:
-                                  FlutterFlowTheme.of(context)
+                                  color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
                                 ),
                                 child: Column(
@@ -646,9 +664,13 @@ bookid= prefs.getString('bookingid')??'';
                                           ),
                                         ],
                                       ),
-                                    ),SizedBox(height: 10,),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Padding(
-                                      padding:  EdgeInsets.only(left:20,right: 20),
+                                      padding:
+                                          EdgeInsets.only(left: 20, right: 20),
                                       child: SwipeButton(
                                         thumbPadding: EdgeInsets.all(3),
                                         thumb: Icon(
@@ -789,7 +811,11 @@ bookid= prefs.getString('bookingid')??'';
                                               isRideStarted = false;
                                               isWaiting = false;
                                             } else if (isWaiting) {
-                                                checkDriverProximity(currentLatitude,currentLongitude,pickupLat,pickupLng);
+                                              checkDriverProximity(
+                                                  currentLatitude,
+                                                  currentLongitude,
+                                                  pickupLat,
+                                                  pickupLng);
                                             } else {
                                               waitingPassanger();
                                               isWaiting = true;
@@ -914,7 +940,6 @@ bookid= prefs.getString('bookingid')??'';
           if (encodedPolyline != null) {
             _polylineCoordinates = decodePolyline(encodedPolyline)!;
 
-
             markers.add(
               Marker(
                 markerId: MarkerId('origin'),
@@ -971,7 +996,6 @@ bookid= prefs.getString('bookingid')??'';
       double latitude = lat / 1E5;
       double longitude = lng / 1E5;
       points.add(LatLng(latitude, longitude));
-
     }
     return points;
   }
@@ -980,7 +1004,6 @@ bookid= prefs.getString('bookingid')??'';
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
-
 
       if (dId == null) {
         print('d_id not found in shared preferences.');
@@ -997,7 +1020,6 @@ bookid= prefs.getString('bookingid')??'';
 
       if (response.statusCode == 200) {
         print(await response.stream.bytesToString());
-
       } else {
         print(response.reasonPhrase);
       }
@@ -1012,7 +1034,6 @@ bookid= prefs.getString('bookingid')??'';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
 
-
       if (dId == null) {
         print('d_id not found in shared preferences.');
       }
@@ -1026,7 +1047,6 @@ bookid= prefs.getString('bookingid')??'';
 
       if (response.statusCode == 200) {
         print(await response.stream.bytesToString());
-
       } else {
         print(response.reasonPhrase);
       }
@@ -1045,7 +1065,6 @@ bookid= prefs.getString('bookingid')??'';
         _currentPosition = position;
         currentLatitude = position.latitude;
         currentLongitude = position.longitude;
-
       });
     } catch (e) {
       print("Error getting current location: $e");
@@ -1090,7 +1109,7 @@ bookid= prefs.getString('bookingid')??'';
       Polyline(
         polylineId: PolylineId('1'),
         points: latLen,
-        color: FlutterFlowTheme.of(context).primary,
+        color: FlutterFlowTheme.of(context as BuildContext).primary,
         // Colors.deepOrange,
       ),
     );
