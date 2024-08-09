@@ -607,18 +607,14 @@ class Alarts {
                                             ),
                                             FFButtonWidget(
                                               onPressed: () async {
-                                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                prefs.setBool('visiblecontainer', true);
+                                                // SharedPreferences prefs = await SharedPreferences.getInstance();
+                                                // prefs.setBool('visiblecontainer', true);
 
                                                 // Call acceptJob function
                                                 await acceptJob('${jobItem.jobId}', closeOverlay);
-
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=> NavBarPage(page:HomeWidget(),))
                                                 // Navigate to NavBarPage with index 0
-                                                Navigator.of(context).pushAndRemoveUntil(
-                                                  MaterialPageRoute(
-                                                    builder: (context) => NavBarPage(page:HomeWidget(),), // Set initialPage to 0
-                                                  ),
-                                                      (Route<dynamic> route) => false, // Remove all previous routes
+
                                                 );
                                               },
                                               text: 'Accept',

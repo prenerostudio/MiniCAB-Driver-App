@@ -1,8 +1,10 @@
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_directions_api/google_directions_api.dart';
+import 'package:mini_cab/main.dart';
 
 import '../Model/jobDetails.dart';
+import '../home/home_widget.dart';
 import '/components/upcommingjob_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -196,7 +198,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
                 size: 30,
               ),
               onPressed: () async {
-                context.pop();
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> NavBarPage(page:HomeWidget(),)));
               },
             ),
             title: Text(

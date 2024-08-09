@@ -116,32 +116,38 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     });
   }
 String jobId='';
-  statuscheck(String jobid) async {
-    final response = await http.post(Uri.parse(
-        'https://www.minicaboffice.com/api/driver/check-job-status.php'));
-    print('statusresponse  ${response.statusCode}');
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body.toString());
-      print('joooooobiddddd ${widget.jobid}');
-      if (data['status'] == false) {
-        Fluttertoast.showToast(
-          msg: data['message'],
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-        );
-        Navigator.push(
-            context as BuildContext,
-            MaterialPageRoute(
-                builder: (context) => NavBarPage(
-                  page: HomeWidget(),
-                )));
-      }
-      Apitimer?.cancel();
+  // statuscheck(String jobid) async {
+  //   final response = await http.post(Uri.parse(
+  //       'https://www.minicaboffice.com/api/driver/check-job-status.php'));
+  //   print('statusresponse  ${response.statusCode}');
+  //   if (response.statusCode == 200) {
+  //     var data = jsonDecode(response.body.toString());
+  //     print('joooooobiddddd ${widget.jobid}');
+  //     if (data['status'] == false) {
+  //       Fluttertoast.showToast(
+  //         msg: data['message'],
+  //         toastLength: Toast.LENGTH_LONG,
+  //         gravity: ToastGravity.BOTTOM,
+  //       );
+  //       Navigator.push(
+  //           context as BuildContext,
+  //           MaterialPageRoute(
+  //               builder: (context) => NavBarPage(
+  //                 page: HomeWidget(),
+  //               )));
+  //     }
+  //     Apitimer?.cancel();
+  //
+  //
+  //
+  //   }
+  // }
 
 
 
-    }
-  }
+
+
+
 
   @override
   void initState() {
@@ -160,10 +166,10 @@ String jobId='';
         await SharedPreferences.getInstance() as SharedPreferences;
 
     jobId=widget.jobid.toString();
-    Apitimer = Timer.periodic(Duration(seconds: 3), (timer) {
-      statuscheck(jobId);
-
-    });
+    // Apitimer = Timer.periodic(Duration(seconds: 3), (timer) {
+    //   statuscheck(jobId);
+    //
+    // });
 
 
 
@@ -246,7 +252,7 @@ String jobId='';
               children: [
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.sizeOf(context).height * 0.85,
+                  height: MediaQuery.sizeOf(context).height * 0.80,
                   decoration: BoxDecoration(
                     color: FlutterFlowTheme.of(context).secondaryBackground,
                   ),
@@ -371,514 +377,517 @@ String jobId='';
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 0.0, 0.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Container(
-                                width: MediaQuery.sizeOf(context).width * 1.0,
-                                height: MediaQuery.sizeOf(context).height * 0.4,
-                                decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 1.0,
+                            height: MediaQuery.sizeOf(context).height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context)
+                                  .secondaryBackground,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Wrap(
                                   children: [
-                                    Wrap(
-                                      children: [
-                                        Row(
-                                          mainAxisSize: MainAxisSize
-                                              .min, // Set this to MainAxisSize.min
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
-                                                      10.0, 10.0, 0.0, 0.0),
-                                              child: Icon(
-                                                Icons.pin_drop_outlined,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                size: 25,
-                                              ),
-                                            ),
-                                            Flexible(
-                                              child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        10.0, 10.0, 0.0, 20.0),
-                                                child: Text(
-                                                  '${widget.pickup}',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        fontSize: 20.0,
-                                                        letterSpacing: 1.5,
-                                                      ),
-                                                  overflow: TextOverflow
-                                                      .ellipsis, // Handle text overflow with ellipsis
-                                                  maxLines:
-                                                      3, // Limit to a maximum of 2 lines
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
                                     Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Set this to MainAxisSize.min
                                       children: [
                                         Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  10, 0, 5, 0),
+                                          padding: EdgeInsetsDirectional
+                                              .fromSTEB(
+                                                  10.0, 10.0, 0.0, 0.0),
                                           child: Icon(
-                                            Icons.access_time_filled_rounded,
-                                            color: Color(0xFF5B68F5),
-                                            size: 20,
+                                            Icons.pin_drop_outlined,
+                                            color:
+                                                FlutterFlowTheme.of(context)
+                                                    .primary,
+                                            size: 25,
                                           ),
                                         ),
-                                        Text(
-                                          '${widget.pickTime}',
-                                          style: FlutterFlowTheme.of(context)
-                                              .titleLarge
-                                              .override(
-                                                fontFamily: 'Open Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                fontSize: 20,
-                                              ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  10, 0, 5, 0),
-                                          child: FaIcon(
-                                            FontAwesomeIcons.calendar,
-                                            size: 21,
-                                            color: Color(0xFF5B68F5),
+                                        Flexible(
+                                          child: Padding(
+                                            padding: EdgeInsetsDirectional
+                                                .fromSTEB(
+                                                    10.0, 10.0, 0.0, 20.0),
+                                            child: Text(
+                                              '${widget.pickup}',
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .labelMedium
+                                                  .override(
+                                                    fontFamily:
+                                                        'Readex Pro',
+                                                    color:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .secondaryText,
+                                                    fontSize: 20.0,
+                                                    letterSpacing: 1.5,
+                                                  ),
+                                              overflow: TextOverflow
+                                                  .ellipsis, // Handle text overflow with ellipsis
+                                              maxLines:
+                                                  3, // Limit to a maximum of 2 lines
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '${widget.pickDate}',
-                                          style: FlutterFlowTheme.of(context)
-                                              .titleLarge
-                                              .override(
-                                                fontFamily: 'Open Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                fontSize: 20,
-                                              ),
                                         ),
                                       ],
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0, 8, 0, 0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    10, 0, 5, 0),
-                                            child: Icon(
-                                              Icons.luggage_outlined,
-                                              color: Color(0xFF5B68F5),
-                                              size: 20,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${widget.luggage ?? '0'}',
-                                            style: FlutterFlowTheme.of(context)
-                                                .titleLarge
-                                                .override(
-                                                  fontFamily: 'Open Sans',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primaryText,
-                                                  fontSize: 20,
-                                                ),
-                                          ),
-                                          SizedBox(
-                                            height: 25,
-                                            child: VerticalDivider(
-                                              width: 40,
-                                              thickness: 3,
-                                              color: Color(0xFF5B68F5),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    20, 0, 5, 0),
-                                            child: FaIcon(
-                                              FontAwesomeIcons.userFriends,
-                                              color: Color(0xFF5B68F5),
-                                              size: 18,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${widget.passenger}',
-                                            style: FlutterFlowTheme.of(context)
-                                                .titleLarge
-                                                .override(
-                                                  fontFamily: 'Open Sans',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primaryText,
-                                                  fontSize: 20,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          10, 10, 10, 0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          FlutterFlowIconButton(
-                                            borderColor: Color(0xFF5B68F5),
-                                            borderWidth: 1,
-                                            buttonSize: 48,
-                                            fillColor: Color(0xFF5B68F5),
-                                            icon: FaIcon(
-                                              FontAwesomeIcons.ellipsisH,
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
-                                              size: 24,
-                                            ),
-                                            onPressed: () async {
-                                              await showModalBottomSheet(
-                                                isScrollControlled: true,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                enableDrag: false,
-                                                context: context,
-                                                builder: (context) {
-                                                  return Padding(
-                                                    padding:
-                                                        MediaQuery.viewInsetsOf(
-                                                            context),
-                                                    child: WaydetailsWidget(
-                                                      time:
-                                                          '${widget.pickTime}',
-                                                      date:
-                                                          '${widget.pickDate}',
-                                                      passanger:
-                                                          '${widget.passenger}',
-                                                      cName: '${widget.cName}',
-                                                      cnumber:
-                                                          '${widget.cnumber}',
-                                                      cemail:
-                                                          '${widget.cemail}',
-                                                      luggage:
-                                                          '${widget.luggage}',
-                                                      pickup:
-                                                          '${widget.pickup}',
-                                                      dropoff:
-                                                          '${widget.dropoff}',
-                                                      cNote: '${widget.note}',
-                                                    ),
-                                                  );
-                                                },
-                                              ).then((value) =>
-                                                  safeSetState(() {}));
-                                            },
-                                          ),
-                                          FFButtonWidget(
-                                            onPressed: () async {
-                                              await showModalBottomSheet(
-                                                isScrollControlled: true,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                enableDrag: false,
-                                                context: context,
-                                                builder: (context) {
-                                                  return Padding(
-                                                    padding:
-                                                        MediaQuery.viewInsetsOf(
-                                                            context),
-                                                    child: ClientnotesWidget(
-                                                      name: '${widget.cName}',
-                                                      notes: '${widget.note}',
-                                                    ),
-                                                  );
-                                                },
-                                              ).then((value) =>
-                                                  safeSetState(() {}));
-                                            },
-                                            text: 'VIEW NOTE',
-                                            icon: FaIcon(
-                                              FontAwesomeIcons.infoCircle,
-                                              size: 21,
-                                            ),
-                                            options: FFButtonOptions(
-                                              width: MediaQuery.sizeOf(context)
-                                                      .width *
-                                                  0.4,
-                                              height: 45,
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(24, 0, 24, 0),
-                                              iconPadding: EdgeInsetsDirectional
-                                                  .fromSTEB(0, 0, 0, 0),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                              textStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleSmall
-                                                      .override(
-                                                        fontFamily: 'Open Sans',
-                                                        color: Colors.white,
-                                                      ),
-                                              elevation: 3,
-                                              borderSide: BorderSide(
-                                                color: Colors.transparent,
-                                                width: 1,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 20, right: 20),
-                                      child: SwipeButton(
-                                        thumbPadding: EdgeInsets.all(3),
-                                        thumb: Icon(
-                                          Icons.chevron_right,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                        ),
-                                        elevationThumb: 2,
-                                        elevationTrack: 2,
-                                        activeThumbColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primaryBackground,
-                                        activeTrackColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primary,
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Text(
-                                          isRideStarted
-                                              ? 'POB'
-                                              : (isWaiting
-                                                      ? 'Arrival Now'
-                                                      : 'Way to Pickup')
-                                                  .toUpperCase(),
-                                          style: TextStyle(
-                                            color: FlutterFlowTheme.of(context)
-                                                .primaryBackground,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        onSwipe: () {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(isRideStarted
-                                                  ? 'POB'
-                                                  : (isWaiting
-                                                      ? 'Arrival Now'
-                                                      : 'Way to Pickup')),
-                                              backgroundColor:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                            ),
-                                          );
-                                        },
-                                        onSwipeEnd: () {
-                                          setState(() async {
-                                            if (isRideStarted) {
-                                              var request = http.MultipartRequest(
-                                                  'POST',
-                                                  Uri.parse(
-                                                      'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
-                                              request.fields.addAll({
-                                                'd_id': '${widget.did}',
-                                                'job_id': '${widget.jobid}',
-                                                'waiting_time':
-                                                    '${_model.timerValue.toString()}'
-                                              });
-
-                                              try {
-                                                http.StreamedResponse response =
-                                                    await request.send();
-
-                                                if (response.statusCode ==
-                                                    200) {
-                                                  print(await response.stream
-                                                      .bytesToString());
-                                                } else {
-                                                  print(
-                                                      'Error: ${response.reasonPhrase}');
-                                                }
-                                              } catch (e) {
-                                                print('Exception occurred: $e');
-                                              }
-                                              _model.timerController
-                                                  .onStopTimer();
-                                              context.pushNamed(
-                                                'Pob',
-                                                queryParameters: {
-                                                  'did': serializeParam(
-                                                    '${widget.did}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'jobid': serializeParam(
-                                                    '${widget.jobid}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'pickup': serializeParam(
-                                                    '${widget.pickup}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'dropoff': serializeParam(
-                                                    '${widget.dropoff}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cName': serializeParam(
-                                                    '${widget.cName}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'fare': serializeParam(
-                                                    '${widget.fare}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'distance': serializeParam(
-                                                    '${widget.distance}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'note': serializeParam(
-                                                    '${widget.note}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'pickTime': serializeParam(
-                                                    '${widget.pickTime}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'pickDate': serializeParam(
-                                                    '${widget.pickDate}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'passenger': serializeParam(
-                                                    '${widget.passenger}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'luggage': serializeParam(
-                                                    '${widget.luggage}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cnumber': serializeParam(
-                                                    '${widget.cnumber}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cemail': serializeParam(
-                                                    '${widget.cemail}',
-                                                    ParamType.String,
-                                                  ),
-                                                }.withoutNulls,
-                                              );
-                                              isRideStarted = false;
-                                              isWaiting = false;
-                                            } else if (isWaiting) {
-                                              checkDriverProximity(
-                                                  currentLatitude,
-                                                  currentLongitude,
-                                                  pickupLat,
-                                                  pickupLng);
-                                            } else {
-                                              waitingPassanger();
-                                              isWaiting = true;
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: Text(
-                                                        'Choose Map Option'),
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        ListTile(
-                                                          leading: SizedBox(
-                                                            width: 25,
-                                                            height: 25,
-                                                            child: Image.asset(
-                                                                'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
-                                                          ),
-                                                          title: Text(
-                                                              'Open in Google Maps'),
-                                                          onTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                            MapUtils.navigateTo(
-                                                                pickupLat,
-                                                                pickupLng);
-                                                          },
-                                                        ),
-                                                        ListTile(
-                                                          leading: SizedBox(
-                                                            width: 25,
-                                                            height: 25,
-                                                            child: Image.asset(
-                                                                'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
-                                                          ),
-                                                          title:
-                                                              Text('Using App'),
-                                                          onTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              );
-                                            }
-                                          });
-                                        },
-                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsetsDirectional.fromSTEB(
+                                              10, 0, 5, 0),
+                                      child: Icon(
+                                        Icons.access_time_filled_rounded,
+                                        color: Color(0xFF5B68F5),
+                                        size: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${widget.pickTime}',
+                                      style: FlutterFlowTheme.of(context)
+                                          .titleLarge
+                                          .override(
+                                            fontFamily: 'Open Sans',
+                                            color:
+                                                FlutterFlowTheme.of(context)
+                                                    .primaryText,
+                                            fontSize: 20,
+                                          ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsetsDirectional.fromSTEB(
+                                              10, 0, 5, 0),
+                                      child: FaIcon(
+                                        FontAwesomeIcons.calendar,
+                                        size: 21,
+                                        color: Color(0xFF5B68F5),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${widget.pickDate}',
+                                      style: FlutterFlowTheme.of(context)
+                                          .titleLarge
+                                          .override(
+                                            fontFamily: 'Open Sans',
+                                            color:
+                                                FlutterFlowTheme.of(context)
+                                                    .primaryText,
+                                            fontSize: 20,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0, 8, 0, 0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                10, 0, 5, 0),
+                                        child: Icon(
+                                          Icons.luggage_outlined,
+                                          color: Color(0xFF5B68F5),
+                                          size: 20,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${widget.luggage ?? '0'}',
+                                        style: FlutterFlowTheme.of(context)
+                                            .titleLarge
+                                            .override(
+                                              fontFamily: 'Open Sans',
+                                              color: FlutterFlowTheme.of(
+                                                      context)
+                                                  .primaryText,
+                                              fontSize: 20,
+                                            ),
+                                      ),
+                                      SizedBox(
+                                        height: 25,
+                                        child: VerticalDivider(
+                                          width: 40,
+                                          thickness: 3,
+                                          color: Color(0xFF5B68F5),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                20, 0, 5, 0),
+                                        child: FaIcon(
+                                          FontAwesomeIcons.userFriends,
+                                          color: Color(0xFF5B68F5),
+                                          size: 18,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${widget.passenger}',
+                                        style: FlutterFlowTheme.of(context)
+                                            .titleLarge
+                                            .override(
+                                              fontFamily: 'Open Sans',
+                                              color: FlutterFlowTheme.of(
+                                                      context)
+                                                  .primaryText,
+                                              fontSize: 20,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      10, 10, 10,60),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      FlutterFlowIconButton(
+                                        borderColor: Color(0xFF5B68F5),
+                                        borderWidth: 1,
+                                        buttonSize: 48,
+                                        fillColor: Color(0xFF5B68F5),
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.ellipsisH,
+                                          color:
+                                              FlutterFlowTheme.of(context)
+                                                  .secondaryBackground,
+                                          size: 24,
+                                        ),
+                                        onPressed: () async {
+                                          await showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            backgroundColor:
+                                                Colors.transparent,
+                                            enableDrag: false,
+                                            context: context,
+                                            builder: (context) {
+                                              return Padding(
+                                                padding:
+                                                    MediaQuery.viewInsetsOf(
+                                                        context),
+                                                child: WaydetailsWidget(
+                                                  time:
+                                                      '${widget.pickTime}',
+                                                  date:
+                                                      '${widget.pickDate}',
+                                                  passanger:
+                                                      '${widget.passenger}',
+                                                  cName: '${widget.cName}',
+                                                  cnumber:
+                                                      '${widget.cnumber}',
+                                                  cemail:
+                                                      '${widget.cemail}',
+                                                  luggage:
+                                                      '${widget.luggage}',
+                                                  pickup:
+                                                      '${widget.pickup}',
+                                                  dropoff:
+                                                      '${widget.dropoff}',
+                                                  cNote: '${widget.note}',
+                                                ),
+                                              );
+                                            },
+                                          ).then((value) =>
+                                              safeSetState(() {}));
+                                        },
+                                      ),
+                                      FFButtonWidget(
+                                        onPressed: () async {
+                                          await showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            backgroundColor:
+                                                Colors.transparent,
+                                            enableDrag: false,
+                                            context: context,
+                                            builder: (context) {
+                                              return Padding(
+                                                padding:
+                                                    MediaQuery.viewInsetsOf(
+                                                        context),
+                                                child: ClientnotesWidget(
+                                                  name: '${widget.cName}',
+                                                  notes: '${widget.note}',
+                                                ),
+                                              );
+                                            },
+                                          ).then((value) =>
+                                              safeSetState(() {}));
+                                        },
+                                        text: 'VIEW NOTE',
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.infoCircle,
+                                          size: 21,
+                                        ),
+                                        options: FFButtonOptions(
+                                          width: MediaQuery.sizeOf(context)
+                                                  .width *
+                                              0.4,
+                                          height: 45,
+                                          padding: EdgeInsetsDirectional
+                                              .fromSTEB(24, 0, 24, 0),
+                                          iconPadding: EdgeInsetsDirectional
+                                              .fromSTEB(0, 0, 0, 0),
+                                          color:
+                                              FlutterFlowTheme.of(context)
+                                                  .primary,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Open Sans',
+                                                    color: Colors.white,
+                                                  ),
+                                          elevation: 3,
+                                          borderSide: BorderSide(
+                                            color: Colors.transparent,
+                                            width: 1,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ],
+                  ),
+                ),Positioned(bottom: 0,
+                  child: Padding(
+                      padding: const EdgeInsets.only(bottom: 18.0),
+                      child:
+                      SwipeButton(
+                        thumbPadding: EdgeInsets.all(3),
+                        thumb: Icon(
+                          Icons.chevron_right,
+                          color: FlutterFlowTheme.of(context)
+                              .primary,
+                        ),
+                        elevationThumb: 2,
+                        elevationTrack: 2,
+                        activeThumbColor:
+                        FlutterFlowTheme.of(context)
+                            .primaryBackground,
+                        activeTrackColor:
+                        FlutterFlowTheme.of(context)
+                            .primary,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Text(
+                          isRideStarted
+                              ? 'POB'
+                              : (isWaiting
+                              ? 'Arrival Now'
+                              : 'Way to Pickup')
+                              .toUpperCase(),
+                          style: TextStyle(
+                            color: FlutterFlowTheme.of(context)
+                                .primaryBackground,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onSwipe: () {setState(() {
+
+                        });
+                        print('ststs');
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(
+                          SnackBar(
+                            content: Text(isRideStarted
+                                ? 'POB'
+                                : (isWaiting
+                                ? 'Arrival Now'
+                                : 'Way to Pickup')),
+                            backgroundColor:
+                            FlutterFlowTheme.of(context)
+                                .primary,
+                          ),
+                        );
+                        },
+                        onSwipeEnd: () {
+                          setState(() async {
+                            if (isRideStarted) {
+                              var request = http.MultipartRequest(
+                                  'POST',
+                                  Uri.parse(
+                                      'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
+                              request.fields.addAll({
+                                'd_id': '${widget.did}',
+                                'job_id': '${widget.jobid}',
+                                'waiting_time':
+                                '${_model.timerValue.toString()}'
+                              });
+
+                              try {
+                                http.StreamedResponse response =
+                                await request.send();
+
+                                if (response.statusCode ==
+                                    200) {
+                                  print(await response.stream
+                                      .bytesToString());
+                                } else {
+                                  print(
+                                      'Error: ${response.reasonPhrase}');
+                                }
+                              } catch (e) {
+                                print('Exception occurred: $e');
+                              }
+                              _model.timerController
+                                  .onStopTimer();
+                              context.pushNamed(
+                                'Pob',
+                                queryParameters: {
+                                  'did': serializeParam(
+                                    '${widget.did}',
+                                    ParamType.String,
+                                  ),
+                                  'jobid': serializeParam(
+                                    '${widget.jobid}',
+                                    ParamType.String,
+                                  ),
+                                  'pickup': serializeParam(
+                                    '${widget.pickup}',
+                                    ParamType.String,
+                                  ),
+                                  'dropoff': serializeParam(
+                                    '${widget.dropoff}',
+                                    ParamType.String,
+                                  ),
+                                  'cName': serializeParam(
+                                    '${widget.cName}',
+                                    ParamType.String,
+                                  ),
+                                  'fare': serializeParam(
+                                    '${widget.fare}',
+                                    ParamType.String,
+                                  ),
+                                  'distance': serializeParam(
+                                    '${widget.distance}',
+                                    ParamType.String,
+                                  ),
+                                  'note': serializeParam(
+                                    '${widget.note}',
+                                    ParamType.String,
+                                  ),
+                                  'pickTime': serializeParam(
+                                    '${widget.pickTime}',
+                                    ParamType.String,
+                                  ),
+                                  'pickDate': serializeParam(
+                                    '${widget.pickDate}',
+                                    ParamType.String,
+                                  ),
+                                  'passenger': serializeParam(
+                                    '${widget.passenger}',
+                                    ParamType.String,
+                                  ),
+                                  'luggage': serializeParam(
+                                    '${widget.luggage}',
+                                    ParamType.String,
+                                  ),
+                                  'cnumber': serializeParam(
+                                    '${widget.cnumber}',
+                                    ParamType.String,
+                                  ),
+                                  'cemail': serializeParam(
+                                    '${widget.cemail}',
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,
+                              );
+                              isRideStarted = false;
+                              isWaiting = false;
+                            }
+                            else if (isWaiting) {
+                              checkDriverProximity(
+                                  currentLatitude,
+                                  currentLongitude,
+                                  pickupLat,
+                                  pickupLng);
+                            }
+                            else {
+                              waitingPassanger();
+                              isWaiting = true;
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(
+                                        'Choose Map Option'),
+                                    content: Column(
+                                      mainAxisSize:
+                                      MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          leading: SizedBox(
+                                            width: 25,
+                                            height: 25,
+                                            child: Image.asset(
+                                                'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
+                                          ),
+                                          title: Text(
+                                              'Open in Google Maps'),
+                                          onTap: () {
+                                            Navigator.pop(
+                                                context);
+                                            MapUtils.navigateTo(
+                                                pickupLat,
+                                                pickupLng);
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: SizedBox(
+                                            width: 25,
+                                            height: 25,
+                                            child: Image.asset(
+                                                'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
+                                          ),
+
+                                          title:
+                                          Text('Using App'),
+                                          onTap: () {
+                                            Navigator.pop(
+                                                context);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          });
+                        },
+                      ),
+
+
                   ),
                 ),
               ],
@@ -1144,5 +1153,70 @@ String jobId='';
     } else {
       print('HTTP Request Error: ${response.statusCode}');
     }
+  }
+}
+
+
+class JobDetailsScreen extends StatefulWidget {
+  final String jobId;
+
+  JobDetailsScreen({required this.jobId});
+
+  @override
+  _JobDetailsScreenState createState() => _JobDetailsScreenState();
+}
+
+class _JobDetailsScreenState extends State<JobDetailsScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    fetchJobDetails();
+  }
+
+  Future<void> fetchJobDetails() async {
+    final response = await http.post(
+      Uri.parse('https://www.minicaboffice.com/api/driver/check-job-status.php'),
+      body: {'job_id': widget.jobId},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == false && data['notification'] != null) {
+        _showInAppNotification(data['notification']);
+      } else {
+        // Handle the job details as normal
+      }
+    } else {
+      // Handle the error
+    }
+  }
+
+  void _showInAppNotification(Map<String, dynamic> notification) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(notification['title']),
+        content: Text(notification['message']),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Job Details'),
+      ),
+      body: Center(
+        child: Text('Loading job details...'),
+      ),
+    );
   }
 }
