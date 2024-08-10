@@ -86,6 +86,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
+
   Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   late CameraPosition _kGoogle;
   late Timer _locationTimer;
@@ -152,6 +153,7 @@ String jobId='';
   @override
   void initState() {
     super.initState();
+
     recive_jobidid;
     wayToPickup();
 
@@ -170,17 +172,17 @@ String jobId='';
     //   statuscheck(jobId);
     //
     // });
-
-
-
-
     setState(() {});
   }
+
+
+
 
   String job = '';
 
   @override
   void dispose() {
+
     Apitimer?.cancel();
     _model.dispose();
 
