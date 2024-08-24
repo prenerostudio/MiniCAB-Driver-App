@@ -1,7 +1,11 @@
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:mini_cab/Data/links.dart';
 import 'package:mini_cab/components/customer_details_widget.dart';
+import 'package:mini_cab/home/home_view_controller.dart';
+import 'package:mini_cab/home/timer_class.dart';
+import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,38 +37,23 @@ import 'dart:convert';
 import 'package:google_directions_api/google_directions_api.dart';
 
 class OnWayWidget extends StatefulWidget {
-  const OnWayWidget({
+  OnWayWidget({
     Key? key,
-    required this.did,
-    required this.jobid,
-    required this.pickup,
-    required this.dropoff,
-    required this.cName,
-    required this.fare,
-    required this.distance,
-    required this.note,
-    required this.pickTime,
-    required this.pickDate,
-    required this.passenger,
-    required this.luggage,
-    required this.cnumber,
-    required this.cemail,
+    // this.did,
+    // this.jobid = '',
+    // this.pickup = '',
+    // this.dropoff = '',
+    // this.cName = '',
+    // this.fare = '',
+    // this.distance = '',
+    // this.note = '',
+    // this.pickTime = '',
+    // this.pickDate = '',
+    // this.passenger = '',
+    // this.luggage = '',
+    // this.cnumber = '',
+    // this.cemail = '',
   }) : super(key: key);
-
-  final String? did;
-  final String jobid;
-  final String? pickup;
-  final String? dropoff;
-  final String? cName;
-  final String? fare;
-  final String? distance;
-  final String? note;
-  final String? pickTime;
-  final String? pickDate;
-  final String? passenger;
-  final String? luggage;
-  final String? cnumber;
-  final String? cemail;
 
   @override
   _OnWayWidgetState createState() => _OnWayWidgetState();
@@ -72,11 +61,25 @@ class OnWayWidget extends StatefulWidget {
 
 class _OnWayWidgetState extends State<OnWayWidget> {
   late OnWayModel _model;
-  late double pickupLat;
-  late double pickupLng;
+  double pickupLat = 0.0;
+  double pickupLng = 0.0;
   late double currentLatitude;
   late double currentLongitude;
 
+  String? did;
+  String? jobid;
+  String? pickup;
+  String? dropoff;
+  String? cName;
+  String? fare;
+  String? distance;
+  String? note;
+  String? pickTime;
+  String? pickDate;
+  String? passenger;
+  String? luggage;
+  String? cnumber;
+  String? cemail;
   late PolylinePoints polylinePoints;
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
@@ -85,7 +88,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   List<LatLng> _polylineCoordinates = [];
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
 
   Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   late CameraPosition _kGoogle;
@@ -116,7 +118,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       }
     });
   }
-String jobId='';
+
+  String jobId = '';
   // statuscheck(String jobid) async {
   //   final response = await http.post(Uri.parse(
   //       'https://www.minicaboffice.com/api/driver/check-job-status.php'));
@@ -144,30 +147,83 @@ String jobId='';
   //   }
   // }
 
-
-
-
-
-
-
+  final JobController myController = Get.put(JobController());
+  TimerClass timerclass = TimerClass();
   @override
   void initState() {
     super.initState();
-
+    loadata().then((s) {});
+    startJobStatusTimer();
+    pushercallbg();
     recive_jobidid;
     wayToPickup();
-
+    jobStatus();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _setupMarkersAndPolylines();
     _model = createModel(context as BuildContext, () => OnWayModel());
   }
 
+  void startJobStatusTimer() {
+    // Ensure the timer is only started once
+
+    myController.timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      print('the timer is ');
+      jobStatus();
+    });
+    // if (_timer == null || !_timer!.isActive) {
+
+    // }
+  }
+
+  Future loadata() async {
+    // myController.jobDetails();
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    isWaiting = sp.getBool('isWaitingTrue') ?? false;
+    setState(() {});
+    // widget.did = sp.getString('did');
+    // widget.jobid = sp.getString('jobId');
+    // widget.pickup = sp.getString('pickup');
+    // widget.dropoff = sp.getString('destination');
+    // widget.cName = sp.getString('cName');
+    // widget.fare = sp.getString('journeyFare');
+    // widget.distance = sp.getString('journeyDistance');
+    // widget.note = sp.getString('note');
+    // widget.pickTime = sp.getString('pickTime');
+    // widget.pickDate = sp.getString('pickDate');
+    // widget.passenger = sp.getString('passenger');
+    // widget.luggage = sp.getString('laggage');
+    // widget.cnumber = sp.getString('cPhone');
+    // widget.cemail = sp.getString('cEmail');
+    await myController.acceptedJobDetails().then((value) {
+      if (value != null) {
+        print("after job details $value");
+        did = value.dId;
+        jobid = value.jobId;
+        pickup = value.pickup;
+        dropoff = value.destination;
+        cName = value.cName;
+        fare = value.journeyFare;
+        distance = value.journeyDistance;
+        note = value.note;
+        pickTime = value.pickTime;
+        pickDate = value.pickDate;
+        passenger = value.passenger;
+        luggage = value.luggage;
+        cnumber = value.cPhone;
+        cemail = value.cEmail;
+      } else {
+        print("No job details found.");
+        // Handle the null case, e.g., show an error message, redirect, etc.
+      }
+    });
+  }
+
   recive_jobidid() async {
     SharedPreferences prefs =
         await SharedPreferences.getInstance() as SharedPreferences;
 
-    jobId=widget.jobid.toString();
+    jobId = jobid.toString();
     // Apitimer = Timer.periodic(Duration(seconds: 3), (timer) {
     //   statuscheck(jobId);
     //
@@ -175,14 +231,10 @@ String jobId='';
     setState(() {});
   }
 
-
-
-
   String job = '';
 
   @override
   void dispose() {
-
     Apitimer?.cancel();
     _model.dispose();
 
@@ -204,13 +256,66 @@ String jobId='';
       _model.timerController.onStartTimer();
       print('Ride started');
     } else {
+      isRideStarted = true;
+      isWaiting = false;
+      _model.timerController.onStartTimer();
       Fluttertoast.showToast(
         msg: "You are not near the customer location",
       );
     }
   }
 
+  pushercallbg() async {
+    var pusher = PusherClient(
+      '28691ac9c0c5ac41b64a',
+      PusherOptions(
+        host: 'https://www.minicaboffice.com/api/driver/check-job-status.php',
+        cluster: 'ap2',
+        encrypted: false,
+      ),
+    );
+    pusher.connect();
+
+    var channel = pusher.subscribe('jobs-channel');
+
+    // Listen for new events
+    channel.bind('job-withdrawn', (event) {
+      Map<String, dynamic> jsonMap = json.decode(event!.data!);
+      jobStatus();
+      print('the order socket from backaground:${jsonMap['data']}');
+
+      // });
+    });
+  }
+
   late GoogleMapController _mapController;
+  Future<void> jobStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? dId = prefs.getString('d_id');
+    String? jobId = prefs.getString('jobId');
+    final response = await http.post(
+      Uri.parse(
+          'https://www.minicaboffice.com/api/driver/check-job-status.php'),
+      body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == false) {
+        print('the response is $data');
+        prefs.remove("isRideStart");
+        setState(() {});
+        myController.visiblecontainer.value = false;
+
+        context.pushNamed('Home');
+      } else {
+        // Handle the job details as normal
+      }
+    } else {
+      // Handle the error
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isiOS) {
@@ -221,6 +326,8 @@ String jobId='';
         ),
       );
     }
+
+    // loadata();
 
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
@@ -242,7 +349,14 @@ String jobId='';
                     fontSize: 22,
                   ),
             ),
-            actions: [],
+            actions: [
+              // TextButton(
+              //     onPressed: () {
+              //       jobStatus();
+              //       // loadata();
+              //     },
+              //     child: Text('Check job status'))
+            ],
             centerTitle: true,
             elevation: 2,
           ),
@@ -317,11 +431,13 @@ String jobId='';
                                           StopWatchTimer.getDisplayTime(value,
                                               milliSecond: false),
                                       controller: _model.timerController,
+                                      onEnded: () {},
                                       onChanged:
                                           (value, displayTime, shouldUpdate) {
                                         _model.timerMilliseconds = value;
                                         _model.timerValue = displayTime;
                                         if (shouldUpdate) setState(() {});
+                                        print(_model.timerValue);
                                       },
                                       textAlign: TextAlign.center,
                                       style: FlutterFlowTheme.of(context)
@@ -361,9 +477,9 @@ String jobId='';
                                         padding:
                                             MediaQuery.viewInsetsOf(context),
                                         child: CustomerDetailsWidget(
-                                          cname: '${widget.cName}',
-                                          cNumber: '${widget.cnumber}',
-                                          cemail: '${widget.cemail}',
+                                          cname: '${cName}',
+                                          cNumber: '${cnumber}',
+                                          cemail: '${cemail}',
                                         ),
                                       );
                                     },
@@ -398,34 +514,31 @@ String jobId='';
                                           .min, // Set this to MainAxisSize.min
                                       children: [
                                         Padding(
-                                          padding: EdgeInsetsDirectional
-                                              .fromSTEB(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
                                                   10.0, 10.0, 0.0, 0.0),
                                           child: Icon(
                                             Icons.pin_drop_outlined,
-                                            color:
-                                                FlutterFlowTheme.of(context)
-                                                    .primary,
+                                            color: FlutterFlowTheme.of(context)
+                                                .primary,
                                             size: 25,
                                           ),
                                         ),
                                         Flexible(
                                           child: Padding(
-                                            padding: EdgeInsetsDirectional
-                                                .fromSTEB(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
                                                     10.0, 10.0, 0.0, 20.0),
                                             child: Text(
-                                              '${widget.pickup}',
+                                              pickup ?? '--',
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .labelMedium
                                                   .override(
-                                                    fontFamily:
-                                                        'Readex Pro',
-                                                    color:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .secondaryText,
+                                                    fontFamily: 'Readex Pro',
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
                                                     fontSize: 20.0,
                                                     letterSpacing: 1.5,
                                                   ),
@@ -442,13 +555,11 @@ String jobId='';
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Padding(
-                                      padding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              10, 0, 5, 0),
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          10, 0, 5, 0),
                                       child: Icon(
                                         Icons.access_time_filled_rounded,
                                         color: Color(0xFF5B68F5),
@@ -456,21 +567,19 @@ String jobId='';
                                       ),
                                     ),
                                     Text(
-                                      '${widget.pickTime}',
+                                      pickTime ?? '--',
                                       style: FlutterFlowTheme.of(context)
                                           .titleLarge
                                           .override(
                                             fontFamily: 'Open Sans',
-                                            color:
-                                                FlutterFlowTheme.of(context)
-                                                    .primaryText,
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
                                             fontSize: 20,
                                           ),
                                     ),
                                     Padding(
-                                      padding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              10, 0, 5, 0),
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          10, 0, 5, 0),
                                       child: FaIcon(
                                         FontAwesomeIcons.calendar,
                                         size: 21,
@@ -478,14 +587,13 @@ String jobId='';
                                       ),
                                     ),
                                     Text(
-                                      '${widget.pickDate}',
+                                      pickDate ?? '--',
                                       style: FlutterFlowTheme.of(context)
                                           .titleLarge
                                           .override(
                                             fontFamily: 'Open Sans',
-                                            color:
-                                                FlutterFlowTheme.of(context)
-                                                    .primaryText,
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
                                             fontSize: 20,
                                           ),
                                     ),
@@ -496,13 +604,11 @@ String jobId='';
                                       0, 8, 0, 0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Padding(
-                                        padding:
-                                            EdgeInsetsDirectional.fromSTEB(
-                                                10, 0, 5, 0),
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            10, 0, 5, 0),
                                         child: Icon(
                                           Icons.luggage_outlined,
                                           color: Color(0xFF5B68F5),
@@ -510,14 +616,14 @@ String jobId='';
                                         ),
                                       ),
                                       Text(
-                                        '${widget.luggage ?? '0'}',
+                                        luggage ?? '0',
                                         style: FlutterFlowTheme.of(context)
                                             .titleLarge
                                             .override(
                                               fontFamily: 'Open Sans',
-                                              color: FlutterFlowTheme.of(
-                                                      context)
-                                                  .primaryText,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryText,
                                               fontSize: 20,
                                             ),
                                       ),
@@ -530,9 +636,8 @@ String jobId='';
                                         ),
                                       ),
                                       Padding(
-                                        padding:
-                                            EdgeInsetsDirectional.fromSTEB(
-                                                20, 0, 5, 0),
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            20, 0, 5, 0),
                                         child: FaIcon(
                                           FontAwesomeIcons.userFriends,
                                           color: Color(0xFF5B68F5),
@@ -540,14 +645,14 @@ String jobId='';
                                         ),
                                       ),
                                       Text(
-                                        '${widget.passenger}',
+                                        passenger ?? '--',
                                         style: FlutterFlowTheme.of(context)
                                             .titleLarge
                                             .override(
                                               fontFamily: 'Open Sans',
-                                              color: FlutterFlowTheme.of(
-                                                      context)
-                                                  .primaryText,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryText,
                                               fontSize: 20,
                                             ),
                                       ),
@@ -556,7 +661,7 @@ String jobId='';
                                 ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      10, 10, 10,60),
+                                      10, 10, 10, 60),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
@@ -569,16 +674,14 @@ String jobId='';
                                         fillColor: Color(0xFF5B68F5),
                                         icon: FaIcon(
                                           FontAwesomeIcons.ellipsisH,
-                                          color:
-                                              FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryBackground,
                                           size: 24,
                                         ),
                                         onPressed: () async {
                                           await showModalBottomSheet(
                                             isScrollControlled: true,
-                                            backgroundColor:
-                                                Colors.transparent,
+                                            backgroundColor: Colors.transparent,
                                             enableDrag: false,
                                             context: context,
                                             builder: (context) {
@@ -587,37 +690,28 @@ String jobId='';
                                                     MediaQuery.viewInsetsOf(
                                                         context),
                                                 child: WaydetailsWidget(
-                                                  time:
-                                                      '${widget.pickTime}',
-                                                  date:
-                                                      '${widget.pickDate}',
-                                                  passanger:
-                                                      '${widget.passenger}',
-                                                  cName: '${widget.cName}',
-                                                  cnumber:
-                                                      '${widget.cnumber}',
-                                                  cemail:
-                                                      '${widget.cemail}',
-                                                  luggage:
-                                                      '${widget.luggage}',
-                                                  pickup:
-                                                      '${widget.pickup}',
-                                                  dropoff:
-                                                      '${widget.dropoff}',
-                                                  cNote: '${widget.note}',
+                                                  time: '${pickTime}',
+                                                  date: '${pickDate}',
+                                                  passanger: '${passenger}',
+                                                  cName: '${cName}',
+                                                  cnumber: '${cnumber}',
+                                                  cemail: '${cemail}',
+                                                  luggage: '${luggage}',
+                                                  pickup: '${pickup}',
+                                                  dropoff: '${dropoff}',
+                                                  cNote: '${note}',
                                                 ),
                                               );
                                             },
-                                          ).then((value) =>
-                                              safeSetState(() {}));
+                                          ).then(
+                                              (value) => safeSetState(() {}));
                                         },
                                       ),
                                       FFButtonWidget(
                                         onPressed: () async {
                                           await showModalBottomSheet(
                                             isScrollControlled: true,
-                                            backgroundColor:
-                                                Colors.transparent,
+                                            backgroundColor: Colors.transparent,
                                             enableDrag: false,
                                             context: context,
                                             builder: (context) {
@@ -626,13 +720,13 @@ String jobId='';
                                                     MediaQuery.viewInsetsOf(
                                                         context),
                                                 child: ClientnotesWidget(
-                                                  name: '${widget.cName}',
-                                                  notes: '${widget.note}',
+                                                  name: '${cName}',
+                                                  notes: '${note}',
                                                 ),
                                               );
                                             },
-                                          ).then((value) =>
-                                              safeSetState(() {}));
+                                          ).then(
+                                              (value) => safeSetState(() {}));
                                         },
                                         text: 'VIEW NOTE',
                                         icon: FaIcon(
@@ -640,17 +734,18 @@ String jobId='';
                                           size: 21,
                                         ),
                                         options: FFButtonOptions(
-                                          width: MediaQuery.sizeOf(context)
-                                                  .width *
-                                              0.4,
+                                          width:
+                                              MediaQuery.sizeOf(context).width *
+                                                  0.4,
                                           height: 45,
-                                          padding: EdgeInsetsDirectional
-                                              .fromSTEB(24, 0, 24, 0),
-                                          iconPadding: EdgeInsetsDirectional
-                                              .fromSTEB(0, 0, 0, 0),
-                                          color:
-                                              FlutterFlowTheme.of(context)
-                                                  .primary,
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  24, 0, 24, 0),
+                                          iconPadding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 0, 0, 0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
                                           textStyle:
                                               FlutterFlowTheme.of(context)
                                                   .titleSmall
@@ -670,8 +765,6 @@ String jobId='';
                                     ],
                                   ),
                                 ),
-
-
                               ],
                             ),
                           ),
@@ -679,217 +772,185 @@ String jobId='';
                       ),
                     ],
                   ),
-                ),Positioned(bottom: 0,
-                  child: Padding(
-                      padding: const EdgeInsets.only(bottom: 18.0),
-                      child:
-                      SwipeButton(
-                        thumbPadding: EdgeInsets.all(3),
-                        thumb: Icon(
-                          Icons.chevron_right,
-                          color: FlutterFlowTheme.of(context)
-                              .primary,
-                        ),
-                        elevationThumb: 2,
-                        elevationTrack: 2,
-                        activeThumbColor:
-                        FlutterFlowTheme.of(context)
-                            .primaryBackground,
-                        activeTrackColor:
-                        FlutterFlowTheme.of(context)
-                            .primary,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Text(
-                          isRideStarted
-                              ? 'POB'
-                              : (isWaiting
-                              ? 'Arrival Now'
-                              : 'Way to Pickup')
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 18.0),
+                  child: SwipeButton(
+                    thumbPadding: EdgeInsets.all(3),
+                    thumb: Icon(
+                      Icons.chevron_right,
+                      color: FlutterFlowTheme.of(context).primary,
+                    ),
+                    elevationThumb: 2,
+                    elevationTrack: 2,
+                    activeThumbColor:
+                        FlutterFlowTheme.of(context).primaryBackground,
+                    activeTrackColor: FlutterFlowTheme.of(context).primary,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Text(
+                      isRideStarted
+                          ? 'POB'
+                          : (isWaiting ? 'Arrival Now' : 'Way to Pickup')
                               .toUpperCase(),
-                          style: TextStyle(
-                            color: FlutterFlowTheme.of(context)
-                                .primaryBackground,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onSwipe: () {setState(() {
-
-                        });
-                        print('ststs');
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                          SnackBar(
-                            content: Text(isRideStarted
-                                ? 'POB'
-                                : (isWaiting
-                                ? 'Arrival Now'
-                                : 'Way to Pickup')),
-                            backgroundColor:
-                            FlutterFlowTheme.of(context)
-                                .primary,
-                          ),
-                        );
-                        },
-                        onSwipeEnd: () {
-                          setState(() async {
-                            if (isRideStarted) {
-                              var request = http.MultipartRequest(
-                                  'POST',
-                                  Uri.parse(
-                                      'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
-                              request.fields.addAll({
-                                'd_id': '${widget.did}',
-                                'job_id': '${widget.jobid}',
-                                'waiting_time':
-                                '${_model.timerValue.toString()}'
-                              });
-
-                              try {
-                                http.StreamedResponse response =
-                                await request.send();
-
-                                if (response.statusCode ==
-                                    200) {
-                                  print(await response.stream
-                                      .bytesToString());
-                                } else {
-                                  print(
-                                      'Error: ${response.reasonPhrase}');
-                                }
-                              } catch (e) {
-                                print('Exception occurred: $e');
-                              }
-                              _model.timerController
-                                  .onStopTimer();
-                              context.pushNamed(
-                                'Pob',
-                                queryParameters: {
-                                  'did': serializeParam(
-                                    '${widget.did}',
-                                    ParamType.String,
-                                  ),
-                                  'jobid': serializeParam(
-                                    '${widget.jobid}',
-                                    ParamType.String,
-                                  ),
-                                  'pickup': serializeParam(
-                                    '${widget.pickup}',
-                                    ParamType.String,
-                                  ),
-                                  'dropoff': serializeParam(
-                                    '${widget.dropoff}',
-                                    ParamType.String,
-                                  ),
-                                  'cName': serializeParam(
-                                    '${widget.cName}',
-                                    ParamType.String,
-                                  ),
-                                  'fare': serializeParam(
-                                    '${widget.fare}',
-                                    ParamType.String,
-                                  ),
-                                  'distance': serializeParam(
-                                    '${widget.distance}',
-                                    ParamType.String,
-                                  ),
-                                  'note': serializeParam(
-                                    '${widget.note}',
-                                    ParamType.String,
-                                  ),
-                                  'pickTime': serializeParam(
-                                    '${widget.pickTime}',
-                                    ParamType.String,
-                                  ),
-                                  'pickDate': serializeParam(
-                                    '${widget.pickDate}',
-                                    ParamType.String,
-                                  ),
-                                  'passenger': serializeParam(
-                                    '${widget.passenger}',
-                                    ParamType.String,
-                                  ),
-                                  'luggage': serializeParam(
-                                    '${widget.luggage}',
-                                    ParamType.String,
-                                  ),
-                                  'cnumber': serializeParam(
-                                    '${widget.cnumber}',
-                                    ParamType.String,
-                                  ),
-                                  'cemail': serializeParam(
-                                    '${widget.cemail}',
-                                    ParamType.String,
-                                  ),
-                                }.withoutNulls,
-                              );
-                              isRideStarted = false;
-                              isWaiting = false;
-                            }
-                            else if (isWaiting) {
-                              checkDriverProximity(
-                                  currentLatitude,
-                                  currentLongitude,
-                                  pickupLat,
-                                  pickupLng);
-                            }
-                            else {
-                              waitingPassanger();
-                              isWaiting = true;
-                              showDialog(
-                                context: context,
-                                builder:
-                                    (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text(
-                                        'Choose Map Option'),
-                                    content: Column(
-                                      mainAxisSize:
-                                      MainAxisSize.min,
-                                      children: [
-                                        ListTile(
-                                          leading: SizedBox(
-                                            width: 25,
-                                            height: 25,
-                                            child: Image.asset(
-                                                'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
-                                          ),
-                                          title: Text(
-                                              'Open in Google Maps'),
-                                          onTap: () {
-                                            Navigator.pop(
-                                                context);
-                                            MapUtils.navigateTo(
-                                                pickupLat,
-                                                pickupLng);
-                                          },
-                                        ),
-                                        ListTile(
-                                          leading: SizedBox(
-                                            width: 25,
-                                            height: 25,
-                                            child: Image.asset(
-                                                'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
-                                          ),
-
-                                          title:
-                                          Text('Using App'),
-                                          onTap: () {
-                                            Navigator.pop(
-                                                context);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            }
-                          });
-                        },
+                      style: TextStyle(
+                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    onSwipe: () {
+                      setState(() {});
+                      print('ststs');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(isRideStarted
+                              ? 'POB'
+                              : (isWaiting ? 'Arrival Now' : 'Way to Pickup')),
+                          backgroundColor: FlutterFlowTheme.of(context).primary,
+                        ),
+                      );
+                    },
+                    onSwipeEnd: () async {
+                      SharedPreferences sp =
+                          await SharedPreferences.getInstance();
+                      setState(() {});
+                      if (isRideStarted) {
+                        var request = http.MultipartRequest(
+                            'POST',
+                            Uri.parse(
+                                'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
+                        request.fields.addAll({
+                          'd_id': '${did}',
+                          'job_id': '${jobid}',
+                          'waiting_time': _model.timerValue.toString()
+                        });
 
+                        try {
+                          http.StreamedResponse response = await request.send();
 
+                          if (response.statusCode == 200) {
+                            print(await response.stream.bytesToString());
+                          } else {
+                            print('Error: ${response.reasonPhrase}');
+                          }
+                        } catch (e) {
+                          print('Exception occurred: $e');
+                        }
+                        _model.timerController.onStopTimer();
+                        await sp.setString(
+                            'timerValue', _model.timerValue.toString());
+                        await sp.setInt('isRideStart', 2);
+                        context.pushNamed(
+                          'Pob',
+                          queryParameters: {
+                            'did': serializeParam(
+                              '${did}',
+                              ParamType.String,
+                            ),
+                            'jobid': serializeParam(
+                              '${jobid}',
+                              ParamType.String,
+                            ),
+                            'pickup': serializeParam(
+                              '${pickup}',
+                              ParamType.String,
+                            ),
+                            'dropoff': serializeParam(
+                              '${dropoff}',
+                              ParamType.String,
+                            ),
+                            'cName': serializeParam(
+                              '${cName}',
+                              ParamType.String,
+                            ),
+                            'fare': serializeParam(
+                              '${fare}',
+                              ParamType.String,
+                            ),
+                            'distance': serializeParam(
+                              '${distance}',
+                              ParamType.String,
+                            ),
+                            'note': serializeParam(
+                              '${note}',
+                              ParamType.String,
+                            ),
+                            'pickTime': serializeParam(
+                              '${pickTime}',
+                              ParamType.String,
+                            ),
+                            'pickDate': serializeParam(
+                              '${pickDate}',
+                              ParamType.String,
+                            ),
+                            'passenger': serializeParam(
+                              '${passenger}',
+                              ParamType.String,
+                            ),
+                            'luggage': serializeParam(
+                              '${luggage}',
+                              ParamType.String,
+                            ),
+                            'cnumber': serializeParam(
+                              '${cnumber}',
+                              ParamType.String,
+                            ),
+                            'cemail': serializeParam(
+                              '${cemail}',
+                              ParamType.String,
+                            ),
+                          }.withoutNulls,
+                        );
+                        isRideStarted = false;
+                        isWaiting = false;
+                      } else if (isWaiting) {
+                        checkDriverProximity(currentLatitude, currentLongitude,
+                            pickupLat, pickupLng);
+                      } else {
+                        sp.setBool('isWaitingTrue', true);
+                        waitingPassanger();
+                        print('swipped called');
+                        isWaiting = true;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Choose Map Option'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Image.asset(
+                                          'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
+                                    ),
+                                    title: Text('Open in Google Maps'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      MapUtils.navigateTo(pickupLat, pickupLng);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Image.asset(
+                                          'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
+                                    ),
+                                    title: Text('Using App'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
                   ),
                 ),
               ],
@@ -939,7 +1000,7 @@ String jobId='';
     final directionsService = DirectionsService();
     final request = DirectionsRequest(
       origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
-      destination: '${widget.pickup}',
+      destination: '${pickup}',
     );
 
     directionsService.route(request,
@@ -1133,7 +1194,7 @@ String jobId='';
   Future<void> getLocationFromAddress() async {
     final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
     final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
-    final address = widget.pickup;
+    final address = pickup;
     final response = await http.post(
       Uri.parse('$apiUrl?address=$address&key=$apiKey'),
     );
@@ -1158,67 +1219,66 @@ String jobId='';
   }
 }
 
+// class JobDetailsScreen extends StatefulWidget {
+//   final String jobId;
 
-class JobDetailsScreen extends StatefulWidget {
-  final String jobId;
+//   JobDetailsScreen({required this.jobId});
 
-  JobDetailsScreen({required this.jobId});
+//   @override
+//   _JobDetailsScreenState createState() => _JobDetailsScreenState();
+// }
 
-  @override
-  _JobDetailsScreenState createState() => _JobDetailsScreenState();
-}
+// class _JobDetailsScreenState extends State<JobDetailsScreen> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchJobDetails();
+//   }
 
-class _JobDetailsScreenState extends State<JobDetailsScreen> {
+//   Future<void> fetchJobDetails() async {
+//     final response = await http.post(
+//       Uri.parse(
+//           'https://www.minicaboffice.com/api/driver/check-job-status.php'),
+//       body: {'job_id':  jobId},
+//     );
 
-  @override
-  void initState() {
-    super.initState();
-    fetchJobDetails();
-  }
+//     if (response.statusCode == 200) {
+//       final data = json.decode(response.body);
+//       if (data['status'] == false && data['notification'] != null) {
+//         _showInAppNotification(data['notification']);
+//       } else {
+//         // Handle the job details as normal
+//       }
+//     } else {
+//       // Handle the error
+//     }
+//   }
 
-  Future<void> fetchJobDetails() async {
-    final response = await http.post(
-      Uri.parse('https://www.minicaboffice.com/api/driver/check-job-status.php'),
-      body: {'job_id': widget.jobId},
-    );
+//   void _showInAppNotification(Map<String, dynamic> notification) {
+//     showDialog(
+//       context: context,
+//       builder: (context) => AlertDialog(
+//         title: Text(notification['title']),
+//         content: Text(notification['message']),
+//         actions: [
+//           TextButton(
+//             onPressed: () => Navigator.of(context).pop(),
+//             child: Text('OK'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['status'] == false && data['notification'] != null) {
-        _showInAppNotification(data['notification']);
-      } else {
-        // Handle the job details as normal
-      }
-    } else {
-      // Handle the error
-    }
-  }
-
-  void _showInAppNotification(Map<String, dynamic> notification) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(notification['title']),
-        content: Text(notification['message']),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Job Details'),
-      ),
-      body: Center(
-        child: Text('Loading job details...'),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Job Details'),
+//       ),
+//       body: Center(
+//         child: Text('Loading job details...'),
+//       ),
+//     );
+//   }
+// }

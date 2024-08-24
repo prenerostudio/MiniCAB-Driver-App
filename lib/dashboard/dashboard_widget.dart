@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
+import 'package:mini_cab/break_time/break_time_view.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -60,7 +61,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
   String? phone;
   String? email;
   String? dueBalance;
-  String? breakId;
+  // String? breakId;
   int initialLabelIndex = 0;
   bool isLoading = true;
   bool isButtonDisabled = false;
@@ -227,7 +228,6 @@ class _DashboardWidgetState extends State<DashboardWidget>
     await SystemAlertWindow.requestPermissions;
   }
 
-
   int? SwitchStatus;
   _loadSwitchStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -264,8 +264,6 @@ class _DashboardWidgetState extends State<DashboardWidget>
         _platformVersion = platformVersion!;
       });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -1452,466 +1450,471 @@ class _DashboardWidgetState extends State<DashboardWidget>
           body: SafeArea(
             top: true,
             child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(30.0, 5.0, 50.0, 5.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                10.0, 10.0, 10.0, 10.0),
-                            child: FlutterFlowIconButton(
-                              borderColor: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              borderWidth: 1.0,
-                              buttonSize: 40.0,
-                              fillColor: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              icon: Icon(
-                                Icons.menu,
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                size: 30,
-                              ),
-                              onPressed: () async {
-                                scaffoldKey.currentState!.openDrawer();
-                              },
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(30.0, 5.0, 50.0, 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              10.0, 10.0, 10.0, 10.0),
+                          child: FlutterFlowIconButton(
+                            borderColor: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            borderWidth: 1.0,
+                            buttonSize: 40.0,
+                            fillColor: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            icon: Icon(
+                              Icons.menu,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 30,
                             ),
-                          ),
-                          InkWell(
-                            onTap: () async {
-                              print('Showing overlay...');
-
-                              print('Overlay shown');
-                            },
-                            child: Text(
-                              'Dashboard',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.05,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 5.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ToggleSwitch(
-                            minWidth: MediaQuery.sizeOf(context).width,
-                            minHeight: 50,
-                            initialLabelIndex: 0,
-                            cornerRadius: 30.0,
-                            activeFgColor: Colors.white,
-                            inactiveBgColor: Colors.grey,
-                            inactiveFgColor: Colors.white,
-                            totalSwitches: 2,
-                            labels: [
-                              'Back To Online',
-                              'Break time',
-                            ],
-                            icons: [
-                              FontAwesomeIcons.dotCircle,
-                              FontAwesomeIcons.powerOff,
-                            ],
-                            activeBgColors: [
-                              [
-                                FlutterFlowTheme.of(context).primary,
-                              ],
-                              [
-                                Colors.yellow,
-                              ]
-                            ],
-                            onToggle: (index) async {
-                              if (SwitchStatus == 1) {
-                                if (index == 1) {
-                                  startBreak();
-                                  context.pushNamed('BreakTime');
-                                } else {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  String? dId = prefs.getString('d_id');
-                                  var request = http.MultipartRequest(
-                                      'POST',
-                                      Uri.parse(
-                                          'https://www.minicaboffice.com/api/driver/end-break.php'));
-                                  request.fields.addAll({
-                                    'bt_id': '${breakId}',
-                                    'd_id': dId.toString()
-                                  });
-                                  print(request.fields);
-                                  http.StreamedResponse response =
-                                      await request.send();
-                                  if (response.statusCode == 200) {
-                                    print(
-                                        await response.stream.bytesToString());
-                                    Fluttertoast.showToast(
-                                      msg: "Switched to Online",
-                                    );
-                                  } else {
-                                    print(response.reasonPhrase);
-                                  }
-                                }
-                              } else {
-                                Fluttertoast.showToast(
-                                  msg:
-                                      "You're not online. You can't go to break.",
-                                );
-                              }
+                            onPressed: () async {
+                              scaffoldKey.currentState!.openDrawer();
                             },
                           ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                          16.0, 12.0, 16.0, 12.0),
-                      child: GridView(
-                        padding: EdgeInsets.zero,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10.0,
-                          mainAxisSpacing: 10.0,
-                          childAspectRatio: 1.0,
                         ),
-                        primary: false,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        children: [
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              context.pushNamed('Home');
-                            },
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).primary,
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.home,
-                                      color: FlutterFlowTheme.of(context).info,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.1,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Home',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .displaySmall
-                                            .override(
-                                              fontFamily: 'Outfit',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .info,
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
+                        InkWell(
+                          onTap: () async {
+                            print('Showing overlay...');
+
+                            print('Overlay shown');
+                          },
+                          child: Text(
+                            'Dashboard',
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: 'Readex Pro',
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.05,
                                 ),
-                              ),
-                            ),
                           ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              context.pushNamed('Upcomming');
-                            },
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.directions_car_outlined,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.1,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Upcoming Jobs',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .displaySmall
-                                            .override(
-                                              fontFamily: 'Outfit',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryText,
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              context.pushNamed('jobshistory');
-                            },
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.checklist_rtl,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.1,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Job History',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .displaySmall
-                                            .override(
-                                              fontFamily: 'Outfit',
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ).animateOnPageLoad(
-                              animationsMap['containerOnPageLoadAnimation2']!),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              context.pushNamed('BidHistoryFilter');
-                            },
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    FaIcon(
-                                      FontAwesomeIcons.clipboardList,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.1,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Bids ',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .displaySmall
-                                            .override(
-                                              fontFamily: 'Outfit',
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ).animateOnPageLoad(
-                              animationsMap['containerOnPageLoadAnimation4']!),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              context.pushNamed('Zones');
-                            },
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.1,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Zones',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .displaySmall
-                                            .override(
-                                              fontFamily: 'Outfit',
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ).animateOnPageLoad(
-                              animationsMap['containerOnPageLoadAnimation5']!),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>AcountStatementsWidget()));
-                            },
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.4,
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.payments,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.1,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        'Payment',
-                                        textAlign: TextAlign.center,
-                                        style: FlutterFlowTheme.of(context)
-                                            .displaySmall
-                                            .override(
-                                              fontFamily: 'Outfit',
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ).animateOnPageLoad(
-                              animationsMap['containerOnPageLoadAnimation6']!),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ToggleSwitch(
+                          minWidth: MediaQuery.sizeOf(context).width,
+                          minHeight: 50,
+                          initialLabelIndex: 0,
+                          cornerRadius: 30.0,
+                          activeFgColor: Colors.white,
+                          inactiveBgColor: Colors.grey,
+                          inactiveFgColor: Colors.white,
+                          totalSwitches: 2,
+                          labels: [
+                            'Back To Online',
+                            'Break time',
+                          ],
+                          icons: [
+                            FontAwesomeIcons.dotCircle,
+                            FontAwesomeIcons.powerOff,
+                          ],
+                          activeBgColors: [
+                            [
+                              FlutterFlowTheme.of(context).primary,
+                            ],
+                            [
+                              Colors.yellow,
+                            ]
+                          ],
+                          onToggle: (index) async {
+                            if (SwitchStatus == 1) {
+                              if (index == 1) {
+                                startBreak();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            BreakTimeWidget()));
+                                // context.pushNamed('BreakTime');
+                              } else {
+                                print('the break press');
+                                // SharedPreferences prefs =
+                                //     await SharedPreferences.getInstance();
+                                // String? dId = prefs.getString('d_id');
+                                // var request = http.MultipartRequest(
+                                //     'POST',
+                                //     Uri.parse(
+                                //         'https://www.minicaboffice.com/api/driver/end-break.php'));
+                                // request.fields.addAll({
+                                //   'bt_id': '${breakId}',
+                                //   'd_id': dId.toString()
+                                // });
+                                // print(request.fields);
+                                // http.StreamedResponse response =
+                                //     await request.send();
+                                // if (response.statusCode == 200) {
+                                //   print(await response.stream.bytesToString());
+                                //   Fluttertoast.showToast(
+                                //     msg: "Switched to Online",
+                                //   );
+                                // } else {
+                                //   print(response.reasonPhrase);
+                                // }
+                              }
+                            } else {
+                              Fluttertoast.showToast(
+                                msg:
+                                    "You're not online. You can't go to break.",
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 12.0),
+                    child: GridView(
+                      padding: EdgeInsets.zero,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                        childAspectRatio: 1.0,
+                      ),
+                      primary: false,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.pushNamed('Home');
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).primary,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 12.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.home,
+                                    color: FlutterFlowTheme.of(context).info,
+                                    size:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Home',
+                                      textAlign: TextAlign.center,
+                                      style: FlutterFlowTheme.of(context)
+                                          .displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            color: FlutterFlowTheme.of(context)
+                                                .info,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.pushNamed('Upcomming');
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 12.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.directions_car_outlined,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    size:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Upcoming Jobs',
+                                      textAlign: TextAlign.center,
+                                      style: FlutterFlowTheme.of(context)
+                                          .displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.pushNamed('jobshistory');
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 12.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.checklist_rtl,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    size:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Job History',
+                                      textAlign: TextAlign.center,
+                                      style: FlutterFlowTheme.of(context)
+                                          .displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ).animateOnPageLoad(
+                            animationsMap['containerOnPageLoadAnimation2']!),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.pushNamed('BidHistoryFilter');
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 12.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.clipboardList,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    size:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Bids ',
+                                      textAlign: TextAlign.center,
+                                      style: FlutterFlowTheme.of(context)
+                                          .displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ).animateOnPageLoad(
+                            animationsMap['containerOnPageLoadAnimation4']!),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.pushNamed('Zones');
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 12.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    size:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Zones',
+                                      textAlign: TextAlign.center,
+                                      style: FlutterFlowTheme.of(context)
+                                          .displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ).animateOnPageLoad(
+                            animationsMap['containerOnPageLoadAnimation5']!),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        AcountStatementsWidget()));
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  12.0, 0.0, 12.0, 0.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.payments,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    size:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    child: Text(
+                                      'Payment',
+                                      textAlign: TextAlign.center,
+                                      style: FlutterFlowTheme.of(context)
+                                          .displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ).animateOnPageLoad(
+                            animationsMap['containerOnPageLoadAnimation6']!),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1936,8 +1939,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
           msg: "Switched to Break time",
         );
         if (jsonResponse['status']) {
-          String data = jsonResponse[''].toString();
-          breakId = data;
+          String data = jsonResponse['data'].toString();
+          // breakId = data;
+          await prefs.setString('breakId', data);
           print(jsonResponse['message']);
         } else {
           print('Error: ${jsonResponse['message']}');
@@ -1992,7 +1996,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
       String responseBody = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseBody);
       print(jsonResponse);
-      String totalCommission = jsonResponse['']['total_commission'];
+      String totalCommission = jsonResponse['data']['total_commission'] ?? "";
       print(totalCommission);
       setState(() {
         dueBalance = totalCommission;
@@ -2020,7 +2024,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      final List<dynamic> data = jsonResponse[''];
+      final List<dynamic> data = jsonResponse['data'] ?? [];
 
       if (data is List) {
         List<Driver> profileData =

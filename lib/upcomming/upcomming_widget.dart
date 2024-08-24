@@ -198,7 +198,12 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
                 size: 30,
               ),
               onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> NavBarPage(page:HomeWidget(),)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NavBarPage(
+                              page: HomeWidget(),
+                            )));
               },
             ),
             title: Text(

@@ -40,8 +40,8 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
   TextEditingController pcoExpController = TextEditingController();
   TextEditingController skypeAcountController = TextEditingController();
   TextEditingController dRemarksController = TextEditingController();
-  String? dropDownValue2;
-  FormFieldController<String>? dropDownValueController2;
+  // String? dropDownValue2;
+  // FormFieldController<String>? dropDownValueController2;
 
   @override
   void initState() {
@@ -110,6 +110,10 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
   String? pcoExp;
   String? skypeAcount;
   String? dRemarks;
+  String? postalCode;
+  String? gender;
+  String? language;
+  String? authority;
   File? selectedImage;
 
   Future<void> getPreferencesData() async {
@@ -129,7 +133,10 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
     pcoExp = prefs.getString('pco_exp');
     skypeAcount = prefs.getString('skype_acount');
     dRemarks = prefs.getString('d_remarks');
-
+    postalCode = prefs.getString('d_post_code');
+    gender = prefs.getString('d_gender');
+    language = prefs.getString('d_language');
+    authority = prefs.getString('licence_authority');
     print(dName);
     dnameController.text = dName ?? '';
     demailController.text = dEmail ?? '';
@@ -140,6 +147,15 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
     pcoExpController.text = pcoExp ?? '';
     skypeAcountController.text = skypeAcount ?? '';
     dRemarksController.text = dRemarks ?? '';
+    addressController.text = dAddress ?? '';
+    licenceController.text = postalCode ?? '';
+    _model.dropDownValueController1!.value = gender ?? '';
+    _model.dropDownValueController2!.value = language ?? '';
+    _model.dropDownValueController3!.value = authority ?? '';
+    print('The address is ${_model.dropDownValueController3!.value}');
+
+    // dRemarksController.text = dRemarks ?? '';
+    setState(() {});
   }
 
   void _showToastMessage(String message) {
@@ -174,624 +190,452 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
           : FocusScope.of(context).unfocus(),
-
-        child: Scaffold(
-          key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(100.0),
-            child: AppBar(
-              backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-              automaticallyImplyLeading: false,
-              actions: [],
-              flexibleSpace: FlexibleSpaceBar(
-                title: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional(0.00, 0.00),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                context.safePop();
-                              },
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: FlutterFlowTheme.of(context).primary,
-                                size: 24.0,
-                              ),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(100.0),
+          child: AppBar(
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+            automaticallyImplyLeading: false,
+            actions: [],
+            flexibleSpace: FlexibleSpaceBar(
+              title: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional(0.00, 0.00),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              context.safePop();
+                            },
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: FlutterFlowTheme.of(context).primary,
+                              size: 24.0,
                             ),
                           ),
-                          Align(
-                            alignment: AlignmentDirectional(0.00, 0.00),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 0.0, 0.0),
-                              child: Text(
-                                'Update Profile',
-                                style: FlutterFlowTheme.of(context)
-                                    .headlineMedium
-                                    .override(
-                                      fontFamily: 'Outfit',
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      fontSize: 22.0,
-                                    ),
-                              ),
+                        ),
+                        Align(
+                          alignment: AlignmentDirectional(0.00, 0.00),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 0.0, 0.0),
+                            child: Text(
+                              'Update Profile',
+                              style: FlutterFlowTheme.of(context)
+                                  .headlineMedium
+                                  .override(
+                                    fontFamily: 'Outfit',
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    fontSize: 22.0,
+                                  ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                centerTitle: true,
-                expandedTitleScale: 1.0,
+                  ),
+                ],
               ),
-              elevation: 0.0,
+              centerTitle: true,
+              expandedTitleScale: 1.0,
             ),
+            elevation: 0.0,
           ),
-          body: SafeArea(
-            top: true,
-            child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 50.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Form(
-                      key: _model.formKey,
-                      autovalidateMode: AutovalidateMode.disabled,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 20.0, 0.0, 16.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      _pickImage(ImageSource.gallery);
-                                    },
+        ),
+        body: SafeArea(
+          top: true,
+          child: Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 50.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Form(
+                    key: _model.formKey,
+                    autovalidateMode: AutovalidateMode.disabled,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 20.0, 0.0, 16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    _pickImage(ImageSource.gallery);
+                                  },
+                                  child: Container(
+                                    width: 100.0,
+                                    height: 100.0,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFE0E3E7),
+                                      shape: BoxShape.circle,
+                                    ),
                                     child: Container(
-                                      width: 100.0,
-                                      height: 100.0,
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.3,
+                                      height: MediaQuery.sizeOf(context).width *
+                                          0.3,
+                                      clipBehavior: Clip.antiAlias,
                                       decoration: BoxDecoration(
-                                        color: Color(0xFFE0E3E7),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.sizeOf(context).width *
-                                                0.3,
-                                        height:
-                                            MediaQuery.sizeOf(context).width *
-                                                0.3,
-                                        clipBehavior: Clip.antiAlias,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: selectedImage != null
-                                            ? Image.file(
-                                                selectedImage!,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : dPic != null
-                                                ? Image.network(
-                                                    'https://minicaboffice.com/img/drivers/$dPic',
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder: (context,
-                                                        error, stackTrace) {
-                                                      return Image.asset(
-                                                        'assets/images/user.png',
-                                                        fit: BoxFit.cover,
-                                                      );
-                                                    },
-                                                  )
-                                                : Image.asset(
-                                                    'assets/images/user.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                      ),
+                                      child: selectedImage != null
+                                          ? Image.file(
+                                              selectedImage!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : dPic != null
+                                              ? Image.network(
+                                                  'https://minicaboffice.com/img/drivers/$dPic',
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/user.png',
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
+                                                )
+                                              : Image.asset(
+                                                  'assets/images/user.png',
+                                                  fit: BoxFit.cover,
+                                                ),
                                     ),
-                                  )
-                                ],
-                              ),
+                                  ),
+                                )
+                              ],
                             ),
-                            Padding(
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 20.0, 16.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                if (value.isEmpty) {
+                                  // Restore the previous text
+                                  dnameController.text =
+                                      dEmail!; // You can use your specific condition here
+                                  dnameController.selection =
+                                      TextSelection.fromPosition(
+                                    TextPosition(
+                                        offset: dnameController.text.length),
+                                  );
+                                }
+                              },
+                              controller: dnameController,
+                              textCapitalization: TextCapitalization.words,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                labelText: 'Full Name',
+                                labelStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                hintStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Color(0xFF57636C),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFE0E3E7),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF4B39EF),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                filled: true,
+                                fillColor: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 24.0, 0.0, 24.0),
+                              ),
+                              style: FlutterFlowTheme.of(context).labelMedium,
+                              validator: _model.yourNameControllerValidator
+                                  .asValidator(context),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 20.0, 16.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                // Check if the field is empty
+                                if (value.isEmpty) {
+                                  // Restore the previous text
+                                  demailController.text =
+                                      dEmail!; // You can use your specific condition here
+                                  demailController.selection =
+                                      TextSelection.fromPosition(
+                                    TextPosition(
+                                        offset: demailController.text.length),
+                                  );
+                                }
+                              },
+                              controller: demailController,
+                              focusNode: _model.emailFocusNode,
+                              textCapitalization: TextCapitalization.words,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                labelStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                hintStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Color(0xFF57636C),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFE0E3E7),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                filled: true,
+                                fillColor: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 24.0, 0.0, 24.0),
+                              ),
+                              style: FlutterFlowTheme.of(context).labelMedium,
+                              validator: _model.emailControllerValidator
+                                  .asValidator(context),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 20.0, 16.0),
+                            child: TextFormField(
+                              controller: dphoneController,
+                              focusNode: _model.phoneNumberFocusNode1,
+                              textCapitalization: TextCapitalization.words,
+                              obscureText: false,
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                labelText: 'Phone ',
+                                labelStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                hintStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Color(0xFF57636C),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFE0E3E7),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                filled: true,
+                                fillColor: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 24.0, 0.0, 24.0),
+                              ),
+                              style: FlutterFlowTheme.of(context).labelMedium,
+                              validator: _model.phoneNumberController1Validator
+                                  .asValidator(context),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 20.0, 16.0),
+                            child: TextFormField(
+                              controller: addressController,
+                              textCapitalization: TextCapitalization.words,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                labelText: 'Address',
+                                labelStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                hintStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Color(0xFF57636C),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFE0E3E7),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF4B39EF),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                filled: true,
+                                fillColor: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 24.0, 0.0, 24.0),
+                              ),
+                              style: FlutterFlowTheme.of(context).labelMedium,
+                              validator: _model.yourNameControllerValidator
+                                  .asValidator(context),
+                            ),
+                          ),
+                          Align(
+                            alignment: AlignmentDirectional(-1.00, 0.00),
+                            child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 20.0, 16.0),
-                              child: TextFormField(
-                                controller: dnameController,
-                                textCapitalization: TextCapitalization.words,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Full Name',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFF4B39EF),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
-                                ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
-                                validator: _model.yourNameControllerValidator
-                                    .asValidator(context),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 20.0, 16.0),
-                              child: TextFormField(
-                                controller: demailController,
-                                focusNode: _model.emailFocusNode,
-                                textCapitalization: TextCapitalization.words,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Email',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
-                                ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
-                                validator: _model.emailControllerValidator
-                                    .asValidator(context),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 20.0, 16.0),
-                              child: TextFormField(
-                                controller: dphoneController,
-                                focusNode: _model.phoneNumberFocusNode1,
-                                textCapitalization: TextCapitalization.words,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Phone ',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
-                                ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
-                                validator: _model
-                                    .phoneNumberController1Validator
-                                    .asValidator(context),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 20.0, 16.0),
-                              child: TextFormField(
-                                controller: addressController,
-                                textCapitalization: TextCapitalization.words,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Address',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFF4B39EF),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
-                                ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
-                                validator: _model.yourNameControllerValidator
-                                    .asValidator(context),
-                              ),
-                            ),
-                            Align(
-                              alignment: AlignmentDirectional(-1.00, 0.00),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    20.0, 0.0, 0.0, 16.0),
-                                child: FlutterFlowDropDown<String>(
-                                  controller:
-                                      _model.dropDownValueController2 ??=
-                                          FormFieldController<String>(null),
-                                  options: ['Male', 'Female', 'Other'],
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _model.dropDownValue2 =
-                                          val; // Assuming you want to update some state in your model
-                                      Gender = val;
-                                      print(Gender);
-                                    });
-                                  },
-                                  width: MediaQuery.sizeOf(context).width * 0.9,
-                                  height: 50.0,
-                                  textStyle:
-                                      FlutterFlowTheme.of(context).labelMedium,
-                                  hintText: 'Select Gender',
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    size: 24.0,
-                                  ),
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  elevation: 2.0,
-                                  borderColor: Color(0x6AD6D6D6),
-                                  borderWidth: 2.0,
-                                  borderRadius: 8.0,
-                                  margin: EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 4.0, 16.0, 4.0),
-                                  hidesUnderline: true,
-                                  isSearchable: false,
-                                  isMultiSelect: false,
-                                ),
-                              ),
-                            ),
-                            Align(
-                              alignment: AlignmentDirectional(-1.00, 0.00),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    20.0, 0.0, 0.0, 16.0),
-                                child: FlutterFlowDropDown<String>(
-                                  controller:
-                                      _model.dropDownValueController3 ??=
-                                          FormFieldController<String>(null),
-                                  options: [
-                                    'English',
-                                    'Urdu',
-                                    'French',
-                                    'Spanish',
-                                    'German',
-                                    'Portuguese',
-                                    'Arabic',
-                                    'Russian',
-                                    'Japanese',
-                                    'Italian',
-                                    'Bengali',
-                                    'Hindi',
-                                    'Korean',
-                                    'Greek',
-                                    'Turkish',
-                                    'Indonesian',
-                                    'Danish',
-                                    'Gujarati',
-                                    'Finnish',
-                                    'Dutch',
-                                    'Tamil',
-                                    'Hungarian',
-                                    'Romanian',
-                                    'Czech',
-                                  ],
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _model.dropDownValue3 =
-                                          val; // Assuming you want to update some state in your model
-                                      lang = val;
-                                      print(
-                                          lang); // Save the selected value in the lang variable
-                                    });
-                                  },
-                                  width: MediaQuery.sizeOf(context).width * 0.9,
-                                  height: 50.0,
-                                  textStyle:
-                                      FlutterFlowTheme.of(context).labelMedium,
-                                  hintText: 'Select Language',
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    size: 24.0,
-                                  ),
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  elevation: 2.0,
-                                  borderColor: Color(0x6AD6D6D6),
-                                  borderWidth: 2.0,
-                                  borderRadius: 8.0,
-                                  margin: EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 4.0, 16.0, 4.0),
-                                  hidesUnderline: true,
-                                  isSearchable: false,
-                                  isMultiSelect: false,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 0.0, 20.0, 16.0),
-                              child: TextFormField(
-                                controller: licenceController,
-                                focusNode: _model.phoneNumberFocusNode2,
-                                textCapitalization: TextCapitalization.words,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Postal Code',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  contentPadding:
-                                      EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
-                                ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
-                                validator: _model
-                                    .phoneNumberController2Validator
-                                    .asValidator(context),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 20.0, 8.0, 0.0),
+                                  20.0, 0.0, 0.0, 16.0),
                               child: FlutterFlowDropDown<String>(
-                                controller: dropDownValueController2 ??=
+                                controller: _model.dropDownValueController1 ??=
                                     FormFieldController<String>(null),
-                                options: [
-                                  'London',
-                                  'The North East',
-                                  'North West',
-                                  'Yorkshire',
-                                  'East Midlands',
-                                  'West Midlands',
-                                  'South East',
-                                  'East of England',
-                                  'South West'
-                                ],
+                                options: ['Male', 'Female', 'Other'],
                                 onChanged: (val) {
                                   setState(() {
-                                    dropDownValue2 = val;
-                                    print("Selected value: $dropDownValue2");
+                                    _model.dropDownValue1 =
+                                        val; // Assuming you want to update some state in your model
+                                    Gender = val;
+                                    print(Gender);
                                   });
                                 },
                                 width: MediaQuery.sizeOf(context).width * 0.9,
                                 height: 50.0,
                                 textStyle:
-                                FlutterFlowTheme.of(context).labelMedium,
-                                hintText: 'Select Authority',
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                hintText: 'Select Gender',
                                 icon: Icon(
                                   Icons.keyboard_arrow_down_rounded,
                                   color: FlutterFlowTheme.of(context)
@@ -811,113 +655,321 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
                                 isMultiSelect: false,
                               ),
                             ),
-                            Align(
-                              alignment: AlignmentDirectional(0.00, 0.05),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 24.0, 0.0, 45.0),
-                                child: FFButtonWidget(
-                                  onPressed: () async {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    String? dId = prefs.getString('d_id');
+                          ),
+                          Align(
+                            alignment: AlignmentDirectional(-1.00, 0.00),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  20.0, 0.0, 0.0, 16.0),
+                              child: FlutterFlowDropDown<String>(
+                                controller: _model.dropDownValueController2 ??=
+                                    FormFieldController<String>(null),
+                                options: [
+                                  'English',
+                                  'Urdu',
+                                  'French',
+                                  'Spanish',
+                                  'German',
+                                  'Portuguese',
+                                  'Arabic',
+                                  'Russian',
+                                  'Japanese',
+                                  'Italian',
+                                  'Bengali',
+                                  'Hindi',
+                                  'Korean',
+                                  'Greek',
+                                  'Turkish',
+                                  'Indonesian',
+                                  'Danish',
+                                  'Gujarati',
+                                  'Finnish',
+                                  'Dutch',
+                                  'Tamil',
+                                  'Hungarian',
+                                  'Romanian',
+                                  'Czech',
+                                ],
+                                onChanged: (val) {
+                                  setState(() {
+                                    _model.dropDownValue2 =
+                                        val; // Assuming you want to update some state in your model
+                                    lang = val;
+                                    print(
+                                        lang); // Save the selected value in the lang variable
+                                  });
+                                },
+                                width: MediaQuery.sizeOf(context).width * 0.9,
+                                height: 50.0,
+                                textStyle:
+                                    FlutterFlowTheme.of(context).labelMedium,
+                                hintText: 'Select Language',
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+                                  size: 24.0,
+                                ),
+                                fillColor: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                elevation: 2.0,
+                                borderColor: Color(0x6AD6D6D6),
+                                borderWidth: 2.0,
+                                borderRadius: 8.0,
+                                margin: EdgeInsetsDirectional.fromSTEB(
+                                    16.0, 4.0, 16.0, 4.0),
+                                hidesUnderline: true,
+                                isSearchable: false,
+                                isMultiSelect: false,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                20.0, 0.0, 20.0, 16.0),
+                            child: TextFormField(
+                              controller: licenceController,
+                              focusNode: _model.phoneNumberFocusNode2,
+                              textCapitalization: TextCapitalization.words,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                labelText: 'Postal Code',
+                                labelStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                hintStyle: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Color(0xFF57636C),
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFE0E3E7),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFFF5963),
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                filled: true,
+                                fillColor: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                    20.0, 24.0, 0.0, 24.0),
+                              ),
+                              style: FlutterFlowTheme.of(context).labelMedium,
+                              validator: _model.phoneNumberController2Validator
+                                  .asValidator(context),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                8.0, 20.0, 8.0, 0.0),
+                            child: FlutterFlowDropDown<String>(
+                              controller: _model.dropDownValueController3 ??=
+                                  FormFieldController<String>(null),
+                              options: [
+                                'Ireland',
+                                'London',
+                                'The North East',
+                                'North West',
+                                'Yorkshire',
+                                'East Midlands',
+                                'West Midlands',
+                                'South East',
+                                'East of England',
+                                'South West'
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _model.dropDownValue3 = val;
+                                  language = val;
+                                  // print("Selected value: $dropDownValue2");
+                                });
+                              },
+                              width: MediaQuery.sizeOf(context).width * 0.9,
+                              height: 50.0,
+                              textStyle:
+                                  FlutterFlowTheme.of(context).labelMedium,
+                              hintText: 'Select Authority',
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                size: 24.0,
+                              ),
+                              fillColor: FlutterFlowTheme.of(context)
+                                  .secondaryBackground,
+                              elevation: 2.0,
+                              borderColor: Color(0x6AD6D6D6),
+                              borderWidth: 2.0,
+                              borderRadius: 8.0,
+                              margin: EdgeInsetsDirectional.fromSTEB(
+                                  16.0, 4.0, 16.0, 4.0),
+                              hidesUnderline: true,
+                              isSearchable: false,
+                              isMultiSelect: false,
+                            ),
+                          ),
+                          Align(
+                            alignment: AlignmentDirectional(0.00, 0.05),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 24.0, 0.0, 45.0),
+                              child: FFButtonWidget(
+                                onPressed: () async {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  String? dId = prefs.getString('d_id');
+                                  // print('objectssssssssssssssssssssss $dPic');
+                                  if (selectedImage == null && dPic!.isEmpty) {
+                                    _showToastMessage(
+                                        'Please select an image.');
+                                    return;
+                                  }
+                                  if (dnameController.text.isEmpty ||
+                                      demailController.text.isEmpty) {
+                                    _showToastMessage(
+                                        'Please fill in all fields.');
+                                    return;
+                                  }
+                                  if (_model.dropDownValue2 == null) {
+                                    _showToastMessage(
+                                        'Please select an Authority.');
+                                    return;
+                                  }
 
-                                    if (selectedImage == null) {
-                                      _showToastMessage(
-                                          'Please select an image.');
-                                      return;
-                                    }
-                                    if (dnameController.text.isEmpty ||
-                                        demailController.text.isEmpty ||
-                                        addressController.text.isEmpty
-                                       ) {
-                                      _showToastMessage(
-                                          'Please fill in all fields.');
-                                      return;
-                                    }
-                                    if (dropDownValue2 == null) {
-                                      _showToastMessage(
-                                          'Please select an Authority.');
-                                      return;
-                                    }
+                                  try {
+                                    var request = http.MultipartRequest(
+                                      'POST',
+                                      Uri.parse(
+                                          'https://minicaboffice.com/api/driver/update-profile.php'),
+                                    );
+                                    request.fields.addAll({
+                                      'd_id': dId.toString(),
+                                      'dname': dnameController.text,
+                                      'd_address': addressController.text,
+                                      'demail': demailController.text,
+                                      'dgender': '${Gender.toString()}',
+                                      'dlang': '${lang.toString()}',
+                                      'post_code': licenceController.text,
+                                      'license_authority':
+                                          '${_model.dropDownValue2}'
+                                    });
+                                    print(request.fields);
 
-                                    try {
-                                      var request = http.MultipartRequest(
-                                        'POST',
-                                        Uri.parse(
-                                            'https://minicaboffice.com/api/driver/update-profile.php'),
-                                      );
-                                      request.fields.addAll({
-                                        'd_id': dId.toString(),
-                                        'dname': dnameController.text,
-                                        'd_address': addressController.text,
-                                        'demail': demailController.text,
-                                        'dgender': '${Gender.toString()}',
-                                        'dlang': '${lang.toString()}',
-                                        'post_code': licenceController.text,
-                                        'license_authority': '${dropDownValue2}'
-                                      });
-                                      print(request.fields);
+                                    if (selectedImage != null) {
+                                      // If selectedImage is not null, upload it
                                       request.files.add(
                                         await http.MultipartFile.fromPath(
                                             'd_img', selectedImage!.path),
                                       );
-                                      final response = await request.send();
+                                    } else if (dPic != null &&
+                                        dPic!.isNotEmpty) {
+                                      // If dPic is not null and not empty, download the image and upload it
+                                      var imageUrl =
+                                          'https://minicaboffice.com/img/drivers/$dPic';
+                                      var response =
+                                          await http.get(Uri.parse(imageUrl));
                                       if (response.statusCode == 200) {
-                                        print(await response.stream
-                                            .bytesToString());
-                                        _showToastMessage(
-                                            'Profile updated successfully');
-                                        context.pushNamed('Dashboard');
+                                        request.files.add(
+                                          http.MultipartFile.fromBytes(
+                                            'd_img',
+                                            response.bodyBytes,
+                                            filename: dPic!.split('/').last,
+                                          ),
+                                        );
                                       } else {
-                                        print(response.reasonPhrase);
-                                        _showToastMessage(
-                                            'Profile update failed. Please check your internet connection.');
+                                        print('Failed to load image from URL.');
                                       }
-                                    } catch (error) {
-                                      print('Error: $error');
-                                      _showToastMessage(
-                                          'Please check your internet connection.');
                                     }
-                                  },
-                                  text: 'Update Profile',
-                                  options: FFButtonOptions(
-                                    width: 270.0,
-                                    height: 50.0,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .override(
-                                          fontFamily: 'Plus Jakarta Sans',
-                                          color: Colors.white,
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                    elevation: 2.0,
-                                    borderSide: BorderSide(
-                                      color: Colors.transparent,
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12.0),
+
+                                    // request.files.add(
+                                    //   await http.MultipartFile.fromPath(
+                                    //       'd_img',selectedImage!.path ),
+                                    // );
+                                    final response = await request.send();
+                                    if (response.statusCode == 200) {
+                                      print(await response.stream
+                                          .bytesToString());
+                                      _showToastMessage(
+                                          'Profile updated successfully');
+                                      context.pushNamed('Dashboard');
+                                    } else {
+                                      print(response.reasonPhrase);
+                                      _showToastMessage(
+                                          'Profile update failed. Please check your internet connection.');
+                                    }
+                                  } catch (error) {
+                                    print('Error: $error');
+                                    _showToastMessage('Please $error');
+                                  }
+                                },
+                                text: 'Update Profile',
+                                options: FFButtonOptions(
+                                  width: 270.0,
+                                  height: 50.0,
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 0.0),
+                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 0.0),
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  textStyle: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .override(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                  elevation: 2.0,
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                    width: 1.0,
                                   ),
+                                  borderRadius: BorderRadius.circular(12.0),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-
+      ),
     );
   }
 }

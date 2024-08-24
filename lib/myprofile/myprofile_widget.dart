@@ -118,23 +118,16 @@ class _MyprofileWidgetState extends State<MyprofileWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 0.0, 0.0),
-                        child: FlutterFlowIconButton(
-                          borderColor: Colors.transparent,
-                          borderRadius: 20.0,
-                          borderWidth: 1.0,
-                          buttonSize: 40.0,
-                          fillColor: FlutterFlowTheme.of(context).primary,
-                          icon: Icon(
-                            Icons.arrow_back_rounded,
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
-                            size: 20.0,
-                          ),
-                          onPressed: () async {
-                            context.pop();
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 12.0, 0.0, 0.0),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
                           },
+                          icon: Icon(Icons.arrow_back_rounded),
+                          color: Colors.blue,
+                          // color:
+                          //     FlutterFlowTheme.of(context).primaryBackground,
                         ),
                       ),
                     ],
@@ -518,7 +511,7 @@ class _MyprofileWidgetState extends State<MyprofileWidget> {
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(0, 10, 0, 8),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 FFButtonWidget(
                                   onPressed: () async {
@@ -548,34 +541,34 @@ class _MyprofileWidgetState extends State<MyprofileWidget> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                FFButtonWidget(
-                                  onPressed: () async {
-                                    context.pushNamed('Reviews');
-                                  },
-                                  text: 'Reviews',
-                                  options: FFButtonOptions(
-                                    width:
-                                        MediaQuery.sizeOf(context).width * 0.45,
-                                    height: 50,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        24, 0, 24, 0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                        0, 0, 0, 0),
-                                    color: FlutterFlowTheme.of(context).success,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                        ),
-                                    elevation: 3,
-                                    borderSide: BorderSide(
-                                      color: Colors.transparent,
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                                // FFButtonWidget(
+                                //   onPressed: () async {
+                                //     context.pushNamed('Reviews');
+                                //   },
+                                //   text: 'Reviews',
+                                //   options: FFButtonOptions(
+                                //     width:
+                                //         MediaQuery.sizeOf(context).width * 0.45,
+                                //     height: 50,
+                                //     padding: EdgeInsetsDirectional.fromSTEB(
+                                //         24, 0, 24, 0),
+                                //     iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                //         0, 0, 0, 0),
+                                //     color: FlutterFlowTheme.of(context).success,
+                                //     textStyle: FlutterFlowTheme.of(context)
+                                //         .titleSmall
+                                //         .override(
+                                //           fontFamily: 'Readex Pro',
+                                //           color: Colors.white,
+                                //         ),
+                                //     elevation: 3,
+                                //     borderSide: BorderSide(
+                                //       color: Colors.transparent,
+                                //       width: 1,
+                                //     ),
+                                //     borderRadius: BorderRadius.circular(8),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),

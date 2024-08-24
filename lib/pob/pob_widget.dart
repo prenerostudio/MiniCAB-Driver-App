@@ -1,5 +1,7 @@
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Data/links.dart';
@@ -28,36 +30,36 @@ import 'package:google_distance_matrix/google_distance_matrix.dart';
 class PobWidget extends StatefulWidget {
   const PobWidget({
     Key? key,
-    required this.did,
-    required this.jobid,
-    required this.pickup,
-    required this.dropoff,
-    required this.cName,
-    required this.fare,
-    required this.distance,
-    required this.note,
-    required this.pickTime,
-    required this.pickDate,
-    required this.passenger,
-    required this.luggage,
-    required this.cnumber,
-    required this.cemail,
+    // required this.did,
+    // required this.jobid,
+    // required this.pickup,
+    // required this.dropoff,
+    // required this.cName,
+    // required this.fare,
+    // required this.distance,
+    // required this.note,
+    // required this.pickTime,
+    // required this.pickDate,
+    // required this.passenger,
+    // required this.luggage,
+    // required this.cnumber,
+    // required this.cemail,
   }) : super(key: key);
 
-  final String? did;
-  final String? jobid;
-  final String? pickup;
-  final String? dropoff;
-  final String? cName;
-  final String? fare;
-  final String? distance;
-  final String? note;
-  final String? pickTime;
-  final String? pickDate;
-  final String? passenger;
-  final String? luggage;
-  final String? cnumber;
-  final String? cemail;
+  // final String? did;
+  // final String? jobid;
+  // final String? pickup;
+  // final String? dropoff;
+  // final String? cName;
+  // final String? fare;
+  // final String? distance;
+  // final String? note;
+  // final String? pickTime;
+  // final String? pickDate;
+  // final String? passenger;
+  // final String? luggage;
+  // final String? cnumber;
+  // final String? cemail;
 
   @override
   _PobWidgetState createState() => _PobWidgetState();
@@ -80,10 +82,10 @@ class _PobWidgetState extends State<PobWidget> {
   final Set<Polyline> _polylines = {};
   late Position _currentPosition;
   bool isLoading = false;
-  late double dropffLat;
-  late double dropffLng;
-  late double currentLatitude;
-  late double currentLongitude;
+  double dropffLat = 0;
+  double dropffLng = 0;
+  double currentLatitude = 0;
+  double currentLongitude = 0;
   String distance = '';
 
   List<Marker> markers = [];
@@ -91,10 +93,72 @@ class _PobWidgetState extends State<PobWidget> {
   @override
   void initState() {
     super.initState();
+    loadata();
     sendOnRideRequest();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _setupMarkersAndPolylines();
     _model = createModel(context, () => PobModel());
+  }
+
+  double pickupLat = 0.0;
+  double pickupLng = 0.0;
+  final JobController myController = Get.put(JobController());
+
+  String? did;
+  String? jobid;
+  String? pickup;
+  String dropoff = '--';
+  String? cName;
+  String? fare;
+
+  String? note;
+  String? pickTime;
+  String? pickDate;
+  String? passenger;
+  String? luggage;
+  String? cnumber;
+  String? cemail;
+  Future loadata() async {
+    // myController.jobDetails();
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    // isWaiting = sp.getBool('isWaitingTrue') ?? false;
+    setState(() {});
+    // widget.did = sp.getString('did');
+    // widget.jobid = sp.getString('jobId');
+    // widget.pickup = sp.getString('pickup');
+    // widget.dropoff = sp.getString('destination');
+    // widget.cName = sp.getString('cName');
+    // widget.fare = sp.getString('journeyFare');
+    // widget.distance = sp.getString('journeyDistance');
+    // widget.note = sp.getString('note');
+    // widget.pickTime = sp.getString('pickTime');
+    // widget.pickDate = sp.getString('pickDate');
+    // widget.passenger = sp.getString('passenger');
+    // widget.luggage = sp.getString('laggage');
+    // widget.cnumber = sp.getString('cPhone');
+    // widget.cemail = sp.getString('cEmail');
+    await myController.acceptedJobDetails().then((value) {
+      if (value != null) {
+        print("after job details $value");
+        did = value.dId;
+        jobid = value.jobId;
+        pickup = value.pickup;
+        dropoff = value.destination;
+        cName = value.cName;
+        fare = value.journeyFare;
+        distance = value.journeyDistance;
+        note = value.note;
+        pickTime = value.pickTime;
+        pickDate = value.pickDate;
+        passenger = value.passenger;
+        luggage = value.luggage;
+        cnumber = value.cPhone;
+        cemail = value.cEmail;
+      } else {
+        print("No job details found.");
+        // Handle the null case, e.g., show an error message, redirect, etc.
+      }
+    });
   }
 
   @override
@@ -103,7 +167,6 @@ class _PobWidgetState extends State<PobWidget> {
     _locationTimer.cancel();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +191,6 @@ class _PobWidgetState extends State<PobWidget> {
           appBar: AppBar(
             backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
             automaticallyImplyLeading: false,
-
             title: Text(
               'At DropOff',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -208,8 +270,7 @@ class _PobWidgetState extends State<PobWidget> {
                                                     .fromSTEB(
                                                         10.0, 10.0, 0.0, 10.0),
                                                 child: Icon(
-                                                  Icons
-                                                      .pin_drop_outlined,
+                                                  Icons.pin_drop_outlined,
                                                   color: FlutterFlowTheme.of(
                                                           context)
                                                       .primary,
@@ -219,10 +280,10 @@ class _PobWidgetState extends State<PobWidget> {
                                               Flexible(
                                                 child: Padding(
                                                   padding: EdgeInsetsDirectional
-                                                      .fromSTEB(10.0, 10.0,
-                                                          0.0, 20.0),
+                                                      .fromSTEB(10.0, 10.0, 0.0,
+                                                          20.0),
                                                   child: Text(
-                                                    '${widget.dropoff}',
+                                                    '${dropoff}',
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .labelMedium
@@ -233,7 +294,7 @@ class _PobWidgetState extends State<PobWidget> {
                                                                   .of(context)
                                                               .secondaryText,
                                                           fontSize: 20.0,
-                                                      letterSpacing: 1.5,
+                                                          letterSpacing: 1.5,
                                                         ),
                                                     overflow: TextOverflow
                                                         .ellipsis, // Handle text overflow with ellipsis
@@ -262,42 +323,34 @@ class _PobWidgetState extends State<PobWidget> {
                                               icon: FaIcon(
                                                 FontAwesomeIcons.ellipsisH,
                                                 color:
-                                                FlutterFlowTheme.of(context)
-                                                    .secondaryBackground,
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryBackground,
                                                 size: 24,
                                               ),
                                               onPressed: () async {
                                                 await showModalBottomSheet(
                                                   isScrollControlled: true,
                                                   backgroundColor:
-                                                  Colors.transparent,
+                                                      Colors.transparent,
                                                   enableDrag: false,
                                                   context: context,
                                                   builder: (context) {
                                                     return Padding(
                                                       padding: MediaQuery
                                                           .viewInsetsOf(
-                                                          context),
+                                                              context),
                                                       child: WaydetailsWidget(
-                                                        time:
-                                                        '${widget.pickTime}',
-                                                        date:
-                                                        '${widget.pickDate}',
+                                                        time: '${pickTime}',
+                                                        date: '${pickDate}',
                                                         passanger:
-                                                        '${widget.passenger}',
-                                                        cName:
-                                                        '${widget.cName}',
-                                                        cnumber:
-                                                        '${widget.cnumber}',
-                                                        luggage:
-                                                        '${widget.luggage}',
-                                                        pickup:
-                                                        '${widget.pickup}',
-                                                        dropoff:
-                                                        '${widget.dropoff}',
-                                                        cNote: '${widget.note}',
-                                                        cemail:
-                                                        '${widget.cemail}',
+                                                            '${passenger}',
+                                                        cName: '${cName}',
+                                                        cnumber: '${cnumber}',
+                                                        luggage: '${luggage}',
+                                                        pickup: '${pickup}',
+                                                        dropoff: '${dropoff}',
+                                                        cNote: '${note}',
+                                                        cemail: '${cemail}',
                                                       ),
                                                     );
                                                   },
@@ -319,8 +372,8 @@ class _PobWidgetState extends State<PobWidget> {
                                                           .viewInsetsOf(
                                                               context),
                                                       child: ClientnotesWidget(
-                                                        name: '${widget.cName}',
-                                                        notes: '${widget.note}',
+                                                        name: '${cName}',
+                                                        notes: '${note}',
                                                       ),
                                                     );
                                                   },
@@ -363,53 +416,65 @@ class _PobWidgetState extends State<PobWidget> {
                                                     BorderRadius.circular(6),
                                               ),
                                             ),
-
                                           ],
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsetsDirectional
-                                            .fromSTEB(15, 20, 15, 0),
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            15, 20, 15, 0),
                                         child: SwipeButton(
                                           thumbPadding: EdgeInsets.all(3),
                                           thumb: Icon(
                                             Icons.chevron_right,
-                                            color: FlutterFlowTheme.of(context).primary,
+                                            color: FlutterFlowTheme.of(context)
+                                                .primary,
                                           ),
                                           elevationThumb: 2,
                                           elevationTrack: 2,
-                                          activeThumbColor: FlutterFlowTheme.of(context).primaryBackground,
-                                          activeTrackColor: FlutterFlowTheme.of(context).primary,
-                                          borderRadius: BorderRadius.circular(8),
-                                          child: Text(
-                                           'AT DROP OFF'.toUpperCase(),
-                                            style: TextStyle(
-                                              color: FlutterFlowTheme.of(context)
+                                          activeThumbColor:
+                                              FlutterFlowTheme.of(context)
                                                   .primaryBackground,
+                                          activeTrackColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primary,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Text(
+                                            'AT DROP OFF'.toUpperCase(),
+                                            style: TextStyle(
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           onSwipe: () {
-                                            ScaffoldMessenger.of(context).showSnackBar(
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
                                               SnackBar(
                                                 content: Text('AT DROP OFF'),
-                                                backgroundColor: FlutterFlowTheme.of(context).primary,
+                                                backgroundColor:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
                                               ),
                                             );
                                           },
-                                          onSwipeEnd: (){
+                                          onSwipeEnd: () async {
+                                            SharedPreferences sp =
+                                                await SharedPreferences
+                                                    .getInstance();
+
                                             context.pushNamed(
                                               'PaymentEntery',
                                               queryParameters: {
                                                 'jobid': serializeParam(
-                                                    '${widget.jobid}',
+                                                    '${jobid}',
                                                     ParamType.String),
                                                 'did': serializeParam(
-                                                    '${widget.did}',
-                                                    ParamType.String),
+                                                    '${did}', ParamType.String),
                                                 'fare': serializeParam(
-                                                    '${widget.fare}',
+                                                    '${fare}',
                                                     ParamType.String),
                                               }.withoutNulls,
                                             );
@@ -463,8 +528,8 @@ class _PobWidgetState extends State<PobWidget> {
       ]),
     );
   }
-  Future<void> sendOnRideRequest() async {
 
+  Future<void> sendOnRideRequest() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
@@ -508,7 +573,7 @@ class _PobWidgetState extends State<PobWidget> {
     var request = await http.Request(
         'GET',
         Uri.parse(
-            'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${widget.pickup}&destinations=${widget.dropoff}&key=AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'));
+            'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${pickup}&destinations=${dropoff}&key=AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'));
     try {
       var response = await request.send();
 
@@ -622,7 +687,7 @@ class _PobWidgetState extends State<PobWidget> {
   Future<void> getLocationFromAddress() async {
     final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
     final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
-    final address = widget.dropoff;
+    final address = dropoff;
     final response = await http.post(
       Uri.parse('$apiUrl?address=$address&key=$apiKey'),
     );
@@ -652,7 +717,7 @@ class _PobWidgetState extends State<PobWidget> {
     final directionsService = DirectionsService();
     final request = DirectionsRequest(
       origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
-      destination: '${widget.dropoff}',
+      destination: '${dropoff}',
     );
     print(request);
     directionsService.route(request,
@@ -730,7 +795,7 @@ class _PobWidgetState extends State<PobWidget> {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return   AlertDialog(
+        return AlertDialog(
           title: Text('Choose Map Option'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -763,6 +828,5 @@ class _PobWidgetState extends State<PobWidget> {
         );
       },
     );
-
   }
 }

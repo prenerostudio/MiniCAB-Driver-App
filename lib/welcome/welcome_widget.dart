@@ -41,6 +41,7 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
 
     super.dispose();
   }
+
   void checkAndRequestPermissions() async {
     bool? isGrantedNullable = await SystemAlertWindow.checkPermissions();
     bool isGranted = isGrantedNullable ?? false; // Default to false if null
@@ -67,6 +68,7 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
       }
     }
   }
+
   Future<void> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? isLogin = prefs.getBool('isLogin');
@@ -80,15 +82,14 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
   }
 
   Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
-    final permissionStatus = await Permission.location.request();
-    final currentStatus = await Permission.location.status;
-    print(currentStatus);
-    if (permissionStatus.isDenied) {
-      openAppSettings();
-    } else {
-    }
+    // final permissionStatus = await Permission.location.request();
+    // final currentStatus = await Permission.location.status;
+    // print(currentStatus);
+    // if (permissionStatus.isDenied) {
+    //   openAppSettings();
+    // } else {
+    // }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +118,7 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
               children: [
                 Expanded(
                   child: Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -152,14 +152,14 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
                               ),
                               Align(
                                 alignment: AlignmentDirectional(-1.00, 0.00),
-                                child : Padding(
+                                child: Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       20.0, 5.0, 20.0, 0.0),
-
-                                child: Text(
-                                  'Reminder :',
-                                  style: FlutterFlowTheme.of(context).bodyLarge,
-                                ),
+                                  child: Text(
+                                    'Reminder :',
+                                    style:
+                                        FlutterFlowTheme.of(context).bodyLarge,
+                                  ),
                                 ),
                               ),
                               Align(
@@ -169,10 +169,10 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
                                       20.0, 5.0, 20.0, 0.0),
                                   child: Text(
                                     'Your Driver account is personal to you. You must never licence, share or grant access to your Driver '
-                                        'account to any other party. Account sharing is a serious breach of the Driver Terms and confirmed'
-                                        ' instances will result in the permanent deactivation of your driver account. Please note that if'
-                                        ' you are using the Uber app as a Courier for Uber Eats, you are permitted to appoint a substitute, '
-                                        'in line with the Courier Terms.',
+                                    'account to any other party. Account sharing is a serious breach of the Driver Terms and confirmed'
+                                    ' instances will result in the permanent deactivation of your driver account. Please note that if'
+                                    ' you are using the Uber app as a Courier for Uber Eats, you are permitted to appoint a substitute, '
+                                    'in line with the Courier Terms.',
                                     textAlign: TextAlign.justify,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -238,8 +238,6 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
                             options: FFButtonOptions(
                               width: double.infinity,
                               height: 56.0,
-
-
                               color: FlutterFlowTheme.of(context).primary,
                               textStyle: FlutterFlowTheme.of(context)
                                   .titleLarge
@@ -249,7 +247,6 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
                                         .secondaryBackground,
                                     fontWeight: FontWeight.bold,
                                   ),
-
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                           ),

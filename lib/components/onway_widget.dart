@@ -118,9 +118,9 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                             style: FlutterFlowTheme.of(context)
                                 .labelLarge
                                 .override(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                            ),
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                ),
                           ),
                         ),
                         Padding(
@@ -130,9 +130,9 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
-                              fontFamily: 'Open Sans',
-                              fontWeight: FontWeight.bold,
-                            ),
+                                  fontFamily: 'Open Sans',
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ),
                       ],
@@ -189,9 +189,9 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                     iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                      fontFamily: 'Open Sans',
-                      color: Colors.white,
-                    ),
+                          fontFamily: 'Open Sans',
+                          color: Colors.white,
+                        ),
                     elevation: 3,
                     borderSide: BorderSide(
                       color: Colors.transparent,
@@ -236,7 +236,8 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                             dropoff: '',
                             cNote: '',
                             cnumber: '',
-                            luggage: '', cemail: '',
+                            luggage: '',
+                            cemail: '',
                           ),
                         );
                       },
@@ -278,9 +279,9 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                     iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                     color: Color(0xFF1C1F28),
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                      fontFamily: 'Open Sans',
-                      color: Colors.white,
-                    ),
+                          fontFamily: 'Open Sans',
+                          color: Colors.white,
+                        ),
                     elevation: 3,
                     borderSide: BorderSide(
                       color: Colors.transparent,

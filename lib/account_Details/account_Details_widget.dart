@@ -1,3 +1,4 @@
+import 'package:mini_cab/Model/invoiceDetails.dart';
 
 import '../Model/invoivce.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
@@ -47,7 +48,7 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      final List<dynamic> data = jsonResponse[''];
+      final List<dynamic> data = jsonResponse[''] ?? [];
 
       if (data is List) {
         List<Invoice> paymentData =
@@ -142,9 +143,7 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
                               ),
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                    FlutterFlowTheme.of(
-                                        context)
-                                        .primary),
+                                    FlutterFlowTheme.of(context).primary),
                               ),
                             ),
                           );
@@ -166,516 +165,433 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
                           return Padding(
                             padding:
                                 EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
-                              child: ListView.builder(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                itemCount: invoiceData!.length,
-                                controller: controller,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final invoice = invoiceData[index];
-                                  return Padding(
-                                    padding: EdgeInsets.all(16),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Invoice INV / ${invoice.invoiceId}',
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: invoiceData!.length,
+                              controller: controller,
+                              itemBuilder: (BuildContext context, int index) {
+                                final invoice = invoiceData[index];
+                                return Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Invoice INV / ${invoice.invoiceId}',
+                                          style: FlutterFlowTheme.of(context)
+                                              .titleLarge
+                                              .override(
+                                                fontFamily: 'Outfit',
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 4, 0, 0),
+                                          child: Text(
+                                            'Booking Details',
                                             style: FlutterFlowTheme.of(context)
-                                                .titleLarge
-                                                .override(
-                                                  fontFamily: 'Outfit',
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                                .labelLarge,
                                           ),
-                                          Padding(
+                                        ),
+                                        Align(
+                                          alignment: AlignmentDirectional(1, 0),
+                                          child: Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 4, 0, 0),
+                                                    0, 10, 0, 10),
                                             child: Text(
-                                              'Booking Details',
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelLarge,
-                                            ),
-                                          ),
-                                          Align(
-                                            alignment:
-                                                AlignmentDirectional(1, 0),
-                                            child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(0, 10, 0, 10),
-                                              child: Text(
-                                                'Status: ${invoice.invoiceStatus}',
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .titleLarge,
-                                              ),
-                                            ),
-                                          ),
-                                          // Padding(
-                                          //   padding:
-                                          //       EdgeInsetsDirectional.fromSTEB(
-                                          //           0, 10, 0, 10),
-                                          //   child: Row(
-                                          //     mainAxisSize: MainAxisSize.max,
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment
-                                          //             .spaceBetween,
-                                          //     children: [
-                                          //       Text(
-                                          //         'Name',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium
-                                          //             .override(
-                                          //               fontFamily:
-                                          //                   'Readex Pro',
-                                          //               fontWeight:
-                                          //                   FontWeight.w600,
-                                          //             ),
-                                          //       ),
-                                          //       Text(
-                                          //         'Atiq Ramzan',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium,
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          // Padding(
-                                          //   padding:
-                                          //       EdgeInsetsDirectional.fromSTEB(
-                                          //           0, 10, 0, 10),
-                                          //   child: Row(
-                                          //     mainAxisSize: MainAxisSize.max,
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment
-                                          //             .spaceBetween,
-                                          //     children: [
-                                          //       Text(
-                                          //         'Phone',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium
-                                          //             .override(
-                                          //               fontFamily:
-                                          //                   'Readex Pro',
-                                          //               fontWeight:
-                                          //                   FontWeight.w600,
-                                          //             ),
-                                          //       ),
-                                          //       Text(
-                                          //         '032511511565',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium,
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          // Padding(
-                                          //   padding:
-                                          //       EdgeInsetsDirectional.fromSTEB(
-                                          //           0, 10, 0, 10),
-                                          //   child: Row(
-                                          //     mainAxisSize: MainAxisSize.max,
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment
-                                          //             .spaceBetween,
-                                          //     children: [
-                                          //       Text(
-                                          //         'Email',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium
-                                          //             .override(
-                                          //               fontFamily:
-                                          //                   'Readex Pro',
-                                          //               fontWeight:
-                                          //                   FontWeight.w600,
-                                          //             ),
-                                          //       ),
-                                          //       Text(
-                                          //         'AtiqRamzan.coom',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium,
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          // Padding(
-                                          //   padding:
-                                          //       EdgeInsetsDirectional.fromSTEB(
-                                          //           0, 10, 0, 10),
-                                          //   child: Row(
-                                          //     mainAxisSize: MainAxisSize.max,
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment
-                                          //             .spaceBetween,
-                                          //     children: [
-                                          //       Text(
-                                          //         'Address',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium
-                                          //             .override(
-                                          //               fontFamily:
-                                          //                   'Readex Pro',
-                                          //               fontWeight:
-                                          //                   FontWeight.w600,
-                                          //             ),
-                                          //       ),
-                                          //       Text(
-                                          //         'Lahore',
-                                          //         style: FlutterFlowTheme.of(
-                                          //                 context)
-                                          //             .labelMedium,
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          // Divider(
-                                          //   height: 32,
-                                          //   thickness: 2,
-                                          //   // color: FlutterFlowTheme.of(context).secondar,
-                                          // ),
-                                          Align(
-                                            alignment:
-                                                AlignmentDirectional(0, 0),
-                                            child: Text(
-                                              'Customer Details:',
+                                              'Status: ${invoice.invoiceStatus}',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .titleLarge,
                                             ),
                                           ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  'Name',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                ),
-                                                Text(
-                                                  '${invoice.cName}',
-                                                  style:
-                                                  FlutterFlowTheme.of(
-                                                      context)
-                                                      .labelMedium
-                                                      .override(
-                                                    fontFamily:
-                                                    'Readex Pro',
-                                                    fontSize:
-                                                    MediaQuery.sizeOf(context)
-                                                        .width *
-                                                        0.04,
+                                        ),
+                                        // Padding(
+                                        //   padding:
+                                        //       EdgeInsetsDirectional.fromSTEB(
+                                        //           0, 10, 0, 10),
+                                        //   child: Row(
+                                        //     mainAxisSize: MainAxisSize.max,
+                                        //     mainAxisAlignment:
+                                        //         MainAxisAlignment
+                                        //             .spaceBetween,
+                                        //     children: [
+                                        //       Text(
+                                        //         'Name',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium
+                                        //             .override(
+                                        //               fontFamily:
+                                        //                   'Readex Pro',
+                                        //               fontWeight:
+                                        //                   FontWeight.w600,
+                                        //             ),
+                                        //       ),
+                                        //       Text(
+                                        //         'Atiq Ramzan',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium,
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        // Padding(
+                                        //   padding:
+                                        //       EdgeInsetsDirectional.fromSTEB(
+                                        //           0, 10, 0, 10),
+                                        //   child: Row(
+                                        //     mainAxisSize: MainAxisSize.max,
+                                        //     mainAxisAlignment:
+                                        //         MainAxisAlignment
+                                        //             .spaceBetween,
+                                        //     children: [
+                                        //       Text(
+                                        //         'Phone',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium
+                                        //             .override(
+                                        //               fontFamily:
+                                        //                   'Readex Pro',
+                                        //               fontWeight:
+                                        //                   FontWeight.w600,
+                                        //             ),
+                                        //       ),
+                                        //       Text(
+                                        //         '032511511565',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium,
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        // Padding(
+                                        //   padding:
+                                        //       EdgeInsetsDirectional.fromSTEB(
+                                        //           0, 10, 0, 10),
+                                        //   child: Row(
+                                        //     mainAxisSize: MainAxisSize.max,
+                                        //     mainAxisAlignment:
+                                        //         MainAxisAlignment
+                                        //             .spaceBetween,
+                                        //     children: [
+                                        //       Text(
+                                        //         'Email',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium
+                                        //             .override(
+                                        //               fontFamily:
+                                        //                   'Readex Pro',
+                                        //               fontWeight:
+                                        //                   FontWeight.w600,
+                                        //             ),
+                                        //       ),
+                                        //       Text(
+                                        //         'AtiqRamzan.coom',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium,
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        // Padding(
+                                        //   padding:
+                                        //       EdgeInsetsDirectional.fromSTEB(
+                                        //           0, 10, 0, 10),
+                                        //   child: Row(
+                                        //     mainAxisSize: MainAxisSize.max,
+                                        //     mainAxisAlignment:
+                                        //         MainAxisAlignment
+                                        //             .spaceBetween,
+                                        //     children: [
+                                        //       Text(
+                                        //         'Address',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium
+                                        //             .override(
+                                        //               fontFamily:
+                                        //                   'Readex Pro',
+                                        //               fontWeight:
+                                        //                   FontWeight.w600,
+                                        //             ),
+                                        //       ),
+                                        //       Text(
+                                        //         'Lahore',
+                                        //         style: FlutterFlowTheme.of(
+                                        //                 context)
+                                        //             .labelMedium,
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        // Divider(
+                                        //   height: 32,
+                                        //   thickness: 2,
+                                        //   // color: FlutterFlowTheme.of(context).secondar,
+                                        // ),
+                                        Align(
+                                          alignment: AlignmentDirectional(0, 0),
+                                          child: Text(
+                                            'Customer Details:',
+                                            style: FlutterFlowTheme.of(context)
+                                                .titleLarge,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 10, 0, 10),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Name',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                              ),
+                                              Text(
+                                                '${invoice.cName}',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontSize:
+                                                              MediaQuery.sizeOf(
+                                                                          context)
+                                                                      .width *
+                                                                  0.04,
+                                                        ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 10, 0, 10),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Phone',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                              ),
+                                              Text(
+                                                '${invoice.cPhone}',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontSize:
+                                                              MediaQuery.sizeOf(
+                                                                          context)
+                                                                      .width *
+                                                                  0.04,
+                                                        ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 10, 0, 10),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Email',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                              ),
+                                              Flexible(
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 30.0),
+                                                  child: Text(
+                                                    '${invoice.cEmail}',
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontSize: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.04,
+                                                        ),
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              )
+                                            ],
                                           ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  'Phone',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                ),
-                                                Text(
-                                                  '${invoice.cPhone}',
-                                                  style:
-                                                  FlutterFlowTheme.of(
-                                                      context)
-                                                      .labelMedium
-                                                      .override(
-                                                    fontFamily:
-                                                    'Readex Pro',
-                                                    fontSize:
-                                                    MediaQuery.sizeOf(context)
-                                                        .width *
-                                                        0.04,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 10, 0, 10),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                'Address',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(20, 0, 0, 0),
+                                                  child: Text(
+                                                    '${invoice.cAddress ?? ''}',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .labelMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          fontSize:
+                                                              MediaQuery.sizeOf(
+                                                                          context)
+                                                                      .width *
+                                                                  0.04,
+                                                        ),
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  'Email',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                ),
-                                                Flexible(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(left: 30.0),
-                                                    child: Text(
-                                                      '${invoice.cEmail}',
-                                                      textAlign: TextAlign.justify,
-                                                      style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                        fontFamily: 'Readex Pro',
-                                                        fontSize: MediaQuery.of(context).size.width * 0.04,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .end,
-                                              children: [
-                                                Text(
-                                                  'Address',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                ),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding:
-                                                    EdgeInsetsDirectional.fromSTEB(
-                                                        20, 0, 0, 0),
-                                                    child: Text(
-                                                      '${invoice.cAddress ?? ''}',
-                                                      style:
-                                                      FlutterFlowTheme.of(
-                                                          context)
+                                        ),
+                                        Divider(
+                                          height: 32,
+                                          thickness: 2,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 12, 0, 0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Booking ID',
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
                                                           .labelMedium
                                                           .override(
-                                                        fontFamily:
-                                                        'Readex Pro',
-                                                        fontSize:
-                                                        MediaQuery.sizeOf(context)
-                                                            .width *
-                                                            0.04,
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        '${invoice.bookId}',
+                                                        style:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  fontSize:
+                                                                      MediaQuery.sizeOf(context)
+                                                                              .width *
+                                                                          0.04,
+                                                                ),
                                                       ),
                                                     ),
-                                                  ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                          Divider(
-                                            height: 32,
-                                            thickness: 2,
-                                          ),
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0, 12, 0, 0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        'Booking ID',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                      ),
-                                                      Flexible(
-                                                        child: Text(
-                                                          '${invoice.bookId}',
-                                                          style:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .labelMedium
-                                                                  .override(
-                                                                    fontFamily:
-                                                                        'Readex Pro',
-                                                                    fontSize:
-                                                                        MediaQuery.sizeOf(context)
-                                                                                .width *
-                                                                            0.04,
-                                                                  ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(0, 0,
-                                                                    10, 0),
-                                                        child: Icon(
-                                                          Icons.arrow_circle_up,
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primary,
-                                                          size: MediaQuery.sizeOf(
-                                                                      context)
-                                                                  .width *
-                                                              0.05,
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          '${invoice.pickup}',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .labelMedium
-                                                              .override(
-                                                                fontFamily:
-                                                                    'Readex Pro',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(0, 0,
-                                                                    10, 0),
-                                                        child: Icon(
-                                                          Icons
-                                                              .arrow_circle_down,
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primary,
-                                                          size: MediaQuery.sizeOf(
-                                                                      context)
-                                                                  .width *
-                                                              0.05,
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          '${invoice.destination}',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .labelMedium
-                                                              .override(
-                                                                fontFamily:
-                                                                    'Readex Pro',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      Icon(
-                                                        Icons.timer_sharp,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0, 0, 10, 0),
+                                                      child: Icon(
+                                                        Icons.arrow_circle_up,
                                                         color:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -685,15 +601,42 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
                                                                 .width *
                                                             0.05,
                                                       ),
-                                                      Text(
-                                                        '${invoice.pickTime}',
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        '${invoice.pickup}',
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
-                                                                .labelMedium,
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
                                                       ),
-                                                      Icon(
-                                                        Icons.date_range,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0, 0, 10, 0),
+                                                      child: Icon(
+                                                        Icons.arrow_circle_down,
                                                         color:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -703,28 +646,10 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
                                                                 .width *
                                                             0.05,
                                                       ),
-                                                      Text(
-                                                        '${invoice.pickDate}',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        'Journey Fare',
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        '${invoice.destination}',
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -737,411 +662,475 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
                                                                           .w600,
                                                                 ),
                                                       ),
-                                                      Text(
-                                                        '£ ${invoice.journeyFare}',
-                                                        style:
-                                                        FlutterFlowTheme.of(
-                                                            context)
-                                                            .labelMedium
-                                                            .override(
-                                                          fontFamily:
-                                                          'Readex Pro',
-                                                          fontSize:
-                                                          MediaQuery.sizeOf(context)
-                                                              .width *
-                                                              0.04,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        'Car Parking',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        '£ ${invoice.carParking}',
-                                                        style:
-                                                        FlutterFlowTheme.of(
-                                                            context)
-                                                            .labelMedium
-                                                            .override(
-                                                          fontFamily:
-                                                          'Readex Pro',
-                                                          fontSize:
-                                                          MediaQuery.sizeOf(context)
-                                                              .width *
-                                                              0.04,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        'Waiting',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        '£ ${invoice.waiting}',
-                                                        style:
-                                                        FlutterFlowTheme.of(
-                                                            context)
-                                                            .labelMedium
-                                                            .override(
-                                                          fontFamily:
-                                                          'Readex Pro',
-                                                          fontSize:
-                                                          MediaQuery.sizeOf(context)
-                                                              .width *
-                                                              0.04,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        'Tolls',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        '£ ${invoice.tolls}',
-                                                        style:
-                                                        FlutterFlowTheme.of(
-                                                            context)
-                                                            .labelMedium
-                                                            .override(
-                                                          fontFamily:
-                                                          'Readex Pro',
-                                                          fontSize:
-                                                          MediaQuery.sizeOf(context)
-                                                              .width *
-                                                              0.04,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 10, 0, 10),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        'Extra',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        '£ ${invoice.extra}',
-                                                        style:
-                                                        FlutterFlowTheme.of(
-                                                            context)
-                                                            .labelMedium
-                                                            .override(
-                                                          fontFamily:
-                                                          'Readex Pro',
-                                                          fontSize:
-                                                          MediaQuery.sizeOf(context)
-                                                              .width *
-                                                              0.04,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Divider(
-                                                  height: 32,
-                                                  thickness: 2,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 8),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0, 0, 0, 8),
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            // Text(
-                                                            //   'Company Charges',
-                                                            //   style: FlutterFlowTheme
-                                                            //           .of(context)
-                                                            //       .bodySmall
-                                                            //       .override(
-                                                            //         fontFamily:
-                                                            //             'Outfit',
-                                                            //         color: FlutterFlowTheme.of(
-                                                            //                 context)
-                                                            //             .secondaryText,
-                                                            //         fontSize:
-                                                            //             14,
-                                                            //         fontWeight:
-                                                            //             FontWeight
-                                                            //                 .w600,
-                                                            //       ),
-                                                            // ),
-                                                            // Text(
-                                                            //   '£156.00',
-                                                            //   textAlign:
-                                                            //       TextAlign.end,
-                                                            //   style: FlutterFlowTheme
-                                                            //           .of(context)
-                                                            //       .bodyLarge,
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0, 0, 0, 8),
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              'Driver Commission',
-                                                              style: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .bodySmall
-                                                                  .override(
-                                                                    fontFamily:
-                                                                        'Outfit',
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .secondaryText,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                            ),
-                                                            Text(
-                                                              '20%',
-                                                              textAlign:
-                                                                  TextAlign.end,
-                                                              style:
-                                                              FlutterFlowTheme.of(
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.timer_sharp,
+                                                      color:
+                                                          FlutterFlowTheme.of(
                                                                   context)
-                                                                  .labelMedium
-                                                                  .override(
-                                                                fontFamily:
+                                                              .primary,
+                                                      size: MediaQuery.sizeOf(
+                                                                  context)
+                                                              .width *
+                                                          0.05,
+                                                    ),
+                                                    Text(
+                                                      '${invoice.pickTime}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium,
+                                                    ),
+                                                    Icon(
+                                                      Icons.date_range,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primary,
+                                                      size: MediaQuery.sizeOf(
+                                                                  context)
+                                                              .width *
+                                                          0.05,
+                                                    ),
+                                                    Text(
+                                                      '${invoice.pickDate}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Journey Fare',
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .labelMedium
+                                                          .override(
+                                                            fontFamily:
                                                                 'Readex Pro',
-                                                                fontSize:
-                                                                MediaQuery.sizeOf(context)
-                                                                    .width *
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                    Text(
+                                                      '£ ${invoice.journeyFare}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Readex Pro',
+                                                                fontSize: MediaQuery.sizeOf(
+                                                                            context)
+                                                                        .width *
                                                                     0.04,
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0, 0, 0, 8),
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              'Driver Amount',
-                                                              style: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .bodySmall
-                                                                  .override(
-                                                                    fontFamily:
-                                                                        'Outfit',
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .secondaryText,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                            ),
-                                                            Text(
-                                                              '£ ${invoice.driverCommission}',
-                                                              textAlign:
-                                                                  TextAlign.end,
-                                                              style:
-                                                              FlutterFlowTheme.of(
-                                                                  context)
-                                                                  .labelMedium
-                                                                  .override(
-                                                                fontFamily:
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Car Parking',
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .labelMedium
+                                                          .override(
+                                                            fontFamily:
                                                                 'Readex Pro',
-                                                                fontSize:
-                                                                MediaQuery.sizeOf(context)
-                                                                    .width *
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                    Text(
+                                                      '£ ${invoice.carParking}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Readex Pro',
+                                                                fontSize: MediaQuery.sizeOf(
+                                                                            context)
+                                                                        .width *
                                                                     0.04,
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Waiting',
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .labelMedium
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                    Text(
+                                                      '£ ${invoice.waiting}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Readex Pro',
+                                                                fontSize: MediaQuery.sizeOf(
+                                                                            context)
+                                                                        .width *
+                                                                    0.04,
+                                                              ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Tolls',
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .labelMedium
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                    Text(
+                                                      '£ ${invoice.tolls}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Readex Pro',
+                                                                fontSize: MediaQuery.sizeOf(
+                                                                            context)
+                                                                        .width *
+                                                                    0.04,
+                                                              ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 10, 0, 10),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Extra',
+                                                      style: FlutterFlowTheme
+                                                              .of(context)
+                                                          .labelMedium
+                                                          .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                    Text(
+                                                      '£ ${invoice.extra}',
+                                                      style:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .labelMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Readex Pro',
+                                                                fontSize: MediaQuery.sizeOf(
+                                                                            context)
+                                                                        .width *
+                                                                    0.04,
+                                                              ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Divider(
+                                                height: 32,
+                                                thickness: 2,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 0, 0, 8),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0, 0, 0, 8),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          // Text(
+                                                          //   'Company Charges',
+                                                          //   style: FlutterFlowTheme
+                                                          //           .of(context)
+                                                          //       .bodySmall
+                                                          //       .override(
+                                                          //         fontFamily:
+                                                          //             'Outfit',
+                                                          //         color: FlutterFlowTheme.of(
+                                                          //                 context)
+                                                          //             .secondaryText,
+                                                          //         fontSize:
+                                                          //             14,
+                                                          //         fontWeight:
+                                                          //             FontWeight
+                                                          //                 .w600,
+                                                          //       ),
+                                                          // ),
+                                                          // Text(
+                                                          //   '£156.00',
+                                                          //   textAlign:
+                                                          //       TextAlign.end,
+                                                          //   style: FlutterFlowTheme
+                                                          //           .of(context)
+                                                          //       .bodyLarge,
+                                                          // ),
+                                                        ],
                                                       ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0, 8, 0, 8),
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Text(
-                                                                  'SubTotal',
-                                                                  style: FlutterFlowTheme.of(
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0, 0, 0, 8),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            'Driver Commission',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodySmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Outfit',
+                                                                  color: FlutterFlowTheme.of(
                                                                           context)
-                                                                      .titleMedium
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .secondaryText,
-                                                                        fontSize:
-                                                                            20,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                      ),
+                                                                      .secondaryText,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
                                                                 ),
-                                                              ],
-                                                            ),
-                                                            Text(
-                                                              '£ ${invoice.totalPay}',
-                                                              style: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .displaySmall
-                                                                  .override(
-                                                                    fontFamily:
-                                                                        'Outfit',
-                                                                    fontSize:
-                                                                        MediaQuery.sizeOf(context).width *
-                                                                            0.05,
-                                                                  ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                          Text(
+                                                            '20%',
+                                                            textAlign:
+                                                                TextAlign.end,
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  fontSize:
+                                                                      MediaQuery.sizeOf(context)
+                                                                              .width *
+                                                                          0.04,
+                                                                ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0, 0, 0, 8),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            'Driver Amount',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodySmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Outfit',
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                          ),
+                                                          Text(
+                                                            '£ ${invoice.driverCommission}',
+                                                            textAlign:
+                                                                TextAlign.end,
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  fontSize:
+                                                                      MediaQuery.sizeOf(context)
+                                                                              .width *
+                                                                          0.04,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0, 8, 0, 8),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Text(
+                                                                'SubTotal',
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Outfit',
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryText,
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Text(
+                                                            '£ ${invoice.totalPay}',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .displaySmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Outfit',
+                                                                  fontSize:
+                                                                      MediaQuery.sizeOf(context)
+                                                                              .width *
+                                                                          0.05,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  );
-                                },
-                              ),
-
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         }
                       },

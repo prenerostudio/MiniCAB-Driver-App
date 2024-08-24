@@ -1,3 +1,4 @@
+import 'package:mini_cab/payment_entery/complete.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -72,9 +73,19 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   Future<void> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? isLogin = prefs.getBool('isLogin');
+    // prefs.setInt('isRideStart', 0);
+    setState(() {});
+    int? isRideStart = prefs.getInt('isRideStart');
 
-    if (isLogin == true) {
+    if (isLogin == true && isRideStart == 0) {
       context.pushNamed('Home');
+    } else if (isLogin == true && isRideStart == 1) {
+      context.pushNamed('onWay');
+    } else if (isLogin == true && isRideStart == 2) {
+      context.pushNamed('Pob');
+    } else if (isLogin == true && isRideStart == 3) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => CompleteWidget()));
     } else {
       context.pushNamed('Welcome');
     }

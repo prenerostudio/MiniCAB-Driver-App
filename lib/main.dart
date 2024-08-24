@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:get/get.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mini_cab/BidHistory/bid_history_filter_widget.dart';
 import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
 import 'package:mini_cab/upcomming/upcomming_widget.dart';
@@ -47,7 +49,8 @@ Future<void> main() async {
   initializeService();
   runApp(MyApp());
 }
-Future notification() async{
+
+Future notification() async {
   await Permission.notification.isDenied.then((value) {
     if (value) {
       Permission.notification.request();
@@ -60,13 +63,12 @@ Future<void> initializeService() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     '09',
     'Minicab Service',
-    description:
-    'Waiting for upcoming job',
+    description: 'Waiting for upcoming job',
     importance: Importance.low,
   );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   if (Platform.isIOS || Platform.isAndroid) {
     await flutterLocalNotificationsPlugin.initialize(
@@ -77,8 +79,9 @@ Future<void> initializeService() async {
     );
   }
 
-  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
   await service.configure(
@@ -94,6 +97,7 @@ Future<void> initializeService() async {
     ),
   );
 }
+
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -131,11 +135,10 @@ void onStart(ServiceInstance service) async {
         service.setForegroundNotificationInfo(
           title: "Minicab Service",
           content: "Waiting for upcoming job",
-
         );
       }
     }
-    print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
+    // print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
 
     try {
       if (await checkApiStatus()) {
@@ -165,7 +168,6 @@ void onStart(ServiceInstance service) async {
 }
 
 Future<bool> checkApiStatus() async {
-
   final prefs = await SharedPreferences.getInstance();
   final dId = prefs.getString('d_id');
   final response = await http.post(
@@ -176,20 +178,21 @@ Future<bool> checkApiStatus() async {
   if (response.statusCode == 200) {
     final parsedResponse = json.decode(response.body);
     if (parsedResponse['status'] == true) {
-      print('New job available: ${DateTime.now()}');
+      // print('New job available: ${DateTime.now()}');
       return true;
     }
   } else {
-    print("API check failed with status code: ${response.statusCode}");
+    // print("API check failed with status code: ${response.statusCode}");
     throw Exception('API Check Failed');
   }
-  print("No new jobs found.");
+  // print("No new jobs found.");
   return false;
 }
 
 void showNotification() async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
     'your_channel_id',
     'your_channel_name',
     channelDescription: 'your_channel_description',
@@ -197,7 +200,8 @@ void showNotification() async {
     ticker: 'ticker',
   );
 
-  const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
     0,
@@ -207,6 +211,7 @@ void showNotification() async {
     payload: 'item x',
   );
 }
+
 class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
@@ -244,7 +249,6 @@ class _MyAppState extends State<MyApp> {
         _themeMode = mode;
         FlutterFlowTheme.saveThemeMode(mode);
       });
-
 
   @override
   Widget build(BuildContext context) {
@@ -294,27 +298,27 @@ class _NavBarPageState extends State<NavBarPage> {
     _currentPage = widget.page;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final tabs = {
       'Home': HomeWidget(),
       'Upcomming': UpcommingWidget(),
       'Dashboard': DashboardWidget(),
-      'Bids': BidsWidget(),
+      'Bids': BidHistoryFilterWidget(),
       'AccountStatement': AcountStatementsWidget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
     final MediaQueryData queryData = MediaQuery.of(context);
-
+    // body: MediaQuery(
+    //         data: queryData
+    //             .removeViewInsets(removeBottom: true)
+    //             .removeViewPadding(removeBottom: true),
+    //         child: _currentPage ?? tabs[_currentPageName]!),
     return Scaffold(
-      body: MediaQuery(
-          data: queryData.removeViewInsets(removeBottom: true).removeViewPadding(removeBottom: true),
-          child: _currentPage ?? tabs[_currentPageName]!),
+      body: _currentPage ?? tabs[_currentPageName],
       extendBody: false,
-      backgroundColor:Colors.white,
+      backgroundColor: Colors.white,
       bottomNavigationBar: FloatingNavbar(
         currentIndex: currentIndex,
         onTap: (i) => setState(() {
@@ -348,7 +352,6 @@ class _NavBarPageState extends State<NavBarPage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: currentIndex == 0
-
                         ? FlutterFlowTheme.of(context).primary
                         : Color(0x8A000000),
                     fontSize: 11.0,

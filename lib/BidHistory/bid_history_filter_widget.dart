@@ -63,7 +63,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        final List<dynamic> data = jsonResponse[''];
+        final List<dynamic> data = jsonResponse['data'];
 
         List<Bid> bookingList =
             data.map((item) => Bid.fromJson(item)).cast<Bid>().toList();
@@ -78,6 +78,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
       return [];
     }
   }
+
   Future<List<Bid>> acceptBids() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
@@ -94,7 +95,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        final List<dynamic> data = jsonResponse[''];
+        final List<dynamic> data = jsonResponse['data'];
 
         List<Bid> bookingList =
             data.map((item) => Bid.fromJson(item)).cast<Bid>().toList();
@@ -116,14 +117,15 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
     );
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      print(jsonResponse);
-      final List<dynamic> data = jsonResponse[''];
+      print("the bid data is ${jsonResponse}");
+      final List<dynamic> data = jsonResponse['data'] ?? [];
       print(data);
       return data.map((item) => BidItem.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load data');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -136,20 +138,20 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
         appBar: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
           automaticallyImplyLeading: false,
-          leading: FlutterFlowIconButton(
-            borderColor: Colors.transparent,
-            borderRadius: 30,
-            borderWidth: 1,
-            buttonSize: 60,
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: FlutterFlowTheme.of(context).primary,
-              size: 30,
-            ),
-            onPressed: () async {
-              context.pop();
-            },
-          ),
+          // leading: FlutterFlowIconButton(
+          //   borderColor: Colors.transparent,
+          //   borderRadius: 30,
+          //   borderWidth: 1,
+          //   buttonSize: 60,
+          //   icon: Icon(
+          //     Icons.arrow_back_rounded,
+          //     color: FlutterFlowTheme.of(context).primary,
+          //     size: 30,
+          //   ),
+          //   onPressed: () async {
+          //     context.pop();
+          //   },
+          // ),
           title: Text(
             'On Bids',
             style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -218,7 +220,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       10.0, 10.0, 10.0, 30.0),
-                                  child:   FutureBuilder<List<BidItem>>(
+                                  child: FutureBuilder<List<BidItem>>(
                                     future: Bids(),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
@@ -226,13 +228,17 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                         return Center(
                                           child: Padding(
                                             padding: EdgeInsets.only(
-                                              top: MediaQuery.of(context).size.height *
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
                                                   0.3, // 30% padding from the top
                                             ),
                                             child: CircularProgressIndicator(
-                                              valueColor: AlwaysStoppedAnimation<Color>(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
                                                 FlutterFlowTheme.of(context)
-                                                    .primary,),
+                                                    .primary,
+                                              ),
                                             ),
                                           ),
                                         );
@@ -240,7 +246,9 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                         return Center(
                                           child: Padding(
                                             padding: EdgeInsets.only(
-                                              top: MediaQuery.of(context).size.height *
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
                                                   0.3, // 30% padding from the top
                                             ),
                                             child: Text('No Bids available.'),
@@ -257,7 +265,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                         return SingleChildScrollView(
                                           padding: EdgeInsets.only(
                                               bottom:
-                                              30.0), // Adjust the bottom padding as needed
+                                                  30.0), // Adjust the bottom padding as needed
                                           child: ListView.builder(
                                             controller: controller,
                                             itemCount: data!.length,
@@ -266,209 +274,149 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                             itemBuilder: (context, index) {
                                               final bidItem = data[index];
                                               return Padding(
-                                                padding: EdgeInsetsDirectional.fromSTEB(
-                                                    0.0, 10.0, 0.0, 0.0),
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        0.0, 10.0, 0.0, 0.0),
                                                 child: InkWell(
-                                                  splashColor: Colors.transparent,
-                                                  focusColor: Colors.transparent,
-                                                  hoverColor: Colors.transparent,
-                                                  highlightColor: Colors.transparent,
+                                                  splashColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  highlightColor:
+                                                      Colors.transparent,
                                                   child: SingleChildScrollView(
                                                     child: Container(
-                                                      child: SingleChildScrollView(
+                                                      child:
+                                                          SingleChildScrollView(
                                                         child: Row(
-                                                          mainAxisSize: MainAxisSize.max,
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment.start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
                                                             Expanded(
                                                               child: Padding(
-                                                                padding:
-                                                                EdgeInsetsDirectional
+                                                                padding: EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                    20.0,
-                                                                    12.0,
-                                                                    20.0,
-                                                                    0.0),
+                                                                        20.0,
+                                                                        12.0,
+                                                                        20.0,
+                                                                        0.0),
                                                                 child:
-                                                                SingleChildScrollView(
+                                                                    SingleChildScrollView(
                                                                   child: Column(
                                                                     mainAxisSize:
-                                                                    MainAxisSize.max,
+                                                                        MainAxisSize
+                                                                            .max,
                                                                     mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
+                                                                        MainAxisAlignment
+                                                                            .start,
                                                                     crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                        CrossAxisAlignment
+                                                                            .start,
                                                                     children: [
                                                                       Row(
                                                                         mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .max,
+                                                                            MainAxisSize.max,
                                                                         mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
+                                                                            MainAxisAlignment.spaceBetween,
                                                                         children: [
                                                                           Padding(
-                                                                            padding:
-                                                                            EdgeInsetsDirectional
-                                                                                .fromSTEB(
+                                                                            padding: EdgeInsetsDirectional.fromSTEB(
                                                                                 0.0,
                                                                                 0.0,
                                                                                 0.0,
                                                                                 4.0),
-                                                                            child: Text(
-                                                                              'Bid Id #${bidItem.bookId}',
-                                                                              style: FlutterFlowTheme.of(
-                                                                                  context)
-                                                                                  .bodyLarge
-                                                                                  .override(
-                                                                                fontFamily:
-                                                                                'Readex Pro',
-                                                                                color: FlutterFlowTheme.of(context)
-                                                                                    .secondaryText,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Padding(
-                                                                            padding:
-                                                                            EdgeInsetsDirectional
-                                                                                .fromSTEB(
-                                                                                0.0,
-                                                                                0.0,
-                                                                                0.0,
-                                                                                10.0),
                                                                             child:
-                                                                            FFButtonWidget(
-                                                                              onPressed:
-                                                                                  () {
-                                                                                print(
-                                                                                    'Button pressed ...');
-                                                                              },
-                                                                              text:
-                                                                              '${bidItem.bookingStatus}',
-                                                                              options:
-                                                                              FFButtonOptions(
-                                                                                height:
-                                                                                40.0,
-                                                                                padding: EdgeInsetsDirectional
-                                                                                    .fromSTEB(
-                                                                                    24.0,
-                                                                                    0.0,
-                                                                                    24.0,
-                                                                                    0.0),
-                                                                                iconPadding:
-                                                                                EdgeInsetsDirectional.fromSTEB(
-                                                                                    0.0,
-                                                                                    0.0,
-                                                                                    0.0,
-                                                                                    0.0),
-                                                                                color: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .primary,
-                                                                                textStyle: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .titleSmall
-                                                                                    .override(
-                                                                                  fontFamily:
-                                                                                  'Readex Pro',
-                                                                                  color:
-                                                                                  Colors.white,
-                                                                                  fontSize:
-                                                                                  14.0,
-                                                                                ),
-                                                                                elevation:
-                                                                                3.0,
-                                                                                borderSide:
-                                                                                BorderSide(
-                                                                                  color: Colors
-                                                                                      .transparent,
-                                                                                  width:
-                                                                                  1.0,
-                                                                                ),
-                                                                                borderRadius:
-                                                                                BorderRadius.circular(
-                                                                                    20.0),
-                                                                              ),
+                                                                                Text(
+                                                                              'Bid Id #${bidItem.bookId}',
+                                                                              style: FlutterFlowTheme.of(context).bodyLarge.override(
+                                                                                    fontFamily: 'Readex Pro',
+                                                                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                  ),
                                                                             ),
                                                                           ),
+                                                                          // Padding(
+                                                                          //   padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          //       0.0,
+                                                                          //       0.0,
+                                                                          //       0.0,
+                                                                          //       10.0),
+                                                                          //   child:
+                                                                          //       FFButtonWidget(
+                                                                          //     onPressed: () {
+                                                                          //       print('Button pressed ...');
+                                                                          //     },
+                                                                          //     text: '${bidItem.bookingStatus}',
+                                                                          //     options: FFButtonOptions(
+                                                                          //       height: 40.0,
+                                                                          //       padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                                                          //       iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                          //       color: FlutterFlowTheme.of(context).primary,
+                                                                          //       textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                          //             fontFamily: 'Readex Pro',
+                                                                          //             color: Colors.white,
+                                                                          //             fontSize: 14.0,
+                                                                          //           ),
+                                                                          //       elevation: 3.0,
+                                                                          //       borderSide: BorderSide(
+                                                                          //         color: Colors.transparent,
+                                                                          //         width: 1.0,
+                                                                          //       ),
+                                                                          //       borderRadius: BorderRadius.circular(20.0),
+                                                                          //     ),
+                                                                          //   ),
+                                                                          // ),
                                                                         ],
                                                                       ),
                                                                       Padding(
-                                                                        padding:
-                                                                        EdgeInsetsDirectional
-                                                                            .fromSTEB(
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
                                                                             0.0,
                                                                             0.0,
                                                                             0.0,
                                                                             10.0),
-                                                                        child: Row(
+                                                                        child:
+                                                                            Row(
                                                                           mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
+                                                                              MainAxisSize.max,
                                                                           children: [
                                                                             FaIcon(
-                                                                              FontAwesomeIcons
-                                                                                  .clock,
-                                                                              color: FlutterFlowTheme.of(
-                                                                                  context)
-                                                                                  .secondaryText,
+                                                                              FontAwesomeIcons.clock,
+                                                                              color: FlutterFlowTheme.of(context).secondaryText,
                                                                               size: 18.0,
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsetsDirectional
-                                                                                  .fromSTEB(
-                                                                                  10.0,
-                                                                                  0.0,
-                                                                                  0.0,
-                                                                                  0.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 0.0),
                                                                               child: Text(
                                                                                 '${bidItem.pickTime}',
-                                                                                style: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .labelMedium,
+                                                                                style: FlutterFlowTheme.of(context).labelMedium,
                                                                               ),
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsetsDirectional
-                                                                                  .fromSTEB(
-                                                                                  10.0,
-                                                                                  0.0,
-                                                                                  0.0,
-                                                                                  0.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 0.0),
                                                                               child: Text(
                                                                                 '${bidItem.pickDate}',
-                                                                                style: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .labelMedium,
+                                                                                style: FlutterFlowTheme.of(context).labelMedium,
                                                                               ),
                                                                             ),
                                                                             SizedBox(
                                                                               height: 10.0,
-                                                                              child:
-                                                                              VerticalDivider(
-                                                                                thickness:
-                                                                                1.0,
-                                                                                color: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .secondaryText,
+                                                                              child: VerticalDivider(
+                                                                                thickness: 1.0,
+                                                                                color: FlutterFlowTheme.of(context).secondaryText,
                                                                               ),
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsetsDirectional
-                                                                                  .fromSTEB(
-                                                                                  10.0,
-                                                                                  0.0,
-                                                                                  0.0,
-                                                                                  0.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 0.0),
                                                                               child: Text(
                                                                                 'cash',
-                                                                                style: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .labelMedium,
+                                                                                style: FlutterFlowTheme.of(context).labelMedium,
                                                                               ),
                                                                             ),
                                                                           ],
@@ -478,44 +426,27 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                         children: [
                                                                           Row(
                                                                             mainAxisSize:
-                                                                            MainAxisSize
-                                                                                .min, // Set this to MainAxisSize.min
+                                                                                MainAxisSize.min, // Set this to MainAxisSize.min
                                                                             children: [
                                                                               Icon(
-                                                                                Icons
-                                                                                    .arrow_circle_up,
-                                                                                color: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .primary,
-                                                                                size: MediaQuery.sizeOf(
-                                                                                    context)
-                                                                                    .width *
-                                                                                    0.05,
+                                                                                Icons.arrow_circle_up,
+                                                                                color: FlutterFlowTheme.of(context).primary,
+                                                                                size: MediaQuery.sizeOf(context).width * 0.05,
                                                                               ),
                                                                               Flexible(
                                                                                 // Wrap the Text widget with Flexible
-                                                                                child:
-                                                                                Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                      10.0,
-                                                                                      10.0,
-                                                                                      0.0,
-                                                                                      20.0),
-                                                                                  child:
-                                                                                  Text(
+                                                                                child: Padding(
+                                                                                  padding: EdgeInsetsDirectional.fromSTEB(10.0, 10.0, 0.0, 20.0),
+                                                                                  child: Text(
                                                                                     '${bidItem.pickup}',
 
-                                                                                    style: FlutterFlowTheme.of(context)
-                                                                                        .labelMedium
-                                                                                        .override(
-                                                                                      fontFamily: 'Readex Pro',
-                                                                                      color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                      fontSize: 15.0,
-                                                                                    ),
-                                                                                    overflow:
-                                                                                    TextOverflow.ellipsis, // Handle text overflow with ellipsis
-                                                                                    maxLines:
-                                                                                    3, // Limit to a maximum of 2 lines
+                                                                                    style: FlutterFlowTheme.of(context).labelMedium.override(
+                                                                                          fontFamily: 'Readex Pro',
+                                                                                          color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                          fontSize: 15.0,
+                                                                                        ),
+                                                                                    overflow: TextOverflow.ellipsis, // Handle text overflow with ellipsis
+                                                                                    maxLines: 3, // Limit to a maximum of 2 lines
                                                                                   ),
                                                                                 ),
                                                                               ),
@@ -527,43 +458,26 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                         children: [
                                                                           Row(
                                                                             mainAxisSize:
-                                                                            MainAxisSize
-                                                                                .min, // Set this to MainAxisSize.min
+                                                                                MainAxisSize.min, // Set this to MainAxisSize.min
                                                                             children: [
                                                                               Icon(
-                                                                                Icons
-                                                                                    .arrow_circle_down,
-                                                                                color: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .primary,
-                                                                                size: MediaQuery.sizeOf(
-                                                                                    context)
-                                                                                    .width *
-                                                                                    0.05,
+                                                                                Icons.arrow_circle_down,
+                                                                                color: FlutterFlowTheme.of(context).primary,
+                                                                                size: MediaQuery.sizeOf(context).width * 0.05,
                                                                               ),
                                                                               Flexible(
                                                                                 // Wrap the Text widget with Flexible
-                                                                                child:
-                                                                                Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                      10.0,
-                                                                                      10.0,
-                                                                                      0.0,
-                                                                                      20.0),
-                                                                                  child:
-                                                                                  Text(
+                                                                                child: Padding(
+                                                                                  padding: EdgeInsetsDirectional.fromSTEB(10.0, 10.0, 0.0, 20.0),
+                                                                                  child: Text(
                                                                                     '${bidItem.destination}',
-                                                                                    style: FlutterFlowTheme.of(context)
-                                                                                        .labelMedium
-                                                                                        .override(
-                                                                                      fontFamily: 'Readex Pro',
-                                                                                      color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                      fontSize: 15.0,
-                                                                                    ),
-                                                                                    overflow:
-                                                                                    TextOverflow.ellipsis, // Handle text overflow with ellipsis
-                                                                                    maxLines:
-                                                                                    3, // Limit to a maximum of 2 lines
+                                                                                    style: FlutterFlowTheme.of(context).labelMedium.override(
+                                                                                          fontFamily: 'Readex Pro',
+                                                                                          color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                          fontSize: 15.0,
+                                                                                        ),
+                                                                                    overflow: TextOverflow.ellipsis, // Handle text overflow with ellipsis
+                                                                                    maxLines: 3, // Limit to a maximum of 2 lines
                                                                                   ),
                                                                                 ),
                                                                               ),
@@ -572,168 +486,96 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                         ],
                                                                       ),
                                                                       Padding(
-                                                                        padding:
-                                                                        EdgeInsetsDirectional
-                                                                            .fromSTEB(
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
                                                                             0.0,
                                                                             10.0,
                                                                             10.0,
                                                                             10.0),
-                                                                        child: Row(
+                                                                        child:
+                                                                            Row(
                                                                           mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
+                                                                              MainAxisSize.max,
                                                                           mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .end,
+                                                                              MainAxisAlignment.end,
                                                                           children: [
                                                                             Icon(
                                                                               Icons.man,
-                                                                              color: FlutterFlowTheme.of(
-                                                                                  context)
-                                                                                  .primary,
-                                                                              size: MediaQuery.sizeOf(
-                                                                                  context)
-                                                                                  .width *
-                                                                                  0.05,
+                                                                              color: FlutterFlowTheme.of(context).primary,
+                                                                              size: MediaQuery.sizeOf(context).width * 0.05,
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsetsDirectional
-                                                                                  .fromSTEB(
-                                                                                  10.0,
-                                                                                  0.0,
-                                                                                  10.0,
-                                                                                  0.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
                                                                               child: Text(
                                                                                 'x ${bidItem.passenger}',
-                                                                                style: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .labelMedium
-                                                                                    .override(
-                                                                                  fontFamily:
-                                                                                  'Readex Pro',
-                                                                                  color:
-                                                                                  FlutterFlowTheme.of(context).secondaryText,
-                                                                                  fontSize:
-                                                                                  15.0,
-                                                                                ),
+                                                                                style: FlutterFlowTheme.of(context).labelMedium.override(
+                                                                                      fontFamily: 'Readex Pro',
+                                                                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                      fontSize: 15.0,
+                                                                                    ),
                                                                               ),
                                                                             ),
                                                                             Icon(
                                                                               Icons.luggage,
-                                                                              color: FlutterFlowTheme.of(
-                                                                                  context)
-                                                                                  .primary,
-                                                                              size: MediaQuery.sizeOf(
-                                                                                  context)
-                                                                                  .width *
-                                                                                  0.05,
+                                                                              color: FlutterFlowTheme.of(context).primary,
+                                                                              size: MediaQuery.sizeOf(context).width * 0.05,
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsetsDirectional
-                                                                                  .fromSTEB(
-                                                                                  10.0,
-                                                                                  0.0,
-                                                                                  10.0,
-                                                                                  0.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
                                                                               child: Text(
                                                                                 'x ${bidItem.luggage}',
-                                                                                style: FlutterFlowTheme.of(
-                                                                                    context)
-                                                                                    .labelMedium
-                                                                                    .override(
-                                                                                  fontFamily:
-                                                                                  'Readex Pro',
-                                                                                  color:
-                                                                                  FlutterFlowTheme.of(context).secondaryText,
-                                                                                  fontSize:
-                                                                                  15.0,
-                                                                                ),
+                                                                                style: FlutterFlowTheme.of(context).labelMedium.override(
+                                                                                      fontFamily: 'Readex Pro',
+                                                                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                      fontSize: 15.0,
+                                                                                    ),
                                                                               ),
                                                                             ),
                                                                           ],
                                                                         ),
                                                                       ),
                                                                       Padding(
-                                                                        padding:
-                                                                        EdgeInsetsDirectional
-                                                                            .fromSTEB(
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
                                                                             0.0,
                                                                             0.0,
                                                                             0.0,
                                                                             5.0),
-                                                                        child: Row(
+                                                                        child:
+                                                                            Row(
                                                                           mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
+                                                                              MainAxisSize.max,
                                                                           mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
+                                                                              MainAxisAlignment.center,
                                                                           children: [
                                                                             Padding(
-                                                                              padding: EdgeInsetsDirectional
-                                                                                  .fromSTEB(
-                                                                                  5.0,
-                                                                                  5.0,
-                                                                                  5.0,
-                                                                                  5.0),
-                                                                              child:
-                                                                              FFButtonWidget(
-                                                                                onPressed:
-                                                                                    () async {
-                                                                                  context
-                                                                                      .pushNamed(
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(5.0, 5.0, 5.0, 5.0),
+                                                                              child: FFButtonWidget(
+                                                                                onPressed: () async {
+                                                                                  context.pushNamed(
                                                                                     'bidDetails',
-                                                                                    queryParameters:
-                                                                                    {
-                                                                                      'bidId':
-                                                                                      serializeParam(
+                                                                                    queryParameters: {
+                                                                                      'bidId': serializeParam(
                                                                                         '${bidItem.bookId}',
                                                                                         ParamType.String,
                                                                                       ),
                                                                                     }.withoutNulls,
                                                                                   );
                                                                                 },
-                                                                                text:
-                                                                                'Offer Price',
-                                                                                options:
-                                                                                FFButtonOptions(
-                                                                                  height:
-                                                                                  40.0,
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                      24.0,
-                                                                                      0.0,
-                                                                                      24.0,
-                                                                                      0.0),
-                                                                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                                                                      0.0,
-                                                                                      0.0,
-                                                                                      0.0,
-                                                                                      0.0),
-                                                                                  color: FlutterFlowTheme.of(
-                                                                                      context)
-                                                                                      .primary,
-                                                                                  textStyle: FlutterFlowTheme.of(
-                                                                                      context)
-                                                                                      .titleSmall
-                                                                                      .override(
-                                                                                    fontFamily:
-                                                                                    'Readex Pro',
-                                                                                    color:
-                                                                                    Colors.white,
+                                                                                text: 'Offer Price',
+                                                                                options: FFButtonOptions(
+                                                                                  height: 40.0,
+                                                                                  padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                                                                                  iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                                                                  color: FlutterFlowTheme.of(context).primary,
+                                                                                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                                                                                        fontFamily: 'Readex Pro',
+                                                                                        color: Colors.white,
+                                                                                      ),
+                                                                                  elevation: 3.0,
+                                                                                  borderSide: BorderSide(
+                                                                                    color: Colors.transparent,
+                                                                                    width: 1.0,
                                                                                   ),
-                                                                                  elevation:
-                                                                                  3.0,
-                                                                                  borderSide:
-                                                                                  BorderSide(
-                                                                                    color: Colors
-                                                                                        .transparent,
-                                                                                    width:
-                                                                                    1.0,
-                                                                                  ),
-                                                                                  borderRadius:
-                                                                                  BorderRadius.circular(
-                                                                                      20.0),
+                                                                                  borderRadius: BorderRadius.circular(20.0),
                                                                                 ),
                                                                               ),
                                                                             ),
@@ -741,9 +583,9 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                         ),
                                                                       ),
                                                                       Divider(
-                                                                        thickness: 1.0,
-                                                                        color: FlutterFlowTheme
-                                                                            .of(context)
+                                                                        thickness:
+                                                                            1.0,
+                                                                        color: FlutterFlowTheme.of(context)
                                                                             .secondaryText,
                                                                       ),
                                                                     ],
@@ -752,7 +594,8 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                               ),
                                                             ),
                                                           ],
-                                                        ),),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -896,58 +739,66 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             ),
                                                                       ),
                                                                     ),
-                                                                    Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                                                          0.0,
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0),
-                                                                      child:
-                                                                          FFButtonWidget(
-                                                                        onPressed:
-                                                                            () {
-                                                                          print(
-                                                                              'Button pressed ...');
-                                                                        },
-                                                                        text:
-                                                                            '£${bidItem.bidAmount}',
-                                                                        options:
-                                                                            FFButtonOptions(
-                                                                          height:
-                                                                              40.0,
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              24.0,
-                                                                              0.0,
-                                                                              24.0,
-                                                                              0.0),
-                                                                          iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0),
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primary,
-                                                                          textStyle: FlutterFlowTheme.of(context)
-                                                                              .titleSmall
-                                                                              .override(
-                                                                                fontFamily: 'Readex Pro',
-                                                                                color: Colors.white,
-                                                                                fontSize: 14.0,
-                                                                              ),
-                                                                          elevation:
-                                                                              3.0,
-                                                                          borderSide:
-                                                                              BorderSide(
-                                                                            color:
-                                                                                Colors.transparent,
-                                                                            width:
-                                                                                1.0,
-                                                                          ),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(20.0),
-                                                                        ),
-                                                                      ),
-                                                                    ),
+                                                                    Text(
+                                                                      "£${bidItem.bidAmount}",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    )
+                                                                    // Padding(
+                                                                    //   padding: EdgeInsetsDirectional.fromSTEB(
+                                                                    //       0.0,
+                                                                    //       10.0,
+                                                                    //       0.0,
+                                                                    //       0.0),
+                                                                    //   child:
+                                                                    //       FFButtonWidget(
+                                                                    //     onPressed:
+                                                                    //         () {
+                                                                    //       print(
+                                                                    //           'Button pressed ...');
+                                                                    //     },
+                                                                    //     text:
+                                                                    //         '£${bidItem.bidAmount}',
+                                                                    //     options:
+                                                                    //         FFButtonOptions(
+                                                                    //       height:
+                                                                    //           40.0,
+                                                                    //       padding: EdgeInsetsDirectional.fromSTEB(
+                                                                    //           24.0,
+                                                                    //           0.0,
+                                                                    //           24.0,
+                                                                    //           0.0),
+                                                                    //       iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                                                    //           0.0,
+                                                                    //           0.0,
+                                                                    //           0.0,
+                                                                    //           0.0),
+                                                                    //       color:
+                                                                    //           FlutterFlowTheme.of(context).primary,
+                                                                    //       textStyle: FlutterFlowTheme.of(context)
+                                                                    //           .titleSmall
+                                                                    //           .override(
+                                                                    //             fontFamily: 'Readex Pro',
+                                                                    //             color: Colors.white,
+                                                                    //             fontSize: 14.0,
+                                                                    //           ),
+                                                                    //       elevation:
+                                                                    //           3.0,
+                                                                    //       borderSide:
+                                                                    //           BorderSide(
+                                                                    //         color:
+                                                                    //             Colors.transparent,
+                                                                    //         width:
+                                                                    //             1.0,
+                                                                    //       ),
+                                                                    //       borderRadius:
+                                                                    //           BorderRadius.circular(20.0),
+                                                                    //     ),
+                                                                    //   ),
+                                                                    // ),
                                                                   ],
                                                                 ),
                                                                 Padding(
@@ -1396,58 +1247,14 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             ),
                                                                       ),
                                                                     ),
-                                                                    Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                                                          0.0,
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0),
-                                                                      child:
-                                                                          FFButtonWidget(
-                                                                        onPressed:
-                                                                            () {
-                                                                          print(
-                                                                              'Button pressed ...');
-                                                                        },
-                                                                        text:
-                                                                            '£${bidItem.bidAmount}',
-                                                                        options:
-                                                                            FFButtonOptions(
-                                                                          height:
-                                                                              40.0,
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              24.0,
-                                                                              0.0,
-                                                                              24.0,
-                                                                              0.0),
-                                                                          iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0,
-                                                                              0.0),
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primary,
-                                                                          textStyle: FlutterFlowTheme.of(context)
-                                                                              .titleSmall
-                                                                              .override(
-                                                                                fontFamily: 'Readex Pro',
-                                                                                color: Colors.white,
-                                                                                fontSize: 14.0,
-                                                                              ),
-                                                                          elevation:
-                                                                              3.0,
-                                                                          borderSide:
-                                                                              BorderSide(
-                                                                            color:
-                                                                                Colors.transparent,
-                                                                            width:
-                                                                                1.0,
-                                                                          ),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(20.0),
-                                                                        ),
-                                                                      ),
-                                                                    ),
+                                                                    Text(
+                                                                      '£${bidItem.bidAmount}',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    )
                                                                   ],
                                                                 ),
                                                                 Padding(
