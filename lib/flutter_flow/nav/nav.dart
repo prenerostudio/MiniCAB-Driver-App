@@ -340,11 +340,13 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'Otp',
           path: '/otp',
           builder: (context, params) => OtpWidget(
+            name: params.getParam('name', ParamType.String),
             phoneNumber: params.getParam('phoneNumber', ParamType.String),
             email: params.getParam('email', ParamType.String),
             password: params.getParam('password', ParamType.String),
             licenseAuth: params.getParam('licenseAuth', ParamType.String),
             varifyId: params.getParam('varifyId', ParamType.String),
+            dropDownValue2: params.getParam('dropDownValue2', ParamType.String),
           ),
         ),
         FFRoute(

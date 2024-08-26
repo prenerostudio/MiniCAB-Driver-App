@@ -194,15 +194,15 @@ class _LoginWidgetState extends State<LoginWidget>
 
     super.dispose();
   }
-  Future<void> loginUser() async {
 
+  Future<void> loginUser() async {
     if (PasswordController.text.length < 8) {
-            _showToastMessage("Password must be at least 8 characters long.");
-            return;
-          }
+      _showToastMessage("Password must be at least 8 characters long.");
+      return;
+    }
     try {
       final url =
-      Uri.parse('https://www.minicaboffice.com/api/driver/signin.php');
+          Uri.parse('https://www.minicaboffice.com/api/driver/signin.php');
       final request = http.MultipartRequest('POST', url);
       request.fields.addAll({
         'd_phone': '${enteredPhoneNumber ?? ''}',
@@ -210,6 +210,7 @@ class _LoginWidgetState extends State<LoginWidget>
       });
       print(request.fields);
       final response = await request.send();
+
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         final jsonResponse = json.decode(responseBody);
@@ -229,31 +230,28 @@ class _LoginWidgetState extends State<LoginWidget>
             }
             context.pushNamed('Home');
             _showToastMessage("Login successful!");
-          } else {
-
-          }
+          } else {}
         } else {
-          _showToastMessage(
-              "Login failed. Please try again.");
+          _showToastMessage("Login failed. Please try again.");
           print(response.reasonPhrase);
         }
       } else {
-        _showToastMessage(
-            "Login failed. Please try again.");
+        _showToastMessage("Login failed. Please try again.");
         print(response.reasonPhrase);
       }
     } catch (error) {
-      _showToastMessage(
-          "Login failed. Please try again.");
+      _showToastMessage("Login failed. Please try again.");
       print('Error during login: $error');
     }
   }
+
   void _showToastMessage(String message) {
     Fluttertoast.showToast(
       msg: message,
       textColor: Colors.white,
     );
   }
+
   Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
     final permissionStatus = await Permission.location.request();
     final currentStatus = await Permission.location.status;
@@ -262,6 +260,7 @@ class _LoginWidgetState extends State<LoginWidget>
       openAppSettings();
     } else {}
   }
+
   @override
   Widget build(BuildContext context) {
     if (isiOS) {
@@ -330,33 +329,37 @@ class _LoginWidgetState extends State<LoginWidget>
                               Container(
                                 width: MediaQuery.sizeOf(context).width,
                                 decoration: BoxDecoration(
-                                  color: FlutterFlowTheme.of(context).primaryBackground,
+                                  color: FlutterFlowTheme.of(context)
+                                      .primaryBackground,
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.asset(
                                     'assets/images/app_launcher_icon.png',
                                     width: MediaQuery.sizeOf(context).width,
-                                    height: MediaQuery.sizeOf(context).height * 0.3,
+                                    height:
+                                        MediaQuery.sizeOf(context).height * 0.3,
                                     fit: BoxFit.fitHeight,
                                   ),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                                padding:
+                                    EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Text(
-                                      'Sign in as driver',
-                                      style: FlutterFlowTheme.of(context).headlineLarge,
+                                      'Sign in as drivers',
+                                      style: FlutterFlowTheme.of(context)
+                                          .headlineLarge,
                                     ),
                                   ],
                                 ),
                               ),
                               Padding(
                                 padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
+                                    EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
                                 child: IntlPhoneField(
                                   controller: phoneController,
                                   focusNode: _model.phoneNumberFocusNode,
@@ -368,41 +371,48 @@ class _LoginWidgetState extends State<LoginWidget>
                                     print(enteredPhoneNumber);
                                   },
                                   onCountryChanged: (country) {
-                                    print('Country changed to: ' +
-                                        country.name);
+                                    print(
+                                        'Country changed to: ' + country.name);
                                   },
                                   decoration: InputDecoration(
                                     labelText: 'Mobile number',
-                                    labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                                      fontFamily: 'Open Sans',
-                                      fontSize: 14,
-                                    ),
+                                    labelStyle: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: 'Open Sans',
+                                          fontSize: 14,
+                                        ),
                                     hintText: 'Enter Mobile Number',
-                                    hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                                    hintStyle: FlutterFlowTheme.of(context)
+                                        .labelMedium,
                                     enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).alternate,
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).primary,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).error,
+                                        color:
+                                            FlutterFlowTheme.of(context).error,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     focusedErrorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).error,
+                                        color:
+                                            FlutterFlowTheme.of(context).error,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
@@ -411,62 +421,68 @@ class _LoginWidgetState extends State<LoginWidget>
                                   style: FlutterFlowTheme.of(context)
                                       .bodyLarge
                                       .override(
-                                    fontFamily: 'Readex Pro',
-
-                                  ),
+                                        fontFamily: 'Readex Pro',
+                                      ),
                                   keyboardType: TextInputType.phone,
                                   cursorColor:
-                                  FlutterFlowTheme.of(context).primary,
-                  
+                                      FlutterFlowTheme.of(context).primary,
                                 ).animateOnPageLoad(animationsMap[
-                                'textFieldOnPageLoadAnimation1']!),
+                                    'textFieldOnPageLoadAnimation1']!),
                               ),
                               Padding(
                                 padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
+                                    EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
                                 child: TextFormField(
                                   controller: PasswordController,
                                   focusNode: _model.passwordFocusNode,
                                   obscureText: !_model.passwordVisibility,
                                   decoration: InputDecoration(
                                     labelText: 'Password',
-                                    labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                                      fontFamily: 'Open Sans',
-                                      fontSize: 14,
-                                    ),
+                                    labelStyle: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: 'Open Sans',
+                                          fontSize: 14,
+                                        ),
                                     hintText: 'Enter Password',
-                                    hintStyle: FlutterFlowTheme.of(context).labelMedium,
+                                    hintStyle: FlutterFlowTheme.of(context)
+                                        .labelMedium,
                                     enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).alternate,
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).primary,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).error,
+                                        color:
+                                            FlutterFlowTheme.of(context).error,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     focusedErrorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context).error,
+                                        color:
+                                            FlutterFlowTheme.of(context).error,
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     suffixIcon: InkWell(
                                       onTap: () => setState(
-                                            () => _model.passwordVisibility = !_model.passwordVisibility,
+                                        () => _model.passwordVisibility =
+                                            !_model.passwordVisibility,
                                       ),
                                       focusNode: FocusNode(skipTraversal: true),
                                       child: Icon(
@@ -480,14 +496,14 @@ class _LoginWidgetState extends State<LoginWidget>
                                   style: FlutterFlowTheme.of(context)
                                       .bodyLarge
                                       .override(
-                                    fontFamily: 'Readex Pro',
-                                  ),
+                                        fontFamily: 'Readex Pro',
+                                      ),
                                   cursorColor:
-                                  FlutterFlowTheme.of(context).primary,
+                                      FlutterFlowTheme.of(context).primary,
                                   validator: _model.passwordControllerValidator
                                       .asValidator(context),
                                 ).animateOnPageLoad(animationsMap[
-                                'textFieldOnPageLoadAnimation2']!),
+                                    'textFieldOnPageLoadAnimation2']!),
                               ),
                             ],
                           ),
@@ -500,32 +516,33 @@ class _LoginWidgetState extends State<LoginWidget>
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             FFButtonWidget(
-                              onPressed: ()async{
+                              onPressed: () async {
                                 loginUser();
-                            },
+                              },
                               text: 'Sign In',
                               options: FFButtonOptions(
                                 height: 52,
-                                padding:
-                                EdgeInsetsDirectional.fromSTEB(44, 0, 44, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    44, 0, 44, 0),
                                 iconPadding:
-                                EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                                 color: FlutterFlowTheme.of(context).primary,
                                 textStyle:
-                                FlutterFlowTheme.of(context).titleMedium,
+                                    FlutterFlowTheme.of(context).titleMedium,
                                 elevation: 3,
                                 borderSide: BorderSide(
                                   color: Colors.transparent,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
-                                hoverColor: FlutterFlowTheme.of(context).accent1,
+                                hoverColor:
+                                    FlutterFlowTheme.of(context).accent1,
                                 hoverBorderSide: BorderSide(
                                   color: FlutterFlowTheme.of(context).primary,
                                   width: 1,
                                 ),
                                 hoverTextColor:
-                                FlutterFlowTheme.of(context).primaryText,
+                                    FlutterFlowTheme.of(context).primaryText,
                                 hoverElevation: 0,
                               ),
                             ),

@@ -1,5 +1,9 @@
-import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:convert';
 
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mini_cab/login/login_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -24,6 +28,8 @@ class OtpWidget extends StatefulWidget {
     required this.varifyId,
     required this.email,
     required this.password,
+    required this.name,
+    required this.dropDownValue2,
     required this.licenseAuth,
   }) : super(key: key);
 
@@ -31,14 +37,16 @@ class OtpWidget extends StatefulWidget {
   final String? email;
   final String? password;
   final String? licenseAuth;
+  final String? name;
+  final String? dropDownValue2;
   final String? varifyId;
 
   @override
   _OtpWidgetState createState() => _OtpWidgetState();
 }
 
-class _OtpWidgetState extends State<OtpWidget> with TickerProviderStateMixin {
-  late OtpModel _model;
+class _OtpWidgetState extends State<OtpWidget> {
+  // late OtpModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   void _showToastMessage(String message) {
@@ -46,6 +54,56 @@ class _OtpWidgetState extends State<OtpWidget> with TickerProviderStateMixin {
       msg: message,
       textColor: Colors.white,
     );
+  }
+
+  Future<void> registerUser(BuildContext context) async {
+    setState(() {});
+    try {
+      final response = await http.post(
+        Uri.parse('https://www.minicaboffice.com/api/driver/register.php'),
+        body: {
+          'd_name': widget.name,
+          'd_email': widget.email,
+          'd_phone': widget.phoneNumber,
+          'd_password': widget.password,
+          'licence_authority': widget.dropDownValue2,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == true) {
+          int dataId = responseData['data'];
+          await saveDataIdInSharedPreferences(dataId.toString());
+          // Safely use the context for navigation
+          if (!mounted) return; // Check if the widget is still mounted
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginWidget()),
+          );
+        } else {
+          print('The else condition is ${responseData['message']}');
+          ispressed = false;
+          if (!mounted) return; // Check if the widget is still mounted
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginWidget()),
+          );
+          _showToastMessage(responseData['message']);
+        }
+      } else {
+        ispressed = false;
+        _showToastMessage("Check your internet connection. Please try again.");
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print('The register exception ${e}');
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        fontSize: 16.0,
+      );
+      ispressed = false;
+    }
   }
 
   final animationsMap = {
@@ -84,41 +142,40 @@ class _OtpWidgetState extends State<OtpWidget> with TickerProviderStateMixin {
       ],
     ),
   };
+  Future<void> saveDataIdInSharedPreferences(String dataId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('d_id', dataId);
+    print('Data ID saved in SharedPreferences: $dataId');
+  }
 
+  bool ispressed = false;
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => OtpModel());
+    // _model = createModel(context, () => OtpModel());
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
-
-    super.dispose();
-  }
-
+  TextEditingController? pinCodeController;
+  String? Function(BuildContext, String?)? pinCodeControllerValidator;
+  //  pinCodeController = TextEditingController();
   var code = "";
   final FirebaseAuth auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    if (isiOS) {
-      SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(
-          statusBarBrightness: Theme.of(context).brightness,
-          systemStatusBarContrastEnforced: true,
-        ),
-      );
-    }
+    // if (isiOS) {
+    //   SystemChrome.setSystemUIOverlayStyle(
+    //     SystemUiOverlayStyle(
+    //       statusBarBrightness: Theme.of(context).brightness,
+    //       systemStatusBarContrastEnforced: true,
+    //     ),
+    //   );
+    // }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
-          key: scaffoldKey,
+          // key: scaffoldKey,
           backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
           appBar: AppBar(
             backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
@@ -233,8 +290,12 @@ class _OtpWidgetState extends State<OtpWidget> with TickerProviderStateMixin {
                                   hintCharacter: '-',
                                   keyboardType: TextInputType.number,
                                   pinTheme: PinTheme(
-                                    fieldHeight: MediaQuery.of(context).size.width * 0.118,
-                                    fieldWidth:  MediaQuery.of(context).size.width * 0.119,
+                                    fieldHeight:
+                                        MediaQuery.of(context).size.width *
+                                            0.118,
+                                    fieldWidth:
+                                        MediaQuery.of(context).size.width *
+                                            0.119,
                                     borderWidth: 1.0,
                                     borderRadius: BorderRadius.circular(7.0),
                                     shape: PinCodeFieldShape.box,
@@ -252,13 +313,13 @@ class _OtpWidgetState extends State<OtpWidget> with TickerProviderStateMixin {
                                     selectedFillColor:
                                         FlutterFlowTheme.of(context).primary,
                                   ),
-                                  controller: _model.pinCodeController,
+                                  controller: pinCodeController,
                                   onChanged: (value) {
                                     code = value;
                                   },
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
-                                  validator: _model.pinCodeControllerValidator
+                                  validator: pinCodeControllerValidator
                                       .asValidator(context),
                                 ),
                               ),
@@ -273,74 +334,69 @@ class _OtpWidgetState extends State<OtpWidget> with TickerProviderStateMixin {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            FFButtonWidget(
-                              onPressed: () async {
-                                try {
-                                  PhoneAuthCredential credential =
-                                      PhoneAuthProvider.credential(
-                                    verificationId: '${widget.varifyId}',
-                                    smsCode: code,
-                                  );
-                                  await auth.signInWithCredential(credential);
-                                  // _showToastMessage("Authentication successful!");
+                            ispressed
+                                ? CircularProgressIndicator()
+                                : FFButtonWidget(
+                                    onPressed: () async {
+                                      setState(() {});
+                                      try {
+                                        ispressed = true;
+                                        PhoneAuthCredential credential =
+                                            PhoneAuthProvider.credential(
+                                          verificationId: widget.varifyId!,
+                                          smsCode: code,
+                                        );
 
-                                  context.pushNamed(
-                                    'Documents',
-                                    queryParameters: {
-                                      'phoneNumber': serializeParam(
-                                        '${widget.phoneNumber}',
-                                        ParamType.String,
+                                        await auth
+                                            .signInWithCredential(credential)
+                                            .then((v) {
+                                          print('successfully  done');
+                                          // Register the user after successful OTP verification
+                                          Future.delayed(Duration(seconds: 1))
+                                              .then((s) {
+                                            print('timer starts now');
+                                            registerUser(context);
+                                          });
+                                        });
+                                      } catch (e) {
+                                        ispressed = false;
+                                        setState(() {});
+                                        print('Wrong OTP');
+                                        _showToastMessage(
+                                            "Wrong OTP. Please try again.");
+                                      }
+                                    },
+                                    text: 'Verify Code',
+                                    options: FFButtonOptions(
+                                      height: 52.0,
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          44.0, 0.0, 44.0, 0.0),
+                                      iconPadding:
+                                          EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 0.0, 0.0, 0.0),
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      textStyle: FlutterFlowTheme.of(context)
+                                          .titleMedium,
+                                      elevation: 3.0,
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                        width: 1.0,
                                       ),
-                                      'email': serializeParam(
-                                        '${widget.email}',
-                                        ParamType.String,
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      hoverColor:
+                                          FlutterFlowTheme.of(context).accent1,
+                                      hoverBorderSide: BorderSide(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        width: 1.0,
                                       ),
-                                      'password': serializeParam(
-                                        '${widget.password}',
-                                        ParamType.String,
-                                      ),
-                                      'licenseAuth': serializeParam(
-                                        '${widget.licenseAuth}',
-                                        ParamType.String,
-                                      ),
-                                    }.withoutNulls,
-                                  );
-                                  print('${widget.phoneNumber}');
-                                  print('${widget.email}');
-                                  print('${widget.licenseAuth}');
-                                } catch (e) {
-                                  print('Wrong OTP');
-                                  _showToastMessage(
-                                      "Wrong OTP. Please try again.");
-                                }
-                              },
-                              text: 'Verify Code',
-                              options: FFButtonOptions(
-                                height: 52.0,
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    44.0, 0.0, 44.0, 0.0),
-                                iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 0.0),
-                                color: FlutterFlowTheme.of(context).primary,
-                                textStyle:
-                                    FlutterFlowTheme.of(context).titleMedium,
-                                elevation: 3.0,
-                                borderSide: BorderSide(
-                                  color: Colors.transparent,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                                hoverColor:
-                                    FlutterFlowTheme.of(context).accent1,
-                                hoverBorderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  width: 1.0,
-                                ),
-                                hoverTextColor:
-                                    FlutterFlowTheme.of(context).primaryText,
-                                hoverElevation: 0.0,
-                              ),
-                            ),
+                                      hoverTextColor:
+                                          FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                      hoverElevation: 0.0,
+                                    ),
+                                  ),
                           ],
                         ),
                       ),

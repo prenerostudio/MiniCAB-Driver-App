@@ -1,3 +1,4 @@
+import 'package:mini_cab/otp/otp_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '/flutter_flow/flutter_flow_drop_down.dart';
@@ -28,12 +29,12 @@ class SignupWidget extends StatefulWidget {
 }
 
 class _SignupWidgetState extends State<SignupWidget> {
-  late SignupModel _model;
+  // late SignupModel _model;
   String? dropDownValue2;
   FormFieldController<String>? dropDownValueController2;
   String? enteredPhoneNumber;
   String? varifyId = "";
-  bool isLoading = false;
+  // bool isLoading = false;
   bool? checkboxValue;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -41,26 +42,105 @@ class _SignupWidgetState extends State<SignupWidget> {
   TextEditingController PasswordController = TextEditingController();
   TextEditingController emailAddressController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => SignupModel());
+    // _model = createModel(context, () => SignupModel());
     checkLocationPermissionAndNavigate(context);
 
-    _model.textController1 ??= TextEditingController();
-    _model.textFieldFocusNode ??= FocusNode();
-    _model.passwordController ??= TextEditingController();
-    _model.passwordFocusNode ??= FocusNode();
-    _model.phoneNumberController ??= TextEditingController();
-    _model.phoneNumberFocusNode ??= FocusNode();
+    textController1 ??= TextEditingController();
+    textFieldFocusNode ??= FocusNode();
+    passwordController ??= TextEditingController();
+    passwordFocusNode ??= FocusNode();
+    phoneNumberController ??= TextEditingController();
+    phoneNumberFocusNode ??= FocusNode();
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
+  final unfocusNode = FocusNode();
+  final formKey = GlobalKey<FormState>();
+  // State field(s) for TextField widget.
+  FocusNode? textFieldFocusNode;
+  TextEditingController? textController1;
+  String? Function(BuildContext, String?)? textController1Validator;
+  // State field(s) for TextField widget.
+  FocusNode? passwordFocusNode;
+  TextEditingController? passwordController;
+  bool passwordVisibility = false;
+  String? Function(BuildContext, String?)? passwordControllerValidator;
+  // State field(s) for DropDown widget.
+  String? dropDownValue1;
+  FormFieldController<String>? dropDownValueController1;
+  // State field(s) for PhoneNumber widget.
+  FocusNode? phoneNumberFocusNode;
+  TextEditingController? phoneNumberController;
+  String? Function(BuildContext, String?)? phoneNumberControllerValidator;
+  // State field(s) for DropDown widget.
 
-    super.dispose();
+  void _verifyPhoneNumber() async {
+    print('the phone number is: +${countryCode}${phoneController.text}');
+    setState(() {});
+    isLoading = true;
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: "+${countryCode}${phoneController.text}",
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Auto-retrieval or instant verification
+          await _auth.signInWithCredential(credential);
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => HomeScreen()),
+          // );
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          isLoading = false;
+          setState(() {});
+          Fluttertoast.showToast(
+            msg: e.message.toString(),
+            fontSize: 16.0,
+          );
+          print('Failed to verify phone number: ${e.message}');
+          // Handle error
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          print('verificationId to verify phone number: ${verificationId}');
+          print('resendToken to verify phone number: ${resendToken}');
+          isLoading = false;
+          setState(() {});
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OtpWidget(
+                  dropDownValue2: dropDownValue2,
+                  name: nameController.text,
+                  phoneNumber: "+${countryCode}${phoneController.text}",
+                  varifyId: verificationId,
+                  email: emailAddressController.text,
+                  password: PasswordController.text,
+                  licenseAuth: phoneNumberController.text),
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Handle auto retrieval timeout
+        },
+      );
+    } catch (e) {
+      isLoading = false;
+      setState(() {});
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        fontSize: 16.0,
+      );
+    }
   }
+
+  // @override
+  // void dispose() {
+  //   _model.dispose();
+
+  //   super.dispose();
+  // }
 
   void _showToastMessage(String message) {
     Fluttertoast.showToast(
@@ -78,6 +158,7 @@ class _SignupWidgetState extends State<SignupWidget> {
     } else {}
   }
 
+  String countryCode = '';
   @override
   Widget build(BuildContext context) {
     if (isiOS) {
@@ -90,11 +171,11 @@ class _SignupWidgetState extends State<SignupWidget> {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      // onTap: () => _model.unfocusNode.canRequestFocus
+      //     ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+      //     : FocusScope.of(context).unfocus(),
       child: WillPopScope(
-        onWillPop: () async => false,
+        onWillPop: () async => true,
         child: Scaffold(
           key: scaffoldKey,
           backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -140,7 +221,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                       child: Container(
                         width: double.infinity,
                         child: Form(
-                          key: _model.formKey,
+                          key: formKey,
                           autovalidateMode: AutovalidateMode.disabled,
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -202,7 +283,6 @@ class _SignupWidgetState extends State<SignupWidget> {
                                     style:
                                         FlutterFlowTheme.of(context).bodyMedium,
                                     keyboardType: TextInputType.name,
-
                                   ),
                                 ),
                               ),
@@ -213,7 +293,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                   width: double.infinity,
                                   child: TextFormField(
                                     controller: emailAddressController,
-                                    focusNode: _model.textFieldFocusNode,
+                                    focusNode: textFieldFocusNode,
                                     autofocus: true,
                                     obscureText: false,
                                     decoration: InputDecoration(
@@ -263,7 +343,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                     style:
                                         FlutterFlowTheme.of(context).bodyMedium,
                                     keyboardType: TextInputType.emailAddress,
-                                    validator: _model.textController1Validator
+                                    validator: textController1Validator
                                         .asValidator(context),
                                   ),
                                 ),
@@ -275,10 +355,10 @@ class _SignupWidgetState extends State<SignupWidget> {
                                   width: double.infinity,
                                   child: TextFormField(
                                     controller: PasswordController,
-                                    focusNode: _model.passwordFocusNode,
+                                    focusNode: passwordFocusNode,
                                     autofocus: true,
                                     autofillHints: [AutofillHints.password],
-                                    obscureText: !_model.passwordVisibility,
+                                    obscureText: passwordVisibility,
                                     decoration: InputDecoration(
                                       labelText: 'Password',
                                       labelStyle: FlutterFlowTheme.of(context)
@@ -324,13 +404,13 @@ class _SignupWidgetState extends State<SignupWidget> {
                                       ),
                                       suffixIcon: InkWell(
                                         onTap: () => setState(
-                                          () => _model.passwordVisibility =
-                                              !_model.passwordVisibility,
+                                          () => passwordVisibility =
+                                              passwordVisibility,
                                         ),
                                         focusNode:
                                             FocusNode(skipTraversal: true),
                                         child: Icon(
-                                          _model.passwordVisibility
+                                          passwordVisibility
                                               ? Icons.visibility_outlined
                                               : Icons.visibility_off_outlined,
                                           size: 20,
@@ -340,8 +420,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                     style:
                                         FlutterFlowTheme.of(context).bodyMedium,
                                     keyboardType: TextInputType.emailAddress,
-                                    validator: _model
-                                        .passwordControllerValidator
+                                    validator: passwordControllerValidator
                                         .asValidator(context),
                                   ),
                                 ),
@@ -357,8 +436,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                         width: double.infinity,
                                         child: IntlPhoneField(
                                           controller: phoneController,
-                                          focusNode:
-                                              _model.phoneNumberFocusNode,
+                                          focusNode: phoneNumberFocusNode,
                                           autofocus: true,
                                           obscureText: false,
                                           initialCountryCode: 'GB',
@@ -368,8 +446,10 @@ class _SignupWidgetState extends State<SignupWidget> {
                                             print(enteredPhoneNumber);
                                           },
                                           onCountryChanged: (country) {
+                                            setState(() {});
+                                            countryCode = country.dialCode;
                                             print('Country changed to: ' +
-                                                country.name);
+                                                country.dialCode);
                                           },
                                           decoration: InputDecoration(
                                             labelText: 'Mobile number',
@@ -539,109 +619,97 @@ class _SignupWidgetState extends State<SignupWidget> {
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 30.0, 0.0, 0.0),
-                                child: FFButtonWidget(
-                                  onPressed: () async {
-                                    if (nameController.text.isEmpty) {
-                                      _showToastMessage(
-                                          'Please enter full name');
-                                      return;
-                                    } if (!emailAddressController.text
-                                        .contains("@")) {
-                                      _showToastMessage(
-                                          'Please enter a valid email address with "@"');
-                                      return;
-                                    }
-                                    if (phoneController.text.isEmpty ||
-                                        emailAddressController.text.isEmpty) {
-                                      _showToastMessage(
-                                          'Please enter a phone number and an email address');
-                                      return;
-                                    }
-
-                                    if (PasswordController.text.length < 8) {
-                                      _showToastMessage(
-                                          'Password must be at least 8 characters long');
-                                      return;
-                                    }
-
-                                    if (dropDownValue2 == null ||
-                                        dropDownValue2!.isEmpty) {
-                                      _showToastMessage(
-                                          'Please select a value for licensing Authority');
-                                      return;
-                                    }
-
-                                    if (checkboxValue != true) {
-                                      _showToastMessage(
-                                          'Please fill the checkbox');
-                                      return;
-                                    }
-                                    try {
-                                      var request = http.MultipartRequest(
-                                          'POST',
-                                          Uri.parse(
-                                              'https://www.minicaboffice.com/api/driver/register.php'));
-                                      request.fields.addAll({
-                                        'd_email':
-                                            '${emailAddressController.text}',
-                                        'd_name':
-                                            '${nameController.text}',
-                                        'd_phone':
-                                            '${enteredPhoneNumber.toString()}',
-                                        'd_password':
-                                            '${PasswordController.text}',
-                                        'licence_authority': '${dropDownValue2}'
-                                      });
-
-                                      http.StreamedResponse response =
-                                          await request.send();
-
-                                      if (response.statusCode == 200) {
-                                        String responseBody = await response.stream.bytesToString();
-                                        var responseData = jsonDecode(responseBody);
-
-                                        if (responseData['status'] == true) {
-                                          int dataId = responseData['data'];
-                                          await saveDataIdInSharedPreferences(dataId.toString());
-                                          await context.pushNamed('AddVehicle');
-                                        } else {
-                                          print(responseData['message']);
-                                          _showToastMessage(responseData['message']);
-                                        }
-                                      } else {
-                                        _showToastMessage(
-                                            "Check your internet Connection. Please try again.");
-                                        print(response.reasonPhrase);
-                                      }
-                                    } catch (e) {}
-                                  },
-                                  text: 'Sign up as a Driver',
-                                  options: FFButtonOptions(
-                                    width: double.infinity,
-                                    height: 60.0,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        24.0, 0.0, 24.0, 0.0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                        ),
-                                    elevation: 3.0,
-                                    borderSide: BorderSide(
-                                      color: Colors.transparent,
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(50.0),
-                                  ),
-                                ),
+                              SizedBox(
+                                height: 10,
                               ),
+                              isLoading
+                                  ? Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 30.0, 0.0, 0.0),
+                                      child: FFButtonWidget(
+                                        onPressed: () async {
+                                          if (nameController.text.isEmpty) {
+                                            _showToastMessage(
+                                                'Please enter full name');
+                                            return;
+                                          }
+                                          if (!emailAddressController.text
+                                              .contains("@")) {
+                                            _showToastMessage(
+                                                'Please enter a valid email address with "@"');
+                                            return;
+                                          }
+                                          if (phoneController.text.isEmpty ||
+                                              emailAddressController
+                                                  .text.isEmpty) {
+                                            _showToastMessage(
+                                                'Please enter a phone number and an email address');
+                                            return;
+                                          }
+
+                                          if (PasswordController.text.length <
+                                              8) {
+                                            _showToastMessage(
+                                                'Password must be at least 8 characters long');
+                                            return;
+                                          }
+
+                                          if (dropDownValue2 == null ||
+                                              dropDownValue2!.isEmpty) {
+                                            _showToastMessage(
+                                                'Please select a value for licensing Authority');
+                                            return;
+                                          }
+
+                                          if (checkboxValue != true) {
+                                            _showToastMessage(
+                                                'Please fill the checkbox');
+                                            return;
+                                          }
+                                          try {
+                                            _verifyPhoneNumber();
+                                          } catch (e) {}
+                                        },
+                                        text: 'Sign up as a Driver',
+                                        options: FFButtonOptions(
+                                          width: double.infinity,
+                                          height: 52.0,
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  44.0, 0.0, 44.0, 0.0),
+                                          iconPadding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 0.0, 0.0, 0.0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          textStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleMedium,
+                                          elevation: 3.0,
+                                          borderSide: BorderSide(
+                                            color: Colors.transparent,
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          hoverColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .accent1,
+                                          hoverBorderSide: BorderSide(
+                                            color: FlutterFlowTheme.of(context)
+                                                .primary,
+                                            width: 1.0,
+                                          ),
+                                          hoverTextColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primaryText,
+                                          hoverElevation: 0.0,
+                                        ),
+                                      ),
+                                    ),
                             ],
                           ),
                         ),
@@ -692,9 +760,6 @@ class _SignupWidgetState extends State<SignupWidget> {
       ),
     );
   }
-  Future<void> saveDataIdInSharedPreferences(String dataId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('d_id', dataId);
-    print('Data ID saved in SharedPreferences: $dataId');
-  }
+
+  bool isLoading = false;
 }
