@@ -300,6 +300,8 @@ class _NavBarPageState extends State<NavBarPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('the navbar index${widget.page}');
+    // checkUserSession();
     final tabs = {
       'Home': HomeWidget(),
       'Upcomming': UpcommingWidget(),

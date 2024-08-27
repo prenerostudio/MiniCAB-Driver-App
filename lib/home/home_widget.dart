@@ -82,6 +82,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   String? driverStatus;
   String locationMessage = "";
   Timer? locationTimer;
+  Timer? userSession;
   bool status = true;
   final ScrollController _scrollController = ScrollController();
   String? pickup;
@@ -182,6 +183,33 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> checkUserSession() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('loginToken');
+    // String? jobId = prefs.getString('jobId');
+    final response = await http.post(
+      Uri.parse(
+          'https://www.minicaboffice.com/api/driver/check-login-token.php'),
+      body: {'token': token.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['status'] == false) {
+        prefs.setString('loginToken', '');
+        prefs.setBool('isLogin', false);
+        setState(() {});
+        userSession?.cancel();
+        context.pushNamed('Login');
+      } else {
+        // Handle the job details as normal
+      }
+    } else {
+      // Handle the error
+    }
+  }
+
   final JobController myController = Get.put(JobController());
   @override
   void initState() {
@@ -194,6 +222,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   showAlert();
     // });
+    userSession = Timer.periodic(Duration(seconds: 4), (s) {
+      print('user session checking starts');
+      checkUserSession();
+    });
     pushercallbg();
     myController.jobDetails();
     WidgetsBinding.instance.addObserver(this);

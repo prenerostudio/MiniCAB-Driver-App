@@ -217,9 +217,11 @@ class _LoginWidgetState extends State<LoginWidget>
         print('Response: $responseBody');
         if (jsonResponse['status'] == true) {
           if (jsonResponse.containsKey('data')) {
-            final Map<String, dynamic> userData = jsonResponse['data'];
+            final Map<String, dynamic> userData = jsonResponse['data']['user'];
+
             if (userData != null && userData.isNotEmpty) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setString('loginToken', jsonResponse['data']['token']);
               prefs.setBool('isLogin', true);
               userData.forEach((key, value) async {
                 await prefs.setString(key, value?.toString() ?? '') ?? '';

@@ -57,16 +57,18 @@ class _OtpWidgetState extends State<OtpWidget> {
   }
 
   Future<void> registerUser(BuildContext context) async {
+    if (!mounted) return; // Check if the widget is still mounted
     setState(() {});
+
     try {
       final response = await http.post(
         Uri.parse('https://www.minicaboffice.com/api/driver/register.php'),
         body: {
-          'd_name': widget.name,
-          'd_email': widget.email,
-          'd_phone': widget.phoneNumber,
-          'd_password': widget.password,
-          'licence_authority': widget.dropDownValue2,
+          'd_name': widget.name ?? '', // Use default values or handle nulls
+          'd_email': widget.email ?? '',
+          'd_phone': widget.phoneNumber ?? '',
+          'd_password': widget.password ?? '',
+          'licence_authority': widget.dropDownValue2 ?? '',
         },
       );
 
@@ -74,13 +76,15 @@ class _OtpWidgetState extends State<OtpWidget> {
         final responseData = jsonDecode(response.body);
         if (responseData['status'] == true) {
           int dataId = responseData['data'];
+          print('The else condition is ${dataId}');
           await saveDataIdInSharedPreferences(dataId.toString());
-          // Safely use the context for navigation
           if (!mounted) return; // Check if the widget is still mounted
+
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => LoginWidget()),
           );
+          _showToastMessage(responseData['message']);
         } else {
           print('The else condition is ${responseData['message']}');
           ispressed = false;
@@ -98,10 +102,7 @@ class _OtpWidgetState extends State<OtpWidget> {
       }
     } catch (e) {
       print('The register exception ${e}');
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        fontSize: 16.0,
-      );
+      _showToastMessage(e.toString());
       ispressed = false;
     }
   }

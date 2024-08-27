@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:mini_cab/payment_entery/complete.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
@@ -14,6 +17,7 @@ export 'splashScreen_model.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 
 class SplashScreenWidget extends StatefulWidget {
   const SplashScreenWidget({Key? key}) : super(key: key);
@@ -29,8 +33,9 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
 
   @override
   void initState() {
-    checkLoginStatus();
     super.initState();
+    checkLoginStatus();
+
     checkAndRequestPermissions();
     checkLocationPermissionAndNavigate(context);
     _model = createModel(context, () => SplashScreenModel());
@@ -78,12 +83,28 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     int? isRideStart = prefs.getInt('isRideStart');
 
     if (isLogin == true && isRideStart == 0) {
+      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+        print('user session checking starts');
+        checkUserSession();
+      });
       context.pushNamed('Home');
     } else if (isLogin == true && isRideStart == 1) {
+      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+        print('user session checking starts');
+        checkUserSession();
+      });
       context.pushNamed('onWay');
     } else if (isLogin == true && isRideStart == 2) {
+      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+        print('user session checking starts');
+        checkUserSession();
+      });
       context.pushNamed('Pob');
     } else if (isLogin == true && isRideStart == 3) {
+      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+        print('user session checking starts');
+        checkUserSession();
+      });
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => CompleteWidget()));
     } else {
@@ -98,6 +119,34 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     if (permissionStatus.isDenied) {
       openAppSettings();
     } else {}
+  }
+
+  Timer? usersessionTimer;
+  Future<void> checkUserSession() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('loginToken');
+    // String? jobId = prefs.getString('jobId');
+    final response = await http.post(
+      Uri.parse(
+          'https://www.minicaboffice.com/api/driver/check-login-token.php'),
+      body: {'token': token.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['status'] == false) {
+        prefs.setString('loginToken', '');
+        prefs.setBool('isLogin', false);
+        setState(() {});
+        usersessionTimer?.cancel();
+        context.pushNamed('Login');
+      } else {
+        // Handle the job details as normal
+      }
+    } else {
+      // Handle the error
+    }
   }
 
   @override

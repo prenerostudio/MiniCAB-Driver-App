@@ -147,7 +147,8 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
             .toList();
       }
     }
-    throw Exception('App Check Now');
+    return [];
+    // throw Exception('App Check Now');
   }
 
   @override

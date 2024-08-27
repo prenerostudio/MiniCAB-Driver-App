@@ -1438,7 +1438,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        Fornt = jsonResponse[''][0]['d_license_front'];
+        Fornt = jsonResponse['data'][0]['d_license_front'];
       });
 
       return Fornt;
@@ -1464,7 +1464,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        Back = jsonResponse[''][0]['d_license_back'];
+        Back = jsonResponse['data'][0]['d_license_back'];
       });
       return Back;
     } else {
@@ -1489,7 +1489,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        AddressProof = jsonResponse[''][0]['address_proof_1' ?? []];
+        AddressProof = jsonResponse['data'][0]['address_proof_1' ?? []];
       });
       return AddressProof;
     } else {
@@ -1514,7 +1514,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        AddressProofsec = jsonResponse[''][0]['address_proof_2'];
+        AddressProofsec = jsonResponse['data'][0]['address_proof_2'];
       });
       return AddressProofsec;
     } else {
@@ -1539,7 +1539,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        PCO = jsonResponse[''][0]['pco_license'] ?? [];
+        PCO = jsonResponse['data'][0]['pco_license'] ?? [];
       });
       return PCO;
     } else {
@@ -1562,7 +1562,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        DVLA = jsonResponse[''][0]['dvla_check_code'];
+        DVLA = jsonResponse['data'][0]['dvla_check_code'];
       });
       return DVLA;
     } else {
@@ -1587,7 +1587,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        Insurance = jsonResponse[''][0]['national_insurance'];
+        Insurance = jsonResponse['data'][0]['national_insurance'];
       });
       return Insurance;
     } else {
@@ -1612,7 +1612,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        Extra = jsonResponse[''][0]['extra'];
+        Extra = jsonResponse['data'][0]['extra'];
       });
       return Extra;
     } else {
@@ -1635,7 +1635,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        LogBook = jsonResponse[''][0]['log_book'];
+        LogBook = jsonResponse['data'][0]['log_book'];
       });
       return LogBook;
     } else {
@@ -1658,7 +1658,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        MotCertificate = jsonResponse[''][0]['mot_certificate'];
+        MotCertificate = jsonResponse['data'][0]['mot_certificate'];
       });
       return MotCertificate;
     } else {
@@ -1679,7 +1679,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        Vpco = jsonResponse[''][0]['pco'];
+        Vpco = jsonResponse['data'][0]['pco'];
       });
       return Vpco;
     } else {
@@ -1702,7 +1702,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        vFornt = jsonResponse[''][0]['vehicle_picture_front'];
+        vFornt = jsonResponse['data'][0]['vehicle_picture_front'];
       });
       return vFornt;
     } else {
@@ -1723,7 +1723,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        vBack = jsonResponse[''][0]['vehicle_picture_back'];
+        vBack = jsonResponse['data'][0]['vehicle_picture_back'];
       });
       return vBack;
     } else {
@@ -1744,7 +1744,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        roadTax = jsonResponse[''][0]['road_tax'];
+        roadTax = jsonResponse['data'][0]['road_tax'];
       });
       return roadTax;
     } else {
@@ -1767,7 +1767,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        VRental = jsonResponse[''][0]['rental_agreement'];
+        VRental = jsonResponse['data'][0]['rental_agreement'];
       });
       return VRental;
     } else {
@@ -1790,7 +1790,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        InsuranceSchedule = jsonResponse[''][0]['insurance_schedule'];
+        InsuranceSchedule = jsonResponse['data'][0]['insurance_schedule'];
       });
       return InsuranceSchedule;
     } else {
@@ -1811,7 +1811,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
       setState(() {
-        VInsurance = jsonResponse[''][0]['insurance'];
+        VInsurance = jsonResponse['data'][0]['insurance'];
       });
       return VInsurance;
     } else {
