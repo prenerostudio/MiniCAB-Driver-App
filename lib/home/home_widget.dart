@@ -199,9 +199,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       if (data['status'] == false) {
         prefs.setString('loginToken', '');
         prefs.setBool('isLogin', false);
-        setState(() {});
         userSession?.cancel();
         context.pushNamed('Login');
+        if (!mounted) return setState(() {});
       } else {
         // Handle the job details as normal
       }
@@ -219,13 +219,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     setState(() {
       // myController.visiblecontainer.value = true;
     });
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   showAlert();
+
+    // userSession = Timer.periodic(Duration(seconds: 4), (s) {
+    //   print('user session checking starts');
+    //   checkUserSession();
     // });
-    userSession = Timer.periodic(Duration(seconds: 4), (s) {
-      print('user session checking starts');
-      checkUserSession();
-    });
     pushercallbg();
     myController.jobDetails();
     WidgetsBinding.instance.addObserver(this);

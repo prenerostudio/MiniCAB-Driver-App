@@ -1,3 +1,5 @@
+import 'package:mini_cab/All%20Docoments/documents_view_upload.dart';
+
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -289,8 +291,13 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'DrivingLicenceCardFornt');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  DocumentsUploadView()));
+                                                      // context.pushNamed(
+                                                      //     'DrivingLicenceCardFornt');
                                                     },
                                                     child: Text(
                                                       'View Upload',
