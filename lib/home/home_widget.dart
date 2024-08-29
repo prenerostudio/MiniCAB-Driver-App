@@ -220,10 +220,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       // myController.visiblecontainer.value = true;
     });
 
-    // userSession = Timer.periodic(Duration(seconds: 4), (s) {
-    //   print('user session checking starts');
-    //   checkUserSession();
-    // });
+    userSession = Timer.periodic(Duration(seconds: 4), (s) {
+      print('user session checking starts');
+      checkUserSession();
+    });
     pushercallbg();
     myController.jobDetails();
     WidgetsBinding.instance.addObserver(this);
@@ -3169,7 +3169,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      final List<dynamic> data = jsonResponse['data'];
+      final List<dynamic> data = jsonResponse['data'] ?? [];
       print('profile api treeeeeeeeeeeeeee');
       if (data is List) {
         List<Driver> profileData =

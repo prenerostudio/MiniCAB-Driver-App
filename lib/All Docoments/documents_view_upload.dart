@@ -15,7 +15,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class DocumentsUploadView extends StatefulWidget {
-  const DocumentsUploadView({super.key});
+  String parameter;
+  String postUrl;
+  String getUrl;
+  String showImageUrl;
+  String forInsideArray;
+  String name;
+  DocumentsUploadView({
+    super.key,
+    required this.parameter,
+    required this.getUrl,
+    required this.postUrl,
+    required this.showImageUrl,
+    required this.forInsideArray,
+    required this.name,
+  });
 
   @override
   State<DocumentsUploadView> createState() => _DocumentsUploadViewState();
@@ -77,7 +91,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Driver PCO License',
+                  widget.name,
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
                         fontFamily: 'Open Sans',
                         letterSpacing: 0,
@@ -106,7 +120,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
                                   width: 400,
                                   child: Image.network(
                                       fit: BoxFit.contain,
-                                      "https://www.minicaboffice.com/img/drivers/driving-license/$uploadedImage")),
+                                      "${widget.showImageUrl}$uploadedImage")),
                             ),
                           ),
                           Positioned(
@@ -254,8 +268,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
     }
 
     // Define your API endpoint
-    final Uri apiUrl = Uri.parse(
-        'https://www.minicaboffice.com/api/driver/upload-license-front.php');
+    final Uri apiUrl = Uri.parse(widget.postUrl);
 
     // Prepare the multipart request
     var request = http.MultipartRequest('POST', apiUrl);
@@ -263,7 +276,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
     // Add the image file
     request.files.add(
       http.MultipartFile(
-        'dl_front', // Field name expected by the server
+        widget.parameter, // Field name expected by the server
         File(_imageFile!.path).readAsBytes().asStream(),
         File(_imageFile!.path).lengthSync(),
         filename: _imageFile!.path,
@@ -286,7 +299,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
         print('the  uploaded response is $responseBody');
         _imageFile == null;
         getFront();
-        _showToastMessage('"License Upload Successfully"');
+        _showToastMessage(responseData['message']);
       } else {
         isloading = false;
         print('Failed to upload image');
@@ -304,10 +317,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
   getFront() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String dId = prefs.getString('d_id') ?? '';
-    var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://minicaboffice.com/api/driver/check-d-license-front.php'));
+    var request = http.MultipartRequest('POST', Uri.parse(widget.getUrl));
     request.fields.addAll({'d_id': dId});
 
     http.StreamedResponse response = await request.send();
@@ -315,72 +325,17 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
     if (response.statusCode == 200) {
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
-      print(
-          'Now the condition is true ${_imageFile == null && uploadedImage.isNotEmpty}');
+      print('Now the condition is true ${jsonResponse}');
       setState(() {
         _imageFile == null;
-        uploadedImage = jsonResponse['data'][0]['d_license_front'];
+        uploadedImage = jsonResponse['data'][0][widget.forInsideArray] ?? '';
       });
     } else {
       throw Exception('Failed to load d_license_back');
     }
   }
 
-  String uploadedImage = ''; // uploadDRLicenseFront() async {
-  //   SharedPreferences sp = await SharedPreferences.getInstance();
-  //   String did = sp.getString('d_id') ?? '';
-  //   try {
-  //     var request = http.MultipartRequest(
-  //       'POST',
-  //       Uri.parse(
-  //           'https://www.minicaboffice.com/api/driver/upload-license-front.php'),
-  //     );
-  //     request.fields.addAll({
-  //       'd_id': did.toString(),
-  //     });
-  //     print(request.fields);
-
-  //     if (selectedImage != null) {
-  //       // If selectedImage is not null, upload it
-  //       request.files.add(
-  //         await http.MultipartFile.fromPath('d_img', _imageFile!.path),
-  //       );
-  //     } else if (dPic != null && dPic!.isNotEmpty) {
-  //       // If dPic is not null and not empty, download the image and upload it
-  //       var imageUrl = 'https://minicaboffice.com/img/drivers/$dPic';
-  //       var response = await http.get(Uri.parse(imageUrl));
-  //       if (response.statusCode == 200) {
-  //         request.files.add(
-  //           http.MultipartFile.fromBytes(
-  //             'd_img',
-  //             response.bodyBytes,
-  //             filename: dPic!.split('/').last,
-  //           ),
-  //         );
-  //       } else {
-  //         print('Failed to load image from URL.');
-  //       }
-  //     }
-
-  //     // request.files.add(
-  //     //   await http.MultipartFile.fromPath(
-  //     //       'd_img',selectedImage!.path ),
-  //     // );
-  //     final response = await request.send();
-  //     if (response.statusCode == 200) {
-  //       print(await response.stream.bytesToString());
-  //       _showToastMessage('Profile updated successfully');
-  //       context.pushNamed('Dashboard');
-  //     } else {
-  //       print(response.reasonPhrase);
-  //       _showToastMessage(
-  //           'Profile update failed. Please check your internet connection.');
-  //     }
-  //   } catch (error) {
-  //     print('Error: $error');
-  //     _showToastMessage('Please $error');
-  //   }
-  // }
+  String uploadedImage = '';
 
   void _showToastMessage(String message) {
     Fluttertoast.showToast(

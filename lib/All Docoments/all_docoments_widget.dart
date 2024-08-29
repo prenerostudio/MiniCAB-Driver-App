@@ -294,8 +294,19 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  DocumentsUploadView()));
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Driving Licence Photo Card (Front)',
+                                                                  forInsideArray:
+                                                                      'd_license_front',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-d-license-front.php',
+                                                                  parameter:
+                                                                      "dl_front",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-license-front.php",
+                                                                  showImageUrl:
+                                                                      "https://www.minicaboffice.com/img/drivers/driving-license/")));
                                                       // context.pushNamed(
                                                       //     'DrivingLicenceCardFornt');
                                                     },
@@ -354,8 +365,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'DrivingLicenceCardBack');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Driving Licence Photo Card (Back)',
+                                                                  forInsideArray:
+                                                                      "d_license_back",
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-d-license-back.php',
+                                                                  parameter:
+                                                                      "dl_back",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-license-back.php",
+                                                                  showImageUrl:
+                                                                      "https://www.minicaboffice.com/img/drivers/driving-license/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -412,8 +437,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'ProofofAddressOne');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Proof of Address One ',
+                                                                  forInsideArray:
+                                                                      'address_proof_1',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-address-proof-1.php',
+                                                                  parameter:
+                                                                      "pa1",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-pa1.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/address-proof/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -470,8 +509,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'ProofofAddressTwo');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Proof of Address Two ',
+                                                                  forInsideArray:
+                                                                      'address_proof_2',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-address-proof-2.php',
+                                                                  parameter:
+                                                                      "pa2",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-pa2.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/address-proof/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -528,8 +581,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'DriverPCOLicense');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'PCO Licence ',
+                                                                  forInsideArray:
+                                                                      'pco_license',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-pco-license.php',
+                                                                  parameter:
+                                                                      "pco",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-pco.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/pco-license/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -586,8 +653,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'DvlaCheckCode');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'DVLA Check Code',
+                                                                  forInsideArray:
+                                                                      'dvla_check_code',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-dvla-code.php',
+                                                                  parameter:
+                                                                      "dvla",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-dvla.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/dvla/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -644,8 +725,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'NationalInsuranceNumber');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Proof of National Insurance',
+                                                                  forInsideArray:
+                                                                      'national_insurance',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-national-insurance.php',
+                                                                  parameter:
+                                                                      "ni",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-ni.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/ni/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -702,8 +797,21 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context
-                                                          .pushNamed('ExtaOne');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name: 'Extra',
+                                                                  forInsideArray:
+                                                                      'extra',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-extra-document.php',
+                                                                  parameter:
+                                                                      "extra",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-extra.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/extra/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -723,58 +831,59 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               ],
                                             ),
                                           ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Expanded(
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 20, 0, 0),
-                                                  child: FFButtonWidget(
-                                                    onPressed: () async {
-                                                      context
-                                                          .pushNamed('Login');
-                                                    },
-                                                    text: 'Submit Application',
-                                                    options: FFButtonOptions(
-                                                      height: 40,
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  24, 0, 24, 0),
-                                                      iconPadding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0, 0, 0, 0),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
-                                                      textStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .titleSmall
-                                                              .override(
-                                                                fontFamily:
-                                                                    'Readex Pro',
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                      elevation: 3,
-                                                      borderSide: BorderSide(
-                                                        color:
-                                                            Colors.transparent,
-                                                        width: 1,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+
+                                          // Row(
+                                          //   mainAxisSize: MainAxisSize.max,
+                                          //   children: [
+                                          //     Expanded(
+                                          //       child: Padding(
+                                          //         padding: EdgeInsetsDirectional
+                                          //             .fromSTEB(0, 20, 0, 0),
+                                          //         child: FFButtonWidget(
+                                          //           onPressed: () async {
+                                          //             context
+                                          //                 .pushNamed('Login');
+                                          //           },
+                                          //           text: 'Submit Application',
+                                          //           options: FFButtonOptions(
+                                          //             height: 40,
+                                          //             padding:
+                                          //                 EdgeInsetsDirectional
+                                          //                     .fromSTEB(
+                                          //                         24, 0, 24, 0),
+                                          //             iconPadding:
+                                          //                 EdgeInsetsDirectional
+                                          //                     .fromSTEB(
+                                          //                         0, 0, 0, 0),
+                                          //             color:
+                                          //                 FlutterFlowTheme.of(
+                                          //                         context)
+                                          //                     .primary,
+                                          //             textStyle:
+                                          //                 FlutterFlowTheme.of(
+                                          //                         context)
+                                          //                     .titleSmall
+                                          //                     .override(
+                                          //                       fontFamily:
+                                          //                           'Readex Pro',
+                                          //                       color: Colors
+                                          //                           .white,
+                                          //                     ),
+                                          //             elevation: 3,
+                                          //             borderSide: BorderSide(
+                                          //               color:
+                                          //                   Colors.transparent,
+                                          //               width: 1,
+                                          //             ),
+                                          //             borderRadius:
+                                          //                 BorderRadius.circular(
+                                          //                     8),
+                                          //           ),
+                                          //         ),
+                                          //       ),
+                                          //     ),
+                                          //   ],
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -870,8 +979,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehicleLogBook');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      "Vehicle Log Book",
+                                                                  forInsideArray:
+                                                                      'log_book',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-log-book.php',
+                                                                  parameter:
+                                                                      "log_book",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-log-book.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/log-book/")));
+                                                      // context.pushNamed(
+                                                      //     'VehicleLogBook');
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -928,8 +1053,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehicleMotcertificate');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      "Vehicle Mot Certificate",
+                                                                  forInsideArray:
+                                                                      'mot_certificate',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-mot-certificate.php',
+                                                                  parameter:
+                                                                      "mot",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-mot.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/mot-certificate/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -986,8 +1125,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehiclePCO');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Vehicle PCO',
+                                                                  forInsideArray:
+                                                                      'pco_license',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-pco-license.php',
+                                                                  parameter:
+                                                                      "vpco",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-vpco.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/pco/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -1044,8 +1197,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehiclePicture');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Vehicle Picture Fornt',
+                                                                  forInsideArray:
+                                                                      'vehicle_picture_front',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-v-pic-front.php',
+                                                                  parameter:
+                                                                      "pic1",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-vehicle-picture-front.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/picture/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -1102,8 +1269,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehiclePictureBack');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Vehicle Picture Back',
+                                                                  forInsideArray:
+                                                                      'vehicle_picture_back',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-v-pic-back.php',
+                                                                  parameter:
+                                                                      "pic2",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-vehicle-picture-back.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/picture/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -1160,8 +1341,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehicleRoadTax');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Vehicle Road Tax',
+                                                                  forInsideArray:
+                                                                      'road_tax',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-road-tax.php',
+                                                                  parameter:
+                                                                      "rt",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-road-tax.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/road-tax/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -1218,8 +1413,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehicleRentalAgreement');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Vehicle Rental Agreement',
+                                                                  forInsideArray:
+                                                                      'rental_agreement',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-rental-agreement.php',
+                                                                  parameter:
+                                                                      "ra",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-rental-agreement.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/rental-agreement/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -1276,8 +1485,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'InsuranceSchedule');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Insurance Schedule',
+                                                                  forInsideArray:
+                                                                      'insurance_schedule',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
+                                                                  parameter:
+                                                                      "sche",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-ins-sche.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/insurance-schedule/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
@@ -1334,8 +1557,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       .fromSTEB(0, 0, 0, 0),
                                                   child: InkWell(
                                                     onTap: () {
-                                                      context.pushNamed(
-                                                          'VehicleInsurance');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => DocumentsUploadView(
+                                                                  name:
+                                                                      'Vehicle Insurance',
+                                                                  forInsideArray:
+                                                                      'insurance',
+                                                                  getUrl:
+                                                                      'https://minicaboffice.com/api/driver/check-insurance.php',
+                                                                  parameter:
+                                                                      "ins",
+                                                                  postUrl:
+                                                                      "https://www.minicaboffice.com/api/driver/upload-insurance.php",
+                                                                  showImageUrl:
+                                                                      "https://minicaboffice.com/img/drivers/vehicle/insurance/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',

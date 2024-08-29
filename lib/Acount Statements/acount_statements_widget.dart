@@ -289,18 +289,19 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
           : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
-          if (lastBackPressed == null ||
-              DateTime.now().difference(lastBackPressed!) >
-                  Duration(seconds: 2)) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Press again to exit')),
-            );
-            lastBackPressed = DateTime.now();
-            return false;
-          } else {
-            SystemNavigator.pop();
-            return true;
-          }
+          // if (lastBackPressed == null ||
+          //     DateTime.now().difference(lastBackPressed!) >
+          //         Duration(seconds: 2)) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text('Press again to exit')),
+          //   );
+          //   lastBackPressed = DateTime.now();
+          //   return true;
+          // } else {
+          //   SystemNavigator.pop();
+          //   return true;
+          // }
+          return true;
         },
         child: Scaffold(
           key: scaffoldKey,
