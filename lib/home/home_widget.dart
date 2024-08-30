@@ -214,16 +214,17 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    myController.visiblecontainer.value = false;
     print('InitState called ......... ');
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual);
     setState(() {
       // myController.visiblecontainer.value = true;
     });
 
-    userSession = Timer.periodic(Duration(seconds: 4), (s) {
-      print('user session checking starts');
-      checkUserSession();
-    });
+    // userSession = Timer.periodic(Duration(seconds: 4), (s) {
+    //   print('user session checking starts');
+    //   checkUserSession();
+    // });
     pushercallbg();
     myController.jobDetails();
     WidgetsBinding.instance.addObserver(this);
@@ -1907,7 +1908,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                       "You Can't Go Offline.  You Go offline to Contact Support.",
                                                                 );
                                                               }
-                                                              setState(() {});
+                                                              if (mounted) {
+                                                                setState(() {
+                                                                  // Update your state here
+                                                                });
+                                                              }
                                                             } else {
                                                               showDialog(
                                                                 context:

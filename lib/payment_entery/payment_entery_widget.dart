@@ -217,6 +217,10 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
   //   }
   // }
 
+  String extra = '';
+  String parking = '';
+  String waiting = '';
+  String tolls = '';
   getFares() async {
     setState(() {});
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -224,6 +228,11 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
     parkingController.text = sp.getString('car_parking') ?? '0';
     tollsController.text = sp.getString('tolls') ?? '0';
     watingController.text = sp.getString('waiting') ?? '0';
+
+    extra = sp.getString('extra') ?? '0';
+    parking = sp.getString('car_parking') ?? '0';
+    tolls = sp.getString('tolls') ?? '0';
+    waiting = sp.getString('waiting') ?? '0';
     print("the waiting fare is ${extraWaitingController.text}");
   }
 
@@ -355,7 +364,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         controller: extraWaitingController,
                                         focusNode: _model.extraWaitingFocusNode,
                                         autofocus: true,
-                                        autofillHints: [AutofillHints.email],
+                                        // autofillHints: [AutofillHints.email],
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Extra',
@@ -366,7 +375,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                                     fontFamily: 'Open Sans',
                                                     fontSize: 18,
                                                   ),
-                                          hintText: 'Extra',
+                                          // hintText: 'Extra',
                                           hintStyle:
                                               FlutterFlowTheme.of(context)
                                                   .labelMedium,
@@ -429,7 +438,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                       child: TextFormField(
                                         controller: parkingController,
                                         autofocus: true,
-                                        autofillHints: [AutofillHints.email],
+                                        // autofillHints: [AutofillHints.email],
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Parking',
@@ -440,7 +449,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                                     fontFamily: 'Open Sans',
                                                     fontSize: 18,
                                                   ),
-                                          hintText: 'Parking',
+                                          // hintText: 'Parking',
                                           hintStyle:
                                               FlutterFlowTheme.of(context)
                                                   .labelMedium,
@@ -503,7 +512,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                       child: TextFormField(
                                         controller: watingController,
                                         autofocus: true,
-                                        autofillHints: [AutofillHints.email],
+                                        // autofillHints: [AutofillHints.email],
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Waiting',
@@ -514,7 +523,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                                     fontFamily: 'Open Sans',
                                                     fontSize: 18,
                                                   ),
-                                          hintText: 'Waiting',
+                                          // hintText: 'Waiting',
                                           hintStyle:
                                               FlutterFlowTheme.of(context)
                                                   .labelMedium,
@@ -578,7 +587,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         controller: tollsController,
                                         focusNode: _model.emailAddressFocusNode,
                                         autofocus: true,
-                                        autofillHints: [AutofillHints.email],
+                                        // autofillHints: [AutofillHints.email],
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Tolls',
@@ -589,7 +598,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                                     fontFamily: 'Open Sans',
                                                     fontSize: 18,
                                                   ),
-                                          hintText: 'Tolls',
+                                          // hintText: 'Tolls',
                                           hintStyle:
                                               FlutterFlowTheme.of(context)
                                                   .labelMedium,
@@ -649,58 +658,41 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         0.0, 0.0, 0.0, 16.0),
                                     child: FFButtonWidget(
                                       onPressed: () async {
-                                        // Navigator.push(
-                                        //     context,
-                                        //     MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             CompleteWidget()));
-                                        setState(() {});
-                                        if (isExcapted == 2) {
+                                        if (extra ==
+                                                extraWaitingController.text &&
+                                            parking == parkingController.text &&
+                                            tolls == tollsController.text &&
+                                            waiting == watingController.text) {
+                                          print('process with same');
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       CompleteWidget()));
                                         } else {
-                                          addFares();
-                                          isExcapted = 1;
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return DailogForFare(
+                                                  addFares: addFares(),
+                                                );
+                                              });
+                                          print('dialog');
                                         }
 
-                                        // context.pushNamed(
-                                        //   'invoiecs',
-                                        //   queryParameters: {
-                                        //     'did': serializeParam(
-                                        //       '${widget.did}',
-                                        //       ParamType.String,
-                                        //     ),
-                                        //     'jobid': serializeParam(
-                                        //       '${widget.jobid}',
-                                        //       ParamType.String,
-                                        //     ),
-                                        //     'fare': serializeParam(
-                                        //       '${widget.fare}',
-                                        //       ParamType.String,
-                                        //     ),
-                                        //     'parking': serializeParam(
-                                        //       '${parkingController.text}',
-                                        //       ParamType.String,
-                                        //     ),
-                                        //     'waiting': serializeParam(
-                                        //       '${extraWaitingController.text}',
-                                        //       ParamType.String,
-                                        //     ),
-                                        //     'tolls': serializeParam(
-                                        //       '${tollsController.text}',
-                                        //       ParamType.String,
-                                        //     ),
-                                        //   }.withoutNulls,
-                                        // );
+                                        setState(() {});
+                                        // if (isExcapted == 2) {
+                                        //   Navigator.push(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //           builder: (context) =>
+                                        //               CompleteWidget()));
+                                        // } else {
+                                        //   addFares();
+                                        //   isExcapted = 1;
+                                        // }
                                       },
-                                      text: isExcapted == 0
-                                          ? 'Correct'
-                                          : isExcapted == 1
-                                              ? 'Waiting for approval'
-                                              : 'Proceed to complete',
+                                      text: 'Proceed',
                                       options: FFButtonOptions(
                                         width: 370.0,
                                         height: 44.0,
@@ -709,15 +701,8 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         iconPadding:
                                             EdgeInsetsDirectional.fromSTEB(
                                                 0.0, 0.0, 0.0, 0.0),
-                                        color: isExcapted == 0
-                                            ? FlutterFlowTheme.of(context)
-                                                .primary
-                                            : isExcapted == 1
-                                                ? FlutterFlowTheme.of(context)
-                                                    .primary
-                                                    .withOpacity(0.3)
-                                                : FlutterFlowTheme.of(context)
-                                                    .primary,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
                                         textStyle: FlutterFlowTheme.of(context)
                                             .titleSmall
                                             .override(
@@ -734,6 +719,81 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                       ),
                                     ),
                                   ),
+                                  // Padding(
+                                  //   padding: EdgeInsetsDirectional.fromSTEB(
+                                  //       0.0, 0.0, 0.0, 16.0),
+                                  //   child: FFButtonWidget(
+                                  //     onPressed: () async {
+                                  //       if (extra ==
+                                  //               extraWaitingController.text &&
+                                  //           parking == parkingController.text &&
+                                  //           tolls == tollsController.text &&
+                                  //           waiting == watingController.text) {
+                                  //         print('process with same');
+                                  //         Navigator.push(
+                                  //             context,
+                                  //             MaterialPageRoute(
+                                  //                 builder: (context) =>
+                                  //                     CompleteWidget()));
+                                  //       } else {
+                                  //         showDialog(
+                                  //             context: context,
+                                  //             builder: (context) {
+                                  //               return DailogForFare();
+                                  //             });
+                                  //         print('dialog');
+                                  //       }
+
+                                  //       setState(() {});
+                                  //       // if (isExcapted == 2) {
+                                  //       //   Navigator.push(
+                                  //       //       context,
+                                  //       //       MaterialPageRoute(
+                                  //       //           builder: (context) =>
+                                  //       //               CompleteWidget()));
+                                  //       // } else {
+                                  //       //   addFares();
+                                  //       //   isExcapted = 1;
+                                  //       // }
+                                  //     },
+                                  //     text: isExcapted == 0
+                                  //         ? 'Correct'
+                                  //         : isExcapted == 1
+                                  //             ? 'Waiting for approval'
+                                  //             : 'Proceed to complete',
+                                  //     options: FFButtonOptions(
+                                  //       width: 370.0,
+                                  //       height: 44.0,
+                                  //       padding: EdgeInsetsDirectional.fromSTEB(
+                                  //           0.0, 0.0, 0.0, 0.0),
+                                  //       iconPadding:
+                                  //           EdgeInsetsDirectional.fromSTEB(
+                                  //               0.0, 0.0, 0.0, 0.0),
+                                  //       color: isExcapted == 0
+                                  //           ? FlutterFlowTheme.of(context)
+                                  //               .primary
+                                  //           : isExcapted == 1
+                                  //               ? FlutterFlowTheme.of(context)
+                                  //                   .primary
+                                  //                   .withOpacity(0.3)
+                                  //               : FlutterFlowTheme.of(context)
+                                  //                   .primary,
+                                  //       textStyle: FlutterFlowTheme.of(context)
+                                  //           .titleSmall
+                                  //           .override(
+                                  //             fontFamily: 'Readex Pro',
+                                  //             color: Colors.white,
+                                  //           ),
+                                  //       elevation: 3.0,
+                                  //       borderSide: BorderSide(
+                                  //         color: Colors.transparent,
+                                  //         width: 1.0,
+                                  //       ),
+                                  //       borderRadius:
+                                  //           BorderRadius.circular(12.0),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -772,6 +832,93 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                   ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DailogForFare extends StatefulWidget {
+  Future addFares;
+  DailogForFare({super.key, required this.addFares});
+
+  @override
+  State<DailogForFare> createState() => _DailogForFareState();
+}
+
+class _DailogForFareState extends State<DailogForFare> {
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Text(
+                'Confirmation',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Your fares need approval from controller.',
+                style: TextStyle(
+                  fontSize: 17,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Spacer(),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 10.0),
+                child: FFButtonWidget(
+                  onPressed: () async {
+                    widget.addFares;
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CompleteWidget()));
+                    setState(() {});
+                    // if (isExcapted == 2) {
+                    //   Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //           builder: (context) =>
+                    //               CompleteWidget()));
+                    // } else {
+
+                    //   isExcapted = 1;
+                    // }
+                  },
+                  text: 'Click Here To Proceed',
+                  options: FFButtonOptions(
+                    width: 370.0,
+                    height: 44.0,
+                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    iconPadding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    color: FlutterFlowTheme.of(context).primary,
+                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                          fontFamily: 'Readex Pro',
+                          color: Colors.white,
+                        ),
+                    elevation: 3.0,
+                    borderSide: BorderSide(
+                      color: Colors.transparent,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

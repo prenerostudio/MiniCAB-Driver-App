@@ -30,7 +30,9 @@ class JobController extends GetxController {
   var dropLocation = ''.obs; // Reactive variable for 'data' (booking ID)
   Timer? timer;
   Future jobDetails() async {
-    try {listFromPusher.clear();
+    try {
+      listFromPusher.clear();
+      
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
       String? jobid = prefs.getString('jobId');
@@ -72,12 +74,11 @@ class JobController extends GetxController {
         await prefs.setString('pickTime', pickuptime.value);
         await prefs.setString('pickLocation', pickupLocatoin.value);
         await prefs.setString('dropLocation', dropLocation.value);
-        print('the data from api ${parsedResponse['data']}');
+        print('the data from ${parsedResponse['data']}');
 
         if (parsedResponse['status'] == true) {
-          
-
-          print("json data api call${parsedResponse['data']}");
+          print(
+              "json data api call${parsedResponse['data'][0]['journey_fare']}");
 
           listFromPusher.value.add(Job(
               jobId: parsedResponse['data'][0]['job_id'].toString() ?? "",
@@ -152,8 +153,8 @@ class JobController extends GetxController {
         }
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-  isJobDetailDone.value = false;
-});
+          isJobDetailDone.value = false;
+        });
 
         // Failed to load jobs, handle it appropriately
         return null;
@@ -162,8 +163,8 @@ class JobController extends GetxController {
       // Get.snackbar('Error', 'No data found in job detail',colorText: Colors.white,backgroundColor: Colors.red);
       // Get.snackbar('Error', 'No data found in job detail',colorText: Colors.white,backgroundColor: Colors.red);
       WidgetsBinding.instance.addPostFrameCallback((_) {
-  isJobDetailDone.value = false;
-});
+        isJobDetailDone.value = false;
+      });
 
       print('Errorssssss: $e');
       // Handle the error, you can return null or an empty job object
@@ -215,6 +216,4 @@ class JobController extends GetxController {
       return null;
     }
   }
-
-  
 }

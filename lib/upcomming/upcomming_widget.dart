@@ -43,10 +43,10 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   late Timer _timer;
   List<LatLng> _polylineCoordinates = [];
   List<Marker> markers = [];
-  late double currentLatitude;
-  late double currentLongitude;
-  late double pickupLat;
-  late double pickupLng;
+    double currentLatitude=0.0;
+    double currentLongitude=0.0;
+    double pickupLat=0.0;
+    double pickupLng=0.0;
   late CameraPosition _kGoogle;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};

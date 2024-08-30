@@ -48,28 +48,35 @@ class _BreakTimeWidgetState extends State<BreakTimeWidget> {
     super.dispose();
   }
 
-  endBreak() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? dId = prefs.getString('d_id');
+void endBreak() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? dId = prefs.getString('d_id');
 
-    print('The total time is ${_model.timerValue}');
-    String? breakId = prefs.getString('breakId');
-    var request = http.MultipartRequest('POST',
-        Uri.parse('https://www.minicaboffice.com/api/driver/end-break.php'));
-    request.fields.addAll({
-      'bt_id': breakId!,
-      'd_id': dId.toString(),
-      "total_time": _model.timerValue
-    });
-    print(request.fields);
+  print('The total time is ${_model.timerValue}');
+  String? breakId = prefs.getString('breakId');
+  var request = http.MultipartRequest('POST', Uri.parse('https://www.minicaboffice.com/api/driver/end-break.php'));
+  request.fields.addAll({
+    'bt_id': breakId!,
+    'd_id': dId.toString(),
+    "total_time": _model.timerValue
+  });
+  print(request.fields);
+
+  try {
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print(await response.stream.bytesToString());
-      Navigator.pop(context);
+      if (mounted) {  // Check if the widget is still mounted
+        Navigator.pop(context);
+      }
     } else {
       print(response.reasonPhrase);
     }
+  } catch (e) {
+    print(e.toString());
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

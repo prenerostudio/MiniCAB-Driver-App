@@ -85,25 +85,25 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     if (isLogin == true && isRideStart == 0) {
       usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
         print('user session checking starts');
-        checkUserSession();
+        // checkUserSession();
       });
       context.pushNamed('Home');
     } else if (isLogin == true && isRideStart == 1) {
       usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
         print('user session checking starts');
-        checkUserSession();
+        // checkUserSession();
       });
       context.pushNamed('onWay');
     } else if (isLogin == true && isRideStart == 2) {
       usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
         print('user session checking starts');
-        checkUserSession();
+        // checkUserSession();
       });
       context.pushNamed('Pob');
     } else if (isLogin == true && isRideStart == 3) {
       usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
         print('user session checking starts');
-        checkUserSession();
+        // checkUserSession();
       });
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => CompleteWidget()));
@@ -122,32 +122,32 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   }
 
   Timer? usersessionTimer;
-  Future<void> checkUserSession() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('loginToken');
-    // String? jobId = prefs.getString('jobId');
-    final response = await http.post(
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/check-login-token.php'),
-      body: {'token': token.toString()},
-    );
+  // Future<void> checkUserSession() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? token = prefs.getString('loginToken');
+  //   // String? jobId = prefs.getString('jobId');
+  //   final response = await http.post(
+  //     Uri.parse(
+  //         'https://www.minicaboffice.com/api/driver/check-login-token.php'),
+  //     body: {'token': token.toString()},
+  //   );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+  //   if (response.statusCode == 200) {
+  //     final data = json.decode(response.body);
 
-      if (data['status'] == false) {
-        prefs.setString('loginToken', '');
-        prefs.setBool('isLogin', false);
-        setState(() {});
-        usersessionTimer?.cancel();
-        context.pushNamed('Login');
-      } else {
-        // Handle the job details as normal
-      }
-    } else {
-      // Handle the error
-    }
-  }
+  //     if (data['status'] == false) {
+  //       prefs.setString('loginToken', '');
+  //       prefs.setBool('isLogin', false);
+  //       setState(() {});
+  //       usersessionTimer?.cancel();
+  //       context.pushNamed('Login');
+  //     } else {
+  //       // Handle the job details as normal
+  //     }
+  //   } else {
+  //     // Handle the error
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
