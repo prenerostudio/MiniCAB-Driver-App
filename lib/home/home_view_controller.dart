@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
 import 'package:mini_cab/home/start_ride_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +15,10 @@ class JobController extends GetxController {
   var isJobDetailDone = false.obs;
   var visiblecontainer = false.obs;
   RxList<Job> listFromPusher = <Job>[].obs;
+  RxDouble convertedLat = 0.0.obs;
+  Position? currentLocation;
+  RxDouble convertedLng = 0.0.obs;
+  RxSet<Polyline> polylines = <Polyline>{}.obs;
   RxInt initialLabelIndex = 0.obs;
   var parsedResponse =
       RxMap<String, dynamic>({}); // Reactive map for parsed response
@@ -32,7 +38,7 @@ class JobController extends GetxController {
   Future jobDetails() async {
     try {
       listFromPusher.clear();
-      
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
       String? jobid = prefs.getString('jobId');

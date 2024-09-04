@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -8,55 +7,40 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_webservice/directions.dart';
+
 import 'package:mini_cab/Acount%20Statements/acount_statements_widget.dart';
-import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/home/home_screen_alert.dart';
 import 'package:mini_cab/home/home_view_controller.dart';
-import 'package:mini_cab/main.dart';
+import 'package:mini_cab/home/polyLinesAndMarker.dart';
 import 'package:mini_cab/review/review_screen.dart';
 import 'package:mini_cab/time_slot/time_slot_view.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:root_checker_plus/root_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:system_alert_window/system_alert_window.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
-import '../Data/background.dart';
-import '../Data/overlay.dart';
 import '../Model/jobDetails.dart';
-import '../components/changepaymentmethod/changepaymentmethod_widget.dart';
-import '../components/newjob_widget.dart';
 import '../components/notes_widget.dart';
-import '../components/upcommingjob_Accepted_widget.dart';
 import '../flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'home_model.dart';
 export 'home_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:latlong2/latlong.dart' as latlong;
 import '../Model/myProfile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:glowy_borders/glowy_borders.dart';
-import 'package:google_directions_api/google_directions_api.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -74,7 +58,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   late HomeModel _model;
   LatLng? selectedLocation;
   GoogleMapController? mapController;
-  Position? currentLocation;
+
   bool isLoading = true;
   String? phone;
   String? email;
@@ -226,7 +210,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     //   checkUserSession();
     // });
     pushercallbg();
-    myController.jobDetails();
+    myController.jobDetails().then((s) {
+      print(
+          'the getCoordinatesFromAddress ${myController.listFromPusher.isNotEmpty} ');
+      if (myController.listFromPusher.isNotEmpty) {
+        // getCoordinatesFromAddress(myController.listFromPusher[0].pickup);
+      }
+    });
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid) {
       androidRootChecker();
@@ -295,6 +285,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     });
   }
 
+  AccpetingOrderViewModel accpetingOrderViewModel =
+      Get.put(AccpetingOrderViewModel());
   Future<void> checkJobStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
@@ -304,12 +296,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           'https://www.minicaboffice.com/api/driver/check-job-status.php'),
       body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
     );
-
+    print('job is deletedS ${response.body}');
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['status'] == false) {
         prefs.remove("isRideStart");
         setState(() {});
+        print('job is deleted ${data}');
         myController.visiblecontainer.value = false;
         myController.isJobDetailDone.value = false;
 
@@ -399,6 +392,29 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     }
   }
 
+  Future getCoordinatesFromAddress(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        myController.convertedLat.value = locations.first.latitude;
+        myController.convertedLng.value = locations.first.longitude;
+        print(
+            'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}');
+        accpetingOrderViewModel.getLatLngFromCurrentLocation().then((value) {
+          accpetingOrderViewModel.getdistanceandtime(
+              locations.first.latitude, locations.first.longitude);
+          accpetingOrderViewModel.kGoogleplay.value = CameraPosition(
+              target: LatLng(accpetingOrderViewModel.latitude.value,
+                  accpetingOrderViewModel.longitude.value),
+              zoom: 12.4746);
+          accpetingOrderViewModel.setcustommarkeritem();
+        });
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print(myController.visiblecontainer.value);
@@ -409,6 +425,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           systemStatusBarContrastEnforced: true,
         ),
       );
+    }
+
+    if (myController.listFromPusher.isNotEmpty) {
+      getCoordinatesFromAddress(myController.listFromPusher[0].pickup);
     }
     DateTime? lastBackPressed;
     return GestureDetector(
@@ -1637,7 +1657,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                     ),
                     child: Stack(
                       children: [
-                        buildMap()
+                        Obx(() => buildMap())
                         // isLoading
                         //     ? Center(
                         //         child: CircularProgressIndicator(
@@ -2033,644 +2053,656 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                     )
                                   : Container(),
                             )),
-                        Obx(() => Column(
-                              children: [
-                                myController.visiblecontainer.value == true
-                                    ? Padding(
-                                        padding:
-                                            const EdgeInsetsDirectional.only(
-                                                top: 50),
-                                        child: Container(
-                                          height: 580,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              SingleChildScrollView(
-                                                child: Container(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primaryBackground,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            12),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                  0, 0, 0, 8),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Text(
-                                                                    '£${myController.listFromPusher[0].journeyFare}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .end,
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .displaySmall
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Outfit',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primaryText,
-                                                                          fontSize:
-                                                                              32,
-                                                                          fontWeight:
-                                                                              FontWeight.w600,
-                                                                        ),
-                                                                  ),
-                                                                  Text(
-                                                                    '(Estimated maximum value)',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primaryText,
-                                                                          fontSize:
-                                                                              14,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                  ),
-                                                                ].divide(
-                                                                    const SizedBox(
-                                                                        height:
-                                                                            4)),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(0),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceEvenly,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              const Icon(
-                                                                Icons.business,
-                                                                color: Color(
-                                                                    0xFF5B68F5),
-                                                                size: 45,
-                                                              ),
-                                                              Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Opacity(
-                                                                    opacity:
-                                                                        0.5,
-                                                                    child:
-                                                                        SizedBox(
-                                                                      height:
-                                                                          50,
-                                                                      child:
-                                                                          VerticalDivider(
-                                                                        thickness:
-                                                                            2,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .secondaryText,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsetsDirectional
-                                                                            .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                    child:
-                                                                        Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      children: [
-                                                                        Text(
-                                                                          'Time',
-                                                                          style: FlutterFlowTheme.of(context)
-                                                                              .bodyMedium
-                                                                              .override(
-                                                                                fontFamily: 'Roboto',
-                                                                                fontSize: 16,
-                                                                              ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsetsDirectional
-                                                                              .fromSTEB(
-                                                                              0,
-                                                                              15,
-                                                                              0,
-                                                                              0),
-                                                                          child:
-                                                                              Text(
-                                                                            'Date',
-                                                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  fontFamily: 'Roboto',
-                                                                                  fontSize: 16,
-                                                                                ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsetsDirectional
-                                                                            .fromSTEB(
-                                                                            80,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                    child:
-                                                                        Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      children: [
-                                                                        Text(
-                                                                          '${myController.listFromPusher[0]!.pickTime}',
-                                                                          style: FlutterFlowTheme.of(context)
-                                                                              .bodyMedium
-                                                                              .override(
-                                                                                fontFamily: 'Roboto',
-                                                                                fontSize: 16,
-                                                                              ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsetsDirectional
-                                                                              .fromSTEB(
-                                                                              0,
-                                                                              15,
-                                                                              0,
-                                                                              0),
-                                                                          child:
-                                                                              Text(
-                                                                            '${myController.listFromPusher[0]!.pickDate}',
-                                                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  fontFamily: 'Roboto',
-                                                                                  fontSize: 16,
-                                                                                ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ].divide(
-                                                                const SizedBox(
-                                                                    width: 16)),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(12),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .center,
-                                                                    child:
-                                                                        Container(
-                                                                      width: 30,
-                                                                      height:
-                                                                          30,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: const Color(
-                                                                            0xFF5B68F5),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(50),
-                                                                        shape: BoxShape
-                                                                            .rectangle,
-                                                                        border:
-                                                                            Border.all(
-                                                                          color:
-                                                                              const Color(0xFF5B68F5),
-                                                                          width:
-                                                                              2,
-                                                                        ),
-                                                                      ),
-                                                                      child:
-                                                                          Center(
-                                                                        child:
-                                                                            Text(
-                                                                          'A',
-                                                                          style: FlutterFlowTheme.of(context)
-                                                                              .bodyMedium
-                                                                              .override(
-                                                                                fontFamily: 'Open Sans',
-                                                                                color: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                fontSize: 18,
-                                                                                fontWeight: FontWeight.w300,
-                                                                              ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .only(
-                                                                      top: 5,
-                                                                      left: 25,
-                                                                    ),
-                                                                    child:
-                                                                        Stack(
-                                                                      children: [
-                                                                        Align(
-                                                                          alignment:
-                                                                              Alignment.center,
-                                                                          child:
-                                                                              Container(
-                                                                            width:
-                                                                                4,
-                                                                            height:
-                                                                                80,
-                                                                            decoration:
-                                                                                const BoxDecoration(
-                                                                              color: Color(0xFFE5E7EB),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.only(
-                                                                            top:
-                                                                                25,
-                                                                          ),
-                                                                          child:
-                                                                              Container(
-                                                                            width:
-                                                                                30,
-                                                                            height:
-                                                                                30,
-                                                                            decoration:
-                                                                                const BoxDecoration(
-                                                                              color: Color.fromRGBO(0, 0, 0, 0.0),
-                                                                              shape: BoxShape.circle,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        top: 5),
-                                                                    child:
-                                                                        Container(
-                                                                      width: 30,
-                                                                      height:
-                                                                          30,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: const Color(
-                                                                            0xFF5B68F5),
-                                                                        shape: BoxShape
-                                                                            .circle,
-                                                                        border:
-                                                                            Border.all(
-                                                                          color:
-                                                                              const Color(0xFF5B68F5),
-                                                                          width:
-                                                                              2,
-                                                                        ),
-                                                                      ),
-                                                                      child:
-                                                                          Center(
-                                                                        child:
-                                                                            Text(
-                                                                          'B',
-                                                                          style: FlutterFlowTheme.of(context)
-                                                                              .bodyMedium
-                                                                              .override(
-                                                                                fontFamily: 'Open Sans',
-                                                                                color: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                fontSize: 18,
-                                                                                fontWeight: FontWeight.w300,
-                                                                              ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const SizedBox(
-                                                                  width:
-                                                                      20), // Added SizedBox for spacing
-                                                              Expanded(
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Row(
-                                                                      children: [
-                                                                        Flexible(
-                                                                          child:
-                                                                              Padding(
-                                                                            padding: const EdgeInsets.only(
-                                                                                left: 10,
-                                                                                top: 10,
-                                                                                bottom: 20),
-                                                                            child:
-                                                                                Text(
-                                                                              '${myController.listFromPusher![0].pickup}',
-                                                                              style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                                    fontFamily: 'Readex Pro',
-                                                                                    color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                    fontSize: 15,
-                                                                                  ),
-                                                                              overflow: TextOverflow.ellipsis,
-                                                                              maxLines: 3,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .only(
-                                                                          bottom:
-                                                                              40),
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          const FaIcon(
-                                                                            FontAwesomeIcons.bong,
-                                                                            color:
-                                                                                Color(0xFF5B68F5),
-                                                                            size:
-                                                                                18,
-                                                                          ),
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 8),
-                                                                            child:
-                                                                                Text(
-                                                                              '${(double.parse(myController.listFromPusher[0]!.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${myController.listFromPusher[0]!.journeyType}',
-                                                                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    fontFamily: 'Open Sans',
-                                                                                    color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                    fontSize: 16,
-                                                                                  ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Flexible(
-                                                                          child:
-                                                                              Padding(
-                                                                            padding: const EdgeInsets.only(
-                                                                                left: 10,
-                                                                                top: 10,
-                                                                                bottom: 20),
-                                                                            child:
-                                                                                Text(
-                                                                              '${myController.listFromPusher![0].destination}',
-                                                                              style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                                    fontFamily: 'Readex Pro',
-                                                                                    color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                    fontSize: 15,
-                                                                                  ),
-                                                                              overflow: TextOverflow.ellipsis,
-                                                                              maxLines: 3,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            FFButtonWidget(
-                                                              onPressed:
-                                                                  () async {
-                                                                SharedPreferences
-                                                                    sp =
-                                                                    await SharedPreferences
-                                                                        .getInstance();
-
-                                                                // print(
-                                                                //     'st ${initialLabelIndex == 1}');
-                                                                if (myController
-                                                                        .initialLabelIndex
-                                                                        .value ==
-                                                                    1) {
-                                                                  await sp
-                                                                      .setBool(
-                                                                          'show',
-                                                                          false);
-                                                                  await sp.setInt(
-                                                                      'isRideStart',
-                                                                      1);
-                                                                  await showModalBottomSheet(
-                                                                    isScrollControlled:
-                                                                        true,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .transparent,
-                                                                    enableDrag:
-                                                                        false,
-                                                                    context:
-                                                                        context,
-                                                                    builder:
-                                                                        (context) {
-                                                                      return Padding(
-                                                                        padding:
-                                                                            MediaQuery.viewInsetsOf(context),
-                                                                        child:
-                                                                            NotesWidget(
-                                                                          dId:
-                                                                              '${myController.listFromPusher[0].dId}',
-                                                                          jobId:
-                                                                              '${myController.listFromPusher[0].jobId}',
-                                                                          pickTime:
-                                                                              '${myController.listFromPusher[0].pickTime}',
-                                                                          pickDate:
-                                                                              '${myController.listFromPusher[0].pickDate}',
-                                                                          passenger:
-                                                                              '${myController.listFromPusher[0].passenger}',
-                                                                          pickup:
-                                                                              '${myController.listFromPusher[0].pickup}',
-                                                                          dropoff:
-                                                                              '${myController.listFromPusher[0].destination}',
-                                                                          luggage:
-                                                                              '${myController.listFromPusher[0].luggage}',
-                                                                          cName:
-                                                                              '${myController.listFromPusher[0].cName}',
-                                                                          cnumber:
-                                                                              '${myController.listFromPusher[0].cPhone}',
-                                                                          cemail:
-                                                                              '${myController.listFromPusher[0].cEmail}',
-                                                                          note:
-                                                                              '${myController.listFromPusher[0].note}',
-                                                                          fare:
-                                                                              '${myController.listFromPusher[0].journeyFare}',
-                                                                          distance:
-                                                                              '${myController.listFromPusher[0].journeyDistance}',
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ).then((value) =>
-                                                                      safeSetState(
-                                                                          () {}));
-                                                                } else {
-                                                                  Fluttertoast
-                                                                      .showToast(
-                                                                    msg:
-                                                                        "Please be online before starting the ride.",
-                                                                    textColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    fontSize:
-                                                                        16.0,
-                                                                  );
-                                                                }
-                                                              },
-                                                              text: 'Start Now',
-                                                              icon: const Icon(
-                                                                Icons.east,
-                                                                size: 15,
-                                                              ),
-                                                              options:
-                                                                  FFButtonOptions(
-                                                                height: 50,
-                                                                padding:
-                                                                    const EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                        24,
-                                                                        0,
-                                                                        24,
-                                                                        0),
-                                                                iconPadding:
-                                                                    const EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                        0,
-                                                                        0,
-                                                                        0,
-                                                                        0),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .primary,
-                                                                textStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .titleSmall
-                                                                    .override(
-                                                                        fontFamily:
-                                                                            'Open Sans',
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontSize:
-                                                                            10),
-                                                                elevation: 3,
-                                                                borderSide:
-                                                                    const BorderSide(
-                                                                  color: Colors
-                                                                      .transparent,
-                                                                  width: 1,
-                                                                ),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ]
-                                                          .divide(
-                                                              const SizedBox(
-                                                                  height: 4))
-                                                          .addToEnd(
-                                                              const SizedBox(
-                                                                  height: 12)),
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    : SizedBox.shrink(),
-                              ],
-                            ))
                       ],
                     ),
                   ),
                 ),
+                Obx(() => Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Column(
+                        children: [
+                          myController.visiblecontainer.value == true
+                              ? Container(
+                                  // height: 580,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SingleChildScrollView(
+                                        child: Container(
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(0, 0, 0, 8),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                            '£${myController.listFromPusher[0].journeyFare}',
+                                                            textAlign:
+                                                                TextAlign.end,
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .displaySmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Outfit',
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .primaryText,
+                                                                  fontSize: 32,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                          ),
+                                                          Text(
+                                                            '(Estimated maximum value)',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Montserrat',
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .primaryText,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                          ),
+                                                        ].divide(const SizedBox(
+                                                            height: 4)),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.business,
+                                                        color:
+                                                            Color(0xFF5B68F5),
+                                                        size: 45,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          Opacity(
+                                                            opacity: 0.5,
+                                                            child: SizedBox(
+                                                              height: 50,
+                                                              child:
+                                                                  VerticalDivider(
+                                                                thickness: 2,
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondaryText,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                    10,
+                                                                    0,
+                                                                    0,
+                                                                    0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              children: [
+                                                                Text(
+                                                                  'Time',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Roboto',
+                                                                        fontSize:
+                                                                            16,
+                                                                      ),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                          0,
+                                                                          15,
+                                                                          0,
+                                                                          0),
+                                                                  child: Text(
+                                                                    'Date',
+                                                                    style: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .override(
+                                                                          fontFamily:
+                                                                              'Roboto',
+                                                                          fontSize:
+                                                                              16,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                    80,
+                                                                    0,
+                                                                    0,
+                                                                    0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              children: [
+                                                                Text(
+                                                                  '${myController.listFromPusher[0]!.pickTime}',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Roboto',
+                                                                        fontSize:
+                                                                            16,
+                                                                      ),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                          0,
+                                                                          15,
+                                                                          0,
+                                                                          0),
+                                                                  child: Text(
+                                                                    '${myController.listFromPusher[0]!.pickDate}',
+                                                                    style: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .override(
+                                                                          fontFamily:
+                                                                              'Roboto',
+                                                                          fontSize:
+                                                                              16,
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ].divide(const SizedBox(
+                                                        width: 16)),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          Align(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: Container(
+                                                              width: 30,
+                                                              height: 30,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: const Color(
+                                                                    0xFF5B68F5),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            50),
+                                                                shape: BoxShape
+                                                                    .rectangle,
+                                                                border:
+                                                                    Border.all(
+                                                                  color: const Color(
+                                                                      0xFF5B68F5),
+                                                                  width: 2,
+                                                                ),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  'A',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Open Sans',
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryBackground,
+                                                                        fontSize:
+                                                                            18,
+                                                                        fontWeight:
+                                                                            FontWeight.w300,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                              left: 25,
+                                                            ),
+                                                            child: Stack(
+                                                              children: [
+                                                                Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  child:
+                                                                      Container(
+                                                                    width: 4,
+                                                                    height: 40,
+                                                                    decoration:
+                                                                        const BoxDecoration(
+                                                                      color: Color(
+                                                                          0xFFE5E7EB),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                    top: 10,
+                                                                  ),
+                                                                  child:
+                                                                      Container(
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    decoration:
+                                                                        const BoxDecoration(
+                                                                      color: Color
+                                                                          .fromRGBO(
+                                                                              0,
+                                                                              0,
+                                                                              0,
+                                                                              0.0),
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            width: 30,
+                                                            height: 30,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: const Color(
+                                                                  0xFF5B68F5),
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              border:
+                                                                  Border.all(
+                                                                color: const Color(
+                                                                    0xFF5B68F5),
+                                                                width: 2,
+                                                              ),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'B',
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Open Sans',
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryBackground,
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w300,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(
+                                                          width:
+                                                              20), // Added SizedBox for spacing
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Flexible(
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10,
+                                                                        // top: 10,
+                                                                        bottom:
+                                                                            20),
+                                                                    child: Text(
+                                                                      '${myController.listFromPusher![0].pickup}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                15,
+                                                                          ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          3,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      bottom:
+                                                                          10),
+                                                              child: Row(
+                                                                children: [
+                                                                  const FaIcon(
+                                                                    FontAwesomeIcons
+                                                                        .bong,
+                                                                    color: Color(
+                                                                        0xFF5B68F5),
+                                                                    size: 18,
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            8),
+                                                                    child: Text(
+                                                                      '${(double.parse(myController.listFromPusher[0]!.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${myController.listFromPusher[0]!.journeyType}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Open Sans',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                16,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Flexible(
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10,
+                                                                        bottom:
+                                                                            10),
+                                                                    child: Text(
+                                                                      '${myController.listFromPusher![0].destination}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                15,
+                                                                          ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          3,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    FFButtonWidget(
+                                                      onPressed: () async {
+                                                        SharedPreferences sp =
+                                                            await SharedPreferences
+                                                                .getInstance();
+
+                                                        // print(
+                                                        //     'st ${initialLabelIndex == 1}');
+                                                        if (myController
+                                                                .initialLabelIndex
+                                                                .value ==
+                                                            1) {
+                                                          await sp.setBool(
+                                                              'show', false);
+                                                          await sp.setInt(
+                                                              'isRideStart', 1);
+                                                          await showModalBottomSheet(
+                                                            isScrollControlled:
+                                                                true,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            enableDrag: false,
+                                                            context: context,
+                                                            builder: (context) {
+                                                              return Padding(
+                                                                padding: MediaQuery
+                                                                    .viewInsetsOf(
+                                                                        context),
+                                                                child:
+                                                                    NotesWidget(
+                                                                  dId:
+                                                                      '${myController.listFromPusher[0].dId}',
+                                                                  jobId:
+                                                                      '${myController.listFromPusher[0].jobId}',
+                                                                  pickTime:
+                                                                      '${myController.listFromPusher[0].pickTime}',
+                                                                  pickDate:
+                                                                      '${myController.listFromPusher[0].pickDate}',
+                                                                  passenger:
+                                                                      '${myController.listFromPusher[0].passenger}',
+                                                                  pickup:
+                                                                      '${myController.listFromPusher[0].pickup}',
+                                                                  dropoff:
+                                                                      '${myController.listFromPusher[0].destination}',
+                                                                  luggage:
+                                                                      '${myController.listFromPusher[0].luggage}',
+                                                                  cName:
+                                                                      '${myController.listFromPusher[0].cName}',
+                                                                  cnumber:
+                                                                      '${myController.listFromPusher[0].cPhone}',
+                                                                  cemail:
+                                                                      '${myController.listFromPusher[0].cEmail}',
+                                                                  note:
+                                                                      '${myController.listFromPusher[0].note}',
+                                                                  fare:
+                                                                      '${myController.listFromPusher[0].journeyFare}',
+                                                                  distance:
+                                                                      '${myController.listFromPusher[0].journeyDistance}',
+                                                                ),
+                                                              );
+                                                            },
+                                                          ).then((value) =>
+                                                              safeSetState(
+                                                                  () {}));
+                                                        } else {
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg:
+                                                                "Please be online before starting the ride.",
+                                                            textColor:
+                                                                Colors.white,
+                                                            fontSize: 16.0,
+                                                          );
+                                                        }
+                                                      },
+                                                      text: 'Start Now',
+                                                      icon: const Icon(
+                                                        Icons.east,
+                                                        size: 15,
+                                                      ),
+                                                      options: FFButtonOptions(
+                                                        height: 40,
+                                                        padding:
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                24, 0, 24, 0),
+                                                        iconPadding:
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                0, 0, 0, 0),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary,
+                                                        textStyle:
+                                                            FlutterFlowTheme
+                                                                    .of(context)
+                                                                .titleSmall
+                                                                .override(
+                                                                    fontFamily:
+                                                                        'Open Sans',
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        10),
+                                                        elevation: 3,
+                                                        borderSide:
+                                                            const BorderSide(
+                                                          color: Colors
+                                                              .transparent,
+                                                          width: 1,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ].divide(
+                                                  const SizedBox(height: 4)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      // TextButton(
+                                      //     onPressed: () {
+                                      //       myController.isJobDetailDone.value =
+                                      //           false;
+                                      //     },
+                                      //     child: Text('data'))
+                                    ],
+                                  ),
+                                )
+                              : SizedBox.shrink(),
+                        ],
+                      ),
+                    )),
+                // TextButton(
+                //     onPressed: () {
+                //       if (myController.listFromPusher.isNotEmpty) {
+                //         getCoordinatesFromAddress(
+                //             myController.listFromPusher[0].pickup);
+                //       }
+                //     },
+                //     child: Text('data'))
               ],
             ),
           ),
@@ -2686,11 +2718,24 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       },
       initialCameraPosition: CameraPosition(
         target: LatLng(
-          currentLocation?.latitude ?? 0.0,
-          currentLocation?.longitude ?? 0.0,
+          myController.currentLocation?.latitude ?? 0.0,
+          myController.currentLocation?.longitude ?? 0.0,
         ),
         zoom: 12.0,
       ),
+      markers: {
+        Marker(
+            markerId: const MarkerId('Source'),
+            position: LatLng(accpetingOrderViewModel.latitude.value,
+                accpetingOrderViewModel.longitude.value),
+            icon: accpetingOrderViewModel.sourceicon.value),
+        Marker(
+            markerId: const MarkerId('destination'),
+            position: LatLng(myController.convertedLat.value,
+                myController.convertedLng.value),
+            icon: accpetingOrderViewModel.destinationicon.value),
+      },
+      polylines: accpetingOrderViewModel.polylines.value,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
       compassEnabled: true,
@@ -2702,6 +2747,117 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     );
   }
 
+  // Future _getPolyline(double destinationLat, double desLng) async {
+  //   print('tapped');
+  //   var origin =
+  //       '${myController.currentLocation?.latitude},${myController.currentLocation?.longitude}'; // Replace with your source coordinates
+  //   var destination =
+  //       // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
+  //       '${myController.currentLocation?.latitude},${desLng}';
+  //   // var destination =
+  //   // // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
+  //   // '${31.3637197},${73.0553336}';
+  //   try {
+  //     final response = await http.post(Uri.parse(// can be get and post request
+  //         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
+  //         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+
+  //       if (data.containsKey('routes') && data['routes'].isNotEmpty) {
+  //         final route = data['routes'][0];
+  //         if (route.containsKey('legs') && route['legs'].isNotEmpty) {
+  //           final leg = route['legs'][0];
+
+  //           if (leg.containsKey('distance')) {
+  //             // distance.value = leg['distance']['text'];
+  //             // time.value = leg['duration']['text'];
+
+  //             final points = route['overview_polyline']['points'];
+  //             print('the point of poly line $points');
+  //             // Decode polyline points and add them to the map
+  //             //         final json = jsonDecode(response.body);
+  //             // final String encodedPolyline =
+  //             //     json['routes'][0]['overview_polyline']['points'];
+  //             // final List<LatLng> points = decodePolyline(encodedPolyline);
+  //             decodedPoints = PolylinePoints()
+  //                 .decodePolyline(points)
+  //                 .map((point) => LatLng(point.latitude, point.longitude))
+  //                 .toList();
+
+  //             if (mounted) {
+  //               setState(() {
+  //                 myController.polylines.add(
+  //                   Polyline(
+  //                     polylineId: PolylineId('poly'),
+  //                     visible: true,
+  //                     points: decodedPoints,
+  //                     width: 4,
+  //                     color: Colors.blue,
+  //                   ),
+  //                 );
+  //               });
+  //             }
+  //           }
+  //         }
+  //       }
+  //     } else {
+  //       print('the point of poly line ');
+  //     }
+  //   } catch (e) {
+  //     print('the point of poly line $e');
+  //   }
+  // }
+
+  // Future getCoordinatesFromAddress(String address) async {
+  //   try {
+  //     List<Location> locations = await locationFromAddress(address);
+  //     if (locations.isNotEmpty) {
+  //       myController.convertedLat.value = locations.first.latitude;
+  //       myController.convertedLng.value = locations.first.longitude;
+  //       print(
+  //           'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}');
+  //       _getPolyline(locations.first.latitude, locations.first.longitude);
+  //     }
+  //   } catch (e) {
+  //     print('Error occurred: $e');
+  //   }
+  // }
+
+  // final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
+
+  // List<LatLng> decodedPoints = <LatLng>[];
+
+  // List<LatLng> decodePolyline(String encoded) {
+  //   List<LatLng> polyline = [];
+  //   int index = 0, len = encoded.length;
+  //   int lat = 0, lng = 0;
+
+  //   while (index < len) {
+  //     int b, shift = 0, result = 0;
+  //     do {
+  //       b = encoded.codeUnitAt(index++) - 63;
+  //       result |= (b & 0x1F) << shift;
+  //       shift += 5;
+  //     } while (b >= 0x20);
+  //     int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+  //     lat += dlat;
+
+  //     shift = 0;
+  //     result = 0;
+  //     do {
+  //       b = encoded.codeUnitAt(index++) - 63;
+  //       result |= (b & 0x1F) << shift;
+  //       shift += 5;
+  //     } while (b >= 0x20);
+  //     int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+  //     lng += dlng;
+
+  //     polyline.add(LatLng(lat / 1E5, lng / 1E5));
+  //   }
+
+  //   return polyline;
+  // }
   // void didChangeAppLifecycleState(AppLifecycleState state) {
   //   if (state == AppLifecycleState.resumed) {
   //     jobDetailsFuture();
@@ -2709,6 +2865,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   //   }
   // }
 
+  LatLng _destination = LatLng(34.0522, -118.2437);
   void fetchJobStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? d_id = prefs.getString('d_id');
@@ -2812,7 +2969,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     if (Position != null) {
       mapController!.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
-          target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
+          target: LatLng(myController.currentLocation!.latitude,
+              myController.currentLocation!.longitude),
           zoom: 12.0,
         ),
       ));
@@ -3133,22 +3291,22 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   Future<void> _getLocation() async {
     try {
-      currentLocation = await Geolocator.getCurrentPosition();
+      myController.currentLocation = await Geolocator.getCurrentPosition();
 
-      if (currentLocation != null) {
+      if (myController.currentLocation != null) {
         mapController!.animateCamera(
           CameraUpdate.newLatLng(
             LatLng(
-              currentLocation!.latitude,
-              currentLocation!.longitude,
+              myController.currentLocation!.latitude,
+              myController.currentLocation!.longitude,
             ),
           ),
         );
         print(
-            " the lat ${currentLocation!.latitude} and long ${currentLocation!.longitude}");
+            " the lat ${myController.currentLocation!.latitude} and long ${myController.currentLocation!.longitude}");
       }
       print(
-          " the lats ${currentLocation!.latitude} and longs ${currentLocation!.longitude}");
+          " the lats ${myController.currentLocation!.latitude} and longs ${myController.currentLocation!.longitude}");
       if (mounted) {
         setState(() {
           isLoading = false;

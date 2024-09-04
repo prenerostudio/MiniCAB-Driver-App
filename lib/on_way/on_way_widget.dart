@@ -1,5 +1,6 @@
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:mini_cab/Data/links.dart';
 import 'package:mini_cab/components/customer_details_widget.dart';
@@ -16,6 +17,7 @@ import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_timer.dart';
 import '../home/home_widget.dart';
 import '../main.dart';
+import 'dart:ui' as ui;
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -63,8 +65,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   late OnWayModel _model;
   double pickupLat = 0.0;
   double pickupLng = 0.0;
-  late double currentLatitude;
-  late double currentLongitude;
+  double currentLatitude = 0;
+  double currentLongitude = 0;
 
   String? did;
   String? jobid;
@@ -81,10 +83,13 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   String? cnumber;
   String? cemail;
   late PolylinePoints polylinePoints;
-  Map<PolylineId, Polyline> polylines = {};
+  // Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
 
-  List<Marker> markers = [];
+  // Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+
+  Set<Marker> markers = {};
   List<LatLng> _polylineCoordinates = [];
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -92,9 +97,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   late CameraPosition _kGoogle;
   late Timer _locationTimer;
-  final Set<Marker> _markers = {};
+  // final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
-  late Position _currentPosition;
+  Position? _currentPosition;
   bool isLoading = false;
   bool isWaiting = false;
   bool isRideStarted = false;
@@ -149,9 +154,28 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
   final JobController myController = Get.put(JobController());
   TimerClass timerclass = TimerClass();
+  getlocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentPosition = position;
+        // currentLatitude = position.latitude;
+        // currentLongitude = position.longitude;
+        print("the current lat long: ${_currentPosition!.latitude}");
+      });
+    } catch (e) {
+      print("Error getting current location: $e");
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
+    getlocation();
     loadata().then((s) {});
     startJobStatusTimer();
     pushercallbg();
@@ -212,6 +236,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         luggage = value.luggage;
         cnumber = value.cPhone;
         cemail = value.cEmail;
+        getCoordinatesFromAddress(pickup!);
       } else {
         print("No job details found.");
         // Handle the null case, e.g., show an error message, redirect, etc.
@@ -962,114 +987,356 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   }
 
   Widget buildMap() {
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: LatLng(
-          _currentPosition?.latitude ?? 0.0,
-          _currentPosition?.longitude ?? 0.0,
-        ),
-        zoom: 14,
-      ),
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      compassEnabled: true,
-      rotateGesturesEnabled: true,
-      tiltGesturesEnabled: true,
-      scrollGesturesEnabled: true,
-      zoomControlsEnabled: false,
-      zoomGesturesEnabled: true,
-      onMapCreated: _onMapCreated,
-      markers: Set<Marker>.of(markers),
-      polylines: Set<Polyline>.of([
-        Polyline(
-          polylineId: PolylineId('route'),
-          color: Colors.blue,
-          width: 5,
-          points: _polylineCoordinates,
-        ),
-      ]),
-    );
+    return _currentPosition == null
+        ? Center(child: CircularProgressIndicator())
+        : GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: LatLng(
+                _currentPosition!.latitude,
+                _currentPosition!.longitude,
+              ),
+              zoom: 14,
+            ),
+            markers: {
+              Marker(
+                  markerId: const MarkerId('Source'),
+                  position: LatLng(
+                      _currentPosition!.latitude, _currentPosition!.longitude),
+                  icon: sourceicon),
+              Marker(
+                  markerId: const MarkerId('destination'),
+                  position: LatLng(convertedLat, convertedLng),
+                  icon: destinationicon),
+            },
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            compassEnabled: true,
+            rotateGesturesEnabled: true,
+            tiltGesturesEnabled: true,
+            scrollGesturesEnabled: true,
+            zoomControlsEnabled: false,
+            zoomGesturesEnabled: true,
+            onMapCreated: _onMapCreated,
+            // markers: markers,
+            polylines: polylines,
+          );
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentPosition = position;
+        currentLatitude = position.latitude;
+        currentLongitude = position.longitude;
+      });
+    } catch (e) {
+      print("Error getting current location: $e");
+    }
   }
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
-    await _getCurrentLocation();
-    setState(() {
-      _mapController = controller;
-    });
+    _mapController = controller;
 
-    final directionsService = DirectionsService();
-    final request = DirectionsRequest(
-      origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
-      destination: '${pickup}',
-    );
+    // await _getCurrentLocation();
 
-    directionsService.route(request,
-        (DirectionsResult? response, DirectionsStatus? status) {
-      if (status == DirectionsStatus.ok && response != null) {
-        setState(() {
-          final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
+    // if (_currentPosition == null || pickupLat == null || pickupLng == null) {
+    //   print('Current position or pickup location is null');
+    //   return;
+    // }
 
-          if (encodedPolyline != null) {
-            _polylineCoordinates = decodePolyline(encodedPolyline)!;
+    // // Add origin and destination markers
+    // markers.add(
+    //   Marker(
+    //     markerId: MarkerId('origin'),
+    //     position:
+    //         LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+    //     infoWindow: InfoWindow(title: 'Your Location'),
+    //   ),
+    // );
 
-            markers.add(
-              Marker(
-                markerId: MarkerId('origin'),
-                position: LatLng(
-                  response.routes![0]!.legs![0].startLocation!.latitude,
-                  response.routes![0]!.legs![0].startLocation!.longitude,
-                ),
-              ),
-            );
-            markers.add(
-              Marker(
-                markerId: MarkerId('destination'),
-                position: LatLng(
-                  response.routes![0]!.legs![0].endLocation!.latitude,
-                  response.routes![0]!.legs![0].endLocation!.longitude,
-                ),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueGreen),
-              ),
-            );
-          }
-        });
-      } else {
-        print('Failed to fetch directions: $status');
-      }
-    });
+    // markers.add(
+    //   Marker(
+    //     markerId: MarkerId('destination'),
+    //     position: LatLng(pickupLat!, pickupLng!),
+    //     infoWindow: InfoWindow(title: 'Pickup Location'),
+    //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    //   ),
+    // );
+
+    // // Fetch directions
+    // await _fetchDirections();
   }
 
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> points = [];
-    int index = 0;
-    int lat = 0, lng = 0;
+  // Future<void> _fetchDirections() async {
+  //   final directionsService = DirectionsService();
+  //   final request = DirectionsRequest(
+  //     origin: '${_currentPosition?.latitude},${_currentPosition?.longitude}',
+  //     destination: '${pickupLat},${pickupLng}',
+  //   );
+  //   print('Request: $request');
 
-    while (index < encoded.length) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
+  //   directionsService.route(request,
+  //       (DirectionsResult? response, DirectionsStatus? status) {
+  //     if (status == DirectionsStatus.ok && response != null) {
+  //       final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
 
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
+  //       if (encodedPolyline != null) {
+  //         List<LatLng> decodedPoints = decodePolyline(encodedPolyline)!;
+  //         print('Decoded points count: ${decodedPoints.length}');
 
-      double latitude = lat / 1E5;
-      double longitude = lng / 1E5;
-      points.add(LatLng(latitude, longitude));
+  //         setState(() {
+  //           polylines.add(
+  //             Polyline(
+  //               polylineId: PolylineId('route'),
+  //               color: Colors.blue,
+  //               width: 5,
+  //               points: decodedPoints,
+  //             ),
+  //           );
+
+  //           // Optionally, adjust the camera to fit the polyline
+  //           _adjustCamera(decodedPoints);
+  //         });
+  //       }
+  //     } else {
+  //       print('Failed to fetch directions: $status');
+  //     }
+  //   });
+  // }
+
+  // void _adjustCamera(List<LatLng> points) {
+  //   if (points.isEmpty) return;
+
+  //   LatLngBounds bounds;
+  //   double x0, x1, y0, y1;
+  //   x0 = x1 = points[0].latitude;
+  //   y0 = y1 = points[0].longitude;
+
+  //   for (LatLng point in points) {
+  //     if (point.latitude > x1) x1 = point.latitude;
+  //     if (point.latitude < x0) x0 = point.latitude;
+  //     if (point.longitude > y1) y1 = point.longitude;
+  //     if (point.longitude < y0) y0 = point.longitude;
+  //   }
+
+  //   bounds = LatLngBounds(
+  //     southwest: LatLng(x0, y0),
+  //     northeast: LatLng(x1, y1),
+  //   );
+
+  //   _mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  // }
+
+  // List<LatLng> decodePolyline(String encoded) {
+  //   List<LatLng> points = [];
+  //   int index = 0;
+  //   int lat = 0, lng = 0;
+
+  //   while (index < encoded.length) {
+  //     int b, shift = 0, result = 0;
+  //     do {
+  //       b = encoded.codeUnitAt(index++) - 63;
+  //       result |= (b & 0x1F) << shift;
+  //       shift += 5;
+  //     } while (b >= 0x20);
+  //     int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+  //     lat += dlat;
+
+  //     shift = 0;
+  //     result = 0;
+  //     do {
+  //       b = encoded.codeUnitAt(index++) - 63;
+  //       result |= (b & 0x1F) << shift;
+  //       shift += 5;
+  //     } while (b >= 0x20);
+  //     int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+  //     lng += dlng;
+
+  //     double latitude = lat / 1E5;
+  //     double longitude = lng / 1E5;
+  //     points.add(LatLng(latitude, longitude));
+  //   }
+  //   return points;
+  // }
+
+  Future<void> _setupMarkersAndPolylines() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await _getCurrentLocation();
+
+    if (currentLatitude != null && currentLongitude != null) {
+      _kGoogle = CameraPosition(
+        target: LatLng(currentLatitude, currentLongitude),
+        zoom: 14,
+      );
     }
-    return points;
+  }
+  //   await getLocationFromAddress();
+
+  //   List<LatLng> latLen = [
+  //     LatLng(currentLatitude, currentLongitude),
+  //     LatLng(pickupLat, pickupLng),
+  //   ];
+
+  //   for (int i = 0; i < latLen.length; i++) {
+  //     markers.add(
+  //       Marker(
+  //         markerId: MarkerId(i.toString()),
+  //         position: latLen[i],
+  //         infoWindow: InfoWindow(
+  //           title: i == 0 ? 'Your Location' : 'Pickup Location',
+  //         ),
+  //         icon: BitmapDescriptor.defaultMarker,
+  //       ),
+  //     );
+  //   }
+
+  //   _polylines.add(
+  //     Polyline(
+  //       polylineId: PolylineId('1'),
+  //       points: latLen,
+  //       color: FlutterFlowTheme.of(context as BuildContext).primary,
+  //       // Colors.deepOrange,
+  //     ),
+  //   );
+
+  //   setState(() {
+  //     isLoading = false;
+  //   });
+  // }
+
+  Future _getPolyline(double destinationLat, double desLng) async {
+    print('tapped');
+    const apiKey =
+        'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
+    var origin =
+        '${_currentPosition!.latitude},${_currentPosition!.longitude}'; // Replace with your source coordinates
+    var destination =
+        // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
+        '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
+    print("the polylines start");
+    final response = await http.post(Uri.parse(// can be get and post request
+        // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response
+      final data = jsonDecode(response.body);
+      // print(data);
+      if (data.containsKey('routes') && data['routes'].isNotEmpty) {
+        final route = data['routes'][0];
+        if (route.containsKey('legs') && route['legs'].isNotEmpty) {
+          final leg = route['legs'][0];
+          setState(() {});
+          if (leg.containsKey('distance')) {
+            distance = leg['distance']['text'];
+            // time.value = leg['duration']['text'];
+
+            final points = route['overview_polyline']['points'];
+
+            // Decode polyline points and add them to the map
+            decodedPoints = PolylinePoints()
+                .decodePolyline(points)
+                .map((point) => LatLng(point.latitude, point.longitude))
+                .toList();
+            // polylines.value.clear();
+            print("the polylines point is $points");
+            polylines.add(Polyline(
+              // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
+              // patterns: points,
+              polylineId: const PolylineId('route'),
+              color: Colors.blue,
+              width: 5,
+              points: decodedPoints,
+            ));
+          }
+        }
+      }
+    }
+  }
+
+  Future<Uint8List> getbytesfromimages(
+      String path, int width, int height) async {
+    setState(() {});
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: width,
+      targetHeight: height,
+    );
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  void setcustommarkeritem() async {
+    setState(() {});
+    final Uint8List sourceImage =
+        await getbytesfromimages('assets/images/car.png', 80, 80);
+    final Uint8List destinationImage =
+        await getbytesfromimages('assets/images/userg.png', 80, 80);
+
+    sourceicon = BitmapDescriptor.fromBytes(sourceImage);
+    destinationicon = BitmapDescriptor.fromBytes(destinationImage);
+  }
+
+  final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
+
+  List<LatLng> decodedPoints = <LatLng>[];
+  BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor destinationicon = BitmapDescriptor.defaultMarker;
+  Future getCoordinatesFromAddress(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        setState(() {});
+        convertedLat = locations.first.latitude;
+        convertedLng = locations.first.longitude;
+        print(
+            'convert Latitude: ${convertedLat}, convert longitude: ${convertedLng}');
+        setcustommarkeritem();
+
+        _getPolyline(locations.first.latitude, locations.first.longitude);
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
+  double convertedLat = 0;
+  double convertedLng = 0;
+
+  Future<void> wayToPickup() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? dId = prefs.getString('d_id');
+
+      if (dId == null) {
+        print('d_id not found in shared preferences.');
+      }
+      var request = http.MultipartRequest('POST',
+          Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'));
+      request.fields.addAll({
+        'd_id': dId.toString(),
+      });
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        print(await response.stream.bytesToString());
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   Future<void> waitingPassanger() async {
@@ -1100,124 +1367,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       // Handle the error as needed
     }
   }
-
-  Future<void> wayToPickup() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? dId = prefs.getString('d_id');
-
-      if (dId == null) {
-        print('d_id not found in shared preferences.');
-      }
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'));
-      request.fields.addAll({
-        'd_id': dId.toString(),
-      });
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      setState(() {
-        _currentPosition = position;
-        currentLatitude = position.latitude;
-        currentLongitude = position.longitude;
-      });
-    } catch (e) {
-      print("Error getting current location: $e");
-    }
-  }
-
-  Future<void> _setupMarkersAndPolylines() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    await _getCurrentLocation();
-
-    if (currentLatitude != null && currentLongitude != null) {
-      _kGoogle = CameraPosition(
-        target: LatLng(currentLatitude, currentLongitude),
-        zoom: 14,
-      );
-    }
-
-    await getLocationFromAddress();
-
-    List<LatLng> latLen = [
-      LatLng(currentLatitude, currentLongitude),
-      LatLng(pickupLat, pickupLng),
-    ];
-
-    for (int i = 0; i < latLen.length; i++) {
-      _markers.add(
-        Marker(
-          markerId: MarkerId(i.toString()),
-          position: latLen[i],
-          infoWindow: InfoWindow(
-            title: i == 0 ? 'Your Location' : 'Pickup Location',
-          ),
-          icon: BitmapDescriptor.defaultMarker,
-        ),
-      );
-    }
-
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId('1'),
-        points: latLen,
-        color: FlutterFlowTheme.of(context as BuildContext).primary,
-        // Colors.deepOrange,
-      ),
-    );
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Future<void> getLocationFromAddress() async {
-    final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
-    final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
-    final address = pickup;
-    final response = await http.post(
-      Uri.parse('$apiUrl?address=$address&key=$apiKey'),
-    );
-
-    if (response.statusCode == 200) {
-      final decodedData = json.decode(response.body);
-
-      if (decodedData['status'] == 'OK') {
-        final results = decodedData['results'][0];
-        final geometry = results['geometry'];
-        final location = geometry['location'];
-        pickupLat = location['lat'];
-        pickupLng = location['lng'];
-        print('Latitude pickup: $pickupLat');
-        print('Longitude pickup: $pickupLng');
-      } else {
-        print('Error: ${decodedData['status']}');
-      }
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
-    }
-  }
-}
 
 // class JobDetailsScreen extends StatefulWidget {
 //   final String jobId;
@@ -1282,3 +1431,4 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 //     );
 //   }
 // }
+}
