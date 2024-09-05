@@ -1,9 +1,10 @@
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:ui' as ui;
 import '../Data/links.dart';
 import '../components/clientnotes_widget.dart';
 import '../components/waydetails_widget.dart';
@@ -69,7 +70,8 @@ class _PobWidgetState extends State<PobWidget> {
   late PobModel _model;
   late GoogleMapController mapController;
   late PolylinePoints polylinePoints;
-  Map<PolylineId, Polyline> polylines = {};
+  // Map<PolylineId, Polyline> polylines = {};
+  Set<Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
   String distanceText = '';
   String durationText = '';
@@ -93,7 +95,7 @@ class _PobWidgetState extends State<PobWidget> {
   @override
   void initState() {
     super.initState();
-    loadata();
+    loadata().then((s) {});
     sendOnRideRequest();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _setupMarkersAndPolylines();
@@ -159,6 +161,7 @@ class _PobWidgetState extends State<PobWidget> {
         // Handle the null case, e.g., show an error message, redirect, etc.
       }
     });
+    getCoordinatesFromAddress(dropoff);
   }
 
   @override
@@ -502,33 +505,137 @@ class _PobWidgetState extends State<PobWidget> {
 
   Widget buildMap() {
     return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: LatLng(
-          _currentPosition?.latitude ?? 0.0,
-          _currentPosition?.longitude ?? 0.0,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(
+            _currentPosition?.latitude ?? 0.0,
+            _currentPosition?.longitude ?? 0.0,
+          ),
+          zoom: 10,
         ),
-        zoom: 10,
-      ),
-      myLocationEnabled: true,
-      myLocationButtonEnabled: true,
-      compassEnabled: true,
-      rotateGesturesEnabled: true,
-      tiltGesturesEnabled: true,
-      scrollGesturesEnabled: true,
-      zoomGesturesEnabled: true,
-      onMapCreated: _onMapCreated,
-      markers: Set<Marker>.of(markers),
-      polylines: Set<Polyline>.of([
-        Polyline(
-          polylineId: PolylineId('route'),
-          color: Colors.blue,
-          width: 5,
-          points: _polylineCoordinates,
-        ),
-      ]),
-    );
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        compassEnabled: true,
+        rotateGesturesEnabled: true,
+        tiltGesturesEnabled: true,
+        scrollGesturesEnabled: true,
+        zoomGesturesEnabled: true,
+        onMapCreated: _onMapCreated,
+        markers: {
+          Marker(
+              markerId: const MarkerId('Source'),
+              position: LatLng(
+                  _currentPosition!.latitude, _currentPosition!.longitude),
+              icon: sourceicon),
+          Marker(
+              markerId: const MarkerId('destination'),
+              position: LatLng(convertedLat, convertedLng),
+              icon: destinationicon),
+        },
+        // markers: Set<Marker>.of(markers),
+        polylines: polylines);
   }
 
+  Future getCoordinatesFromAddress(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        setState(() {});
+        convertedLat = locations.first.latitude;
+        convertedLng = locations.first.longitude;
+        print(
+            'convert Latitude: ${convertedLat}, convert longitude: ${convertedLng}');
+        setcustommarkeritem();
+
+        _getPolyline(locations.first.latitude, locations.first.longitude);
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
+  Future _getPolyline(double destinationLat, double desLng) async {
+    print('tapped');
+    const apiKey =
+        'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
+    var origin =
+        '${_currentPosition!.latitude},${_currentPosition!.longitude}'; // Replace with your source coordinates
+    var destination =
+        // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
+        '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
+    print("the polylines start");
+    final response = await http.post(Uri.parse(// can be get and post request
+        // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response
+      final data = jsonDecode(response.body);
+      // print(data);
+      if (data.containsKey('routes') && data['routes'].isNotEmpty) {
+        final route = data['routes'][0];
+        if (route.containsKey('legs') && route['legs'].isNotEmpty) {
+          final leg = route['legs'][0];
+          setState(() {});
+          if (leg.containsKey('distance')) {
+            distance = leg['distance']['text'];
+            // time.value = leg['duration']['text'];
+
+            final points = route['overview_polyline']['points'];
+
+            // Decode polyline points and add them to the map
+            decodedPoints = PolylinePoints()
+                .decodePolyline(points)
+                .map((point) => LatLng(point.latitude, point.longitude))
+                .toList();
+            // polylines.value.clear();
+            print("the polylines point is $points");
+            polylines.add(Polyline(
+              // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
+              // patterns: points,
+              polylineId: const PolylineId('route'),
+              color: Colors.blue,
+              width: 5,
+              points: decodedPoints,
+            ));
+          }
+        }
+      }
+    }
+  }
+
+  double convertedLat = 0;
+  double convertedLng = 0;
+  void setcustommarkeritem() async {
+    setState(() {});
+    final Uint8List sourceImage =
+        await getbytesfromimages('assets/images/car.png', 80, 80);
+    final Uint8List destinationImage =
+        await getbytesfromimages('assets/images/flag.png', 80, 80);
+
+    sourceicon = BitmapDescriptor.fromBytes(sourceImage);
+    destinationicon = BitmapDescriptor.fromBytes(destinationImage);
+  }
+
+  Future<Uint8List> getbytesfromimages(
+      String path, int width, int height) async {
+    setState(() {});
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: width,
+      targetHeight: height,
+    );
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
+
+  List<LatLng> decodedPoints = <LatLng>[];
+  BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor destinationicon = BitmapDescriptor.defaultMarker;
   Future<void> sendOnRideRequest() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

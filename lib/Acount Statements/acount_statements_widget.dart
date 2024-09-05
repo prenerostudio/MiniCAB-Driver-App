@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:mini_cab/Acount%20Statements/accountStatementDetails.dart';
 import 'package:mini_cab/Model/invoivce.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -506,35 +507,118 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                             child: Material(
                                               color: Colors.transparent,
                                               elevation: 3,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryBackground,
-                                                ),
-                                                child: InkWell(
-                                                  splashColor:
-                                                      Colors.transparent,
-                                                  focusColor:
-                                                      Colors.transparent,
-                                                  hoverColor:
-                                                      Colors.transparent,
-                                                  highlightColor:
-                                                      Colors.transparent,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            15.0),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(7,
-                                                                      10, 7, 5),
-                                                          child: Row(
+                                              child: InkWell(
+                                                onTap: () {
+                                                  print('object');
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) => AccountStatementDetails(
+                                                              totalFee:
+                                                                  invoice.totalPay ??
+                                                                      '0',
+                                                              jounreryFare: invoice
+                                                                  .journeyFare!,
+                                                              parking: invoice
+                                                                  .carParking!,
+                                                              tolls: invoice
+                                                                  .tolls!,
+                                                              did: invoice.dId!,
+                                                              waiting: invoice
+                                                                  .waiting!,
+                                                              time: invoice
+                                                                  .pickTime!,
+                                                              jobid: invoice
+                                                                  .jobId!,
+                                                              pickupDate: invoice
+                                                                  .pickDate!,
+                                                              pickUplocation:
+                                                                  invoice
+                                                                      .pickup!,
+                                                              dropOflocation:
+                                                                  invoice
+                                                                      .destination!,
+                                                              pickupTime: invoice
+                                                                  .pickTime!,
+                                                              extra: invoice
+                                                                  .extra!)));
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryBackground,
+                                                  ),
+                                                  child: InkWell(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    focusColor:
+                                                        Colors.transparent,
+                                                    hoverColor:
+                                                        Colors.transparent,
+                                                    highlightColor:
+                                                        Colors.transparent,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              15.0),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        7,
+                                                                        10,
+                                                                        7,
+                                                                        5),
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Text(
+                                                                      'Booking ID ',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).primary,
+                                                                            fontSize:
+                                                                                12,
+                                                                          ),
+                                                                    ),
+                                                                    Text(
+                                                                      '${invoice.bookId}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            fontSize:
+                                                                                12,
+                                                                          ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
                                                                     .max,
@@ -547,346 +631,308 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                     MainAxisSize
                                                                         .max,
                                                                 children: [
-                                                                  Text(
-                                                                    'Booking ID ',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Readex Pro',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primary,
-                                                                          fontSize:
-                                                                              12,
-                                                                        ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .timer_sharp,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primary,
+                                                                      size: 14,
+                                                                    ),
                                                                   ),
-                                                                  Text(
-                                                                    '${invoice.bookId}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Readex Pro',
-                                                                          fontSize:
-                                                                              12,
-                                                                        ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            3,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${invoice.pickTime}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Outfit',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .max,
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .date_range,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primary,
+                                                                      size: 14,
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            3,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${invoice.pickDate}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Outfit',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                    ),
                                                                   ),
                                                                 ],
                                                               ),
                                                             ],
                                                           ),
-                                                        ),
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          5,
-                                                                          0),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .timer_sharp,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: 14,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          3,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '${invoice.pickTime}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Outfit',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondaryText,
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          5,
-                                                                          0),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .date_range,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: 14,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          3,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '${invoice.pickDate}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Outfit',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondaryText,
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                          Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .arrow_circle_up,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_circle_up,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      '${invoice.pickup}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        '${invoice.pickup}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .arrow_circle_down,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_circle_down,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      '${invoice.destination}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        '${invoice.destination}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
 
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .payment,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .payment,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      'Total fare : ${invoice.totalPay}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        'Total fare : ${invoice.totalPay}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            // Padding(
-                                                            //   padding:
-                                                            //       EdgeInsetsDirectional
-                                                            //           .fromSTEB(
-                                                            //               0,
-                                                            //               20,
-                                                            //               0,
-                                                            //               20),
-                                                            //   child:
-                                                            //       FFButtonWidget(
-                                                            //     onPressed:
-                                                            //         () async {
-                                                            //       context
-                                                            //           .pushNamed(
-                                                            //         'AccountDetails',
-                                                            //         queryParameters:
-                                                            //             {
-                                                            //           'Id':
-                                                            //               serializeParam(
-                                                            //             '${invoice.invoiceId}',
-                                                            //             ParamType
-                                                            //                 .String,
-                                                            //           ),
-                                                            //         }.withoutNulls,
-                                                            //       );
-                                                            //     },
-                                                            //     text: 'View',
-                                                            //     icon: Icon(
-                                                            //       Icons
-                                                            //           .remove_red_eye_outlined,
-                                                            //       size: 15,
-                                                            //     ),
-                                                            //     options:
-                                                            //         FFButtonOptions(
-                                                            //       width: MediaQuery.sizeOf(
-                                                            //                   context)
-                                                            //               .width *
-                                                            //           0.8,
-                                                            //       height: 40,
-                                                            //       padding: EdgeInsetsDirectional
-                                                            //           .fromSTEB(
-                                                            //               24,
-                                                            //               0,
-                                                            //               24,
-                                                            //               0),
-                                                            //       iconPadding:
-                                                            //           EdgeInsetsDirectional
-                                                            //               .fromSTEB(
-                                                            //                   0,
-                                                            //                   0,
-                                                            //                   0,
-                                                            //                   0),
-                                                            //       color: FlutterFlowTheme.of(
-                                                            //               context)
-                                                            //           .primary,
-                                                            //       textStyle: FlutterFlowTheme.of(
-                                                            //               context)
-                                                            //           .titleSmall
-                                                            //           .override(
-                                                            //             fontFamily:
-                                                            //                 'Readex Pro',
-                                                            //             color: Colors
-                                                            //                 .white,
-                                                            //           ),
-                                                            //       elevation: 3,
-                                                            //       borderSide:
-                                                            //           BorderSide(
-                                                            //         color: Colors
-                                                            //             .transparent,
-                                                            //         width: 1,
-                                                            //       ),
-                                                            //       borderRadius:
-                                                            //           BorderRadius
-                                                            //               .circular(
-                                                            //                   8),
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      ],
+                                                              // Padding(
+                                                              //   padding:
+                                                              //       EdgeInsetsDirectional
+                                                              //           .fromSTEB(
+                                                              //               0,
+                                                              //               20,
+                                                              //               0,
+                                                              //               20),
+                                                              //   child:
+                                                              //       FFButtonWidget(
+                                                              //     onPressed:
+                                                              //         () async {
+                                                              //       context
+                                                              //           .pushNamed(
+                                                              //         'AccountDetails',
+                                                              //         queryParameters:
+                                                              //             {
+                                                              //           'Id':
+                                                              //               serializeParam(
+                                                              //             '${invoice.invoiceId}',
+                                                              //             ParamType
+                                                              //                 .String,
+                                                              //           ),
+                                                              //         }.withoutNulls,
+                                                              //       );
+                                                              //     },
+                                                              //     text: 'View',
+                                                              //     icon: Icon(
+                                                              //       Icons
+                                                              //           .remove_red_eye_outlined,
+                                                              //       size: 15,
+                                                              //     ),
+                                                              //     options:
+                                                              //         FFButtonOptions(
+                                                              //       width: MediaQuery.sizeOf(
+                                                              //                   context)
+                                                              //               .width *
+                                                              //           0.8,
+                                                              //       height: 40,
+                                                              //       padding: EdgeInsetsDirectional
+                                                              //           .fromSTEB(
+                                                              //               24,
+                                                              //               0,
+                                                              //               24,
+                                                              //               0),
+                                                              //       iconPadding:
+                                                              //           EdgeInsetsDirectional
+                                                              //               .fromSTEB(
+                                                              //                   0,
+                                                              //                   0,
+                                                              //                   0,
+                                                              //                   0),
+                                                              //       color: FlutterFlowTheme.of(
+                                                              //               context)
+                                                              //           .primary,
+                                                              //       textStyle: FlutterFlowTheme.of(
+                                                              //               context)
+                                                              //           .titleSmall
+                                                              //           .override(
+                                                              //             fontFamily:
+                                                              //                 'Readex Pro',
+                                                              //             color: Colors
+                                                              //                 .white,
+                                                              //           ),
+                                                              //       elevation: 3,
+                                                              //       borderSide:
+                                                              //           BorderSide(
+                                                              //         color: Colors
+                                                              //             .transparent,
+                                                              //         width: 1,
+                                                              //       ),
+                                                              //       borderRadius:
+                                                              //           BorderRadius
+                                                              //               .circular(
+                                                              //                   8),
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -962,47 +1008,130 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                             child: Material(
                                               color: Colors.transparent,
                                               elevation: 3,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryBackground,
-                                                ),
-                                                child: InkWell(
-                                                  splashColor:
-                                                      Colors.transparent,
-                                                  focusColor:
-                                                      Colors.transparent,
-                                                  hoverColor:
-                                                      Colors.transparent,
-                                                  highlightColor:
-                                                      Colors.transparent,
-                                                  // onTap: () async {
-                                                  //   context.pushNamed(
-                                                  //     'AccountDetails',
-                                                  //     queryParameters: {
-                                                  //       'Invoice ID  ': serializeParam(
-                                                  //         '${invoice.invoiceId}',
-                                                  //         ParamType.String,
-                                                  //       ),
-                                                  //     }.withoutNulls,
-                                                  //   );
-                                                  // },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            15.0),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      children: [
-                                                        // Generated code for this Row Widget...
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(7,
-                                                                      10, 7, 5),
-                                                          child: Row(
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) => AccountStatementDetails(
+                                                              totalFee:
+                                                                  invoice.totalPay ??
+                                                                      '0',
+                                                              jounreryFare: invoice
+                                                                  .journeyFare!,
+                                                              parking: invoice
+                                                                  .carParking!,
+                                                              tolls: invoice
+                                                                  .tolls!,
+                                                              did: invoice.dId!,
+                                                              waiting: invoice
+                                                                  .waiting!,
+                                                              time: invoice
+                                                                  .pickTime!,
+                                                              jobid: invoice
+                                                                  .jobId!,
+                                                              pickupDate: invoice
+                                                                  .pickDate!,
+                                                              pickUplocation:
+                                                                  invoice
+                                                                      .pickup!,
+                                                              dropOflocation:
+                                                                  invoice
+                                                                      .destination!,
+                                                              pickupTime: invoice
+                                                                  .pickTime!,
+                                                              extra: invoice
+                                                                  .extra!)));
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryBackground,
+                                                  ),
+                                                  child: InkWell(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    focusColor:
+                                                        Colors.transparent,
+                                                    hoverColor:
+                                                        Colors.transparent,
+                                                    highlightColor:
+                                                        Colors.transparent,
+                                                    // onTap: () async {
+                                                    //   context.pushNamed(
+                                                    //     'AccountDetails',
+                                                    //     queryParameters: {
+                                                    //       'Invoice ID  ': serializeParam(
+                                                    //         '${invoice.invoiceId}',
+                                                    //         ParamType.String,
+                                                    //       ),
+                                                    //     }.withoutNulls,
+                                                    //   );
+                                                    // },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              15.0),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          // Generated code for this Row Widget...
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        7,
+                                                                        10,
+                                                                        7,
+                                                                        5),
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Text(
+                                                                      'Booking ID ',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).primary,
+                                                                            fontSize:
+                                                                                12,
+                                                                          ),
+                                                                    ),
+                                                                    Text(
+                                                                      '${invoice.bookId}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            fontSize:
+                                                                                12,
+                                                                          ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          // Generated code for this Row Widget...
+                                                          Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
                                                                     .max,
@@ -1015,100 +1144,115 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                     MainAxisSize
                                                                         .max,
                                                                 children: [
-                                                                  Text(
-                                                                    'Booking ID ',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Readex Pro',
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .timer_sharp,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primary,
+                                                                      size: 14,
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            3,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${invoice.pickTime}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Outfit',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Column(
+                                                                children: [
+                                                                  // Text(
+                                                                  //     'Fare: ${invoice.journeyFare.toString()}'),
+                                                                  SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .max,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                        child:
+                                                                            Icon(
+                                                                          Icons
+                                                                              .date_range,
                                                                           color:
                                                                               FlutterFlowTheme.of(context).primary,
-                                                                          fontSize:
-                                                                              12,
+                                                                          size:
+                                                                              14,
                                                                         ),
-                                                                  ),
-                                                                  Text(
-                                                                    '${invoice.bookId}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Readex Pro',
-                                                                          fontSize:
-                                                                              12,
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            3,
+                                                                            0,
+                                                                            0),
+                                                                        child:
+                                                                            Text(
+                                                                          '${invoice.pickDate}',
+                                                                          style: FlutterFlowTheme.of(context)
+                                                                              .labelMedium
+                                                                              .override(
+                                                                                fontFamily: 'Outfit',
+                                                                                color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                fontSize: 12,
+                                                                                fontWeight: FontWeight.w500,
+                                                                              ),
                                                                         ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ],
                                                               ),
                                                             ],
                                                           ),
-                                                        ),
-                                                        // Generated code for this Row Widget...
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          5,
-                                                                          0),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .timer_sharp,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: 14,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          3,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '${invoice.pickTime}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Outfit',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondaryText,
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Column(
-                                                              children: [
-                                                                // Text(
-                                                                //     'Fare: ${invoice.journeyFare.toString()}'),
-                                                                SizedBox(
-                                                                  height: 10,
-                                                                ),
-                                                                Row(
+                                                          Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            15,
+                                                                            0,
+                                                                            0),
+                                                                child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
@@ -1118,249 +1262,193 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                           .fromSTEB(
                                                                               0,
                                                                               0,
-                                                                              5,
+                                                                              20,
                                                                               0),
                                                                       child:
                                                                           Icon(
                                                                         Icons
-                                                                            .date_range,
+                                                                            .arrow_circle_up,
                                                                         color: FlutterFlowTheme.of(context)
                                                                             .primary,
                                                                         size:
-                                                                            14,
+                                                                            24,
                                                                       ),
                                                                     ),
-                                                                    Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              3,
-                                                                              0,
-                                                                              0),
+                                                                    Expanded(
                                                                       child:
                                                                           Text(
-                                                                        '${invoice.pickDate}',
+                                                                        '${invoice.pickup}',
                                                                         style: FlutterFlowTheme.of(context)
-                                                                            .labelMedium
-                                                                            .override(
-                                                                              fontFamily: 'Outfit',
-                                                                              color: FlutterFlowTheme.of(context).secondaryText,
-                                                                              fontSize: 12,
-                                                                              fontWeight: FontWeight.w500,
-                                                                            ),
+                                                                            .bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
                                                                 ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .arrow_circle_up,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_circle_down,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      '${invoice.pickup}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        '${invoice.destination}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .arrow_circle_down,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .payment,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      '${invoice.destination}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        'Total fare : ${invoice.totalPay}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            20,
-                                                                            0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .payment,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
-                                                                    ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      'Total fare : ${invoice.totalPay}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            // Padding(
-                                                            //   padding:
-                                                            //       EdgeInsetsDirectional
-                                                            //           .fromSTEB(
-                                                            //               0,
-                                                            //               20,
-                                                            //               0,
-                                                            //               20),
-                                                            //   child:
-                                                            //       FFButtonWidget(
-                                                            //     onPressed:
-                                                            //         () async {
-                                                            //       context
-                                                            //           .pushNamed(
-                                                            //         'AccountDetails',
-                                                            //         queryParameters:
-                                                            //             {
-                                                            //           'Id':
-                                                            //               serializeParam(
-                                                            //             '${invoice.invoiceId}',
-                                                            //             ParamType
-                                                            //                 .String,
-                                                            //           ),
-                                                            //         }.withoutNulls,
-                                                            //       );
-                                                            //     },
-                                                            //     text: 'View',
-                                                            //     icon: Icon(
-                                                            //       Icons
-                                                            //           .remove_red_eye_outlined,
-                                                            //       size: 15,
-                                                            //     ),
-                                                            //     options:
-                                                            //         FFButtonOptions(
-                                                            //       width: MediaQuery.sizeOf(
-                                                            //                   context)
-                                                            //               .width *
-                                                            //           0.8,
-                                                            //       height: 40,
-                                                            //       padding: EdgeInsetsDirectional
-                                                            //           .fromSTEB(
-                                                            //               24,
-                                                            //               0,
-                                                            //               24,
-                                                            //               0),
-                                                            //       iconPadding:
-                                                            //           EdgeInsetsDirectional
-                                                            //               .fromSTEB(
-                                                            //                   0,
-                                                            //                   0,
-                                                            //                   0,
-                                                            //                   0),
-                                                            //       color: FlutterFlowTheme.of(
-                                                            //               context)
-                                                            //           .primary,
-                                                            //       textStyle: FlutterFlowTheme.of(
-                                                            //               context)
-                                                            //           .titleSmall
-                                                            //           .override(
-                                                            //             fontFamily:
-                                                            //                 'Readex Pro',
-                                                            //             color: Colors
-                                                            //                 .white,
-                                                            //           ),
-                                                            //       elevation: 3,
-                                                            //       borderSide:
-                                                            //           BorderSide(
-                                                            //         color: Colors
-                                                            //             .transparent,
-                                                            //         width: 1,
-                                                            //       ),
-                                                            //       borderRadius:
-                                                            //           BorderRadius
-                                                            //               .circular(
-                                                            //                   8),
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      ],
+                                                              // Padding(
+                                                              //   padding:
+                                                              //       EdgeInsetsDirectional
+                                                              //           .fromSTEB(
+                                                              //               0,
+                                                              //               20,
+                                                              //               0,
+                                                              //               20),
+                                                              //   child:
+                                                              //       FFButtonWidget(
+                                                              //     onPressed:
+                                                              //         () async {
+                                                              //       context
+                                                              //           .pushNamed(
+                                                              //         'AccountDetails',
+                                                              //         queryParameters:
+                                                              //             {
+                                                              //           'Id':
+                                                              //               serializeParam(
+                                                              //             '${invoice.invoiceId}',
+                                                              //             ParamType
+                                                              //                 .String,
+                                                              //           ),
+                                                              //         }.withoutNulls,
+                                                              //       );
+                                                              //     },
+                                                              //     text: 'View',
+                                                              //     icon: Icon(
+                                                              //       Icons
+                                                              //           .remove_red_eye_outlined,
+                                                              //       size: 15,
+                                                              //     ),
+                                                              //     options:
+                                                              //         FFButtonOptions(
+                                                              //       width: MediaQuery.sizeOf(
+                                                              //                   context)
+                                                              //               .width *
+                                                              //           0.8,
+                                                              //       height: 40,
+                                                              //       padding: EdgeInsetsDirectional
+                                                              //           .fromSTEB(
+                                                              //               24,
+                                                              //               0,
+                                                              //               24,
+                                                              //               0),
+                                                              //       iconPadding:
+                                                              //           EdgeInsetsDirectional
+                                                              //               .fromSTEB(
+                                                              //                   0,
+                                                              //                   0,
+                                                              //                   0,
+                                                              //                   0),
+                                                              //       color: FlutterFlowTheme.of(
+                                                              //               context)
+                                                              //           .primary,
+                                                              //       textStyle: FlutterFlowTheme.of(
+                                                              //               context)
+                                                              //           .titleSmall
+                                                              //           .override(
+                                                              //             fontFamily:
+                                                              //                 'Readex Pro',
+                                                              //             color: Colors
+                                                              //                 .white,
+                                                              //           ),
+                                                              //       elevation: 3,
+                                                              //       borderSide:
+                                                              //           BorderSide(
+                                                              //         color: Colors
+                                                              //             .transparent,
+                                                              //         width: 1,
+                                                              //       ),
+                                                              //       borderRadius:
+                                                              //           BorderRadius
+                                                              //               .circular(
+                                                              //                   8),
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1438,47 +1526,130 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                             child: Material(
                                               color: Colors.transparent,
                                               elevation: 3,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryBackground,
-                                                ),
-                                                child: InkWell(
-                                                  splashColor:
-                                                      Colors.transparent,
-                                                  focusColor:
-                                                      Colors.transparent,
-                                                  hoverColor:
-                                                      Colors.transparent,
-                                                  highlightColor:
-                                                      Colors.transparent,
-                                                  // onTap: () async {
-                                                  //   context.pushNamed(
-                                                  //     'AccountDetails',
-                                                  //     queryParameters: {
-                                                  //       'Invoice ID  ': serializeParam(
-                                                  //         '${invoice.invoiceId}',
-                                                  //         ParamType.String,
-                                                  //       ),
-                                                  //     }.withoutNulls,
-                                                  //   );
-                                                  // },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            15.0),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      children: [
-                                                        // Generated code for this Row Widget...
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(7,
-                                                                      10, 7, 5),
-                                                          child: Row(
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) => AccountStatementDetails(
+                                                              totalFee:
+                                                                  invoice.totalPay ??
+                                                                      '0',
+                                                              jounreryFare: invoice
+                                                                  .journeyFare!,
+                                                              parking: invoice
+                                                                  .carParking!,
+                                                              tolls: invoice
+                                                                  .tolls!,
+                                                              did: invoice.dId!,
+                                                              waiting: invoice
+                                                                  .waiting!,
+                                                              time: invoice
+                                                                  .pickTime!,
+                                                              jobid: invoice
+                                                                  .jobId!,
+                                                              pickupDate: invoice
+                                                                  .pickDate!,
+                                                              pickUplocation:
+                                                                  invoice
+                                                                      .pickup!,
+                                                              dropOflocation:
+                                                                  invoice
+                                                                      .destination!,
+                                                              pickupTime: invoice
+                                                                  .pickTime!,
+                                                              extra: invoice
+                                                                  .extra!)));
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryBackground,
+                                                  ),
+                                                  child: InkWell(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    focusColor:
+                                                        Colors.transparent,
+                                                    hoverColor:
+                                                        Colors.transparent,
+                                                    highlightColor:
+                                                        Colors.transparent,
+                                                    // onTap: () async {
+                                                    //   context.pushNamed(
+                                                    //     'AccountDetails',
+                                                    //     queryParameters: {
+                                                    //       'Invoice ID  ': serializeParam(
+                                                    //         '${invoice.invoiceId}',
+                                                    //         ParamType.String,
+                                                    //       ),
+                                                    //     }.withoutNulls,
+                                                    //   );
+                                                    // },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              15.0),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          // Generated code for this Row Widget...
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        7,
+                                                                        10,
+                                                                        7,
+                                                                        5),
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Text(
+                                                                      'Booking ID ',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).primary,
+                                                                            fontSize:
+                                                                                12,
+                                                                          ),
+                                                                    ),
+                                                                    Text(
+                                                                      '${invoice.bookId}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Readex Pro',
+                                                                            fontSize:
+                                                                                12,
+                                                                          ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          // Generated code for this Row Widget...
+                                                          Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
                                                                     .max,
@@ -1491,346 +1662,307 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                     MainAxisSize
                                                                         .max,
                                                                 children: [
-                                                                  Text(
-                                                                    'Booking ID ',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Readex Pro',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primary,
-                                                                          fontSize:
-                                                                              12,
-                                                                        ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .timer_sharp,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primary,
+                                                                      size: 14,
+                                                                    ),
                                                                   ),
-                                                                  Text(
-                                                                    '${invoice.bookId}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Readex Pro',
-                                                                          fontSize:
-                                                                              12,
-                                                                        ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            3,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${invoice.pickTime}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Outfit',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .max,
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .date_range,
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primary,
+                                                                      size: 14,
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            3,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${invoice.pickDate}',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .labelMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Outfit',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                    ),
                                                                   ),
                                                                 ],
                                                               ),
                                                             ],
                                                           ),
-                                                        ),
-                                                        // Generated code for this Row Widget...
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          5,
-                                                                          0),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .timer_sharp,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: 14,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          3,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '${invoice.pickTime}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Outfit',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondaryText,
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          5,
-                                                                          0),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .date_range,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: 14,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          3,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '${invoice.pickDate}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Outfit',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondaryText,
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                          Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .arrow_circle_up,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_circle_up,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      '${invoice.pickup}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        '${invoice.pickup}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .arrow_circle_down,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_circle_down,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      '${invoice.destination}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        '${invoice.destination}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          15,
-                                                                          0,
-                                                                          0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0,
+                                                                            15,
                                                                             0,
-                                                                            20,
                                                                             0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .payment,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      size: 24,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsetsDirectional
+                                                                          .fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              20,
+                                                                              0),
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .payment,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        size:
+                                                                            24,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      'Total fare : ${invoice.totalPay}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium,
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        'Total fare : ${invoice.totalPay}',
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            // Padding(
-                                                            //   padding:
-                                                            //       EdgeInsetsDirectional
-                                                            //           .fromSTEB(
-                                                            //               0,
-                                                            //               20,
-                                                            //               0,
-                                                            //               20),
-                                                            //   child:
-                                                            //       FFButtonWidget(
-                                                            //     onPressed:
-                                                            //         () async {
-                                                            //       context
-                                                            //           .pushNamed(
-                                                            //         'AccountDetails',
-                                                            //         queryParameters:
-                                                            //             {
-                                                            //           'Id':
-                                                            //               serializeParam(
-                                                            //             '${invoice.invoiceId}',
-                                                            //             ParamType
-                                                            //                 .String,
-                                                            //           ),
-                                                            //         }.withoutNulls,
-                                                            //       );
-                                                            //     },
-                                                            //     text: 'View',
-                                                            //     icon: Icon(
-                                                            //       Icons
-                                                            //           .remove_red_eye_outlined,
-                                                            //       size: 15,
-                                                            //     ),
-                                                            //     options:
-                                                            //         FFButtonOptions(
-                                                            //       width: MediaQuery.sizeOf(
-                                                            //                   context)
-                                                            //               .width *
-                                                            //           0.8,
-                                                            //       height: 40,
-                                                            //       padding: EdgeInsetsDirectional
-                                                            //           .fromSTEB(
-                                                            //               24,
-                                                            //               0,
-                                                            //               24,
-                                                            //               0),
-                                                            //       iconPadding:
-                                                            //           EdgeInsetsDirectional
-                                                            //               .fromSTEB(
-                                                            //                   0,
-                                                            //                   0,
-                                                            //                   0,
-                                                            //                   0),
-                                                            //       color: FlutterFlowTheme.of(
-                                                            //               context)
-                                                            //           .primary,
-                                                            //       textStyle: FlutterFlowTheme.of(
-                                                            //               context)
-                                                            //           .titleSmall
-                                                            //           .override(
-                                                            //             fontFamily:
-                                                            //                 'Readex Pro',
-                                                            //             color: Colors
-                                                            //                 .white,
-                                                            //           ),
-                                                            //       elevation: 3,
-                                                            //       borderSide:
-                                                            //           BorderSide(
-                                                            //         color: Colors
-                                                            //             .transparent,
-                                                            //         width: 1,
-                                                            //       ),
-                                                            //       borderRadius:
-                                                            //           BorderRadius
-                                                            //               .circular(
-                                                            //                   8),
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      ],
+                                                              // Padding(
+                                                              //   padding:
+                                                              //       EdgeInsetsDirectional
+                                                              //           .fromSTEB(
+                                                              //               0,
+                                                              //               20,
+                                                              //               0,
+                                                              //               20),
+                                                              //   child:
+                                                              //       FFButtonWidget(
+                                                              //     onPressed:
+                                                              //         () async {
+                                                              //       context
+                                                              //           .pushNamed(
+                                                              //         'AccountDetails',
+                                                              //         queryParameters:
+                                                              //             {
+                                                              //           'Id':
+                                                              //               serializeParam(
+                                                              //             '${invoice.invoiceId}',
+                                                              //             ParamType
+                                                              //                 .String,
+                                                              //           ),
+                                                              //         }.withoutNulls,
+                                                              //       );
+                                                              //     },
+                                                              //     text: 'View',
+                                                              //     icon: Icon(
+                                                              //       Icons
+                                                              //           .remove_red_eye_outlined,
+                                                              //       size: 15,
+                                                              //     ),
+                                                              //     options:
+                                                              //         FFButtonOptions(
+                                                              //       width: MediaQuery.sizeOf(
+                                                              //                   context)
+                                                              //               .width *
+                                                              //           0.8,
+                                                              //       height: 40,
+                                                              //       padding: EdgeInsetsDirectional
+                                                              //           .fromSTEB(
+                                                              //               24,
+                                                              //               0,
+                                                              //               24,
+                                                              //               0),
+                                                              //       iconPadding:
+                                                              //           EdgeInsetsDirectional
+                                                              //               .fromSTEB(
+                                                              //                   0,
+                                                              //                   0,
+                                                              //                   0,
+                                                              //                   0),
+                                                              //       color: FlutterFlowTheme.of(
+                                                              //               context)
+                                                              //           .primary,
+                                                              //       textStyle: FlutterFlowTheme.of(
+                                                              //               context)
+                                                              //           .titleSmall
+                                                              //           .override(
+                                                              //             fontFamily:
+                                                              //                 'Readex Pro',
+                                                              //             color: Colors
+                                                              //                 .white,
+                                                              //           ),
+                                                              //       elevation: 3,
+                                                              //       borderSide:
+                                                              //           BorderSide(
+                                                              //         color: Colors
+                                                              //             .transparent,
+                                                              //         width: 1,
+                                                              //       ),
+                                                              //       borderRadius:
+                                                              //           BorderRadius
+                                                              //               .circular(
+                                                              //                   8),
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 ),

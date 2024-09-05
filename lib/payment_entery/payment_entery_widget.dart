@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/payment_entery/complete.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +53,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
   void initState() {
     super.initState();
     jobDetailsFuture();
+    // myhomeController.jobDetails();
     getFares();
     pushercallbg();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -103,6 +106,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
     super.dispose();
   }
 
+  JobController myhomeController = Get.put(JobController());
   Future<List<Job>> jobDetailsFuture() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');

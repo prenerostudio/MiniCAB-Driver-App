@@ -427,7 +427,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       );
     }
 
-    if (myController.listFromPusher.isNotEmpty) {
+    if (myController.visiblecontainer.value) {
       getCoordinatesFromAddress(myController.listFromPusher[0].pickup);
     }
     DateTime? lastBackPressed;
@@ -1742,10 +1742,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                         padding: const EdgeInsetsDirectional
                                             .fromSTEB(0, 10, 0, 0),
                                         child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          // mainAxisSize: MainAxisSize.max,
+                                          // mainAxisAlignment:
+                                          //     MainAxisAlignment.center,
                                           children: [
+                                            SizedBox(
+                                              width: 15,
+                                            ),
                                             Padding(
                                               padding:
                                                   const EdgeInsetsDirectional
@@ -1798,6 +1801,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                   ),
                                                 ),
                                               ),
+                                            ),
+                                            SizedBox(
+                                              width: 15,
                                             ),
                                             Padding(
                                               padding:
@@ -2157,8 +2163,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         CrossAxisAlignment
                                                             .center,
                                                     children: [
-                                                      const Icon(
-                                                        Icons.business,
+                                                      Icon(
+                                                        FontAwesomeIcons.car,
                                                         color:
                                                             Color(0xFF5B68F5),
                                                         size: 45,

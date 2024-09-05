@@ -47,11 +47,11 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
     )..addListener(() => setState(() {}));
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _model.dispose();
+  //   super.dispose();
+  // }
 
   Future<List<Bid>> fetchBidHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

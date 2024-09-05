@@ -40,13 +40,13 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   // LocationData? currentLocation;
   Position? currentLocation;
   bool isLoading = false;
-  late Timer _timer;
+  // late Timer _timer;
   List<LatLng> _polylineCoordinates = [];
   List<Marker> markers = [];
-    double currentLatitude=0.0;
-    double currentLongitude=0.0;
-    double pickupLat=0.0;
-    double pickupLng=0.0;
+  double currentLatitude = 0.0;
+  double currentLongitude = 0.0;
+  double pickupLat = 0.0;
+  double pickupLng = 0.0;
   late CameraPosition _kGoogle;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
@@ -87,7 +87,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   @override
   void dispose() {
     _model.dispose();
-    _timer.cancel();
+    // _timer.cancel();
     super.dispose();
   }
 

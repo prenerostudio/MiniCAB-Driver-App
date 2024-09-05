@@ -217,13 +217,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
     _initPlatformState();
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
-
-    super.dispose();
-  }
-
+ 
   Future<void> _checkPermissions() async {
     await SystemAlertWindow.requestPermissions;
   }
@@ -1756,7 +1750,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('BidHistoryFilter');
+                            context.pushNamed('Bids');
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,

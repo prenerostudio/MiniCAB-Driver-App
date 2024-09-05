@@ -402,26 +402,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                       Container(
                         width: double.infinity,
                         height: MediaQuery.sizeOf(context).height * 0.60,
-                        child: isLoading
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          FlutterFlowTheme.of(context).primary),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      'Finding Route...',
-                                      style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : buildMap(),
+                        child: buildMap(),
                       ),
                       Container(
                         width: double.infinity,
@@ -988,7 +969,22 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
   Widget buildMap() {
     return _currentPosition == null
-        ? Center(child: CircularProgressIndicator())
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      FlutterFlowTheme.of(context).primary),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Finding Route...',
+                  style: TextStyle(color: FlutterFlowTheme.of(context).primary),
+                ),
+              ],
+            ),
+          )
         : GoogleMap(
             initialCameraPosition: CameraPosition(
               target: LatLng(
