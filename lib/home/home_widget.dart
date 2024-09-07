@@ -211,11 +211,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     // });
     pushercallbg();
     myController.jobDetails().then((s) {
-      print(
-          'the getCoordinatesFromAddress ${myController.listFromPusher.isNotEmpty} ');
-      if (myController.listFromPusher.isNotEmpty) {
-        // getCoordinatesFromAddress(myController.listFromPusher[0].pickup);
-      }
+      // print(
+      //     'the available pickup address is  ${myController.listFromPusher[0].pickup} ');
+      // if (myController.listFromPusher.isNotEmpty) {
+      //   getCoordinatesFromAddress(myController.listFromPusher[0].pickup);
+      // }
     });
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid) {
@@ -392,28 +392,28 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     }
   }
 
-  Future getCoordinatesFromAddress(String address) async {
-    try {
-      List<Location> locations = await locationFromAddress(address);
-      if (locations.isNotEmpty) {
-        myController.convertedLat.value = locations.first.latitude;
-        myController.convertedLng.value = locations.first.longitude;
-        print(
-            'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}');
-        accpetingOrderViewModel.getLatLngFromCurrentLocation().then((value) {
-          accpetingOrderViewModel.getdistanceandtime(
-              locations.first.latitude, locations.first.longitude);
-          accpetingOrderViewModel.kGoogleplay.value = CameraPosition(
-              target: LatLng(accpetingOrderViewModel.latitude.value,
-                  accpetingOrderViewModel.longitude.value),
-              zoom: 12.4746);
-          accpetingOrderViewModel.setcustommarkeritem();
-        });
-      }
-    } catch (e) {
-      print('Error occurred: $e');
-    }
-  }
+  // Future getCoordinatesFromAddress(String address) async {
+  //   try {
+  //     List<Location> locations = await locationFromAddress(address);
+  //     if (locations.isNotEmpty) {
+  //       myController.convertedLat.value = locations.first.latitude;
+  //       myController.convertedLng.value = locations.first.longitude;
+  //       print(
+  //           'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}');
+  //       accpetingOrderViewModel.getLatLngFromCurrentLocation().then((value) {
+  //         accpetingOrderViewModel.getdistanceandtime(
+  //             locations.first.latitude, locations.first.longitude);
+  //         accpetingOrderViewModel.kGoogleplay.value = CameraPosition(
+  //             target: LatLng(accpetingOrderViewModel.latitude.value,
+  //                 accpetingOrderViewModel.longitude.value),
+  //             zoom: 12.4746);
+  //         accpetingOrderViewModel.setcustommarkeritem();
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error occurred: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -426,10 +426,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         ),
       );
     }
-
-    if (myController.visiblecontainer.value) {
-      getCoordinatesFromAddress(myController.listFromPusher[0].pickup);
-    }
+    // getCoordinatesFromAddress(myController.listFromPusher.isNotEmpty
+    //     ? myController.listFromPusher[0].pickup
+    //     : '');
     DateTime? lastBackPressed;
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
@@ -2732,16 +2731,16 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       markers: {
         Marker(
             markerId: const MarkerId('Source'),
-            position: LatLng(accpetingOrderViewModel.latitude.value,
-                accpetingOrderViewModel.longitude.value),
-            icon: accpetingOrderViewModel.sourceicon.value),
+            position: LatLng(
+                myController.latitude.value, myController.longitude.value),
+            icon: myController.sourceicon.value),
         Marker(
             markerId: const MarkerId('destination'),
             position: LatLng(myController.convertedLat.value,
                 myController.convertedLng.value),
-            icon: accpetingOrderViewModel.destinationicon.value),
+            icon: myController.destinationicon.value),
       },
-      polylines: accpetingOrderViewModel.polylines.value,
+      polylines: myController.polylines.value,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
       compassEnabled: true,

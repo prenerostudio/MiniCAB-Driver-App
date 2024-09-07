@@ -57,6 +57,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   void initState() {
     super.initState();
     _getLocation();
+    _getCurrentLocation();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await showModalBottomSheet(
         isScrollControlled: true,

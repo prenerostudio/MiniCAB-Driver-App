@@ -844,8 +844,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1360,8 +1361,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1874,8 +1876,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20),
                                                                       ),
                                                                     ),
                                                                   ],

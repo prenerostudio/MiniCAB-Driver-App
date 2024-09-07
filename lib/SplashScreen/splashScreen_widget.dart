@@ -83,28 +83,24 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     int? isRideStart = prefs.getInt('isRideStart');
 
     if (isLogin == true && isRideStart == 0) {
-      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
-        print('user session checking starts');
-        // checkUserSession();
-      });
+      // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+      //   // checkUserSession();
+      // });
       context.pushNamed('Home');
     } else if (isLogin == true && isRideStart == 1) {
-      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
-        print('user session checking starts');
-        // checkUserSession();
-      });
+      // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+      //   // checkUserSession();
+      // });
       context.pushNamed('onWay');
     } else if (isLogin == true && isRideStart == 2) {
-      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
-        print('user session checking starts');
-        // checkUserSession();
-      });
+      // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+      //   // checkUserSession();
+      // });
       context.pushNamed('Pob');
     } else if (isLogin == true && isRideStart == 3) {
-      usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
-        print('user session checking starts');
-        // checkUserSession();
-      });
+      // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
+      //   // checkUserSession();
+      // });
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => CompleteWidget()));
     } else {
@@ -115,7 +111,6 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
     final permissionStatus = await Permission.location.request();
     final currentStatus = await Permission.location.status;
-    print(currentStatus);
     if (permissionStatus.isDenied) {
       openAppSettings();
     } else {}

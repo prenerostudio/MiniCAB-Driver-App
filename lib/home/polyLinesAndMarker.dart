@@ -35,8 +35,8 @@ class AccpetingOrderViewModel extends GetxController {
   // Completer<GoogleMapController> mapController = Completer();
   final isridestart = false.obs;
   final index = 0.obs;
-  final resturantaddress = '1024, Hemioton Street, Union Market, USA'.obs;
-  final customeraddress = 'customer address will here'.obs;
+  // final resturantaddress = '1024, Hemioton Street, Union Market, USA'.obs;
+  // final customeraddress = 'customer address will here'.obs;
   final distance = ''.obs;
   final time = ''.obs;
   RxList<LatLng> decodedPoints = <LatLng>[].obs;
@@ -135,29 +135,6 @@ class AccpetingOrderViewModel extends GetxController {
     }
   }
 
-  // Future<Uint8List> getbytesfromimages(String path, int width) async {
-  //   ByteData data = await rootBundle.load(path);
-  //   ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-  //       targetHeight: width);
-  //   ui.FrameInfo fi = await codec.getNextFrame();
-  //   return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-  //       .buffer
-  //       .asUint8List();
-  // }
-
-  // void setcustommarkeritem() {
-  //   BitmapDescriptor.fromAssetImage(
-  //     ImageConfiguration.empty,
-  //     'assets/images/userg.png',
-  //   ).then((value) {
-  //     sourceicon.value = value;
-  //   });
-  //   BitmapDescriptor.fromAssetImage(
-  //           ImageConfiguration.empty, 'assets/images/car.png')
-  //       .then((value) {
-  //     destinationicon.value = value;
-  //   });
-  // }
   Future<Uint8List> getbytesfromimages(
       String path, int width, int height) async {
     ByteData data = await rootBundle.load(path);
