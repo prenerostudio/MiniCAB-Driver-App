@@ -845,8 +845,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
                                                                         style: TextStyle(
-                                                                            fontSize:
-                                                                                20),
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 20),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1361,7 +1362,8 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: TextStyle(
+                                                                        style: TextStyle( fontWeight:
+                                                                                FontWeight.bold,
                                                                             fontSize:
                                                                                 20),
                                                                       ),
@@ -1876,7 +1878,8 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: TextStyle(
+                                                                        style: TextStyle( fontWeight:
+                                                                                FontWeight.bold,
                                                                             fontSize:
                                                                                 20),
                                                                       ),
