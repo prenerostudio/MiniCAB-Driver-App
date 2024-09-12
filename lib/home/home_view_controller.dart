@@ -16,10 +16,12 @@ import 'dart:ui' as ui;
 
 class JobController extends GetxController {
   var isPeriodicVisible = false.obs;
-  var isJobDetailDone = false.obs;  Rx<CameraPosition> kGoogleplay = const CameraPosition(
+  var isJobDetailDone = false.obs;
+  Rx<CameraPosition> kGoogleplay = const CameraPosition(
           target: LatLng(31.4064054, 73.0413076), zoom: 12.4746)
       .obs;
   var visiblecontainer = false.obs;
+  var jobPusherContainer = false.obs;
   RxList<Job> listFromPusher = <Job>[].obs;
   RxDouble convertedLat = 0.0.obs;
   RxList<LatLng> decodedPoints = <LatLng>[].obs;
@@ -45,7 +47,12 @@ class JobController extends GetxController {
   var pickuptime = ''.obs; // Reactive variable for 'data' (booking ID)
   var pickupLocatoin = ''.obs; // Reactive variable for 'data' (booking ID)
   var dropLocation = ''.obs; // Reactive variable for 'data' (booking ID)
+  final mapController = ValueNotifier<GoogleMapController?>(null);
   Timer? timer;
+  setMapController(GoogleMapController controller) {
+    mapController.value = controller;
+  }
+
   Future jobDetails() async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       listFromPusher.clear();
@@ -53,21 +60,18 @@ class JobController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
     String? jobid = prefs.getString('jobId');
-    print("job id $jobid");
-    print("dd id $dId");
 
     final response = await http.post(
       Uri.parse(
           'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'),
       body: {'d_id': dId.toString()},
     );
-    print('the data response ${response.body}');
-
+    print('before if condition');
     if (response.statusCode == 200) {
       parsedResponse.value = json.decode(response.body);
-
+      print('inside if condition');
       if (parsedResponse['status'] == true) {
-        print("json data api call${parsedResponse['data'][0]['journey_fare']}");
+        print('status is true');
         data.value = parsedResponse['book_id'].toString();
         jobId.value = parsedResponse['data'][0]['job_id'].toString();
         cid.value = parsedResponse['data'][0]['c_id'].toString();
@@ -94,7 +98,6 @@ class JobController extends GetxController {
         await prefs.setString('pickTime', pickuptime.value);
         await prefs.setString('pickLocation', pickupLocatoin.value);
         await prefs.setString('dropLocation', dropLocation.value);
-        print('the data from ${parsedResponse['data']}');
         listFromPusher.add(Job(
             jobId: parsedResponse['data'][0]['job_id'].toString() ?? "",
             bookId: parsedResponse['data'][0]['book_id'].toString() ?? '',
@@ -107,7 +110,7 @@ class JobController extends GetxController {
                 parsedResponse['data'][0]['booking_fee'].toString() ?? "",
             carParking:
                 parsedResponse['data'][0]['car_parking'].toString() ?? '',
-            waiting: parsedResponse['data'][0]['waiting'].toString() ?? '',
+            waiting: parsedResponse['data'][0]['waiting'].toString(),
             tolls: parsedResponse['data'][0]['tolls'].toString() ?? '',
             extra: parsedResponse['data'][0]['extra'].toString() ?? '',
             jobStatus: parsedResponse['data'][0]['job_status'].toString() ?? '',
@@ -147,7 +150,7 @@ class JobController extends GetxController {
             bidNote: parsedResponse['data'][0]['bid_note'].toString() ?? '',
             bookAddDate:
                 parsedResponse['data'][0]['bid_status'].toString() ?? ''));
- getCoordinatesFromAddress(listFromPusher[0].pickup);
+        getCoordinatesFromAddress(listFromPusher[0].pickup);
         visiblecontainer.value = true;
         isJobDetailDone.value = false;
 //        if (mounted) {
@@ -163,15 +166,15 @@ class JobController extends GetxController {
 // }
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          print(
-              'the list is now cleard because job is compeleted ${listFromPusher}');
-               getCoordinatesFromAddress('');
+          getCoordinatesFromAddress('');
+          print('staus is false');
           visiblecontainer.value = false;
           listFromPusher.clear();
         });
       }
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        print('200 condition is false');
         isJobDetailDone.value = false;
       });
 
@@ -198,7 +201,6 @@ class JobController extends GetxController {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
       String? jobId = prefs.getString('jobId');
-      print("dd id $jobId");
 
       final response = await http.post(
         Uri.parse(
@@ -210,7 +212,6 @@ class JobController extends GetxController {
         parsedResponse.value = json.decode(response.body);
         data.value = parsedResponse['book_id'].toString();
         prefs.setString('bookingid', data.value);
-        print('the data from api ${parsedResponse['data']}');
 
         if (parsedResponse['status'] == true) {
           isPeriodicVisible.value = true;
@@ -232,7 +233,6 @@ class JobController extends GetxController {
         return null;
       }
     } catch (e) {
-      print('Error: $e');
       // Handle the error and return null
       return null;
     }
@@ -268,7 +268,6 @@ class JobController extends GetxController {
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${destinationLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    print("the polylines start");
     final response = await http.post(Uri.parse(// can be get and post request
         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
@@ -294,10 +293,11 @@ class JobController extends GetxController {
                 .map((point) => LatLng(point.latitude, point.longitude))
                 .toList();
             // polylines.value.clear();
-            print("the polylines point is $points");
+            polylines.clear(); // Clear previous polyline
             polylines.add(Polyline(
               // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
               // patterns: points,
+              // polylineId: const PolylineId('updated_route'),
               polylineId: const PolylineId('route'),
               color: Colors.blue,
               width: 5,
@@ -335,31 +335,103 @@ class JobController extends GetxController {
 Future getCoordinatesFromAddress(String address) async {
   try {
     if (address.isEmpty) {
-      // Reset polylines when the pickup address is empty
+      print('if getCoordinatesFromAddress');
+      // Reset polylines and markers when the pickup address is empty
       polylines.clear();
-      print('Pickup address is empty, polylines reset');
+      convertedLat.value = 0.0;
+      convertedLng.value = 0.0;
       return;
-    }
-    
-    List<Location> locations = await locationFromAddress(address);
-    if (locations.isNotEmpty) {
-      convertedLat.value = locations.first.latitude;
-      convertedLng.value = locations.first.longitude;
-      print('Converted Latitude: ${convertedLat.value}, Converted Longitude: ${convertedLng.value}');
-      
-      getLatLngFromCurrentLocation().then((value) {
-        getdistanceandtime(locations.first.latitude, locations.first.longitude);
-        
-        kGoogleplay.value = CameraPosition(
-          target: LatLng(latitude.value, longitude.value),
-          zoom: 12.4746,
-        );
-        setcustommarkeritem();
-      });
+    } else {
+      print('else getCoordinatesFromAddress');
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        convertedLat.value = locations.first.latitude;
+        convertedLng.value = locations.first.longitude;
+
+        getLatLngFromCurrentLocation().then((value) {
+          getdistanceandtime(
+            locations.first.latitude, locations.first.longitude
+          );
+
+          kGoogleplay.value = CameraPosition(
+            target: LatLng(latitude.value, longitude.value),
+            zoom: 12.4746,
+          );
+          setcustommarkeritem();
+        });
+      }
     }
   } catch (e) {
-    print('Error occurred: $e');
+    print("polylines updation exception $e");
   }
 }
 
+  // Future getCoordinatesFromAddress(String address) async {
+  //   try {
+  //     if (address.isEmpty) {
+  //       print('if getCoordinatesFromAddress');
+  //       // Reset polylines when the pickup address is empty
+  //       polylines.clear();
+  //       return;
+  //     } else {
+  //       print('else getCoordinatesFromAddress');
+  //       List<Location> locations = await locationFromAddress(address);
+  //       if (locations.isNotEmpty) {
+  //         convertedLat.value = locations.first.latitude;
+  //         convertedLng.value = locations.first.longitude;
+
+  //         getLatLngFromCurrentLocation().then((value) {
+  //           getdistanceandtime(
+  //               locations.first.latitude, locations.first.longitude);
+
+  //           kGoogleplay.value = CameraPosition(
+  //             target: LatLng(latitude.value, longitude.value),
+  //             zoom: 12.4746,
+  //           );
+  //           setcustommarkeritem();
+  //         });
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print("polylines updation exception $e");
+  //   }
+  // }
+
+  Future<void> updatePolyline() async {
+    try {
+      // Get destination coordinates
+      final destinationLat = convertedLat.value;
+      final destinationLng = convertedLng.value;
+
+      // Recalculate distance and polyline with the new current location
+      await getdistanceandtime(destinationLat, destinationLng);
+
+      // Optionally, move the camera to the new current location
+      mapController.value?.animateCamera(
+        CameraUpdate.newLatLng(LatLng(latitude.value, longitude.value)),
+      );
+    } catch (e) {}
+  }
+
+  StreamSubscription<Position>? positionStream;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _trackLocationChanges();
+  }
+
+  void _trackLocationChanges() {
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) {
+      // Update current location variables
+      latitude.value = position.latitude;
+      longitude.value = position.longitude;
+// currentLocation.latitude = position.latitude;
+      longitude.value = position.longitude;
+      // Update polyline with new user location
+      updatePolyline();
+    });
+  }
 }

@@ -176,6 +176,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   void initState() {
     super.initState();
     getlocation();
+    _trackLocationChanges();
     loadata().then((s) {});
     startJobStatusTimer();
     pushercallbg();
@@ -917,44 +918,45 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                         waitingPassanger();
                         print('swipped called');
                         isWaiting = true;
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Choose Map Option'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ListTile(
-                                    leading: SizedBox(
-                                      width: 25,
-                                      height: 25,
-                                      child: Image.asset(
-                                          'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
-                                    ),
-                                    title: Text('Open in Google Maps'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      MapUtils.navigateTo(pickupLat, pickupLng);
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: SizedBox(
-                                      width: 25,
-                                      height: 25,
-                                      child: Image.asset(
-                                          'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
-                                    ),
-                                    title: Text('Using App'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
+
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (BuildContext context) {
+                        //     return AlertDialog(
+                        //       title: Text('Choose Map Option'),
+                        //       content: Column(
+                        //         mainAxisSize: MainAxisSize.min,
+                        //         children: [
+                        //           ListTile(
+                        //             leading: SizedBox(
+                        //               width: 25,
+                        //               height: 25,
+                        //               child: Image.asset(
+                        //                   'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
+                        //             ),
+                        //             title: Text('Open in Google Maps'),
+                        //             onTap: () {
+                        //               Navigator.pop(context);
+                        //               MapUtils.navigateTo(pickupLat, pickupLng);
+                        //             },
+                        //           ),
+                        //           ListTile(
+                        //             leading: SizedBox(
+                        //               width: 25,
+                        //               height: 25,
+                        //               child: Image.asset(
+                        //                   'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
+                        //             ),
+                        //             title: Text('Using App'),
+                        //             onTap: () {
+                        //               Navigator.pop(context);
+                        //             },
+                        //           ),
+                        //         ],
+                        //       ),
+                        //     );
+                        //   },
+                        // );
                       }
                     },
                   ),
@@ -988,23 +990,22 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         : GoogleMap(
             initialCameraPosition: CameraPosition(
               target: LatLng(
-                _currentPosition!.latitude,
-                _currentPosition!.longitude,
+                latitude,
+                longitude,
               ),
               zoom: 14,
             ),
             markers: {
               Marker(
                   markerId: const MarkerId('Source'),
-                  position: LatLng(
-                      _currentPosition!.latitude, _currentPosition!.longitude),
+                  position: LatLng(latitude, longitude),
                   icon: sourceicon),
               Marker(
                   markerId: const MarkerId('destination'),
                   position: LatLng(convertedLat, convertedLng),
                   icon: destinationicon),
             },
-            myLocationEnabled: true,
+            myLocationEnabled: false,
             myLocationButtonEnabled: false,
             compassEnabled: true,
             rotateGesturesEnabled: true,
@@ -1034,130 +1035,46 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     }
   }
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    _mapController = controller;
-
-    // await _getCurrentLocation();
-
-    // if (_currentPosition == null || pickupLat == null || pickupLng == null) {
-    //   print('Current position or pickup location is null');
-    //   return;
-    // }
-
-    // // Add origin and destination markers
-    // markers.add(
-    //   Marker(
-    //     markerId: MarkerId('origin'),
-    //     position:
-    //         LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-    //     infoWindow: InfoWindow(title: 'Your Location'),
-    //   ),
-    // );
-
-    // markers.add(
-    //   Marker(
-    //     markerId: MarkerId('destination'),
-    //     position: LatLng(pickupLat!, pickupLng!),
-    //     infoWindow: InfoWindow(title: 'Pickup Location'),
-    //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-    //   ),
-    // );
-
-    // // Fetch directions
-    // await _fetchDirections();
+  StreamSubscription<Position>? positionStream;
+  void _trackLocationChanges() {
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) {
+      setState(() {});
+//       _currentPosition!.latitude=
+//       // Update current location variables
+      latitude = position.latitude;
+      longitude = position.longitude;
+// // currentLocation.latitude = position.latitude;
+//       longitude.value = position.longitude;
+      // Update polyline with new user location
+      updatePolyline();
+    });
   }
 
-  // Future<void> _fetchDirections() async {
-  //   final directionsService = DirectionsService();
-  //   final request = DirectionsRequest(
-  //     origin: '${_currentPosition?.latitude},${_currentPosition?.longitude}',
-  //     destination: '${pickupLat},${pickupLng}',
-  //   );
-  //   print('Request: $request');
+  double longitude = 0.0;
+  double latitude = 0.0;
+  Future<void> updatePolyline() async {
+    try {
+      // Get destination coordinates
+      final destinationLat = convertedLat;
+      final destinationLng = convertedLng;
+      setState(() {});
+      // Recalculate distance and polyline with the new current location
+      await _getPolyline(destinationLat, destinationLng);
 
-  //   directionsService.route(request,
-  //       (DirectionsResult? response, DirectionsStatus? status) {
-  //     if (status == DirectionsStatus.ok && response != null) {
-  //       final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
+      // Optionally, move the camera to the new current location
+      _mapController.animateCamera(
+        CameraUpdate.newLatLng(
+            LatLng(_currentPosition!.latitude, _currentPosition!.longitude)),
+      );
+    } catch (e) {}
+  }
 
-  //       if (encodedPolyline != null) {
-  //         List<LatLng> decodedPoints = decodePolyline(encodedPolyline)!;
-  //         print('Decoded points count: ${decodedPoints.length}');
-
-  //         setState(() {
-  //           polylines.add(
-  //             Polyline(
-  //               polylineId: PolylineId('route'),
-  //               color: Colors.blue,
-  //               width: 5,
-  //               points: decodedPoints,
-  //             ),
-  //           );
-
-  //           // Optionally, adjust the camera to fit the polyline
-  //           _adjustCamera(decodedPoints);
-  //         });
-  //       }
-  //     } else {
-  //       print('Failed to fetch directions: $status');
-  //     }
-  //   });
-  // }
-
-  // void _adjustCamera(List<LatLng> points) {
-  //   if (points.isEmpty) return;
-
-  //   LatLngBounds bounds;
-  //   double x0, x1, y0, y1;
-  //   x0 = x1 = points[0].latitude;
-  //   y0 = y1 = points[0].longitude;
-
-  //   for (LatLng point in points) {
-  //     if (point.latitude > x1) x1 = point.latitude;
-  //     if (point.latitude < x0) x0 = point.latitude;
-  //     if (point.longitude > y1) y1 = point.longitude;
-  //     if (point.longitude < y0) y0 = point.longitude;
-  //   }
-
-  //   bounds = LatLngBounds(
-  //     southwest: LatLng(x0, y0),
-  //     northeast: LatLng(x1, y1),
-  //   );
-
-  //   _mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  // }
-
-  // List<LatLng> decodePolyline(String encoded) {
-  //   List<LatLng> points = [];
-  //   int index = 0;
-  //   int lat = 0, lng = 0;
-
-  //   while (index < encoded.length) {
-  //     int b, shift = 0, result = 0;
-  //     do {
-  //       b = encoded.codeUnitAt(index++) - 63;
-  //       result |= (b & 0x1F) << shift;
-  //       shift += 5;
-  //     } while (b >= 0x20);
-  //     int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-  //     lat += dlat;
-
-  //     shift = 0;
-  //     result = 0;
-  //     do {
-  //       b = encoded.codeUnitAt(index++) - 63;
-  //       result |= (b & 0x1F) << shift;
-  //       shift += 5;
-  //     } while (b >= 0x20);
-  //     int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-  //     lng += dlng;
-
-  //     double latitude = lat / 1E5;
-  //     double longitude = lng / 1E5;
-  //     points.add(LatLng(latitude, longitude));
-  //   }
-  //   return points;
-  // }
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    setState(() {});
+    _mapController = controller;
+  }
 
   Future<void> _setupMarkersAndPolylines() async {
     setState(() {
@@ -1173,46 +1090,13 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       );
     }
   }
-  //   await getLocationFromAddress();
-
-  //   List<LatLng> latLen = [
-  //     LatLng(currentLatitude, currentLongitude),
-  //     LatLng(pickupLat, pickupLng),
-  //   ];
-
-  //   for (int i = 0; i < latLen.length; i++) {
-  //     markers.add(
-  //       Marker(
-  //         markerId: MarkerId(i.toString()),
-  //         position: latLen[i],
-  //         infoWindow: InfoWindow(
-  //           title: i == 0 ? 'Your Location' : 'Pickup Location',
-  //         ),
-  //         icon: BitmapDescriptor.defaultMarker,
-  //       ),
-  //     );
-  //   }
-
-  //   _polylines.add(
-  //     Polyline(
-  //       polylineId: PolylineId('1'),
-  //       points: latLen,
-  //       color: FlutterFlowTheme.of(context as BuildContext).primary,
-  //       // Colors.deepOrange,
-  //     ),
-  //   );
-
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
 
   Future _getPolyline(double destinationLat, double desLng) async {
     print('tapped');
     const apiKey =
         'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
     var origin =
-        '${_currentPosition!.latitude},${_currentPosition!.longitude}'; // Replace with your source coordinates
+        '${latitude},${longitude}'; // Replace with your source coordinates
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
@@ -1241,7 +1125,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                 .decodePolyline(points)
                 .map((point) => LatLng(point.latitude, point.longitude))
                 .toList();
-            // polylines.value.clear();
+            polylines.clear();
             print("the polylines point is $points");
             polylines.add(Polyline(
               // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
@@ -1299,7 +1183,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
             'convert Latitude: ${convertedLat}, convert longitude: ${convertedLng}');
         setcustommarkeritem();
 
-        _getPolyline(locations.first.latitude, locations.first.longitude);
+        // _getPolyline(locations.first.latitude, locations.first.longitude);
       }
     } catch (e) {
       print('Error occurred: $e');

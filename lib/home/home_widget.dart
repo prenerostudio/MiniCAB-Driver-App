@@ -57,7 +57,7 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   late HomeModel _model;
   LatLng? selectedLocation;
-  GoogleMapController? mapController;
+  // GoogleMapController? mapController;
 
   bool isLoading = true;
   String? phone;
@@ -149,8 +149,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
             bidStatus: jsonMap['details'][0]['bid_status'].toString() ?? '',
             bidNote: jsonMap['details'][0]['bid_note'].toString() ?? '',
             bookAddDate: jsonMap['details'][0]['bid_status'].toString() ?? ''));
-
-        showAlert();
+        myController.jobPusherContainer.value = true;
+        // showAlert();
 // listFromPusher=jsonMap
         // jobDetailsFuture();
         // });
@@ -378,13 +378,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    mapController?.dispose();
-    mapController = null;
+    myController.mapController.value?.dispose();
+    myController.mapController.value = null;
     super.dispose();
   }
 
   void _initMapAndLocation() {
-    if (mapController != null) {
+    if (myController.mapController.value != null) {
       _getLocation();
     } else {
       // Delay until the map is ready
@@ -1656,7 +1656,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                     ),
                     child: Stack(
                       children: [
-                        Obx(() => buildMap())
+                        // Obx(() => )
+                        buildMap()
                         // isLoading
                         //     ? Center(
                         //         child: CircularProgressIndicator(
@@ -1927,11 +1928,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                               5));
                                                                 } else {}
                                                               } else {
-                                                                Fluttertoast
-                                                                    .showToast(
-                                                                  msg:
-                                                                      "You Can't Go Offline.  You Go offline to Contact Support.",
-                                                                );
+                                                                // Fluttertoast
+                                                                //     .showToast(
+                                                                //   msg:
+                                                                //       "You Can't Go Offline.  You Go offline to Contact Support.",
+                                                                // );
                                                               }
                                                               if (mounted) {
                                                                 setState(() {
@@ -2066,6 +2067,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                       padding: const EdgeInsets.all(4.0),
                       child: Column(
                         children: [
+                          myController.jobPusherContainer.value == true
+                              ? HomeScreenAlert(
+                                  st: listFromPusher,
+                                )
+                              : SizedBox.shrink(),
                           myController.visiblecontainer.value == true
                               ? Container(
                                   // height: 580,
@@ -2717,158 +2723,51 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   Widget buildMap() {
-    return GoogleMap(
-      onMapCreated: (GoogleMapController controller) {
-        mapController = controller;
-      },
-      initialCameraPosition: CameraPosition(
-        target: LatLng(
-          myController.currentLocation?.latitude ?? 0.0,
-          myController.currentLocation?.longitude ?? 0.0,
-        ),
-        zoom: 12.0,
-      ),
-      markers: {
-        Marker(
-            markerId: const MarkerId('Source'),
-            position: LatLng(
-                myController.latitude.value, myController.longitude.value),
-            icon: myController.sourceicon.value),
-        Marker(
-            markerId: const MarkerId('destination'),
-            position: LatLng(myController.convertedLat.value,
-                myController.convertedLng.value),
-            icon: myController.destinationicon.value),
-      },
-      polylines: myController.polylines.value,
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      compassEnabled: true,
-      rotateGesturesEnabled: true,
-      tiltGesturesEnabled: true,
-      scrollGesturesEnabled: true,
-      zoomControlsEnabled: false,
-      zoomGesturesEnabled: true,
-    );
+    return Obx(() => GoogleMap(
+          onMapCreated: (GoogleMapController controller) {
+            myController.setMapController(controller);
+          },
+          initialCameraPosition: CameraPosition(
+            target: LatLng(
+              myController.currentLocation?.latitude ?? 0.0,
+              myController.currentLocation?.longitude ?? 0.0,
+            ),
+            zoom: 12.0,
+          ),
+          markers: {
+            // Always show source marker (current location)
+            Marker(
+              markerId: const MarkerId('Source'),
+              position: LatLng(
+                  myController.latitude.value, myController.longitude.value),
+              icon: myController.sourceicon.value,
+            ),
+            // Only show destination marker if valid coordinates exist
+            if (myController.convertedLat.value != 0.0 &&
+                myController.convertedLng.value != 0.0)
+              Marker(
+                markerId: const MarkerId('destination'),
+                position: LatLng(myController.convertedLat.value,
+                    myController.convertedLng.value),
+                icon: myController.destinationicon.value,
+              ),
+          },
+          polylines: myController.polylines.value,
+          myLocationEnabled: false,
+          myLocationButtonEnabled: false,
+          compassEnabled: true,
+          rotateGesturesEnabled: true,
+          tiltGesturesEnabled: true,
+          scrollGesturesEnabled: true,
+          zoomControlsEnabled: false,
+          zoomGesturesEnabled: true,
+        ));
   }
 
-  // Future _getPolyline(double destinationLat, double desLng) async {
-  //   print('tapped');
-  //   var origin =
-  //       '${myController.currentLocation?.latitude},${myController.currentLocation?.longitude}'; // Replace with your source coordinates
-  //   var destination =
-  //       // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-  //       '${myController.currentLocation?.latitude},${desLng}';
-  //   // var destination =
-  //   // // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-  //   // '${31.3637197},${73.0553336}';
-  //   try {
-  //     final response = await http.post(Uri.parse(// can be get and post request
-  //         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
-  //         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-
-  //       if (data.containsKey('routes') && data['routes'].isNotEmpty) {
-  //         final route = data['routes'][0];
-  //         if (route.containsKey('legs') && route['legs'].isNotEmpty) {
-  //           final leg = route['legs'][0];
-
-  //           if (leg.containsKey('distance')) {
-  //             // distance.value = leg['distance']['text'];
-  //             // time.value = leg['duration']['text'];
-
-  //             final points = route['overview_polyline']['points'];
-  //             print('the point of poly line $points');
-  //             // Decode polyline points and add them to the map
-  //             //         final json = jsonDecode(response.body);
-  //             // final String encodedPolyline =
-  //             //     json['routes'][0]['overview_polyline']['points'];
-  //             // final List<LatLng> points = decodePolyline(encodedPolyline);
-  //             decodedPoints = PolylinePoints()
-  //                 .decodePolyline(points)
-  //                 .map((point) => LatLng(point.latitude, point.longitude))
-  //                 .toList();
-
-  //             if (mounted) {
-  //               setState(() {
-  //                 myController.polylines.add(
-  //                   Polyline(
-  //                     polylineId: PolylineId('poly'),
-  //                     visible: true,
-  //                     points: decodedPoints,
-  //                     width: 4,
-  //                     color: Colors.blue,
-  //                   ),
-  //                 );
-  //               });
-  //             }
-  //           }
-  //         }
-  //       }
-  //     } else {
-  //       print('the point of poly line ');
-  //     }
-  //   } catch (e) {
-  //     print('the point of poly line $e');
-  //   }
-  // }
-
-  // Future getCoordinatesFromAddress(String address) async {
-  //   try {
-  //     List<Location> locations = await locationFromAddress(address);
-  //     if (locations.isNotEmpty) {
-  //       myController.convertedLat.value = locations.first.latitude;
-  //       myController.convertedLng.value = locations.first.longitude;
-  //       print(
-  //           'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}');
-  //       _getPolyline(locations.first.latitude, locations.first.longitude);
-  //     }
-  //   } catch (e) {
-  //     print('Error occurred: $e');
-  //   }
-  // }
-
-  // final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
-
-  // List<LatLng> decodedPoints = <LatLng>[];
-
-  // List<LatLng> decodePolyline(String encoded) {
-  //   List<LatLng> polyline = [];
-  //   int index = 0, len = encoded.length;
-  //   int lat = 0, lng = 0;
-
-  //   while (index < len) {
-  //     int b, shift = 0, result = 0;
-  //     do {
-  //       b = encoded.codeUnitAt(index++) - 63;
-  //       result |= (b & 0x1F) << shift;
-  //       shift += 5;
-  //     } while (b >= 0x20);
-  //     int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-  //     lat += dlat;
-
-  //     shift = 0;
-  //     result = 0;
-  //     do {
-  //       b = encoded.codeUnitAt(index++) - 63;
-  //       result |= (b & 0x1F) << shift;
-  //       shift += 5;
-  //     } while (b >= 0x20);
-  //     int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-  //     lng += dlng;
-
-  //     polyline.add(LatLng(lat / 1E5, lng / 1E5));
-  //   }
-
-  //   return polyline;
-  // }
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     jobDetailsFuture();
-  //     myController.jobDetails();
-  //   }
-  // }
+  // Widget buildMap() {
+  //   return GoogleMap(
+  //     onMapCreated: (GoogleMapController controller) {
+  //       // myController.mapController.value = controller;
 
   LatLng _destination = LatLng(34.0522, -118.2437);
   void fetchJobStatus() async {
@@ -2903,76 +2802,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     }
   }
 
-  // Future<void> fetchDriverStatus() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final String? dId = prefs.getString('d_id');
-  //
-  //   final Uri uri =
-  //       Uri.parse('https://www.minicaboffice.com/api/driver/fetch-status.php');
-  //   final http.MultipartRequest request = http.MultipartRequest('POST', uri);
-  //   request.fields['d_id'] = dId ?? '';
-  //   final http.StreamedResponse response = await request.send();
-  //
-  //   if (response.statusCode == 200) {
-  //     final String responseBody = await response.stream.bytesToString();
-  //     final Map<String, dynamic> jsonResponse = json.decode(responseBody);
-  //
-  //     if (jsonResponse['status'] == true) {
-  //       setState(() async {
-  //         driverStatus = jsonResponse['data'][0]['status'];
-  //         print(driverStatus);
-  //       });
-  //       print(
-  //           'Driver status: $driverStatus'); // This will print: Driver status: Offline
-  //     } else {
-  //       print('Failed to fetch status');
-  //     }
-  //   } else {
-  //     print('Request failed with status: ${response.statusCode}');
-  //     print(response.reasonPhrase);
-  //   }
-  // }
-  // final JobController myController = Get.put(JobController());
-  // Future<Job> myController.jobDetails() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? dId = prefs.getString('d_id');
-  //   print(dId);
-  //   final response = await http.post(
-  //     Uri.parse(
-  //         'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'),
-  //     body: {
-  //       'd_id': dId.toString(),
-  //     },
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     final parsedResponse = json.decode(response.body);
-  //     var data = parsedResponse['book_id'].toString();
-  //     prefs.setString('bookingid', data);
-  //     print('bookingid   $data');
-
-  //     if (parsedResponse['status'] == true) {
-  //       isPeriodicVisible = true;
-  //       if (parsedResponse['data'] is List &&
-  //           parsedResponse['data'].isNotEmpty) {
-  //         return Job.fromJson(parsedResponse['data'].first);
-  //       } else {
-  //         isPeriodicVisible = false;
-  //         throw Exception('No jobs found');
-  //       }
-  //     } else {
-  //       isPeriodicVisible = false;
-
-  //       throw Exception('No jobs found');
-  //     }
-  //   } else {
-  //     throw Exception('Failed to load jobs');
-  //   }
-  // }
-
   void _animateToCurrentLocation() {
     if (Position != null) {
-      mapController!.animateCamera(CameraUpdate.newCameraPosition(
+      myController.mapController.value!
+          .animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(myController.currentLocation!.latitude,
               myController.currentLocation!.longitude),
@@ -3094,8 +2927,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
               bidStatus: jsonMap['data'][0]['bid_status'].toString() ?? '',
               bidNote: jsonMap['data'][0]['bid_note'].toString() ?? '',
               bookAddDate: jsonMap['data'][0]['bid_status'].toString() ?? ''));
-
-          showAlert();
+          myController.jobPusherContainer.value = true;
+          // showAlert();
         } else {
           periodicStatus = false;
         }
@@ -3299,7 +3132,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       myController.currentLocation = await Geolocator.getCurrentPosition();
 
       if (myController.currentLocation != null) {
-        mapController!.animateCamera(
+        myController.mapController.value!.animateCamera(
           CameraUpdate.newLatLng(
             LatLng(
               myController.currentLocation!.latitude,

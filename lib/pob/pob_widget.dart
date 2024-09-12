@@ -99,6 +99,7 @@ class _PobWidgetState extends State<PobWidget> {
     sendOnRideRequest();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _setupMarkersAndPolylines();
+    _trackLocationChanges();
     _model = createModel(context, () => PobModel());
   }
 
@@ -507,12 +508,12 @@ class _PobWidgetState extends State<PobWidget> {
     return GoogleMap(
         initialCameraPosition: CameraPosition(
           target: LatLng(
-            _currentPosition?.latitude ?? 0.0,
-            _currentPosition?.longitude ?? 0.0,
+            latitude ?? 0.0,
+            longitude ?? 0.0,
           ),
-          zoom: 10,
+          zoom: 14,
         ),
-        myLocationEnabled: true,
+        myLocationEnabled: false,
         myLocationButtonEnabled: true,
         compassEnabled: true,
         rotateGesturesEnabled: true,
@@ -523,8 +524,7 @@ class _PobWidgetState extends State<PobWidget> {
         markers: {
           Marker(
               markerId: const MarkerId('Source'),
-              position: LatLng(
-                  _currentPosition!.latitude, _currentPosition!.longitude),
+              position: LatLng(latitude, longitude),
               icon: sourceicon),
           Marker(
               markerId: const MarkerId('destination'),
@@ -533,6 +533,41 @@ class _PobWidgetState extends State<PobWidget> {
         },
         // markers: Set<Marker>.of(markers),
         polylines: polylines);
+  }
+
+  StreamSubscription<Position>? positionStream;
+  void _trackLocationChanges() {
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) {
+      setState(() {});
+//       _currentPosition!.latitude=
+//       // Update current location variables
+      latitude = position.latitude;
+      longitude = position.longitude;
+// // currentLocation.latitude = position.latitude;
+//       longitude.value = position.longitude;
+      // Update polyline with new user location
+      updatePolyline();
+    });
+  }
+
+  double longitude = 0.0;
+  double latitude = 0.0;
+  Future<void> updatePolyline() async {
+    try {
+      // Get destination coordinates
+      final destinationLat = convertedLat;
+      final destinationLng = convertedLng;
+      setState(() {});
+      // Recalculate distance and polyline with the new current location
+      await _getPolyline(destinationLat, destinationLng);
+
+      // Optionally, move the camera to the new current location
+      _mapController.animateCamera(
+        CameraUpdate.newLatLng(LatLng(latitude, longitude)),
+      );
+    } catch (e) {}
   }
 
   Future getCoordinatesFromAddress(String address) async {
@@ -558,7 +593,7 @@ class _PobWidgetState extends State<PobWidget> {
     const apiKey =
         'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
     var origin =
-        '${_currentPosition!.latitude},${_currentPosition!.longitude}'; // Replace with your source coordinates
+        '${latitude},${longitude}'; // Replace with your source coordinates
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
@@ -816,7 +851,7 @@ class _PobWidgetState extends State<PobWidget> {
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     await _getCurrentLocation();
-    await MapOptionDialog(context);
+    // await MapOptionDialog(context);
     setState(() {
       _mapController = controller;
     });
@@ -898,42 +933,42 @@ class _PobWidgetState extends State<PobWidget> {
     return points;
   }
 
-  Future MapOptionDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Choose Map Option'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: SizedBox(
-                  width: 25,
-                  height: 25,
-                  child: Image.asset('assets/images/google.png'),
-                ),
-                title: Text('Using Google Maps'),
-                onTap: () {
-                  Navigator.pop(context);
-                  MapUtils.navigateTo(dropffLat, dropffLng);
-                },
-              ),
-              ListTile(
-                leading: SizedBox(
-                  width: 25,
-                  height: 25,
-                  child: Image.asset('assets/images/app_launcher_icon.png'),
-                ),
-                title: Text('Using Another App'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  // Future MapOptionDialog(BuildContext context) {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Choose Map Option'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             ListTile(
+  //               leading: SizedBox(
+  //                 width: 25,
+  //                 height: 25,
+  //                 child: Image.asset('assets/images/google.png'),
+  //               ),
+  //               title: Text('Using Google Maps'),
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //                 MapUtils.navigateTo(dropffLat, dropffLng);
+  //               },
+  //             ),
+  //             ListTile(
+  //               leading: SizedBox(
+  //                 width: 25,
+  //                 height: 25,
+  //                 child: Image.asset('assets/images/app_launcher_icon.png'),
+  //               ),
+  //               title: Text('Using Another App'),
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }

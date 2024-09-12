@@ -84,7 +84,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
       String? cid = prefs.getString('c_id');
-      print(dId);
+      print('the cid is $cid');
       // print('d_id not found in shared preferences.${widget.jobid}');
       // print('d_id not found in shared preferences.${dId}');
       // print('d_id not found in shared preferences.${parkingController.text}');
@@ -136,6 +136,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   late OnWayModel _model;
   @override
   Widget build(BuildContext context) {
+    // print('the jobs id $cid');
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: WillPopScope(
