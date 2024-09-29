@@ -405,9 +405,8 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                         ),
                                   ),
                                   Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 15, 0, 0),
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0, 5, 0, 0),
                                     child: Text(
                                       '${jobItem.pickDate}',
                                       style: FlutterFlowTheme.of(context)
@@ -427,7 +426,8 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -475,7 +475,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                     alignment: Alignment.center,
                                     child: Container(
                                       width: 4,
-                                      height: 80,
+                                      height: 30,
                                       decoration: const BoxDecoration(
                                         color: Color(0xFFE5E7EB),
                                       ),
@@ -483,7 +483,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                      top: 25,
+                                      top: 5,
                                     ),
                                     child: Container(
                                       width: 30,
@@ -539,7 +539,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                   Flexible(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 0, top: 10, bottom: 20),
+                                          left: 0, top: 10, bottom: 10),
                                       child: Text(
                                         '${jobItem.pickup}',
                                         style: FlutterFlowTheme.of(context)
@@ -549,7 +549,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                               color:
                                                   FlutterFlowTheme.of(context)
                                                       .secondaryText,
-                                              fontSize: 15,
+                                              fontSize: 14,
                                             ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
@@ -559,7 +559,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                 ],
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
+                                padding: const EdgeInsets.only(bottom: 0),
                                 child: Row(
                                   children: [
                                     const FaIcon(
@@ -580,7 +580,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                             fontFamily: 'Open Sans',
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryText,
-                                            fontSize: 16,
+                                            fontSize: 15,
                                           ),
                                     ),
                                   ],
@@ -591,7 +591,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                   Flexible(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 10, bottom: 20),
+                                          top: 10, bottom: 0),
                                       child: Text(
                                         '${jobItem.destination}',
                                         style: FlutterFlowTheme.of(context)

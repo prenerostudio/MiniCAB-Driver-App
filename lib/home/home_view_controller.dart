@@ -22,6 +22,13 @@ class JobController extends GetxController {
       .obs;
   var visiblecontainer = false.obs;
   var jobPusherContainer = false.obs;
+  var isTimeSlotDispatched = false.obs;
+    final timeSlotDate = '--'.obs;
+  final timeSlotStarttime = '--'.obs;
+  final timeSlotEndTime = '--'.obs;
+  final timeSloPricePerhour = '--'.obs;
+  final timeSlottotalPay = '--'.obs;
+  final timeSlotid = '--'.obs;
   RxList<Job> listFromPusher = <Job>[].obs;
   RxDouble convertedLat = 0.0.obs;
   RxList<LatLng> decodedPoints = <LatLng>[].obs;
