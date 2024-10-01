@@ -183,7 +183,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       var channel = pusher.subscribe('times-channel');
 
       // Listen for new events
-      channel.bind('slot-dispatched', (event) {
+      channel.bind('slot-dispatched', (event) async {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
 
         print("json data pusehrt${jsonMap['details']}");
@@ -198,6 +198,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         myController.timeSlotStarttime.value =
             jsonMap['details'][0]['start_time'].toString();
         _startTime = jsonMap['details'][0]['start_time'].toString();
+        await prefs.remove('accepted');
+        myController.isTimeSlotAccepted.value =
+            prefs.getBool('accepted') ?? false;
         _endTime =
             jsonMap['details'][0]['end_time'].toString(); // e.g., "15:00:00"
         print('the start time from pusher is ${_startTime}');
@@ -363,6 +366,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         print('the response is ${response.body}');
         var jsonData = json.decode(response.body);
         if (jsonData['data'].isNotEmpty) {
+          myController.isTimeSlotAccepted.value =
+              prefs.getBool('accepted') ?? false;
           myController.isTimeSlotDispatched.value = true;
 
           myController.timeSlotDate.value = jsonData['data'][0]['ts_date'];
@@ -382,8 +387,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
         // closeOverlay();
       } else {
+        await prefs.remove('accepted');
         WidgetsBinding.instance.addPostFrameCallback((_) {
           myController.isTimeSlotDispatched.value = false;
+          setState(() {});
+          myController.isTimeSlotAccepted.value =
+              prefs.getBool('accepted') ?? false;
         });
         print('Failed to accept job. Status Code: ${response.statusCode}');
         print('Reason: ${response.reasonPhrase}');
@@ -2269,50 +2278,57 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                       ),
                                     ],
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      print('time slot accept');
-                                      acceptTimeSlot();
-                                      // _startTimer();
-                                      // getTimeSlotFroApi();
-                                      // timeSlotPusher();
-                                    },
-                                    child: Container(
-                                      height: 40,
-                                      width: 90,
-                                      decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: Center(
-                                        child: Text(
-                                          'Accept',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      rejectTimeSlot();
-                                      // _stopTimer();
-                                    },
-                                    child: Container(
-                                      height: 40,
-                                      width: 90,
-                                      decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: Center(
-                                        child: Text(
-                                          'Reject',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  )
+                                  myController.isTimeSlotAccepted.value == false
+                                      ? InkWell(
+                                          onTap: () {
+                                            print('time slot accept');
+                                            acceptTimeSlot();
+                                            // _startTimer();
+                                            // getTimeSlotFroApi();
+                                            // timeSlotPusher();
+                                          },
+                                          child: Container(
+                                            height: 40,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            child: Center(
+                                              child: Text(
+                                                'Accept',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
+                                  myController.isTimeSlotAccepted.value == false
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            rejectTimeSlot();
+                                            // _stopTimer();
+                                          },
+                                          child: Container(
+                                            height: 40,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                color: Colors.red,
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            child: Center(
+                                              child: Text(
+                                                'Reject',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
                                 ],
                               ),
                               SizedBox(
@@ -3103,7 +3119,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   bool _isRunning = false;
   String? _startTime; // Start time from API in "HH:mm:ss"
   String? _endTime; // End time from API in "HH:mm:ss"
-
+  // bool myController.isTimeSlotAccepted.value = false;
   Future<void> acceptTimeSlot() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
@@ -3119,7 +3135,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       var jsonResponse = json.decode(response.body);
       if (jsonResponse['status'] == true) {
         // Assuming the API returns time in "HH:mm:ss" format
-
+        await prefs.setBool('accepted', true);
+        setState(() {});
+        myController.isTimeSlotAccepted.value = true;
         print('Time slot accepted: Start: $_startTime, End: $_endTime');
         _startCheckTimer(); // Start checking for time match
       } else {
@@ -3146,19 +3164,21 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
       // Check if the current time exceeds the end time
       if (_endTime != null && currentTime == _endTime) {
+        _checkTimer?.cancel(); // Stop checking for time matchstart time timer
+        _countdownTimer?.cancel();
         completeTimeSlot();
         print('End time reached, stopping timer...');
         _stopCountdownTimer(); // Stop the countdown timer if end time is reached
-        _checkTimer?.cancel(); // Stop checking for time matchstart time timer
+
         _seconds = 0;
       }
     });
   }
 
   void _startCountdownTimer() {
-    setState(() {
-      _isRunning = true; // Set the timer running state
-    });
+    // setState(() {
+    //   _isRunning = true; // Set the timer running state
+    // });
 
     _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
@@ -3169,9 +3189,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   void _stopCountdownTimer() {
-    setState(() {
-      _isRunning = false; // Set the timer to stopped state
-    });
+    // setState(() {
+    //   _isRunning = false; // Set the timer to stopped state
+    // });
     _countdownTimer?.cancel(); // Cancel the countdown timer
   }
 
@@ -3186,35 +3206,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     int secs = seconds % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
-  // Future acceptTimeSlot() async {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     listFromPusher.clear();
-  //   });
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? dId = prefs.getString('d_id');
-  //   String? tsid = prefs.getString('ts_id');
-
-  //   final response = await http.post(
-  //     Uri.parse(
-  //         'https://www.minicaboffice.com/api/driver/accept-time-slot.php'),
-  //     body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
-  //   );
-  //   print('before if condition');
-  //   if (response.statusCode == 200) {
-  //     var jsonResponse = json.decode(response.body);
-  //     print('inside if condition');
-  //     if (jsonResponse['status'] == true) {
-  //       print('time slot is accepted');
-  //     } else {
-  //       print('time slot issue');
-  //     }
-  //   } else {
-  //     print('time slot not fetched');
-
-  //     // Failed to load jobs, handle it appropriately
-  //     return null;
-  //   }
-  // }
 
   Future<void> completeTimeSlot() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -3230,6 +3221,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       if (jsonResponse['status'] == true) {
+        await prefs.remove('accepted');
         // Assuming the API returns time in "HH:mm:ss" format
         getTimeSlotFroApi();
       } else {

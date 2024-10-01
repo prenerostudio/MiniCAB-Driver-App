@@ -23,7 +23,8 @@ class JobController extends GetxController {
   var visiblecontainer = false.obs;
   var jobPusherContainer = false.obs;
   var isTimeSlotDispatched = false.obs;
-    final timeSlotDate = '--'.obs;
+  var isTimeSlotAccepted = false.obs;
+  final timeSlotDate = '--'.obs;
   final timeSlotStarttime = '--'.obs;
   final timeSlotEndTime = '--'.obs;
   final timeSloPricePerhour = '--'.obs;
@@ -339,39 +340,39 @@ class JobController extends GetxController {
     sourceicon.value = BitmapDescriptor.fromBytes(sourceImage);
     destinationicon.value = BitmapDescriptor.fromBytes(destinationImage);
   }
-Future getCoordinatesFromAddress(String address) async {
-  try {
-    if (address.isEmpty) {
-      print('if getCoordinatesFromAddress');
-      // Reset polylines and markers when the pickup address is empty
-      polylines.clear();
-      convertedLat.value = 0.0;
-      convertedLng.value = 0.0;
-      return;
-    } else {
-      print('else getCoordinatesFromAddress');
-      List<Location> locations = await locationFromAddress(address);
-      if (locations.isNotEmpty) {
-        convertedLat.value = locations.first.latitude;
-        convertedLng.value = locations.first.longitude;
 
-        getLatLngFromCurrentLocation().then((value) {
-          getdistanceandtime(
-            locations.first.latitude, locations.first.longitude
-          );
+  Future getCoordinatesFromAddress(String address) async {
+    try {
+      if (address.isEmpty) {
+        print('if getCoordinatesFromAddress');
+        // Reset polylines and markers when the pickup address is empty
+        polylines.clear();
+        convertedLat.value = 0.0;
+        convertedLng.value = 0.0;
+        return;
+      } else {
+        print('else getCoordinatesFromAddress');
+        List<Location> locations = await locationFromAddress(address);
+        if (locations.isNotEmpty) {
+          convertedLat.value = locations.first.latitude;
+          convertedLng.value = locations.first.longitude;
 
-          kGoogleplay.value = CameraPosition(
-            target: LatLng(latitude.value, longitude.value),
-            zoom: 12.4746,
-          );
-          setcustommarkeritem();
-        });
+          getLatLngFromCurrentLocation().then((value) {
+            getdistanceandtime(
+                locations.first.latitude, locations.first.longitude);
+
+            kGoogleplay.value = CameraPosition(
+              target: LatLng(latitude.value, longitude.value),
+              zoom: 12.4746,
+            );
+            setcustommarkeritem();
+          });
+        }
       }
+    } catch (e) {
+      print("polylines updation exception $e");
     }
-  } catch (e) {
-    print("polylines updation exception $e");
   }
-}
 
   // Future getCoordinatesFromAddress(String address) async {
   //   try {
