@@ -1313,10 +1313,10 @@ packages:
     dependency: "direct main"
     description:
       name: pusher_client_fixed
-      sha256: "0e7de6999cac7b0a36e29c81e50a936e1c3e6d52e96a28c877c75eca14fd8d15"
+      sha256: d8645b9a9e4c8c2850cd72ad07fcb9e3f215cfc4ed51d02b5b3a60e19fdf5e0f
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.4+1"
+    version: "0.0.4+2"
   qr:
     dependency: transitive
     description:
@@ -1425,26 +1425,26 @@ packages:
     dependency: "direct main"
     description:
       name: sign_in_with_apple
-      sha256: ac3b113767dfdd765078c507dad9d4d9fe96b669cc7bd88fc36fc15376fb3400
+      sha256: "602f1374c9c4c33889c969b53ebf7cc8417c22cc7e25ea771581330173bc6603"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.0"
+    version: "6.1.3"
   sign_in_with_apple_platform_interface:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sign_in_with_apple_platform_interface
-      sha256: a5883edee09ed6be19de19e7d9f618a617fe41a6fa03f76d082dfb787e9ea18d
+      sha256: c2ef2ce6273fce0c61acd7e9ff5be7181e33d7aa2b66508b39418b786cca2119
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   sign_in_with_apple_web:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sign_in_with_apple_web
-      sha256: "44b66528f576e77847c14999d5e881e17e7223b7b0625a185417829e5306f47a"
+      sha256: c009e9beeb6c376e86aaa154fcc8b4e075d4bad90c56286b9668a51cdb6129ea
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "2.1.0"
   sky_engine:
     dependency: transitive
     description: flutter

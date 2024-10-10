@@ -18,6 +18,7 @@ import 'package:mini_cab/Acount%20Statements/acount_statements_widget.dart';
 import 'package:mini_cab/home/home_screen_alert.dart';
 import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/home/polyLinesAndMarker.dart';
+import 'package:mini_cab/main.dart';
 import 'package:mini_cab/review/review_screen.dart';
 import 'package:mini_cab/time_slot/time_slot_view.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
@@ -170,6 +171,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   timeSlotPusher() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
+      // await prefs.remove('ts_id');
+
       var pusher = PusherClient(
         '28691ac9c0c5ac41b64a',
         PusherOptions(
@@ -188,7 +191,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
         print("json data pusehrt${jsonMap['details']}");
         print("json data pusehrt${jsonMap['details'][0]['job_id']}");
-        prefs.setString('ts_id', jsonMap['details'][0]['ts_id'].toString());
+        await prefs.setString(
+            'ts_id', jsonMap['details'][0]['ts_id'].toString());
         print(
             'the ts id from pusher is ${jsonMap['details'][0]['ts_id'].toString()}');
         myController.timeSlotid.value =
@@ -313,7 +317,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     //     });
     //   }
     // });
+
     getTimeSlotFroApi();
+    _restoreTimerState();
     // jobDetailsFuture();
     callAp();
     fetchJobStatus();
@@ -401,6 +407,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       print('Error during HTTP request: $e');
     }
   }
+
 
   AccpetingOrderViewModel accpetingOrderViewModel =
       Get.put(AccpetingOrderViewModel());
@@ -3137,6 +3144,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         // Assuming the API returns time in "HH:mm:ss" format
         await prefs.setBool('accepted', true);
         setState(() {});
+
+        await prefs.setString('startTime', _startTime!);
+
+        updateEndTime(_endTime!);
+        setTsId(tsid ?? '');
+        print('accepted timeslot id is ${tsid}');
+        await prefs.setBool('isAccepted', true);
+
         myController.isTimeSlotAccepted.value = true;
         print('Time slot accepted: Start: $_startTime, End: $_endTime');
         _startCheckTimer(); // Start checking for time match
@@ -3146,6 +3161,18 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     } else {
       print('Failed to fetch time slot');
     }
+  }
+
+  void updateEndTime(String newEndTime) async {
+    final service = FlutterBackgroundService();
+    // This will send the 'updateTimer' event to the background service
+    service.invoke('updateTimer', {'endTime': newEndTime});
+  }
+
+  void setTsId(String tsId) async {
+    final service = FlutterBackgroundService();
+    // This will send the 'updateTimer' event to the background service
+    service.invoke('setTsId', {'tsId': tsId});
   }
 
   void _startCheckTimer() {
@@ -3254,6 +3281,32 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     } else {
       print('Failed to fetch time slot');
     }
+  }
+
+  void _restoreTimerState() async {
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String? startTime = prefs.getString('startTime');
+    // String? endTime = prefs.getString('endTime');
+    // bool isAccepted = prefs.getBool('isAccepted') ?? false;
+
+    // if (isAccepted && startTime != null && endTime != null) {
+    //   DateTime now = DateTime.now();
+
+    //   // Append today's date to the start and end times
+    //   String startDateTime =
+    //       "${now.toIso8601String().substring(0, 10)} $startTime";
+    //   String endDateTime = "${now.toIso8601String().substring(0, 10)} $endTime";
+
+    //   DateTime start = DateTime.parse(startDateTime);
+    //   DateTime end = DateTime.parse(endDateTime);
+
+    //   if (now.isAfter(end)) {
+    //     completeTimeSlot(); // If time is complete, send complete status
+    //   } else {
+    //     _seconds = end.difference(now).inSeconds; // Update the remaining time
+    //     _startCountdownTimer(); // Start the UI countdown
+    //   }
+    // }
   }
 
   Future jobDetailsFuture() async {

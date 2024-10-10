@@ -26,6 +26,8 @@ class JobController extends GetxController {
   var isTimeSlotAccepted = false.obs;
   final timeSlotDate = '--'.obs;
   final timeSlotStarttime = '--'.obs;
+  final startTime = '--'.obs;
+  final endTime = '--'.obs;
   final timeSlotEndTime = '--'.obs;
   final timeSloPricePerhour = '--'.obs;
   final timeSlottotalPay = '--'.obs;
@@ -442,4 +444,6 @@ class JobController extends GetxController {
       updatePolyline();
     });
   }
+
+  
 }

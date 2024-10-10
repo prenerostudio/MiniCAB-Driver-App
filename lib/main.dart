@@ -17,8 +17,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:mini_cab/BidHistory/bid_history_filter_widget.dart';
 import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
+import 'package:mini_cab/home/timer_controller.dart';
 import 'package:mini_cab/upcomming/upcomming_widget.dart';
+import 'package:mini_cab/zones/new_class.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Acount Statements/acount_statements_widget.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
@@ -114,7 +117,9 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
+  TimerController timerController = Get.put(TimerController());
   DartPluginRegistrant.ensureInitialized();
+  // String tsid = '';
   SharedPreferences preferences = await SharedPreferences.getInstance();
   await preferences.setString("hello", "world");
   if (service is AndroidServiceInstance) {
@@ -128,6 +133,48 @@ void onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
+  // timeSlotPusher();
+  Timer.periodic(Duration(seconds: 1), (timer) async {
+    String? startTime = preferences.getString('startTime');
+
+    if (startTime != null && timerController.endTime.value != null) {
+      service.on('updateTimer').listen((event) async {
+        // Example: Update the endTime from the UI
+        if (event != null && event['endTime'] != null) {
+          String newEndTime = event['endTime'];
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+
+          await prefs.setString('endTime', newEndTime!);
+          timerController.endTime.value =
+              preferences.getString('endTime') ?? '';
+          print('the endTime is here ${timerController.endTime.value}');
+        }
+      });
+      service.on('setTsId').listen((event) async {
+        // Example: Update the endTime from the UI
+        if (event != null && event['tsId'] != null) {
+          String tsId = event['tsId'];
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+
+          await prefs.setString('ts_id', tsId!);
+          timerController.tsId.value = preferences.getString('ts_id') ?? '';
+          print('the endTime is here ${timerController.tsId.value}');
+        }
+      });
+      timerController.currentTime.value =
+          _getCurrentTime(); // Get current time in "HH:mm:ss"
+
+      print('check current time ${timerController.currentTime.value}');
+
+      if (timerController.currentTime.value == timerController.endTime.value) {
+        completeTimeSlot(timerController
+            .tsId.value); // Send complete status if time is finished
+        timer.cancel(); // Stop the timer
+      }
+    }
+  });
 
   Timer.periodic(const Duration(seconds: 5), (timer) async {
     if (service is AndroidServiceInstance) {
@@ -136,6 +183,7 @@ void onStart(ServiceInstance service) async {
           title: "Minicab Service",
           content: "Waiting for upcoming job",
         );
+        print('the duration is in background ');
       }
     }
     // print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
@@ -147,6 +195,9 @@ void onStart(ServiceInstance service) async {
     } catch (e) {
       print('Error checking API status: $e');
     }
+    // if (await checkLatestTimeslot()) {
+    //   showtimeSlotNoti();
+    // }
     final deviceInfo = DeviceInfoPlugin();
     String? device;
     if (Platform.isAndroid) {
@@ -167,6 +218,39 @@ void onStart(ServiceInstance service) async {
   });
 }
 
+String _getCurrentTime() {
+  DateTime now = DateTime.now();
+  return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+}
+
+Future<void> completeTimeSlot(String tsid) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? dId = prefs.getString('d_id');
+
+  final response = await http.post(
+    Uri.parse(
+        'https://www.minicaboffice.com/api/driver/complete-time-slot.php'),
+    body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
+  );
+  print('the did ${dId}');
+  print('the ts_id ${tsid}');
+  print('the response body of complete status is ${response.body}');
+  if (response.statusCode == 200) {
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == true) {
+      await prefs.remove('accepted');
+      await prefs.remove('ts_id');
+      print('the staus is completed');
+      // Assuming the API returns time in "HH:mm:ss" format
+      // getTimeSlotFroApi();
+    } else {
+      print('Time slot issue');
+    }
+  } else {
+    print('Failed to fetch time slot');
+  }
+}
+
 Future<bool> checkApiStatus() async {
   final prefs = await SharedPreferences.getInstance();
   final dId = prefs.getString('d_id');
@@ -177,6 +261,30 @@ Future<bool> checkApiStatus() async {
 
   if (response.statusCode == 200) {
     final parsedResponse = json.decode(response.body);
+    if (parsedResponse['status'] == true) {
+      // print('New job available: ${DateTime.now()}');
+      return true;
+    }
+  } else {
+    // print("API check failed with status code: ${response.statusCode}");
+    throw Exception('API Check Failed');
+  }
+  // print("No new jobs found.");
+  return false;
+}
+
+Future<bool> checkLatestTimeslot() async {
+  final prefs = await SharedPreferences.getInstance();
+  final dId = prefs.getString('d_id');
+  final response = await http.post(
+    Uri.parse('https://www.minicaboffice.com/api/driver/fetch-time-slot.php'),
+    body: {'d_id': dId.toString()},
+  );
+
+  if (response.statusCode == 200) {
+    final parsedResponse = json.decode(response.body);
+    await prefs.setString(
+        "ts_id", parsedResponse['data'][0]['ts_id'].toString());
     if (parsedResponse['status'] == true) {
       // print('New job available: ${DateTime.now()}');
       return true;
@@ -207,6 +315,29 @@ void showNotification() async {
     0,
     'New Job',
     'You have new upcoming jobs.',
+    platformChannelSpecifics,
+    payload: 'item x',
+  );
+}
+
+void showtimeSlotNoti() async {
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'your_channel_id',
+    'your_channel_name',
+    channelDescription: 'your_channel_description',
+    importance: Importance.max,
+    ticker: 'ticker',
+  );
+
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    'New TimeSlot',
+    'You have new TimeSlot.',
     platformChannelSpecifics,
     payload: 'item x',
   );
