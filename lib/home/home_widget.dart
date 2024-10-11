@@ -21,6 +21,7 @@ import 'package:mini_cab/home/polyLinesAndMarker.dart';
 import 'package:mini_cab/main.dart';
 import 'package:mini_cab/review/review_screen.dart';
 import 'package:mini_cab/time_slot/time_slot_view.dart';
+import 'package:mini_cab/zones/new_class.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:root_checker_plus/root_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -191,6 +192,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
         print("json data pusehrt${jsonMap['details']}");
         print("json data pusehrt${jsonMap['details'][0]['job_id']}");
+        startRingtoneAndVibrateLoop();
         await prefs.setString(
             'ts_id', jsonMap['details'][0]['ts_id'].toString());
         print(
@@ -216,6 +218,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         myController.timeSlottotalPay.value =
             jsonMap['details'][0]['total_pay'].toString();
         myController.isTimeSlotDispatched.value = true;
+        _loadSavedState();
       });
       channel.bind('slot-withdrawn', (event) {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
@@ -388,7 +391,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           print('the end time from api is ${_endTime}');
           _startTime = jsonData['data'][0]['start_time']; // e.g., "14:00:00"
           _endTime = jsonData['data'][0]['end_time']; // e.g., "15:00:00"
+          _loadSavedState();
         }
+
         // myController.visiblecontainer.value = true;
 
         // closeOverlay();
@@ -407,7 +412,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       print('Error during HTTP request: $e');
     }
   }
-
 
   AccpetingOrderViewModel accpetingOrderViewModel =
       Get.put(AccpetingOrderViewModel());
@@ -504,6 +508,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   void dispose() {
     myController.mapController.value?.dispose();
     myController.mapController.value = null;
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -1705,7 +1710,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
                               await prefs.remove('isLoggedIn');
-                              await prefs.clear();
+                              // await prefs.clear();
                               await prefs.setBool('isLoggedIn', false);
                               context.pushNamed('Login');
                             },
@@ -2346,6 +2351,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                         )
                       : Container(),
                 ),
+                // TextButton(
+                //     onPressed: () async {
+                //       SharedPreferences prefs =
+                //           await SharedPreferences.getInstance();
+                //       // await initializeService();
+                //       updateEndTime('10:10:10');
+                //     },
+                //     child: Text('next')),
                 Obx(() => Column(
                       children: [
                         myController.jobPusherContainer.value == true
@@ -3145,16 +3158,18 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         await prefs.setBool('accepted', true);
         setState(() {});
 
-        await prefs.setString('startTime', _startTime!);
+        // await prefs.setString('startTime', _startTime!);
+        // await prefs.setString('endTime', _endTime!);
 
-        updateEndTime(_endTime!);
-        setTsId(tsid ?? '');
+        updateEndTime(myController.timeSlotEndTime.value!);
+        setTsId(myController.timeSlotid.value);
         print('accepted timeslot id is ${tsid}');
         await prefs.setBool('isAccepted', true);
 
         myController.isTimeSlotAccepted.value = true;
         print('Time slot accepted: Start: $_startTime, End: $_endTime');
-        _startCheckTimer(); // Start checking for time match
+        _startCounter(); // Start checking for time match
+        //  start
       } else {
         print('Time slot issue');
       }
@@ -3164,68 +3179,181 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   void updateEndTime(String newEndTime) async {
+    setState(() {});
     final service = FlutterBackgroundService();
     // This will send the 'updateTimer' event to the background service
     service.invoke('updateTimer', {'endTime': newEndTime});
   }
 
   void setTsId(String tsId) async {
+    setState(() {});
     final service = FlutterBackgroundService();
     // This will send the 'updateTimer' event to the background service
     service.invoke('setTsId', {'tsId': tsId});
   }
 
-  void _startCheckTimer() {
-    print('start time timer');
-    _checkTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      print('the current time${_getCurrentTime()} start time from $_startTime');
+  // void _startCheckTimer() {
+  //   print('start time timer');
+  //   _checkTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+  //     print('the current time${_getCurrentTime()} start time from $_startTime');
 
-      String currentTime = _getCurrentTime(); // Get current time in "HH:mm:ss"
-      setState(() {});
-      print('the current time  from ${_getCurrentTime()} end time ${_endTime}');
-      // Check if the current time matches or exceeds the start time
-      if (_startTime != null && currentTime == _startTime) {
-        _startCountdownTimer(); // Start the countdown timer
-        // _checkTimer?.cancel(); // Stop checking for time match
+  //     String currentTime = _getCurrentTime(); // Get current time in "HH:mm:ss"
+  //     setState(() {});
+  //     print('the current time  from ${_getCurrentTime()} end time ${_endTime}');
+  //     // Check if the current time matches or exceeds the start time
+
+  //     if (_startTime != null && currentTime == _startTime) {
+  //       _startCountdownTimer(); // Start the countdown timer
+  //       // _checkTimer?.cancel(); // Stop checking for time match
+  //     }
+
+  //     // Check if the current time exceeds the end time
+  //     if (_endTime != null && currentTime == _endTime) {
+  //       _checkTimer?.cancel(); // Stop checking for time matchstart time timer
+  //       _countdownTimer?.cancel();
+  //       completeTimeSlot();
+  //       print('End time reached, stopping timer...');
+  //       _stopCountdownTimer(); // Stop the countdown timer if end time is reached
+
+  //       _seconds = 0;
+  //     }
+  //   });
+  // }
+
+  // void _startCountdownTimer() {
+  //   _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+  //     setState(() {
+  //       print("start time timer${_seconds}");
+  //       _seconds++; // Increment the seconds
+  //     });
+  //   });
+  // }
+
+  // void _stopCountdownTimer() {
+  //   _countdownTimer?.cancel(); // Cancel the countdown timer
+  // }
+
+  // String _getCurrentTime() {
+  //   DateTime now = DateTime.now();
+  //   return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+  // }
+
+  // Parse time from strings to DateTime
+  DateTime _parseTime(String date, String time) {
+    String dateTimeString = "$date $time";
+    return DateFormat("yyyy-MM-dd HH:mm:ss").parse(dateTimeString);
+  }
+
+  DateTime? startTime;
+  DateTime? endTime;
+  // Load saved state from SharedPreferences
+  Future<void> _loadSavedState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? startTimeString = prefs.getString('start-Time');
+    String? endTimeString = prefs.getString('end-Time');
+
+    if (startTimeString != null && endTimeString != null) {
+      print('the if condition in timer is works');
+      startTime = DateTime.parse(startTimeString);
+      endTime = DateTime.parse(endTimeString);
+
+      DateTime now = DateTime.now();
+      if (now.isBefore(endTime!)) {
+        if (now.isAfter(startTime!)) {
+          // Timer should be running, calculate how long the counter should be
+          Duration elapsed = now.difference(startTime!);
+          _seconds = elapsed.inSeconds;
+          _startCounter();
+        } else {
+          // Wait for the startTime
+          _startCounter();
+        }
+      } else {
+        // Timer has already finished, no action needed
+        await prefs.remove('start-Time');
+        await prefs.remove('end-Time');
       }
-
-      // Check if the current time exceeds the end time
-      if (_endTime != null && currentTime == _endTime) {
-        _checkTimer?.cancel(); // Stop checking for time matchstart time timer
-        _countdownTimer?.cancel();
-        completeTimeSlot();
-        print('End time reached, stopping timer...');
-        _stopCountdownTimer(); // Stop the countdown timer if end time is reached
-
-        _seconds = 0;
-      }
-    });
+    } else {
+      print(
+          'the else condition in timer is works ${myController.timeSlotStarttime.value}');
+      // Initialize fresh times if there's no saved state
+      String dateString =
+          myController.timeSlotDate.value; // Change date accordingly
+      startTime = _parseTime(
+          dateString, myController.timeSlotStarttime.value); // hh:mm:ss
+      endTime = _parseTime(
+          dateString, myController.timeSlotEndTime.value); // hh:mm:ss
+    }
   }
 
-  void _startCountdownTimer() {
-    // setState(() {
-    //   _isRunning = true; // Set the timer running state
-    // });
+  void _startCounter() async {
+    if (startTime == null || endTime == null) return;
 
-    _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        print("start time timer${_seconds}");
-        _seconds++; // Increment the seconds
-      });
-    });
-  }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  void _stopCountdownTimer() {
-    // setState(() {
-    //   _isRunning = false; // Set the timer to stopped state
-    // });
-    _countdownTimer?.cancel(); // Cancel the countdown timer
-  }
+    // Save startTime, endTime to SharedPreferences
+    await prefs.setString('start-Time', startTime!.toIso8601String());
+    await prefs.setString('end-Time', endTime!.toIso8601String());
 
-  String _getCurrentTime() {
     DateTime now = DateTime.now();
-    return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+
+    // If the current time is after start time, calculate the delay
+    if (now.isAfter(startTime!)) {
+      setState(() {
+        // isRunning = true;
+      });
+      Duration remainingTime = endTime!.difference(now);
+
+      // Start counting up from the already elapsed time
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+        setState(() {
+          _seconds++;
+        });
+
+        // Save the counter value to SharedPreferences
+        await prefs.setInt('counter', _seconds);
+
+        // If current time reaches endTime, stop the counter
+        if (DateTime.now().isAfter(endTime!)) {
+          _stopCounter();
+        }
+      });
+
+      Future.delayed(remainingTime, () {
+        _stopCounter();
+      });
+    } else {
+      // If current time is before start time, wait until start time
+      Duration initialDelay = startTime!.difference(now);
+      Future.delayed(initialDelay, () {
+        setState(() {
+          // isRunning = true;
+        });
+        _startCounter(); // Recursive call to start when start time is reached
+      });
+    }
   }
+
+  void _stopCounter() async {
+    _timer?.cancel();
+    // setState(() {
+    //   isRunning = false;
+    // });
+
+    if (mounted) {
+      setState(() {
+        completeTimeSlot();
+        // isRunning = false;
+      });
+    }
+    // Clear the saved state when the timer stops
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('start-Time');
+    await prefs.remove('end-Time');
+  }
+
+  Timer? _timer;
 
   String _formatTime(int seconds) {
     int hours = seconds ~/ 3600;
@@ -3233,6 +3361,33 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     int secs = seconds % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
+
+  // Future<void> _loadStartTime() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? savedStartTime = prefs.getString('start_time');
+
+  //   if (savedStartTime != null) {
+  //     DateTime startTime = DateTime.parse(savedStartTime);
+  //     DateTime currentTime = DateTime.now();
+
+  //     // Example end time duration (in seconds)
+  //     _totalDuration = 180; // This is 3 minutes (endTime - startTime)
+
+  //     // Calculate the elapsed time
+  //     int elapsed = currentTime.difference(startTime).inSeconds;
+
+  //     // If time has passed, set the counter to elapsed time
+  //     if (elapsed < _totalDuration) {
+  //       setState(() {
+  //         _elapsedSeconds = elapsed;
+  //         _startTimer(); // Resume the timer from where it left off
+  //       });
+  //     } else {
+  //       // Timer already finished
+  //       _elapsedSeconds = _totalDuration;
+  //     }
+  //   }
+  // }
 
   Future<void> completeTimeSlot() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -3414,7 +3569,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     // );
     Vibration.vibrate(duration: 1000);
 
-    Timer(const Duration(seconds: 1), () {
+    Timer(const Duration(seconds: 4), () {
       FlutterRingtonePlayer().stop();
       Vibration.cancel();
     });

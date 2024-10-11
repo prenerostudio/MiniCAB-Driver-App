@@ -273,6 +273,18 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                             scrollDirection: Axis.vertical,
                                             itemBuilder: (context, index) {
                                               final bidItem = data[index];
+                                              String combinedDateTimeString =
+                                                  "${bidItem.bdate} ${bidItem.btime}";
+                                              DateTime combinedDateTime =
+                                                  DateTime.parse(
+                                                      combinedDateTimeString);
+
+                                              // Format the DateTime object to the desired format
+                                              String formattedDateTime =
+                                                  DateFormat(
+                                                          'h a, E dd MMM yyyy')
+                                                      .format(combinedDateTime);
+
                                               return Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
@@ -415,7 +427,14 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             Padding(
                                                                               padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 0.0),
                                                                               child: Text(
-                                                                                'cash',
+                                                                                'cash |',
+                                                                                style: FlutterFlowTheme.of(context).labelMedium,
+                                                                              ),
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 0.0),
+                                                                              child: Text(
+                                                                                bidItem.vName,
                                                                                 style: FlutterFlowTheme.of(context).labelMedium,
                                                                               ),
                                                                             ),
@@ -493,11 +512,13 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             10.0),
                                                                         child:
                                                                             Row(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.max,
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.end,
+                                                                          // mainAxisSize:
+                                                                          //     MainAxisSize.max,
+                                                                          // mainAxisAlignment:
+                                                                          //     MainAxisAlignment.end,
                                                                           children: [
+                                                                            Text('Total fare: ${bidItem.journeyFare}'),
+                                                                            Spacer(),
                                                                             Icon(
                                                                               Icons.man,
                                                                               color: FlutterFlowTheme.of(context).primary,
@@ -506,7 +527,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             Padding(
                                                                               padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
                                                                               child: Text(
-                                                                                'x ${bidItem.passenger}',
+                                                                                '${bidItem.passenger}',
                                                                                 style: FlutterFlowTheme.of(context).labelMedium.override(
                                                                                       fontFamily: 'Readex Pro',
                                                                                       color: FlutterFlowTheme.of(context).secondaryText,
@@ -517,12 +538,12 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             Icon(
                                                                               Icons.luggage,
                                                                               color: FlutterFlowTheme.of(context).primary,
-                                                                              size: MediaQuery.sizeOf(context).width * 0.05,
+                                                                              size: MediaQuery.sizeOf(context).width * 0.04,
                                                                             ),
                                                                             Padding(
                                                                               padding: EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 10.0, 0.0),
                                                                               child: Text(
-                                                                                'x ${bidItem.luggage}',
+                                                                                '${bidItem.luggage}',
                                                                                 style: FlutterFlowTheme.of(context).labelMedium.override(
                                                                                       fontFamily: 'Readex Pro',
                                                                                       color: FlutterFlowTheme.of(context).secondaryText,
@@ -581,6 +602,23 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
                                                                             ),
                                                                           ],
                                                                         ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            6,
+                                                                      ),
+                                                                      Row(
+                                                                        children: [
+                                                                          FaIcon(
+                                                                            FontAwesomeIcons.clock,
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).secondaryText,
+                                                                            size:
+                                                                                16.0,
+                                                                          ),
+                                                                          Text(
+                                                                              '  Expires on ${formattedDateTime} (GMT)')
+                                                                        ],
                                                                       ),
                                                                       Divider(
                                                                         thickness:

@@ -8,6 +8,7 @@ class BidItem {
   String? note;
   String? bookDate;
   String? bookTime;
+  String? journeyfare;
   String? journeydistance;
   String? vId;
   String? bookingStatus;
@@ -47,6 +48,7 @@ class BidItem {
     this.journeydistance,
     this.luggage,
     this.note,
+    this.journeyfare,
     this.bookingStatus,
     this.vId,
     this.vName,
@@ -91,6 +93,7 @@ class BidItem {
       bookingStatus: json['booking_status'],
       vId: json['v_id'],
       vName: json['v_name'],
+      journeyfare: json['journey_fare'],
       vSeat: json['v_seat'],
       vBags: json['v_bags'],
       vWchair: json['v_wchair'],

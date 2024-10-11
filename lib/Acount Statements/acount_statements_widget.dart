@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:mini_cab/Acount%20Statements/accountStatementDetails.dart';
 import 'package:mini_cab/Model/invoivce.dart';
+import 'package:mini_cab/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/invoiceDetails.dart';
@@ -310,20 +311,24 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
           appBar: AppBar(
             backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
             automaticallyImplyLeading: false,
-            // leading: FlutterFlowIconButton(
-            //   borderColor: Colors.transparent,
-            //   borderRadius: 30,
-            //   borderWidth: 1,
-            //   buttonSize: 60,
-            //   icon: Icon(
-            //     Icons.arrow_back_rounded,
-            //     color: FlutterFlowTheme.of(context).primary,
-            //     size: 30,
-            //   ),
-            //   onPressed: () async {
-            //     context.pop();
-            //   },
-            // ),
+            leading: FlutterFlowIconButton(
+              borderColor: Colors.transparent,
+              borderRadius: 30,
+              borderWidth: 1,
+              buttonSize: 60,
+              icon: Icon(
+                Icons.arrow_back_rounded,
+                color: FlutterFlowTheme.of(context).primary,
+                size: 30,
+              ),
+              onPressed: () async {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            NavBarPage(initialPage: 'Dashboard')));
+              },
+            ),
             title: Text(
               'Account Statement',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -1362,10 +1367,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: TextStyle( fontWeight:
+                                                                        style: TextStyle(
+                                                                            fontWeight:
                                                                                 FontWeight.bold,
-                                                                            fontSize:
-                                                                                20),
+                                                                            fontSize: 20),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1878,10 +1883,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                       child:
                                                                           Text(
                                                                         'Total fare : ${invoice.totalPay}',
-                                                                        style: TextStyle( fontWeight:
+                                                                        style: TextStyle(
+                                                                            fontWeight:
                                                                                 FontWeight.bold,
-                                                                            fontSize:
-                                                                                20),
+                                                                            fontSize: 20),
                                                                       ),
                                                                     ),
                                                                   ],

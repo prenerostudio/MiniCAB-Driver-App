@@ -1,6 +1,8 @@
 class BidItem {
   final String bookId;
   final String bTypeId;
+  final String bdate;
+  final String btime;
   final String cId;
   final String pickup;
   final String destination;
@@ -11,6 +13,7 @@ class BidItem {
   final String pickTime;
   final String journeyType;
   final String vId;
+  final String vName;
   final String luggage;
   final String childSeat;
   final String flightNumber;
@@ -35,6 +38,8 @@ class BidItem {
     required this.bookId,
     required this.bTypeId,
     required this.cId,
+    required this.bdate,
+    required this.btime,
     required this.pickup,
     required this.destination,
     required this.address,
@@ -49,6 +54,7 @@ class BidItem {
     required this.flightNumber,
     required this.delayTime,
     required this.note,
+    required this.vName,
     required this.journeyFare,
     required this.journeyDistance,
     required this.bookingFee,
@@ -70,6 +76,8 @@ class BidItem {
       bookId: json['book_id'],
       bTypeId: json['b_type_id'],
       cId: json['c_id'],
+      bdate: json['bid_date'],
+      btime: json['bid_time'],
       pickup: json['pickup'],
       destination: json['destination'],
       address: json['address'],
@@ -79,6 +87,7 @@ class BidItem {
       pickTime: json['pick_time'],
       journeyType: json['journey_type'],
       vId: json['v_id'],
+      vName: json['v_name'],
       luggage: json['luggage'],
       childSeat: json['child_seat'],
       flightNumber: json['flight_number'],

@@ -241,7 +241,7 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                                             .fromSTEB(
                                                                 8, 0, 0, 0),
                                                     child: Text(
-                                                      'Bid Id',
+                                                      'Booking Id',
                                                       textAlign: TextAlign.end,
                                                       style:
                                                           FlutterFlowTheme.of(
@@ -271,7 +271,7 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                         Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  10, 10, 10, 10),
+                                                  2, 10, 5, 10),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -284,11 +284,11 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                                         .secondaryText,
                                                 size: MediaQuery.sizeOf(context)
                                                         .width *
-                                                    0.05,
+                                                    0.04,
                                               ),
                                               Padding(
                                                 padding: EdgeInsetsDirectional
-                                                    .fromSTEB(10, 0, 0, 0),
+                                                    .fromSTEB(5, 0, 0, 0),
                                                 child: Text(
                                                   '${BidItem.bookTime}',
                                                   style: FlutterFlowTheme.of(
@@ -296,9 +296,21 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                                       .labelMedium,
                                                 ),
                                               ),
+                                              SizedBox(
+                                                width: 6,
+                                              ),
+                                              FaIcon(
+                                                FontAwesomeIcons.calendar,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                                size: MediaQuery.sizeOf(context)
+                                                        .width *
+                                                    0.04,
+                                              ),
                                               Padding(
                                                 padding: EdgeInsetsDirectional
-                                                    .fromSTEB(10, 0, 0, 0),
+                                                    .fromSTEB(7, 0, 0, 0),
                                                 child: Text(
                                                   '${BidItem.bookDate}',
                                                   style: FlutterFlowTheme.of(
@@ -306,20 +318,21 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                                       .labelMedium,
                                                 ),
                                               ),
-                                              SizedBox(
-                                                height: 10,
-                                                child: VerticalDivider(
-                                                  thickness: 1,
-                                                  color: FlutterFlowTheme.of(
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(4, 0, 0, 0),
+                                                child: Text(
+                                                  '| cash |',
+                                                  style: FlutterFlowTheme.of(
                                                           context)
-                                                      .secondaryText,
+                                                      .labelMedium,
                                                 ),
                                               ),
                                               Padding(
                                                 padding: EdgeInsetsDirectional
-                                                    .fromSTEB(10, 0, 0, 0),
+                                                    .fromSTEB(4, 0, 0, 0),
                                                 child: Text(
-                                                  'cash',
+                                                  BidItem.vName.toString(),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .labelMedium,
@@ -458,6 +471,91 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                                   Divider(
                                                     thickness: 1,
                                                     color: Color(0xCCC3C2C2),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(0.0, 10.0,
+                                                                10.0, 10.0),
+                                                    child: Row(
+                                                      // mainAxisSize:
+                                                      //     MainAxisSize.max,
+                                                      // mainAxisAlignment:
+                                                      //     MainAxisAlignment.end,
+                                                      children: [
+                                                        Text(
+                                                            'Total fare: ${BidItem.journeyfare}'),
+                                                        Spacer(),
+                                                        Icon(
+                                                          Icons.man,
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .primary,
+                                                          size: MediaQuery.sizeOf(
+                                                                      context)
+                                                                  .width *
+                                                              0.05,
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      10.0,
+                                                                      0.0,
+                                                                      10.0,
+                                                                      0.0),
+                                                          child: Text(
+                                                            '${BidItem.passenger}',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
+                                                                  fontSize:
+                                                                      15.0,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        Icon(
+                                                          Icons.luggage,
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .primary,
+                                                          size: MediaQuery.sizeOf(
+                                                                      context)
+                                                                  .width *
+                                                              0.04,
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      10.0,
+                                                                      0.0,
+                                                                      10.0,
+                                                                      0.0),
+                                                          child: Text(
+                                                            '${BidItem.luggage}',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .labelMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
+                                                                  fontSize:
+                                                                      15.0,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                   Padding(
                                                     padding:
@@ -641,7 +739,7 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
                                                                   .fromSTEB(0,
                                                                       5, 0, 0),
                                                           child: Text(
-                                                            '${BidItem.journeydistance}km',
+                                                            '${BidItem.journeydistance} miles',
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium

@@ -137,42 +137,40 @@ void onStart(ServiceInstance service) async {
   Timer.periodic(Duration(seconds: 1), (timer) async {
     String? startTime = preferences.getString('startTime');
 
-    if (startTime != null && timerController.endTime.value != null) {
-      service.on('updateTimer').listen((event) async {
-        // Example: Update the endTime from the UI
-        if (event != null && event['endTime'] != null) {
-          String newEndTime = event['endTime'];
+    // if (startTime != null && timerController.endTime.value != null) {
+    service.on('updateTimer').listen((event) async {
+      // Example: Update the endTime from the UI
+      if (event != null && event['endTime'] != null) {
+        String newEndTime = event['endTime'];
 
-          SharedPreferences prefs = await SharedPreferences.getInstance();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
 
-          await prefs.setString('endTime', newEndTime!);
-          timerController.endTime.value =
-              preferences.getString('endTime') ?? '';
-          print('the endTime is here ${timerController.endTime.value}');
-        }
-      });
-      service.on('setTsId').listen((event) async {
-        // Example: Update the endTime from the UI
-        if (event != null && event['tsId'] != null) {
-          String tsId = event['tsId'];
-
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-
-          await prefs.setString('ts_id', tsId!);
-          timerController.tsId.value = preferences.getString('ts_id') ?? '';
-          print('the endTime is here ${timerController.tsId.value}');
-        }
-      });
-      timerController.currentTime.value =
-          _getCurrentTime(); // Get current time in "HH:mm:ss"
-
-      print('check current time ${timerController.currentTime.value}');
-
-      if (timerController.currentTime.value == timerController.endTime.value) {
-        completeTimeSlot(timerController
-            .tsId.value); // Send complete status if time is finished
-        timer.cancel(); // Stop the timer
+        await prefs.setString('endTime', newEndTime!);
+        timerController.endTime.value = preferences.getString('endTime') ?? '';
+        print('the endTime is here ${timerController.endTime.value}');
       }
+    });
+    service.on('setTsId').listen((event) async {
+      // Example: Update the endTime from the UI
+      if (event != null && event['tsId'] != null) {
+        String tsId = event['tsId'];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        await prefs.setString('ts_id', tsId!);
+        timerController.tsId.value = preferences.getString('ts_id') ?? '';
+        print('the endTime is here ${timerController.tsId.value}');
+      }
+    });
+    timerController.currentTime.value =
+        _getCurrentTime(); // Get current time in "HH:mm:ss"
+
+    print('check current time ${timerController.currentTime.value}');
+
+    if (timerController.currentTime.value == timerController.endTime.value) {
+      completeTimeSlot(timerController
+          .tsId.value); // Send complete status if time is finished
+      timer.cancel(); // Stop the timer
     }
   });
 
@@ -195,9 +193,9 @@ void onStart(ServiceInstance service) async {
     } catch (e) {
       print('Error checking API status: $e');
     }
-    // if (await checkLatestTimeslot()) {
-    //   showtimeSlotNoti();
-    // }
+    if (await checkLatestTimeslot()) {
+      showtimeSlotNoti();
+    }
     final deviceInfo = DeviceInfoPlugin();
     String? device;
     if (Platform.isAndroid) {
@@ -283,9 +281,10 @@ Future<bool> checkLatestTimeslot() async {
 
   if (response.statusCode == 200) {
     final parsedResponse = json.decode(response.body);
-    await prefs.setString(
-        "ts_id", parsedResponse['data'][0]['ts_id'].toString());
+
     if (parsedResponse['status'] == true) {
+      await prefs.setString(
+          "ts_id", parsedResponse['data'][0]['ts_id'].toString());
       // print('New job available: ${DateTime.now()}');
       return true;
     }

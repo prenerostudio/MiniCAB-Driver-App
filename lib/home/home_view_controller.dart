@@ -24,11 +24,11 @@ class JobController extends GetxController {
   var jobPusherContainer = false.obs;
   var isTimeSlotDispatched = false.obs;
   var isTimeSlotAccepted = false.obs;
-  final timeSlotDate = '--'.obs;
-  final timeSlotStarttime = '--'.obs;
+  final timeSlotDate = '2024-09-09'.obs;
+  final timeSlotStarttime = '21:10:00'.obs;
   final startTime = '--'.obs;
   final endTime = '--'.obs;
-  final timeSlotEndTime = '--'.obs;
+  final timeSlotEndTime = '21:10:00'.obs;
   final timeSloPricePerhour = '--'.obs;
   final timeSlottotalPay = '--'.obs;
   final timeSlotid = '--'.obs;
