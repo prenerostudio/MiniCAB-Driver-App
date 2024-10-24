@@ -1,3 +1,4 @@
+import 'package:mini_cab/login/login_widget.dart';
 import 'package:mini_cab/otp/otp_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -132,6 +133,68 @@ class _SignupWidgetState extends State<SignupWidget> {
         msg: e.toString(),
         fontSize: 16.0,
       );
+    }
+  }
+
+  Future<void> saveDataIdInSharedPreferences(String dataId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('d_id', dataId);
+    print('Data ID saved in SharedPreferences: $dataId');
+  }
+
+  Future<void> registerUser(BuildContext context) async {
+    isLoading = true;
+    if (!mounted) return; // Check if the widget is still mounted
+    setState(() {});
+
+    try {
+      print('+${countryCode}${phoneController.text}');
+      print('${passwordController.text}');
+      final response = await http.post(
+        Uri.parse('https://www.minicaboffice.com/api/driver/register.php'),
+        body: {
+          'd_name':
+              nameController.text ?? '', // Use default values or handle nulls
+          'd_email': emailAddressController.text ?? '',
+
+          'd_phone': "+${countryCode}${phoneController.text}" ?? '',
+          'd_password': passwordController.text.toString() ?? '',
+          'licence_authority': dropDownValue2 ?? '',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == true) {
+          int dataId = responseData['data'];
+          print('The else condition is ${dataId}');
+          await saveDataIdInSharedPreferences(dataId.toString());
+          if (!mounted) return; // Check if the widget is still mounted
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginWidget()),
+          );
+          _showToastMessage(responseData['message']);
+        } else {
+          print('The else condition is ${responseData['message']}');
+          isLoading = false;
+          if (!mounted) return; // Check if the widget is still mounted
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginWidget()),
+          );
+          _showToastMessage(responseData['message']);
+        }
+      } else {
+        isLoading = false;
+        _showToastMessage("Check your internet connection. Please try again.");
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      print('The register exception ${e}');
+      _showToastMessage(e.toString());
+      isLoading = false;
     }
   }
 
@@ -670,7 +733,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                             return;
                                           }
                                           try {
-                                            _verifyPhoneNumber();
+                                            registerUser(context);
                                           } catch (e) {}
                                         },
                                         text: 'Sign up as a Driver',

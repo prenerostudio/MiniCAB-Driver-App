@@ -88,6 +88,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   // bool visiblecontainer = false;
   pushercallbg() async {
     myController.timer?.cancel();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       var pusher = PusherClient(
         '28691ac9c0c5ac41b64a',
@@ -103,55 +104,74 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
       // Listen for new events
       channel.bind('job-dispatched', (event) {
-        startToon();
-        listFromPusher.clear();
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
-        print("json data pusehrt${jsonMap['details'][0]['job_id']}");
-        listFromPusher.add(Job(
-            jobId: jsonMap['details'][0]['job_id'].toString() ?? "",
-            bookId: jsonMap['details'][0]['book_id'].toString() ?? '',
-            cId: jsonMap['details'][0]['00000003'].toString() ?? "",
-            dId: jsonMap['details'][0]['00000000002'].toString() ?? '',
-            jobNote: jsonMap['details'][0]['job_note'].toString() ?? '',
-            journeyFare: jsonMap['details'][0]['journey_fare'].toString() ?? '',
-            bookingFee: jsonMap['details'][0]['booking_fee'].toString() ?? "",
-            carParking: jsonMap['details'][0]['car_parking'].toString() ?? '',
-            waiting: jsonMap['details'][0]['waiting'].toString() ?? '',
-            tolls: jsonMap['details'][0]['tolls'].toString() ?? '',
-            extra: jsonMap['details'][0]['extra'].toString() ?? '',
-            jobStatus: jsonMap['details'][0]['job_status'].toString() ?? '',
-            dateJobAdd: jsonMap['details'][0]['date_job_add'].toString() ?? '',
-            cName: jsonMap['details'][0]['c_name'].toString() ?? '',
-            cEmail: jsonMap['details'][0]['c_email'].toString() ?? '',
-            cPhone: jsonMap['details'][0]['c_phone'].toString() ?? '',
-            cAddress: jsonMap['details'][0]['c_address'].toString() ?? '',
-            dName: jsonMap['details'][0]['d_name'].toString() ?? '',
-            dEmail: jsonMap['details'][0]['d_email'].toString() ?? '',
-            dPhone: jsonMap['details'][0]['d_phone'].toString() ?? '',
-            bTypeId: jsonMap['details'][0]['b_type_id'].toString() ?? '',
-            pickup: jsonMap['details'][0]['pickup'].toString() ?? '',
-            destination: jsonMap['details'][0]['destination'].toString() ?? '',
-            address: jsonMap['details'][0]['address'].toString() ?? '',
-            postalCode: jsonMap['details'][0]['postal_code'].toString() ?? '',
-            passenger: jsonMap['details'][0]['passenger'].toString() ?? '',
-            pickDate: jsonMap['details'][0]['pick_date'].toString() ?? '',
-            pickTime: jsonMap['details'][0]['pick_time'].toString() ?? '',
-            journeyType: jsonMap['details'][0]['journey_type'].toString() ?? '',
-            vId: jsonMap['details'][0]['v_id'].toString() ?? '',
-            luggage: jsonMap['details'][0]['luggage'].toString() ?? '',
-            childSeat: jsonMap['details'][0]['child_seat'].toString() ?? '',
-            flightNumber:
-                jsonMap['details'][0]['flight_number'].toString() ?? '',
-            delayTime: jsonMap['details'][0]['delay_time'].toString() ?? '',
-            note: jsonMap['details'][0]['note'].toString() ?? '',
-            journeyDistance:
-                jsonMap['details'][0]['journey_distance'].toString() ?? '',
-            bookingStatus:
-                jsonMap['details'][0]['booking_status'].toString() ?? '',
-            bidStatus: jsonMap['details'][0]['bid_status'].toString() ?? '',
-            bidNote: jsonMap['details'][0]['bid_note'].toString() ?? '',
-            bookAddDate: jsonMap['details'][0]['bid_status'].toString() ?? ''));
-        myController.jobPusherContainer.value = true;
+
+        print("json data from dispatch job pusehrt ${jsonMap['details']}");
+
+        myController.currentLoggedInid.value = prefs.getString('d_id') ?? '';
+        print(
+            "json data from dispatch job pusehrt${myController.currentLoggedInid.value}");
+        print(
+            "json data from dispatch job pusehrt ${jsonMap['details'][0]['d_id']}");
+        print(
+            'the condition is ${myController.currentLoggedInid.value == jsonMap['details'][0]['d_id'].toString()}');
+        if (myController.currentLoggedInid.value ==
+            jsonMap['details'][0]['d_id'].toString()) {
+          startToon();
+          listFromPusher.clear();
+          print('added to the list');
+          listFromPusher.add(Job(
+              jobId: jsonMap['details'][0]['job_id'].toString() ?? "",
+              bookId: jsonMap['details'][0]['book_id'].toString() ?? '',
+              cId: jsonMap['details'][0]['00000003'].toString() ?? "",
+              dId: jsonMap['details'][0]['00000000002'].toString() ?? '',
+              jobNote: jsonMap['details'][0]['job_note'].toString() ?? '',
+              journeyFare:
+                  jsonMap['details'][0]['journey_fare'].toString() ?? '',
+              bookingFee: jsonMap['details'][0]['booking_fee'].toString() ?? "",
+              carParking: jsonMap['details'][0]['car_parking'].toString() ?? '',
+              waiting: jsonMap['details'][0]['waiting'].toString() ?? '',
+              tolls: jsonMap['details'][0]['tolls'].toString() ?? '',
+              extra: jsonMap['details'][0]['extra'].toString() ?? '',
+              jobStatus: jsonMap['details'][0]['job_status'].toString() ?? '',
+              dateJobAdd:
+                  jsonMap['details'][0]['date_job_add'].toString() ?? '',
+              cName: jsonMap['details'][0]['c_name'].toString() ?? '',
+              cEmail: jsonMap['details'][0]['c_email'].toString() ?? '',
+              cPhone: jsonMap['details'][0]['c_phone'].toString() ?? '',
+              cAddress: jsonMap['details'][0]['c_address'].toString() ?? '',
+              dName: jsonMap['details'][0]['d_name'].toString() ?? '',
+              dEmail: jsonMap['details'][0]['d_email'].toString() ?? '',
+              dPhone: jsonMap['details'][0]['d_phone'].toString() ?? '',
+              bTypeId: jsonMap['details'][0]['b_type_id'].toString() ?? '',
+              pickup: jsonMap['details'][0]['pickup'].toString() ?? '',
+              destination:
+                  jsonMap['details'][0]['destination'].toString() ?? '',
+              address: jsonMap['details'][0]['address'].toString() ?? '',
+              postalCode: jsonMap['details'][0]['postal_code'].toString() ?? '',
+              passenger: jsonMap['details'][0]['passenger'].toString() ?? '',
+              pickDate: jsonMap['details'][0]['pick_date'].toString() ?? '',
+              pickTime: jsonMap['details'][0]['pick_time'].toString() ?? '',
+              journeyType:
+                  jsonMap['details'][0]['journey_type'].toString() ?? '',
+              vId: jsonMap['details'][0]['v_id'].toString() ?? '',
+              luggage: jsonMap['details'][0]['luggage'].toString() ?? '',
+              childSeat: jsonMap['details'][0]['child_seat'].toString() ?? '',
+              flightNumber:
+                  jsonMap['details'][0]['flight_number'].toString() ?? '',
+              delayTime: jsonMap['details'][0]['delay_time'].toString() ?? '',
+              note: jsonMap['details'][0]['note'].toString() ?? '',
+              journeyDistance:
+                  jsonMap['details'][0]['journey_distance'].toString() ?? '',
+              bookingStatus:
+                  jsonMap['details'][0]['booking_status'].toString() ?? '',
+              bidStatus: jsonMap['details'][0]['bid_status'].toString() ?? '',
+              bidNote: jsonMap['details'][0]['bid_note'].toString() ?? '',
+              bookAddDate:
+                  jsonMap['details'][0]['bid_status'].toString() ?? ''));
+          myController.jobPusherContainer.value = true;
+        }
+
         // showAlert();
 // listFromPusher=jsonMap
         // jobDetailsFuture();
@@ -160,7 +180,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       channel.bind('job-withdrawn', (event) {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
         checkJobStatus();
-        print('the order socket from backaground:${jsonMap['data']}');
+        print('the order job withdrawn from pusher:${jsonMap['data']}');
 
         // });
       });
@@ -192,33 +212,40 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
         print("json data pusehrt${jsonMap['details']}");
         print("json data pusehrt${jsonMap['details'][0]['job_id']}");
-        startRingtoneAndVibrateLoop();
-        await prefs.setString(
-            'ts_id', jsonMap['details'][0]['ts_id'].toString());
-        print(
-            'the ts id from pusher is ${jsonMap['details'][0]['ts_id'].toString()}');
-        myController.timeSlotid.value =
-            jsonMap['details'][0]['ts_id'].toString();
-        myController.timeSlotDate.value =
-            jsonMap['details'][0]['ts_date'].toString();
-        myController.timeSlotStarttime.value =
-            jsonMap['details'][0]['start_time'].toString();
-        _startTime = jsonMap['details'][0]['start_time'].toString();
-        await prefs.remove('accepted');
-        myController.isTimeSlotAccepted.value =
-            prefs.getBool('accepted') ?? false;
-        _endTime =
-            jsonMap['details'][0]['end_time'].toString(); // e.g., "15:00:00"
-        print('the start time from pusher is ${_startTime}');
-        print('the end time from pusher is ${_endTime}');
-        myController.timeSlotEndTime.value =
-            jsonMap['details'][0]['end_time'].toString();
-        myController.timeSloPricePerhour.value =
-            jsonMap['details'][0]['price_hour'].toString();
-        myController.timeSlottotalPay.value =
-            jsonMap['details'][0]['total_pay'].toString();
-        myController.isTimeSlotDispatched.value = true;
-        _loadSavedState();
+
+        myController.currentLoggedInid.value = prefs.getString('d_id') ?? '';
+        if (myController.currentLoggedInid.value ==
+            jsonMap['details'][0]['d_id'].toString()) {
+          startToon();
+
+          startRingtoneAndVibrateLoop();
+          await prefs.setString(
+              'ts_id', jsonMap['details'][0]['ts_id'].toString());
+          print(
+              'the ts id from pusher is ${jsonMap['details'][0]['ts_id'].toString()}');
+          myController.timeSlotid.value =
+              jsonMap['details'][0]['ts_id'].toString();
+          myController.timeSlotDate.value =
+              jsonMap['details'][0]['ts_date'].toString();
+          myController.timeSlotStarttime.value =
+              jsonMap['details'][0]['start_time'].toString();
+          _startTime = jsonMap['details'][0]['start_time'].toString();
+          await prefs.remove('accepted');
+          myController.isTimeSlotAccepted.value =
+              prefs.getBool('accepted') ?? false;
+          _endTime =
+              jsonMap['details'][0]['end_time'].toString(); // e.g., "15:00:00"
+          print('the start time from pusher is ${_startTime}');
+          print('the end time from pusher is ${_endTime}');
+          myController.timeSlotEndTime.value =
+              jsonMap['details'][0]['end_time'].toString();
+          myController.timeSloPricePerhour.value =
+              jsonMap['details'][0]['price_hour'].toString();
+          myController.timeSlottotalPay.value =
+              jsonMap['details'][0]['total_pay'].toString();
+          myController.isTimeSlotDispatched.value = true;
+          _loadSavedState();
+        }
       });
       channel.bind('slot-withdrawn', (event) {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
@@ -233,22 +260,24 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Future<void> checkUserSession() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('loginToken');
-    // String? jobId = prefs.getString('jobId');
+    String? did = prefs.getString('d_id');
     final response = await http.post(
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/check-login-token.php'),
-      body: {'token': token.toString()},
+      Uri.parse('https://minicaboffice.com/api/driver/check-user-login.php'),
+      body: {'d_id': did.toString()},
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-
-      if (data['status'] == false) {
-        prefs.setString('loginToken', '');
-        prefs.setBool('isLogin', false);
+      // print('user session token${token}');
+      // print('user session token${did}');
+      // print('user from api token${data['data']['login_token']}');
+      if (data['status'] == false || token != data['data']['login_token']) {
+        await prefs.setString('loginToken', '');
+        await prefs.setBool('isLogin', false);
+        await prefs.clear();
         userSession?.cancel();
         context.pushNamed('Login');
-        if (!mounted) return setState(() {});
+        // if (!mounted) return setState(() {});
       } else {
         // Handle the job details as normal
       }
@@ -268,10 +297,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       // myController.visiblecontainer.value = true;
     });
 
-    // userSession = Timer.periodic(Duration(seconds: 4), (s) {
-    //   print('user session checking starts');
-    //   checkUserSession();
-    // });
+    userSession = Timer.periodic(Duration(seconds: 4), (s) {
+      print('user session checking starts');
+      checkUserSession();
+    });
     pushercallbg();
     timeSlotPusher();
     myController.jobDetails().then((s) {
@@ -351,6 +380,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     });
   }
 
+  checkId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String st = '';
+    st = prefs.getString('d_id') ?? '';
+    print('the did of logged in person is ${st}');
+  }
+
   Future getTimeSlotFroApi() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
@@ -358,10 +394,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       String? dId = prefs.getString('d_id');
       String? tsid = prefs.getString('ts_id');
       print('ts id ${tsid}');
+      print('did id ${dId}');
 
       var fields = {
         'd_id': dId.toString(),
-        'ts_id': tsid,
+        'ts_id': tsid.toString(),
       };
       var uri = Uri.parse(
           'https://www.minicaboffice.com/api/driver/fetch-time-slots.php');
@@ -374,7 +411,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         print('the response is ${response.body}');
         var jsonData = json.decode(response.body);
-        if (jsonData['data'].isNotEmpty) {
+        if (dId == jsonData['data'][0]['d_id']) {
           myController.isTimeSlotAccepted.value =
               prefs.getBool('accepted') ?? false;
           myController.isTimeSlotDispatched.value = true;
@@ -1712,6 +1749,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                               await prefs.remove('isLoggedIn');
                               // await prefs.clear();
                               await prefs.setBool('isLoggedIn', false);
+                              await prefs.clear();
                               context.pushNamed('Login');
                             },
                             child: AnimatedContainer(
@@ -1788,29 +1826,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                       children: [
                         // Obx(() => )
                         buildMap(),
-                        // TextButton(
-                        //     onPressed: () {
-                        //       getTimeSlotFroApi();
-                        //     },
-                        //     child: Text('call'))
-                        // isLoading
-                        //     ? Center(
-                        //         child: CircularProgressIndicator(
-                        //           valueColor: AlwaysStoppedAnimation<Color>(
-                        //             FlutterFlowTheme.of(context).primary,
-                        //           ),
-                        //         ),
-                        //       )
-                        //     :
-                        // currentLocation != null
-                        //     ?
-                        //     : Center(
-                        //         child: CircularProgressIndicator(
-                        //           valueColor: AlwaysStoppedAnimation<Color>(
-                        //             FlutterFlowTheme.of(context).primary,
-                        //           ),
-                        //         ),
-                        //       ),
 
                         Align(
                             alignment: const AlignmentDirectional(0, 0),
@@ -2124,6 +2139,188 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                           ],
                                         ),
                                       ),
+                                      Obx(
+                                        () => myController
+                                                .isTimeSlotDispatched.value
+                                            ? Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white),
+                                                width: double.infinity,
+                                                child: Column(
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Text(
+                                                      _formatTime(_seconds),
+                                                      style: TextStyle(
+                                                          fontSize: 22,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Text(
+                                                          'TimeSlot-Date :',
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        ),
+                                                        Text(
+                                                          myController
+                                                              .timeSlotDate
+                                                              .value,
+                                                          style: TextStyle(),
+                                                        ),
+                                                        Container(
+                                                          height: 15,
+                                                          width: 1,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        Text(
+                                                          'Start time :',
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        ),
+                                                        Text(
+                                                          myController
+                                                              .timeSlotStarttime
+                                                              .value,
+                                                          style: TextStyle(),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Text(
+                                                          'End time :',
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        ),
+                                                        Text(
+                                                          '${myController.timeSlotEndTime.value}',
+                                                          style: TextStyle(),
+                                                        ),
+                                                        Container(
+                                                          height: 15,
+                                                          width: 1,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        Text(
+                                                          'Price per hour :',
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        ),
+                                                        Text(
+                                                          '£${myController.timeSloPricePerhour.value}',
+                                                          style: TextStyle(),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                              '  Total pay : £${myController.timeSlottotalPay.value}',
+                                                              style: TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        myController.isTimeSlotAccepted
+                                                                    .value ==
+                                                                false
+                                                            ? InkWell(
+                                                                onTap: () {
+                                                                  print(
+                                                                      'time slot accept');
+                                                                  acceptTimeSlot();
+                                                                  // _startTimer();
+                                                                  // getTimeSlotFroApi();
+                                                                  // timeSlotPusher();
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  height: 40,
+                                                                  width: 90,
+                                                                  decoration: BoxDecoration(
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primary,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8)),
+                                                                  child: Center(
+                                                                    child: Text(
+                                                                      'Accept',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : Container(),
+                                                        myController.isTimeSlotAccepted
+                                                                    .value ==
+                                                                false
+                                                            ? GestureDetector(
+                                                                onTap: () {
+                                                                  rejectTimeSlot();
+                                                                  // _stopTimer();
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  height: 40,
+                                                                  width: 90,
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors
+                                                                          .red,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8)),
+                                                                  child: Center(
+                                                                    child: Text(
+                                                                      'Reject',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : Container(),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 5,
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            : Container(),
+                                      ),
                                     ],
                                   ),
                                   Padding(
@@ -2143,17 +2340,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                       ),
                                     ),
                                   ),
-                                  // Padding(
-                                  //   padding: const EdgeInsets.all(8.0),
-                                  //   child: TextButton(
-                                  //       onPressed: () {
-                                  //         myController.visiblecontainer.value =
-                                  //             false;
-                                  //         print(
-                                  //             myController.visiblecontainer.value);
-                                  //       },
-                                  //       child: Text('st')),
-                                  // )
                                 ],
                               ),
                             )),
@@ -2198,167 +2384,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                Obx(
-                  () => myController.isTimeSlotDispatched.value
-                      ? Container(
-                          decoration: BoxDecoration(color: Colors.white),
-                          width: double.infinity,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                _formatTime(_seconds),
-                                style: TextStyle(
-                                    fontSize: 22, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(
-                                    'TimeSlot-Date :',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    myController.timeSlotDate.value,
-                                    style: TextStyle(),
-                                  ),
-                                  Container(
-                                    height: 15,
-                                    width: 1,
-                                    color: Colors.grey,
-                                  ),
-                                  Text(
-                                    'Start time :',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    myController.timeSlotStarttime.value,
-                                    style: TextStyle(),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(
-                                    'End time :',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    '${myController.timeSlotEndTime.value}',
-                                    style: TextStyle(),
-                                  ),
-                                  Container(
-                                    height: 15,
-                                    width: 1,
-                                    color: Colors.grey,
-                                  ),
-                                  Text(
-                                    'Price per hour :',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    '£${myController.timeSloPricePerhour.value}',
-                                    style: TextStyle(),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        '  Total pay : £${myController.timeSlottotalPay.value}',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                  myController.isTimeSlotAccepted.value == false
-                                      ? InkWell(
-                                          onTap: () {
-                                            print('time slot accept');
-                                            acceptTimeSlot();
-                                            // _startTimer();
-                                            // getTimeSlotFroApi();
-                                            // timeSlotPusher();
-                                          },
-                                          child: Container(
-                                            height: 40,
-                                            width: 90,
-                                            decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            child: Center(
-                                              child: Text(
-                                                'Accept',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                  myController.isTimeSlotAccepted.value == false
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            rejectTimeSlot();
-                                            // _stopTimer();
-                                          },
-                                          child: Container(
-                                            height: 40,
-                                            width: 90,
-                                            decoration: BoxDecoration(
-                                                color: Colors.red,
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            child: Center(
-                                              child: Text(
-                                                'Reject',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              )
-                            ],
-                          ),
-                        )
-                      : Container(),
-                ),
-                // TextButton(
-                //     onPressed: () async {
-                //       SharedPreferences prefs =
-                //           await SharedPreferences.getInstance();
-                //       // await initializeService();
-                //       updateEndTime('10:10:10');
-                //     },
-                //     child: Text('next')),
                 Obx(() => Column(
                       children: [
                         myController.jobPusherContainer.value == true
@@ -2980,14 +3005,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                             : SizedBox.shrink(),
                       ],
                     )),
-                // TextButton(
-                //     onPressed: () {
-                //       if (myController.listFromPusher.isNotEmpty) {
-                //         getCoordinatesFromAddress(
-                //             myController.listFromPusher[0].pickup);
-                //       }
-                //     },
-                //     child: Text('data'))
               ],
             ),
           ),

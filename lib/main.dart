@@ -147,7 +147,6 @@ void onStart(ServiceInstance service) async {
 
         await prefs.setString('endTime', newEndTime!);
         timerController.endTime.value = preferences.getString('endTime') ?? '';
-        print('the endTime is here ${timerController.endTime.value}');
       }
     });
     service.on('setTsId').listen((event) async {
@@ -159,13 +158,12 @@ void onStart(ServiceInstance service) async {
 
         await prefs.setString('ts_id', tsId!);
         timerController.tsId.value = preferences.getString('ts_id') ?? '';
-        print('the endTime is here ${timerController.tsId.value}');
       }
     });
     timerController.currentTime.value =
         _getCurrentTime(); // Get current time in "HH:mm:ss"
 
-    print('check current time ${timerController.currentTime.value}');
+    // print('check current time ${timerController.currentTime.value}');
 
     if (timerController.currentTime.value == timerController.endTime.value) {
       completeTimeSlot(timerController
@@ -181,7 +179,6 @@ void onStart(ServiceInstance service) async {
           title: "Minicab Service",
           content: "Waiting for upcoming job",
         );
-        print('the duration is in background ');
       }
     }
     // print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
@@ -190,9 +187,7 @@ void onStart(ServiceInstance service) async {
       if (await checkApiStatus()) {
         showNotification();
       }
-    } catch (e) {
-      print('Error checking API status: $e');
-    }
+    } catch (e) {}
     if (await checkLatestTimeslot()) {
       showtimeSlotNoti();
     }
@@ -230,23 +225,15 @@ Future<void> completeTimeSlot(String tsid) async {
         'https://www.minicaboffice.com/api/driver/complete-time-slot.php'),
     body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
   );
-  print('the did ${dId}');
-  print('the ts_id ${tsid}');
-  print('the response body of complete status is ${response.body}');
   if (response.statusCode == 200) {
     var jsonResponse = json.decode(response.body);
     if (jsonResponse['status'] == true) {
       await prefs.remove('accepted');
       await prefs.remove('ts_id');
-      print('the staus is completed');
       // Assuming the API returns time in "HH:mm:ss" format
       // getTimeSlotFroApi();
-    } else {
-      print('Time slot issue');
-    }
-  } else {
-    print('Failed to fetch time slot');
-  }
+    } else {}
+  } else {}
 }
 
 Future<bool> checkApiStatus() async {
@@ -430,7 +417,6 @@ class _NavBarPageState extends State<NavBarPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('the navbar index${widget.page}');
     // checkUserSession();
     final tabs = {
       'Home': HomeWidget(),

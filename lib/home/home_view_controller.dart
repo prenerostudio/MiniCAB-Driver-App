@@ -22,6 +22,7 @@ class JobController extends GetxController {
       .obs;
   var visiblecontainer = false.obs;
   var jobPusherContainer = false.obs;
+  var currentLoggedInid = ''.obs;
   var isTimeSlotDispatched = false.obs;
   var isTimeSlotAccepted = false.obs;
   final timeSlotDate = '2024-09-09'.obs;

@@ -23,7 +23,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LoginWidget extends StatefulWidget {
-  const LoginWidget({super.key});
+  bool? isFromHome;
+  LoginWidget({super.key, this.isFromHome});
 
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
@@ -201,11 +202,12 @@ class _LoginWidgetState extends State<LoginWidget>
       return;
     }
     try {
+      print('entire phopne +${countryCode}${phoneController.text}');
       final url =
           Uri.parse('https://www.minicaboffice.com/api/driver/signin.php');
       final request = http.MultipartRequest('POST', url);
       request.fields.addAll({
-        'd_phone': '${enteredPhoneNumber ?? ''}',
+        'd_phone': '+${countryCode}${phoneController.text}',
         'd_password': '${PasswordController.text ?? ''}',
       });
       print(request.fields);
@@ -254,6 +256,7 @@ class _LoginWidgetState extends State<LoginWidget>
     );
   }
 
+  String countryCode = '';
   Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
     final permissionStatus = await Permission.location.request();
     final currentStatus = await Permission.location.status;
@@ -368,13 +371,17 @@ class _LoginWidgetState extends State<LoginWidget>
                                   obscureText: false,
                                   initialCountryCode: 'GB',
                                   onChanged: (phone) {
+                                    setState(() {});
                                     enteredPhoneNumber =
-                                        phone.completeNumber ?? '';
-                                    print(enteredPhoneNumber);
+                                        "${countryCode}${phone.completeNumber}" ??
+                                            '';
+                                    print("st code${enteredPhoneNumber}");
                                   },
                                   onCountryChanged: (country) {
-                                    print(
-                                        'Country changed to: ' + country.name);
+                                    countryCode = country.dialCode;
+                                    setState(() {});
+                                    print('Country changedss to: ' +
+                                        "${country.dialCode}");
                                   },
                                   decoration: InputDecoration(
                                     labelText: 'Mobile number',
