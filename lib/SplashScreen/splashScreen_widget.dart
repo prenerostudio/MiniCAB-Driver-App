@@ -36,7 +36,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     super.initState();
     checkLoginStatus();
 
-    checkAndRequestPermissions();
+    // checkAndRequestPermissions();
     checkLocationPermissionAndNavigate(context);
     _model = createModel(context, () => SplashScreenModel());
   }
@@ -48,32 +48,32 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     super.dispose();
   }
 
-  void checkAndRequestPermissions() async {
-    bool? isGrantedNullable = await SystemAlertWindow.checkPermissions();
-    bool isGranted = isGrantedNullable ?? false; // Default to false if null
-    if (!isGranted) {
-      bool requested = await SystemAlertWindow.requestPermissions() ?? false;
-      if (!requested) {
-        // Navigate to app settings
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: Text("Permission Required"),
-            content: Text(
-                "This app requires the 'Draw over other apps' permission to function properly. Please enable it in the app settings."),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Open Settings"),
-                onPressed: () {
-                  openAppSettings();
-                },
-              ),
-            ],
-          ),
-        );
-      }
-    }
-  }
+  // void checkAndRequestPermissions() async {
+  //   bool? isGrantedNullable = await SystemAlertWindow.checkPermissions();
+  //   bool isGranted = isGrantedNullable ?? false; // Default to false if null
+  //   if (!isGranted) {
+  //     bool requested = await SystemAlertWindow.requestPermissions() ?? false;
+  //     if (!requested) {
+  //       // Navigate to app settings
+  //       showDialog(
+  //         context: context,
+  //         builder: (BuildContext context) => AlertDialog(
+  //           title: Text("Permission Required"),
+  //           content: Text(
+  //               "This app requires the 'Draw over other apps' permission to function properly. Please enable it in the app settings."),
+  //           actions: <Widget>[
+  //             TextButton(
+  //               child: Text("Open Settings"),
+  //               onPressed: () {
+  //                 openAppSettings();
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   Future<void> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

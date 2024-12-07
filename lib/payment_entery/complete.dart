@@ -111,6 +111,8 @@ class _CompleteWidgetState extends State<CompleteWidget> {
         setState(() {});
         // await fetchFareData();
         final data = json.decode(response.body);
+        await sp.remove('isWaitingTrue');
+        await sp.remove('arrivalDone');
         sp.setInt('isRideStart', 0);
         // context.pushNamed('AcountStatements');
         Navigator.push(

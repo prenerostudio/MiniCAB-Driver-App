@@ -30,6 +30,7 @@ class Job {
   final String journeyType;
   final String vId;
   final String luggage;
+  final String? totalFee;
   final String childSeat;
   final String flightNumber;
   final String delayTime;
@@ -72,6 +73,7 @@ class Job {
     required this.journeyType,
     required this.vId,
     required this.luggage,
+    this.totalFee,
     required this.childSeat,
     required this.flightNumber,
     required this.delayTime,
@@ -116,6 +118,7 @@ class Job {
       journeyType: json['journey_type'],
       vId: json['v_id'],
       luggage: json['luggage'],
+      totalFee: json['totalFee'],
       childSeat: json['child_seat'],
       flightNumber: json['flight_number'],
       delayTime: json['delay_time'],

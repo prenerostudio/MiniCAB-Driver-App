@@ -621,8 +621,11 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                     children: [
                       FFButtonWidget(
                         onPressed: () async {
-                          Navigator.pop(context);
+                          // Navigator.pop(context);
+                          FlutterRingtonePlayer().stop();
+                          Vibration.cancel();
                           myController.visiblecontainer.value = true;
+
                           rejectJob(
                             '${jobItem.jobId}',
                             '${jobItem.bookId}',

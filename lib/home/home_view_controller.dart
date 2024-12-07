@@ -106,6 +106,8 @@ class JobController extends GetxController {
         await prefs.setString('waiting', waiting.value);
         await prefs.setString('tolls', tolls.value);
         await prefs.setString('pickDate', pickUpdate.value);
+        await prefs.setString(
+            'totalFee', parsedResponse['data'][0]['totalFee'] ?? '');
         await prefs.setString('pickTime', pickuptime.value);
         await prefs.setString('pickLocation', pickupLocatoin.value);
         await prefs.setString('dropLocation', dropLocation.value);
@@ -445,6 +447,4 @@ class JobController extends GetxController {
       updatePolyline();
     });
   }
-
-  
 }

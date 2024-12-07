@@ -217,7 +217,6 @@ class _DashboardWidgetState extends State<DashboardWidget>
     _initPlatformState();
   }
 
- 
   Future<void> _checkPermissions() async {
     await SystemAlertWindow.requestPermissions;
   }
@@ -1990,14 +1989,17 @@ class _DashboardWidgetState extends State<DashboardWidget>
       String responseBody = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseBody);
       print(jsonResponse);
-      String totalCommission = jsonResponse['data']['total_commission'] ?? "";
-      print(totalCommission);
-      setState(() {
-        dueBalance = totalCommission;
-        print('Total commission: $dueBalance');
-      });
+      if (jsonResponse['status'] == false) {
+      } else {
+        String totalCommission = jsonResponse['data']['total_commission'] ?? "";
+        print(totalCommission);
+        setState(() {
+          dueBalance = totalCommission;
+          print('Total commission: $dueBalance');
+        });
 
-      print('Total commission: $totalCommission');
+        print('Total commission: $totalCommission');
+      }
     } else {
       print('Failed to fetch data: ${response.reasonPhrase}');
     }

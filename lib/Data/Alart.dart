@@ -12,7 +12,7 @@ import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/index.dart';
 import 'package:mini_cab/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:system_alert_window/system_alert_window.dart';
+
 import 'package:vibration/vibration.dart';
 import '../Model/jobDetails.dart';
 import '../components/upcommingjob_Accepted_widget.dart';

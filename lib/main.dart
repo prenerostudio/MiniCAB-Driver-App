@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +19,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:mini_cab/BidHistory/bid_history_filter_widget.dart';
 import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
+import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/home/timer_controller.dart';
+import 'package:mini_cab/main_overlay_example/true_call_overlay.dart';
 import 'package:mini_cab/upcomming/upcomming_widget.dart';
 import 'package:mini_cab/zones/new_class.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -51,6 +55,42 @@ Future<void> main() async {
   notification();
   initializeService();
   runApp(MyApp());
+}
+
+// @pragma("vm:entry-point")
+// void overlayMain() {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   runApp(
+//     const MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home:TrueCallerOverlay(),
+//     ),
+//   );
+// }
+JobController myController = Get.put(JobController());
+
+class St extends StatefulWidget {
+  const St({super.key});
+
+  @override
+  State<St> createState() => _StState();
+}
+
+class _StState extends State<St> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Container(
+            height: 300,
+            width: 400,
+            color: Colors.red,
+          )
+        ],
+      ),
+    );
+  }
 }
 
 Future notification() async {
@@ -138,6 +178,36 @@ void onStart(ServiceInstance service) async {
     String? startTime = preferences.getString('startTime');
 
     // if (startTime != null && timerController.endTime.value != null) {
+    service.on('StartRide').listen((event) async {
+      // Example: Update the endTime from the UI
+      if (event != null && event['startRideEvent1'] != null) {
+        print('first triggers');
+        String pickLat = event['startRideEvent1'];
+        String pickLng = event['startRideEvent2'];
+        startTracking(double.parse(pickLat), double.parse(pickLng));
+      }
+    });
+    service.on('StartRide2').listen((event) async {
+      // Example: Update the endTime from the UI
+
+      if (event != null && event['startRideSecondEvent1'] != null) {
+        print('second triggers');
+        String pickLat = event['startRideSecondEvent1'];
+        String pickLng = event['startRideSecondEvent2'];
+        startTrackingforpickUp(double.parse(pickLat), double.parse(pickLng));
+      }
+    });
+    service.on('StartRide3').listen((event) async {
+      // Example: Update the endTime from the UI
+      if (event != null && event['startRideThirdEvent1'] != null) {
+        print('third triggers');
+        String pickLat = event['startRideThirdEvent1'];
+        String pickLng = event['startRideThirdEvent2'];
+        String timeCount = event['timecount'];
+        startTrackingfordropOf(
+            double.parse(pickLat), double.parse(pickLng), timeCount);
+      }
+    });
     service.on('updateTimer').listen((event) async {
       // Example: Update the endTime from the UI
       if (event != null && event['endTime'] != null) {
@@ -211,9 +281,144 @@ void onStart(ServiceInstance service) async {
   });
 }
 
+Timer? locationTrackingTimer;
+Future startTracking(double pickLat, double pickLng) async {
+  SharedPreferences sp = await SharedPreferences.getInstance();
+
+  locationTrackingTimer?.cancel(); // Stop the tracking
+  locationTrackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    double distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      pickLat,
+      pickLng,
+    );
+
+    if (distance < 4000) {
+      // You can set the threshold to any value (e.g., 50 meters)
+      // User has reached the destination
+      print("first listner");
+      //  await     _showOverlay();c
+      showNotificationFor1(
+          'Customer Location', 'You have reached on customer location.');
+      locationTrackingTimer?.cancel(); // Stop the tracking
+      locationTrackingTimer = null; // Stop the tracking
+      // Navigator.pop(context);
+      await sp.setBool('isWaitingTrue', true);
+      await sp.setBool('show', false);
+      await sp.setInt('isRideStart', 1);
+    } else {
+      print("no reached the location");
+    }
+  });
+}
+
 String _getCurrentTime() {
   DateTime now = DateTime.now();
   return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+}
+
+Timer? locationTrackingTimer1;
+Timer? locationTrackingTimer2;
+Future startTrackingforpickUp(double pickLat, double pickLng) async {
+  SharedPreferences sp = await SharedPreferences.getInstance();
+
+  locationTrackingTimer1?.cancel(); // Stop the tracking
+  locationTrackingTimer1 = Timer.periodic(Duration(seconds: 5), (timer) async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    double distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      pickLat,
+      pickLng,
+    );
+
+    if (distance < 4000) {
+      // You can set the threshold to any value (e.g., 50 meters)
+      // User has reached the destination
+      print("secnd listner");
+      //  await     _showOverlay();
+      await showNotificationFor1(
+          'Customer Location', 'You have reached on customer location.');
+      locationTrackingTimer1?.cancel(); // Stop the tracking
+      locationTrackingTimer1 = null;
+    } else {
+      print("no reached the location");
+    }
+  });
+}
+
+Future startTrackingfordropOf(
+    double pickLat, double pickLng, String _timerDisplayValue) async {
+  SharedPreferences sp = await SharedPreferences.getInstance();
+  String? did = sp.getString('d_id');
+  String? jobid = sp.getString('job_id');
+  // if (locationTrackingTimer2 != null) {
+  //   locationTrackingTimer2!.cancel();
+  // }
+  locationTrackingTimer2?.cancel(); // Cancel if not null
+  locationTrackingTimer2 = Timer.periodic(Duration(seconds: 5), (timer) async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    double distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      pickLat,
+      pickLng,
+    );
+
+    if (distance < 4000) {
+      // You can set the threshold to any value (e.g., 50 meters)
+      // User has reached the destination
+      print("third listner!");
+      //  await     _showOverlay();
+      await showNotificationFor1(
+          'Ride Complete', 'You have reached on destination');
+
+      locationTrackingTimer2?.cancel();
+      locationTrackingTimer2 = null; // Set to null to avoid reuse
+
+      // print('if condtion isridestarted is $isRideStarted');
+
+      await sp.remove('isWaitingTrue');
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
+      request.fields.addAll({
+        'd_id': '${did}',
+        'job_id': '${jobid}',
+        'waiting_time': _timerDisplayValue
+        // 'waiting_time': _model.timerValue.toString()
+      });
+
+      try {
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+        } else {}
+      } catch (e) {}
+      // _stopTimer();
+      // _model.timerController.onStopTimer();
+      // await sp.setString('timerValue', _model.timerValue.toString());
+      await sp.setInt('isRideStart', 2);
+      // Timer(Duration(seconds: 2), () {
+      //   Navigator.push(
+      //       context, MaterialPageRoute(builder: (context) => PobWidget()));
+      // });
+
+      // isRideStarted = false;
+      // isWaiting = false;
+    } else {
+      print("no reached the location");
+    }
+  });
 }
 
 Future<void> completeTimeSlot(String tsid) async {
@@ -259,28 +464,55 @@ Future<bool> checkApiStatus() async {
 }
 
 Future<bool> checkLatestTimeslot() async {
-  final prefs = await SharedPreferences.getInstance();
-  final dId = prefs.getString('d_id');
-  final response = await http.post(
-    Uri.parse('https://www.minicaboffice.com/api/driver/fetch-time-slot.php'),
-    body: {'d_id': dId.toString()},
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final dId = prefs.getString('d_id');
+    final response = await http.post(
+      Uri.parse('https://www.minicaboffice.com/api/driver/fetch-time-slot.php'),
+      body: {'d_id': dId.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      final parsedResponse = json.decode(response.body);
+
+      if (parsedResponse['status'] == true) {
+        await prefs.setString(
+            "ts_id", parsedResponse['data'][0]['ts_id'].toString());
+        // print('New job available: ${DateTime.now()}');
+        return true;
+      }
+    } else {
+      // print("API check failed with status code: ${response.statusCode}");
+      throw Exception('API Check Failed');
+    }
+    // print("No new jobs found.");
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+showNotificationFor1(String title, String subtitle) async {
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'your_channel_id',
+    'your_channel_name',
+    channelDescription: 'your_channel_description',
+    importance: Importance.max,
+    ticker: 'ticker',
   );
 
-  if (response.statusCode == 200) {
-    final parsedResponse = json.decode(response.body);
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    if (parsedResponse['status'] == true) {
-      await prefs.setString(
-          "ts_id", parsedResponse['data'][0]['ts_id'].toString());
-      // print('New job available: ${DateTime.now()}');
-      return true;
-    }
-  } else {
-    // print("API check failed with status code: ${response.statusCode}");
-    throw Exception('API Check Failed');
-  }
-  // print("No new jobs found.");
-  return false;
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    title,
+    subtitle,
+    platformChannelSpecifics,
+    payload: 'item x',
+  );
 }
 
 void showNotification() async {

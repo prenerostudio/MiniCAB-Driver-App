@@ -148,7 +148,7 @@ class _SignupWidgetState extends State<SignupWidget> {
     setState(() {});
 
     try {
-      print('+${countryCode}${phoneController.text}');
+      print('the picked number +${countryCode}${phoneController.text}');
       print('${passwordController.text}');
       final response = await http.post(
         Uri.parse('https://www.minicaboffice.com/api/driver/register.php'),
@@ -157,8 +157,9 @@ class _SignupWidgetState extends State<SignupWidget> {
               nameController.text ?? '', // Use default values or handle nulls
           'd_email': emailAddressController.text ?? '',
 
-          'd_phone': "+${countryCode}${phoneController.text}" ?? '',
-          'd_password': passwordController.text.toString() ?? '',
+          'd_phone': "${enteredPhoneNumber}" ?? '',
+          // 'd_phone': "+${countryCode}${phoneController.text}" ?? '',
+          'd_password': PasswordController.text.toString() ?? '',
           'licence_authority': dropDownValue2 ?? '',
         },
       );

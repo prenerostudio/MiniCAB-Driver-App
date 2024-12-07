@@ -202,12 +202,12 @@ class _LoginWidgetState extends State<LoginWidget>
       return;
     }
     try {
-      print('entire phopne +${countryCode}${phoneController.text}');
+      print('entire phopne ${enteredPhoneNumber}');
       final url =
           Uri.parse('https://www.minicaboffice.com/api/driver/signin.php');
       final request = http.MultipartRequest('POST', url);
       request.fields.addAll({
-        'd_phone': '+${countryCode}${phoneController.text}',
+        'd_phone': '$enteredPhoneNumber',
         'd_password': '${PasswordController.text ?? ''}',
       });
       print(request.fields);
@@ -373,8 +373,7 @@ class _LoginWidgetState extends State<LoginWidget>
                                   onChanged: (phone) {
                                     setState(() {});
                                     enteredPhoneNumber =
-                                        "${countryCode}${phone.completeNumber}" ??
-                                            '';
+                                                phone.completeNumber ?? '';
                                     print("st code${enteredPhoneNumber}");
                                   },
                                   onCountryChanged: (country) {

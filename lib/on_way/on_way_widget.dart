@@ -1,3 +1,5 @@
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
@@ -6,6 +8,7 @@ import 'package:mini_cab/Data/links.dart';
 import 'package:mini_cab/components/customer_details_widget.dart';
 import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/home/timer_class.dart';
+import 'package:mini_cab/pob/pob_widget.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
@@ -164,19 +167,19 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         _currentPosition = position;
         // currentLatitude = position.latitude;
         // currentLongitude = position.longitude;
-        print("the current lat long: ${_currentPosition!.latitude}");
       });
-    } catch (e) {
-      print("Error getting current location: $e");
-    }
+    } catch (e) {}
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
+    _loadSavedTimer();
     getlocation();
     _trackLocationChanges();
+
+    // Load the saved timer state
     loadata().then((s) {});
     startJobStatusTimer();
     pushercallbg();
@@ -193,7 +196,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     // Ensure the timer is only started once
 
     myController.timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      print('the timer is ');
       jobStatus();
     });
     // if (_timer == null || !_timer!.isActive) {
@@ -201,10 +203,139 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     // }
   }
 
+  double latitudeforGooglmap = 0;
+  double lngforGooglmap = 0;
+  Future<void> getLatLngFromAddress(String address) async {
+    try {
+      // Geocode the address to get a list of locations
+      List<Location> locations = await locationFromAddress(address);
+
+      if (locations.isNotEmpty) {
+        // The first location in the list will be the best match
+        latitudeforGooglmap = locations[0].latitude;
+        lngforGooglmap = locations[0].longitude;
+        setState(() {});
+      } else {}
+    } catch (e) {}
+  }
+
+  Timer? locationTrackingTimer;
+  Future startTrackingforpickUp(double pickLat, double pickLng) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    locationTrackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      double distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        pickLat,
+        pickLng,
+      );
+
+      if (distance < 4000) {
+        // You can set the threshold to any value (e.g., 50 meters)
+        // User has reached the destination
+        print("Ride complete!");
+        //  await     _showOverlay();
+        await showNotification(
+            'Customer Location', 'You have reached on customer location.');
+        locationTrackingTimer!.cancel(); // Stop the tracking
+      } else {
+        print("no reached the location");
+      }
+    });
+  }
+
+  Future startTrackingfordropOf(double pickLat, double pickLng) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    locationTrackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      double distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        pickLat,
+        pickLng,
+      );
+
+      if (distance < 4000) {
+        // You can set the threshold to any value (e.g., 50 meters)
+        // User has reached the destination
+        print("Ride complete!");
+        //  await     _showOverlay();
+        await showNotification(
+            'Ride Complete', 'You have reached on destination');
+
+        locationTrackingTimer!.cancel(); // Stop the tracking
+
+        print('if condtion isridestarted is $isRideStarted');
+
+        await sp.remove('isWaitingTrue');
+        var request = http.MultipartRequest(
+            'POST',
+            Uri.parse(
+                'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
+        request.fields.addAll({
+          'd_id': '${did}',
+          'job_id': '${jobid}',
+          'waiting_time': _timerDisplayValue
+          // 'waiting_time': _model.timerValue.toString()
+        });
+
+        try {
+          http.StreamedResponse response = await request.send();
+
+          if (response.statusCode == 200) {
+          } else {}
+        } catch (e) {}
+        _stopTimer();
+        _model.timerController.onStopTimer();
+        await sp.setString('timerValue', _formatTime(_elapsedSeconds));
+        await sp.setInt('isRideStart', 2);
+        Timer(Duration(seconds: 2), () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PobWidget()));
+        });
+
+        isRideStarted = false;
+        isWaiting = false;
+      } else {
+        print("no reached the location");
+      }
+    });
+  }
+
+  showNotification(String title, String subtitle) async {
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      ticker: 'ticker',
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      subtitle,
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
+  }
+
   Future loadata() async {
     // myController.jobDetails();
     SharedPreferences sp = await SharedPreferences.getInstance();
     isWaiting = sp.getBool('isWaitingTrue') ?? false;
+    isRideStarted = sp.getBool('arrivalDone') ?? false;
+    print('user done arrival swipe');
     setState(() {});
     // widget.did = sp.getString('did');
     // widget.jobid = sp.getString('jobId');
@@ -222,7 +353,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     // widget.cemail = sp.getString('cEmail');
     await myController.acceptedJobDetails().then((value) {
       if (value != null) {
-        print("after job details $value");
         did = value.dId;
         jobid = value.jobId;
         pickup = value.pickup;
@@ -239,7 +369,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         cemail = value.cEmail;
         getCoordinatesFromAddress(pickup!);
       } else {
-        print("No job details found.");
         // Handle the null case, e.g., show an error message, redirect, etc.
       }
     });
@@ -259,32 +388,31 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
   String job = '';
 
-  @override
-  void dispose() {
-    Apitimer?.cancel();
-    _model.dispose();
+  // @override
+  // void dispose() {
+  //   Apitimer?.cancel();
+  //   _model.dispose();
 
-    super.dispose();
-  }
+  //   super.dispose();
+  // }
 
   static const String _baseUrl =
       'https://maps.googleapis.com/maps/api/directions/json';
   void checkDriverProximity(double currentLatitude, double currentLongitude,
       double pickupLatitude, double pickupLongitude,
       {double precision = 0.00030}) {
-    print(currentLatitude);
-    print(pickupLatitude);
     if (isWaiting &&
         ((currentLatitude - pickupLatitude).abs() < precision) &&
         ((currentLongitude - pickupLongitude).abs() < precision)) {
       isRideStarted = true;
       isWaiting = false;
       _model.timerController.onStartTimer();
-      print('Ride started');
+      _startTimer();
     } else {
       isRideStarted = true;
       isWaiting = false;
       _model.timerController.onStartTimer();
+      _startTimer();
       Fluttertoast.showToast(
         msg: "You are not near the customer location",
       );
@@ -308,7 +436,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     channel.bind('job-withdrawn', (event) {
       Map<String, dynamic> jsonMap = json.decode(event!.data!);
       jobStatus();
-      print('the order socket from backaground:${jsonMap['data']}');
 
       // });
     });
@@ -328,7 +455,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['status'] == false) {
-        print('the response is $data');
         prefs.remove("isRideStart");
         setState(() {});
         myController.visiblecontainer.value = false;
@@ -340,6 +466,67 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     } else {
       // Handle the error
     }
+  }
+
+  int? _timerMilliseconds;
+  FlutterFlowTimerController _timerController =
+      FlutterFlowTimerController(StopWatchTimer(mode: StopWatchMode.countUp));
+  String _timerDisplayValue = "00:00:00";
+
+  Future<void> _loadSavedTimer() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    // await _clearSavedTimerState();
+    setState(() {
+      _elapsedSeconds = sp.getInt('savedTimerMilliseconds') ?? 0;
+      _timerMilliseconds = sp.getInt('savedTimerMilliseconds') ?? 0;
+      _timerDisplayValue = StopWatchTimer.getDisplayTime(_timerMilliseconds!,
+          milliSecond: false);
+      print('the saved time $_timerDisplayValue');
+      print('the saved miliSecondtime $_timerMilliseconds');
+    });
+    if (_elapsedSeconds > 0) {
+      _startTimer();
+      _timerController.onStartTimer();
+    }
+  }
+
+  Future<void> _saveTimerState(int milliseconds) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    await sp.setInt('savedTimerMilliseconds', milliseconds);
+  }
+
+  Future<void> _clearSavedTimerState() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    await sp.remove('savedTimerMilliseconds');
+  }
+
+  Timer? _timercounter;
+  int _elapsedSeconds = 0;
+
+  String _formatTime(int seconds) {
+    final duration = Duration(seconds: seconds);
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    final secs = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return "$hours:$minutes:$secs";
+  }
+
+  void _startTimer() {
+    if (_timercounter != null) {
+      _timercounter!.cancel();
+    }
+    _timercounter = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+        _saveTimerState(_elapsedSeconds);
+      });
+    });
+  }
+
+  void _stopTimer() async {
+    await _clearSavedTimerState();
+    _timercounter?.cancel();
+    _timercounter = null;
   }
 
   @override
@@ -432,32 +619,44 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                       color: FlutterFlowTheme.of(context).info,
                                       size: 24,
                                     ),
-                                    FlutterFlowTimer(
-                                      initialTime: _model.timerMilliseconds,
-                                      getDisplayTime: (value) =>
-                                          StopWatchTimer.getDisplayTime(value,
-                                              milliSecond: false),
-                                      controller: _model.timerController,
-                                      onEnded: () {},
-                                      onChanged:
-                                          (value, displayTime, shouldUpdate) {
-                                        _model.timerMilliseconds = value;
-                                        _model.timerValue = displayTime;
-                                        if (shouldUpdate) setState(() {});
-                                        print(_model.timerValue);
-                                      },
-                                      textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Open Sans',
-                                            color: FlutterFlowTheme.of(context)
-                                                .info,
-                                            fontSize: 18,
-                                            letterSpacing: 0,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                    Text(
+                                      _formatTime(_elapsedSeconds),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
                                     ),
+                                    // FlutterFlowTimer(
+                                    //   initialTime: _timerMilliseconds!,
+                                    //   getDisplayTime: (value) =>
+                                    //       StopWatchTimer.getDisplayTime(value,
+                                    //           milliSecond: false),
+                                    //   controller: _timerController,
+                                    //   onEnded: () async {
+                                    //     await _clearSavedTimerState();
+                                    //   },
+                                    //   onChanged: (value, displayTime,
+                                    //       shouldUpdate) async {
+                                    //     _timerMilliseconds = value;
+                                    //     _timerDisplayValue = displayTime;
+                                    //     _model.timerMilliseconds = value;
+                                    //     _model.timerValue = displayTime;
+                                    //     await _saveTimerState(value);
+
+                                    //     if (shouldUpdate) setState(() {});
+                                    //   },
+                                    //   textAlign: TextAlign.center,
+                                    //   style: FlutterFlowTheme.of(context)
+                                    //       .bodyMedium
+                                    //       .override(
+                                    //         fontFamily: 'Open Sans',
+                                    //         color: FlutterFlowTheme.of(context)
+                                    //             .info,
+                                    //         fontSize: 18,
+                                    //         letterSpacing: 0,
+                                    //         fontWeight: FontWeight.w600,
+                                    //       ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -807,7 +1006,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                     ),
                     onSwipe: () {
                       setState(() {});
-                      print('ststs');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(isRideStarted
@@ -822,141 +1020,155 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                           await SharedPreferences.getInstance();
                       setState(() {});
                       if (isRideStarted) {
-                        var request = http.MultipartRequest(
-                            'POST',
-                            Uri.parse(
-                                'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
-                        request.fields.addAll({
-                          'd_id': '${did}',
-                          'job_id': '${jobid}',
-                          'waiting_time': _model.timerValue.toString()
-                        });
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Choose Map Option'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Image.asset(
+                                          'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
+                                    ),
+                                    title: Text('Open in Google Maps'),
+                                    onTap: () async {
+                                      // await sp.remove('isWaitingTrue');
+                                      // await sp.remove('isWaitingTrue');
+                                      await getLatLngFromAddress(dropoff!);
+                                      Navigator.pop(context);
+                                      startRideTrackingthird(
+                                          latitudeforGooglmap.toString(),
+                                          lngforGooglmap.toString());
+                                      await startTrackingfordropOf(
+                                          latitudeforGooglmap, lngforGooglmap);
+                                      await MapUtils.navigateTo(
+                                          latitudeforGooglmap, lngforGooglmap);
 
-                        try {
-                          http.StreamedResponse response = await request.send();
+                                      // start from here
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Image.asset(
+                                          'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
+                                    ),
+                                    title: Text('Using App'),
+                                    onTap: () async {
+                                      // Navigator.pop(context);
+                                      print(
+                                          'if condtion isridestarted is $isRideStarted');
 
-                          if (response.statusCode == 200) {
-                            print(await response.stream.bytesToString());
-                          } else {
-                            print('Error: ${response.reasonPhrase}');
-                          }
-                        } catch (e) {
-                          print('Exception occurred: $e');
-                        }
-                        _model.timerController.onStopTimer();
-                        await sp.setString(
-                            'timerValue', _model.timerValue.toString());
-                        await sp.setInt('isRideStart', 2);
-                        context.pushNamed(
-                          'Pob',
-                          queryParameters: {
-                            'did': serializeParam(
-                              '${did}',
-                              ParamType.String,
-                            ),
-                            'jobid': serializeParam(
-                              '${jobid}',
-                              ParamType.String,
-                            ),
-                            'pickup': serializeParam(
-                              '${pickup}',
-                              ParamType.String,
-                            ),
-                            'dropoff': serializeParam(
-                              '${dropoff}',
-                              ParamType.String,
-                            ),
-                            'cName': serializeParam(
-                              '${cName}',
-                              ParamType.String,
-                            ),
-                            'fare': serializeParam(
-                              '${fare}',
-                              ParamType.String,
-                            ),
-                            'distance': serializeParam(
-                              '${distance}',
-                              ParamType.String,
-                            ),
-                            'note': serializeParam(
-                              '${note}',
-                              ParamType.String,
-                            ),
-                            'pickTime': serializeParam(
-                              '${pickTime}',
-                              ParamType.String,
-                            ),
-                            'pickDate': serializeParam(
-                              '${pickDate}',
-                              ParamType.String,
-                            ),
-                            'passenger': serializeParam(
-                              '${passenger}',
-                              ParamType.String,
-                            ),
-                            'luggage': serializeParam(
-                              '${luggage}',
-                              ParamType.String,
-                            ),
-                            'cnumber': serializeParam(
-                              '${cnumber}',
-                              ParamType.String,
-                            ),
-                            'cemail': serializeParam(
-                              '${cemail}',
-                              ParamType.String,
-                            ),
-                          }.withoutNulls,
+                                      await sp.remove('isWaitingTrue');
+                                      var request = http.MultipartRequest(
+                                          'POST',
+                                          Uri.parse(
+                                              'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
+                                      request.fields.addAll({
+                                        'd_id': '${did}',
+                                        'job_id': '${jobid}',
+                                        'waiting_time': _timerDisplayValue
+                                        //     _model.timerValue.toString()
+                                      });
+
+                                      try {
+                                        http.StreamedResponse response =
+                                            await request.send();
+
+                                        if (response.statusCode == 200) {
+                                        } else {}
+                                      } catch (e) {}
+                                      _stopTimer();
+                                      _model.timerController.onStopTimer();
+                                      await sp.setString('timerValue',
+                                          _formatTime(_elapsedSeconds));
+
+                                      await sp.setInt('isRideStart', 2);
+                                      // Timer(Duration(seconds: 2), () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PobWidget()));
+                                      // });
+
+                                      isRideStarted = false;
+                                      isWaiting = false;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         );
-                        isRideStarted = false;
-                        isWaiting = false;
                       } else if (isWaiting) {
+                        await sp.setBool('arrivalDone', true);
+                        print('arrival swiped');
+                        print(
+                            'else if condtion isridestarted is $isRideStarted and iswaiting is $isWaiting');
                         checkDriverProximity(currentLatitude, currentLongitude,
                             pickupLat, pickupLng);
                       } else {
-                        sp.setBool('isWaitingTrue', true);
+                        print(
+                            'only else and alert showing   condtion isridestarted is $isRideStarted and iswaiting is $isWaiting');
+                        await sp.setBool('isWaitingTrue', true);
                         waitingPassanger();
-                        print('swipped called');
                         isWaiting = true;
 
-                        // showDialog(
-                        //   context: context,
-                        //   builder: (BuildContext context) {
-                        //     return AlertDialog(
-                        //       title: Text('Choose Map Option'),
-                        //       content: Column(
-                        //         mainAxisSize: MainAxisSize.min,
-                        //         children: [
-                        //           ListTile(
-                        //             leading: SizedBox(
-                        //               width: 25,
-                        //               height: 25,
-                        //               child: Image.asset(
-                        //                   'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
-                        //             ),
-                        //             title: Text('Open in Google Maps'),
-                        //             onTap: () {
-                        //               Navigator.pop(context);
-                        //               MapUtils.navigateTo(pickupLat, pickupLng);
-                        //             },
-                        //           ),
-                        //           ListTile(
-                        //             leading: SizedBox(
-                        //               width: 25,
-                        //               height: 25,
-                        //               child: Image.asset(
-                        //                   'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
-                        //             ),
-                        //             title: Text('Using App'),
-                        //             onTap: () {
-                        //               Navigator.pop(context);
-                        //             },
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     );
-                        //   },
-                        // );
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Choose Map Option'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Image.asset(
+                                          'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
+                                    ),
+                                    title: Text('Open in Google Maps'),
+                                    onTap: () async {
+                                      await getLatLngFromAddress(pickup!);
+                                      startRideTracking(
+                                          latitudeforGooglmap.toString(),
+                                          lngforGooglmap.toString());
+                                      await startTrackingforpickUp(
+                                          latitudeforGooglmap, lngforGooglmap);
+
+                                      Navigator.pop(context);
+                                      await MapUtils.navigateTo(
+                                          latitudeforGooglmap, lngforGooglmap);
+
+                                      // start from here
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: Image.asset(
+                                          'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
+                                    ),
+                                    title: Text('Using App'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
                       }
                     },
                   ),
@@ -967,6 +1179,29 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         ),
       ),
     );
+  }
+
+  void startRideTracking(
+      String customerLocation1, String customerLocation2) async {
+    setState(() {});
+    final service = FlutterBackgroundService();
+    // This will send the 'updateTimer' event to the background service
+    service.invoke('StartRide2', {
+      'startRideSecondEvent1': customerLocation1,
+      'startRideSecondEvent2': customerLocation2,
+    });
+  }
+
+  void startRideTrackingthird(
+      String customerLocation1, String customerLocation2) async {
+    setState(() {});
+    final service = FlutterBackgroundService();
+    // This will send the 'updateTimer' event to the background service
+    service.invoke('StartRide3', {
+      'startRideThirdEvent1': customerLocation1,
+      'startRideThirdEvent2': customerLocation2,
+      'timecount': _timerDisplayValue,
+    });
   }
 
   Widget buildMap() {
@@ -1030,9 +1265,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         currentLatitude = position.latitude;
         currentLongitude = position.longitude;
       });
-    } catch (e) {
-      print("Error getting current location: $e");
-    }
+    } catch (e) {}
   }
 
   StreamSubscription<Position>? positionStream;
@@ -1092,7 +1325,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   }
 
   Future _getPolyline(double destinationLat, double desLng) async {
-    print('tapped');
     const apiKey =
         'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
     var origin =
@@ -1100,7 +1332,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    print("the polylines start");
     final response = await http.post(Uri.parse(// can be get and post request
         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
@@ -1126,7 +1357,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                 .map((point) => LatLng(point.latitude, point.longitude))
                 .toList();
             polylines.clear();
-            print("the polylines point is $points");
             polylines.add(Polyline(
               // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
               // patterns: points,
@@ -1179,15 +1409,11 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         setState(() {});
         convertedLat = locations.first.latitude;
         convertedLng = locations.first.longitude;
-        print(
-            'convert Latitude: ${convertedLat}, convert longitude: ${convertedLng}');
         setcustommarkeritem();
 
         // _getPolyline(locations.first.latitude, locations.first.longitude);
       }
-    } catch (e) {
-      print('Error occurred: $e');
-    }
+    } catch (e) {}
   }
 
   double convertedLat = 0;
@@ -1198,9 +1424,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
 
-      if (dId == null) {
-        print('d_id not found in shared preferences.');
-      }
+      if (dId == null) {}
       var request = http.MultipartRequest('POST',
           Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'));
       request.fields.addAll({
@@ -1210,13 +1434,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+      } else {}
+    } catch (e) {}
   }
 
   Future<void> waitingPassanger() async {
@@ -1224,9 +1443,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
 
-      if (dId == null) {
-        print('d_id not found in shared preferences.');
-      }
+      if (dId == null) {}
       var request = http.MultipartRequest(
           'POST',
           Uri.parse(
@@ -1238,12 +1455,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-      }
+      } else {}
     } catch (error) {
-      print('Error: $error');
       // Handle the error as needed
     }
   }

@@ -94,7 +94,6 @@ class AccpetingOrderViewModel extends GetxController {
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${destinationLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    print("the polylines start");
     final response = await http.post(Uri.parse(// can be get and post request
         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
@@ -120,7 +119,6 @@ class AccpetingOrderViewModel extends GetxController {
                 .map((point) => LatLng(point.latitude, point.longitude))
                 .toList();
             // polylines.value.clear();
-            print("the polylines point is $points");
             polylines.add(Polyline(
               // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
               // patterns: points,

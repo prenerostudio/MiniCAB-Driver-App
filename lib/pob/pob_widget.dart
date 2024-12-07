@@ -142,7 +142,6 @@ class _PobWidgetState extends State<PobWidget> {
     // widget.cemail = sp.getString('cEmail');
     await myController.acceptedJobDetails().then((value) {
       if (value != null) {
-        print("after job details $value");
         did = value.dId;
         jobid = value.jobId;
         pickup = value.pickup;
@@ -158,7 +157,6 @@ class _PobWidgetState extends State<PobWidget> {
         cnumber = value.cPhone;
         cemail = value.cEmail;
       } else {
-        print("No job details found.");
         // Handle the null case, e.g., show an error message, redirect, etc.
       }
     });
@@ -577,19 +575,15 @@ class _PobWidgetState extends State<PobWidget> {
         setState(() {});
         convertedLat = locations.first.latitude;
         convertedLng = locations.first.longitude;
-        print(
-            'convert Latitude: ${convertedLat}, convert longitude: ${convertedLng}');
         setcustommarkeritem();
 
         _getPolyline(locations.first.latitude, locations.first.longitude);
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
   Future _getPolyline(double destinationLat, double desLng) async {
-    print('tapped');
     const apiKey =
         'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
     var origin =
@@ -597,7 +591,6 @@ class _PobWidgetState extends State<PobWidget> {
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    print("the polylines start");
     final response = await http.post(Uri.parse(// can be get and post request
         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
@@ -623,7 +616,6 @@ class _PobWidgetState extends State<PobWidget> {
                 .map((point) => LatLng(point.latitude, point.longitude))
                 .toList();
             // polylines.value.clear();
-            print("the polylines point is $points");
             polylines.add(Polyline(
               // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
               // patterns: points,
@@ -675,7 +667,6 @@ class _PobWidgetState extends State<PobWidget> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
-      print(dId);
       var request = http.MultipartRequest('POST',
           Uri.parse('https://minicaboffice.com/api/driver/on-ride.php'));
       request.fields.addAll({
@@ -683,13 +674,9 @@ class _PobWidgetState extends State<PobWidget> {
       });
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-        print('on Ride');
       } else {
-        print(response.reasonPhrase);
       }
     } catch (error) {
-      print('Error: $error');
     }
   }
 
@@ -702,7 +689,6 @@ class _PobWidgetState extends State<PobWidget> {
     );
     setState(() {
       distance = distanceMatrix as String;
-      print(distance);
     });
   }
 
@@ -721,7 +707,6 @@ class _PobWidgetState extends State<PobWidget> {
 
       if (response.statusCode == 200) {
         var streamString = await response.stream.bytesToString();
-        print(streamString);
         return streamString;
       } else {
         return response.reasonPhrase;
@@ -736,13 +721,10 @@ class _PobWidgetState extends State<PobWidget> {
       var result = await getDistanceMatrix();
       if (result != null) {
         final jsonResponse = json.decode(result);
-        print(jsonResponse);
         originAddresses = jsonResponse['origin_addresses'][0];
         destinationAddresses = jsonResponse['destination_addresses'][0];
         distance1 = jsonResponse['rows'][0]['elements'][0]['distance']['text'];
         duration = jsonResponse['rows'][0]['elements'][0]['duration']['text'];
-        print(
-            "Origin: ${originAddresses}, Destination: $destinationAddresses, Distance: $distance1, Duration: $duration");
       }
     } catch (e) {
       setState(() {
@@ -763,7 +745,6 @@ class _PobWidgetState extends State<PobWidget> {
         currentLongitude = position.longitude;
       });
     } catch (e) {
-      print("Error getting current location: $e");
     }
   }
 
@@ -842,10 +823,8 @@ class _PobWidgetState extends State<PobWidget> {
         dropffLat = location['lat'];
         dropffLng = location['lng'];
       } else {
-        print('Error: ${decodedData['status']}');
       }
     } else {
-      print('HTTP Request Error: ${response.statusCode}');
     }
   }
 
@@ -861,16 +840,13 @@ class _PobWidgetState extends State<PobWidget> {
       origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
       destination: '${dropoff}',
     );
-    print(request);
     directionsService.route(request,
         (DirectionsResult? response, DirectionsStatus? status) {
       if (status == DirectionsStatus.ok && response != null) {
         setState(() {
           final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
-          print('encoded    ${encodedPolyline}');
           if (encodedPolyline != null) {
             _polylineCoordinates = decodePolyline(encodedPolyline)!;
-            print('polylineCoordinates ${_polylineCoordinates}');
 
             markers.add(
               Marker(
@@ -895,7 +871,6 @@ class _PobWidgetState extends State<PobWidget> {
           }
         });
       } else {
-        print('Failed to fetch directions: $status');
       }
     });
   }
@@ -928,7 +903,6 @@ class _PobWidgetState extends State<PobWidget> {
       double latitude = lat / 1E5;
       double longitude = lng / 1E5;
       points.add(LatLng(latitude, longitude));
-      print('lati ${latitude}');
     }
     return points;
   }

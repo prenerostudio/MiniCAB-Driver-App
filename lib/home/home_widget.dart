@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -15,6 +18,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 import 'package:mini_cab/Acount%20Statements/acount_statements_widget.dart';
+import 'package:mini_cab/Data/links.dart';
 import 'package:mini_cab/home/home_screen_alert.dart';
 import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/home/polyLinesAndMarker.dart';
@@ -106,26 +110,19 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       channel.bind('job-dispatched', (event) {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
 
-        print("json data from dispatch job pusehrt ${jsonMap['details']}");
-
         myController.currentLoggedInid.value = prefs.getString('d_id') ?? '';
-        print(
-            "json data from dispatch job pusehrt${myController.currentLoggedInid.value}");
-        print(
-            "json data from dispatch job pusehrt ${jsonMap['details'][0]['d_id']}");
-        print(
-            'the condition is ${myController.currentLoggedInid.value == jsonMap['details'][0]['d_id'].toString()}');
         if (myController.currentLoggedInid.value ==
             jsonMap['details'][0]['d_id'].toString()) {
-          startToon();
+          // startToon();
+          startRingtoneAndVibrateLoop();
           listFromPusher.clear();
-          print('added to the list');
           listFromPusher.add(Job(
               jobId: jsonMap['details'][0]['job_id'].toString() ?? "",
               bookId: jsonMap['details'][0]['book_id'].toString() ?? '',
               cId: jsonMap['details'][0]['00000003'].toString() ?? "",
               dId: jsonMap['details'][0]['00000000002'].toString() ?? '',
               jobNote: jsonMap['details'][0]['job_note'].toString() ?? '',
+              totalFee: jsonMap['details'][0]['totalFee'].toString() ?? '',
               journeyFare:
                   jsonMap['details'][0]['journey_fare'].toString() ?? '',
               bookingFee: jsonMap['details'][0]['booking_fee'].toString() ?? "",
@@ -180,13 +177,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       channel.bind('job-withdrawn', (event) {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
         checkJobStatus();
-        print('the order job withdrawn from pusher:${jsonMap['data']}');
 
         // });
       });
-    } catch (e) {
-      print('the exception is $e');
-    }
+    } catch (e) {}
   }
 
   timeSlotPusher() async {
@@ -210,19 +204,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       channel.bind('slot-dispatched', (event) async {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
 
-        print("json data pusehrt${jsonMap['details']}");
-        print("json data pusehrt${jsonMap['details'][0]['job_id']}");
-
         myController.currentLoggedInid.value = prefs.getString('d_id') ?? '';
         if (myController.currentLoggedInid.value ==
             jsonMap['details'][0]['d_id'].toString()) {
-          startToon();
+          // startToon();
 
           startRingtoneAndVibrateLoop();
           await prefs.setString(
               'ts_id', jsonMap['details'][0]['ts_id'].toString());
-          print(
-              'the ts id from pusher is ${jsonMap['details'][0]['ts_id'].toString()}');
           myController.timeSlotid.value =
               jsonMap['details'][0]['ts_id'].toString();
           myController.timeSlotDate.value =
@@ -235,8 +224,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
               prefs.getBool('accepted') ?? false;
           _endTime =
               jsonMap['details'][0]['end_time'].toString(); // e.g., "15:00:00"
-          print('the start time from pusher is ${_startTime}');
-          print('the end time from pusher is ${_endTime}');
           myController.timeSlotEndTime.value =
               jsonMap['details'][0]['end_time'].toString();
           myController.timeSloPricePerhour.value =
@@ -249,12 +236,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       });
       channel.bind('slot-withdrawn', (event) {
         Map<String, dynamic> jsonMap = json.decode(event!.data!);
-        print('slot withdrawn succes');
         getTimeSlotFroApi();
       });
-    } catch (e) {
-      print('the exception is $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> checkUserSession() async {
@@ -291,15 +275,19 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     myController.visiblecontainer.value = false;
-    print('InitState called ......... ');
     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual);
     setState(() {
       // myController.visiblecontainer.value = true;
     });
-
+    // Check if overlay permission is granted
+    FlutterOverlayWindow.isPermissionGranted().then((granted) {
+      if (!granted) {
+        print('granted');
+        FlutterOverlayWindow.requestPermission();
+      }
+    });
     userSession = Timer.periodic(Duration(seconds: 4), (s) {
-      print('user session checking starts');
-      checkUserSession();
+      // checkUserSession();
     });
     pushercallbg();
     timeSlotPusher();
@@ -380,11 +368,21 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     });
   }
 
+  Future _showOverlay() async {
+    await FlutterOverlayWindow.showOverlay();
+    FlutterOverlayWindow.showOverlay(
+      startPosition: OverlayPosition(30, 40),
+      overlayContent: 'this is overlay contenet',
+      height: 300,
+      width: 100,
+      // positionGravity:PositionGravity.left,
+    );
+  }
+
   checkId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String st = '';
     st = prefs.getString('d_id') ?? '';
-    print('the did of logged in person is ${st}');
   }
 
   Future getTimeSlotFroApi() async {
@@ -393,8 +391,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       myController.isTimeSlotDispatched.value = false;
       String? dId = prefs.getString('d_id');
       String? tsid = prefs.getString('ts_id');
-      print('ts id ${tsid}');
-      print('did id ${dId}');
 
       var fields = {
         'd_id': dId.toString(),
@@ -409,7 +405,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       );
 
       if (response.statusCode == 200) {
-        print('the response is ${response.body}');
         var jsonData = json.decode(response.body);
         if (dId == jsonData['data'][0]['d_id']) {
           myController.isTimeSlotAccepted.value =
@@ -424,8 +419,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
               jsonData['data'][0]['price_hour'];
           myController.timeSlottotalPay.value =
               jsonData['data'][0]['total_pay'];
-          print('the start time from api is ${_startTime}');
-          print('the end time from api is ${_endTime}');
           _startTime = jsonData['data'][0]['start_time']; // e.g., "14:00:00"
           _endTime = jsonData['data'][0]['end_time']; // e.g., "15:00:00"
           _loadSavedState();
@@ -442,12 +435,24 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           myController.isTimeSlotAccepted.value =
               prefs.getBool('accepted') ?? false;
         });
-        print('Failed to accept job. Status Code: ${response.statusCode}');
-        print('Reason: ${response.reasonPhrase}');
       }
-    } catch (e) {
-      print('Error during HTTP request: $e');
-    }
+    } catch (e) {}
+  }
+
+  double latitudeforGooglmap = 0;
+  double lngforGooglmap = 0;
+  Future<void> getLatLngFromAddress(String address) async {
+    try {
+      // Geocode the address to get a list of locations
+      List<Location> locations = await locationFromAddress(address);
+
+      if (locations.isNotEmpty) {
+        // The first location in the list will be the best match
+        latitudeforGooglmap = locations[0].latitude;
+        lngforGooglmap = locations[0].longitude;
+        setState(() {});
+      } else {}
+    } catch (e) {}
   }
 
   AccpetingOrderViewModel accpetingOrderViewModel =
@@ -461,13 +466,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           'https://www.minicaboffice.com/api/driver/check-job-status.php'),
       body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
     );
-    print('job is deletedS ${response.body}');
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['status'] == false) {
         prefs.remove("isRideStart");
         setState(() {});
-        print('job is deleted ${data}');
         myController.visiblecontainer.value = false;
         myController.isJobDetailDone.value = false;
 
@@ -494,41 +497,128 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   List<Job> listFromPusher = [];
 
-  Future startToon() async {
-    FlutterRingtonePlayer().playRingtone();
+  // Future startToon() async {
+  //   // FlutterRingtonePlayer().playRingtone();
 
-    // FlutterRingtonePlayer..play(
-    //   // fromAsset: "assets\audios\ring.mp3",
-    //   android: AndroidSounds.alarm,
-    //   ios: IosSounds.alarm,
-    //   looping: true,
-    //   volume: 1.0,
-    // );
+  //   // FlutterRingtonePlayer..play(
+  //   //   // fromAsset: "assets\audios\ring.mp3",
+  //   //   android: AndroidSounds.alarm,
+  //   //   ios: IosSounds.alarm,
+  //   //   looping: true,
+  //   //   volume: 1.0,
+  //   // );
 
-    try {
-      int totalDuration = 20000;
-      int vibrationDuration = 3000;
-      int pauseDuration = 3000;
-      int numIterations = totalDuration ~/ (vibrationDuration + pauseDuration);
-      for (int i = 0; i < numIterations; i++) {
-        await Vibration.vibrate(duration: vibrationDuration);
+  //   try {
+  //     int totalDuration = 20000;
+  //     int vibrationDuration = 3000;
+  //     int pauseDuration = 3000;
+  //     int numIterations = totalDuration ~/ (vibrationDuration + pauseDuration);
+  //     for (int i = 0; i < numIterations; i++) {
+  //       await Vibration.vibrate(duration: vibrationDuration);
+  //       FlutterRingtonePlayer().playRingtone();
+  //       await Future.delayed(Duration(milliseconds: pauseDuration));
+  //     }
+  //   } catch (e) {}
 
-        await Future.delayed(Duration(milliseconds: pauseDuration));
+  //   Timer(const Duration(seconds: 20), () {
+  //     // FlutterRingtonePlayer.stop();
+  //     FlutterRingtonePlayer().stop();
+  //     Vibration.cancel();
+  //   });
+  // }
+
+  showNotification() async {
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      ticker: 'ticker',
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Customer Location',
+      'You have reached on customer location.',
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
+  }
+
+  Timer? locationTrackingTimer;
+  Future startTracking(double pickLat, double pickLng) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    locationTrackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      double distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        pickLat,
+        pickLng,
+      );
+
+      if (distance < 4000) {
+        // You can set the threshold to any value (e.g., 50 meters)
+        // User has reached the destination
+        print("Ride complete!");
+        //  await     _showOverlay();
+        await showNotification();
+        locationTrackingTimer!.cancel(); // Stop the tracking
+        locationTrackingTimer != null; // Stop the tracking
+        // Navigator.pop(context);
+        if (myController.initialLabelIndex.value == 1) {
+          await sp.setBool('isWaitingTrue', true);
+          await sp.setBool('show', false);
+          await sp.setInt('isRideStart', 1);
+          await showModalBottomSheet(
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            enableDrag: false,
+            context: context,
+            builder: (context) {
+              return Padding(
+                padding: MediaQuery.viewInsetsOf(context),
+                child: NotesWidget(
+                  dId: '${myController.listFromPusher[0].dId}',
+                  jobId: '${myController.listFromPusher[0].jobId}',
+                  pickTime: '${myController.listFromPusher[0].pickTime}',
+                  pickDate: '${myController.listFromPusher[0].pickDate}',
+                  passenger: '${myController.listFromPusher[0].passenger}',
+                  pickup: '${myController.listFromPusher[0].pickup}',
+                  dropoff: '${myController.listFromPusher[0].destination}',
+                  luggage: '${myController.listFromPusher[0].luggage}',
+                  cName: '${myController.listFromPusher[0].cName}',
+                  cnumber: '${myController.listFromPusher[0].cPhone}',
+                  cemail: '${myController.listFromPusher[0].cEmail}',
+                  note: '${myController.listFromPusher[0].note}',
+                  fare: '${myController.listFromPusher[0].journeyFare}',
+                  distance: '${myController.listFromPusher[0].journeyDistance}',
+                ),
+              );
+            },
+          ).then((value) => safeSetState(() {}));
+        } else {
+          Fluttertoast.showToast(
+            msg: "Please be online before starting the ride.",
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      } else {
+        print("no reached the location");
       }
-    } catch (e) {
-      print("Failed to vibrate: $e");
-    }
-
-    Timer(const Duration(seconds: 20), () {
-      // FlutterRingtonePlayer.stop();
-      FlutterRingtonePlayer().stop();
-      Vibration.cancel();
     });
   }
 
   callAp() async {
     await jobDetailsFuture().then((_) {
-      print('true');
       periodicStatus = true;
 
       // _timer!.cancel();
@@ -583,7 +673,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    print(myController.visiblecontainer.value);
     if (isiOS) {
       SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(
@@ -2047,7 +2136,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                             showToast(
                                                                 "Device is jailbreak");
                                                           } else {
-                                                            if (status) {
+                                                            if (status ==
+                                                                false) {
                                                               await saveSwitchStatus(
                                                                   index!);
                                                               myController
@@ -2056,7 +2146,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                               if (!jobStatus) {
                                                                 if (index ==
                                                                     1) {
-                                                                  startRingtoneAndVibrateLoop();
+                                                                  makeBeep();
+                                                                  // startRingtoneAndVibrateLoop();
                                                                   sendOnlineStatus();
                                                                   sendLocationDataPeriodically();
                                                                   service
@@ -2067,7 +2158,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                               5));
                                                                 } else if (index ==
                                                                     0) {
-                                                                  startRingtoneAndVibrateLoop();
+                                                                  makeBeep();
+                                                                  // startRingtoneAndVibrateLoop();
                                                                   sendOnlineStatus();
                                                                   stopLocationDataPeriodicUpdates();
                                                                   service.invoke(
@@ -2127,8 +2219,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                   );
                                                                 },
                                                               );
-                                                              print(
-                                                                  'Switched else to: $index');
                                                             }
                                                           }
                                                         },
@@ -2252,9 +2342,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                     .value ==
                                                                 false
                                                             ? InkWell(
-                                                                onTap: () {
-                                                                  print(
-                                                                      'time slot accept');
+                                                                onTap:
+                                                                    () async {
+                                                                  await FlutterRingtonePlayer()
+                                                                      .stop();
+
+                                                                  await Vibration
+                                                                      .cancel();
                                                                   acceptTimeSlot();
                                                                   // _startTimer();
                                                                   // getTimeSlotFroApi();
@@ -2286,7 +2380,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                     .value ==
                                                                 false
                                                             ? GestureDetector(
-                                                                onTap: () {
+                                                                onTap:
+                                                                    () async {
+                                                                  await FlutterRingtonePlayer()
+                                                                      .stop();
+                                                                  await Vibration
+                                                                      .cancel();
                                                                   rejectTimeSlot();
                                                                   // _stopTimer();
                                                                 },
@@ -2876,75 +2975,131 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                       SharedPreferences sp =
                                                           await SharedPreferences
                                                               .getInstance();
-
-                                                      // print(
-                                                      //     'st ${initialLabelIndex == 1}');
-                                                      if (myController
-                                                              .initialLabelIndex
-                                                              .value ==
-                                                          1) {
-                                                        await sp.setBool(
-                                                            'show', false);
-                                                        await sp.setInt(
-                                                            'isRideStart', 1);
-                                                        await showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          enableDrag: false,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return Padding(
-                                                              padding: MediaQuery
-                                                                  .viewInsetsOf(
-                                                                      context),
-                                                              child:
-                                                                  NotesWidget(
-                                                                dId:
-                                                                    '${myController.listFromPusher[0].dId}',
-                                                                jobId:
-                                                                    '${myController.listFromPusher[0].jobId}',
-                                                                pickTime:
-                                                                    '${myController.listFromPusher[0].pickTime}',
-                                                                pickDate:
-                                                                    '${myController.listFromPusher[0].pickDate}',
-                                                                passenger:
-                                                                    '${myController.listFromPusher[0].passenger}',
-                                                                pickup:
-                                                                    '${myController.listFromPusher[0].pickup}',
-                                                                dropoff:
-                                                                    '${myController.listFromPusher[0].destination}',
-                                                                luggage:
-                                                                    '${myController.listFromPusher[0].luggage}',
-                                                                cName:
-                                                                    '${myController.listFromPusher[0].cName}',
-                                                                cnumber:
-                                                                    '${myController.listFromPusher[0].cPhone}',
-                                                                cemail:
-                                                                    '${myController.listFromPusher[0].cEmail}',
-                                                                note:
-                                                                    '${myController.listFromPusher[0].note}',
-                                                                fare:
-                                                                    '${myController.listFromPusher[0].journeyFare}',
-                                                                distance:
-                                                                    '${myController.listFromPusher[0].journeyDistance}',
-                                                              ),
-                                                            );
-                                                          },
-                                                        ).then((value) =>
-                                                            safeSetState(
-                                                                () {}));
-                                                      } else {
-                                                        Fluttertoast.showToast(
-                                                          msg:
-                                                              "Please be online before starting the ride.",
-                                                          textColor:
-                                                              Colors.white,
-                                                          fontSize: 16.0,
-                                                        );
-                                                      }
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return AlertDialog(
+                                                            title: Text(
+                                                                'Choose Map Option'),
+                                                            content: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                ListTile(
+                                                                  leading:
+                                                                      SizedBox(
+                                                                    width: 25,
+                                                                    height: 25,
+                                                                    child: Image
+                                                                        .asset(
+                                                                            'assets/images/google.png'), // Replace 'your_image.png' with your image asset path
+                                                                  ),
+                                                                  title: Text(
+                                                                      'Open in Google Maps'),
+                                                                  onTap:
+                                                                      () async {
+                                                                    await getLatLngFromAddress(myController
+                                                                        .listFromPusher[
+                                                                            0]
+                                                                        .pickup);
+                                                                    // first background
+                                                                    startRideTracking(
+                                                                        latitudeforGooglmap
+                                                                            .toString(),
+                                                                        lngforGooglmap
+                                                                            .toString());
+                                                                    await startTracking(
+                                                                        latitudeforGooglmap,
+                                                                        lngforGooglmap);
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    await MapUtils.navigateTo(
+                                                                        latitudeforGooglmap,
+                                                                        lngforGooglmap);
+                                                                    // start from here
+                                                                  },
+                                                                ),
+                                                                ListTile(
+                                                                  leading:
+                                                                      SizedBox(
+                                                                    width: 25,
+                                                                    height: 25,
+                                                                    child: Image
+                                                                        .asset(
+                                                                            'assets/images/app_launcher_icon.png'), // Replace 'your_image.png' with your image asset path
+                                                                  ),
+                                                                  title: Text(
+                                                                      'Using App'),
+                                                                  onTap:
+                                                                      () async {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    if (myController
+                                                                            .initialLabelIndex
+                                                                            .value ==
+                                                                        1) {
+                                                                      await sp.setBool(
+                                                                          'show',
+                                                                          false);
+                                                                      await sp.setInt(
+                                                                          'isRideStart',
+                                                                          1);
+                                                                      await showModalBottomSheet(
+                                                                        isScrollControlled:
+                                                                            true,
+                                                                        backgroundColor:
+                                                                            Colors.transparent,
+                                                                        enableDrag:
+                                                                            false,
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (context) {
+                                                                          return Padding(
+                                                                            padding:
+                                                                                MediaQuery.viewInsetsOf(context),
+                                                                            child:
+                                                                                NotesWidget(
+                                                                              dId: '${myController.listFromPusher[0].dId}',
+                                                                              jobId: '${myController.listFromPusher[0].jobId}',
+                                                                              pickTime: '${myController.listFromPusher[0].pickTime}',
+                                                                              pickDate: '${myController.listFromPusher[0].pickDate}',
+                                                                              passenger: '${myController.listFromPusher[0].passenger}',
+                                                                              pickup: '${myController.listFromPusher[0].pickup}',
+                                                                              dropoff: '${myController.listFromPusher[0].destination}',
+                                                                              luggage: '${myController.listFromPusher[0].luggage}',
+                                                                              cName: '${myController.listFromPusher[0].cName}',
+                                                                              cnumber: '${myController.listFromPusher[0].cPhone}',
+                                                                              cemail: '${myController.listFromPusher[0].cEmail}',
+                                                                              note: '${myController.listFromPusher[0].note}',
+                                                                              fare: '${myController.listFromPusher[0].journeyFare}',
+                                                                              distance: '${myController.listFromPusher[0].journeyDistance}',
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ).then((value) =>
+                                                                          safeSetState(
+                                                                              () {}));
+                                                                    } else {
+                                                                      Fluttertoast
+                                                                          .showToast(
+                                                                        msg:
+                                                                            "Please be online before starting the ride.",
+                                                                        textColor:
+                                                                            Colors.white,
+                                                                        fontSize:
+                                                                            16.0,
+                                                                      );
+                                                                    }
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
                                                     },
                                                     text: 'Start Now',
                                                     icon: const Icon(
@@ -3062,35 +3217,29 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   LatLng _destination = LatLng(34.0522, -118.2437);
   void fetchJobStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? d_id = prefs.getString('d_id');
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? d_id = prefs.getString('d_id');
 
-    if (d_id != null) {
-      var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'));
-      request.fields.addAll({'d_id': d_id});
+      if (d_id != null) {
+        var request = http.MultipartRequest(
+            'POST',
+            Uri.parse(
+                'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'));
+        request.fields.addAll({'d_id': d_id});
 
-      http.StreamedResponse response = await request.send();
+        http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
-        var responseString = await response.stream.bytesToString();
-        var responseData = jsonDecode(responseString);
+        if (response.statusCode == 200) {
+          var responseString = await response.stream.bytesToString();
+          var responseData = jsonDecode(responseString);
 
-        jobStatus = responseData['status'];
-        print('Status: $status');
-        if (status) {
-          print('Job List Fetch Successfully');
-        } else {
-          print('Failed to fetch job list');
-        }
-      } else {
-        print('Error accpet: ${response.reasonPhrase}');
-      }
-    } else {
-      print('d_id not found in preferences');
-    }
+          jobStatus = responseData['status'];
+          if (status) {
+          } else {}
+        } else {}
+      } else {}
+    } catch (e) {}
   }
 
   void _animateToCurrentLocation() {
@@ -3180,19 +3329,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
         updateEndTime(myController.timeSlotEndTime.value!);
         setTsId(myController.timeSlotid.value);
-        print('accepted timeslot id is ${tsid}');
         await prefs.setBool('isAccepted', true);
 
         myController.isTimeSlotAccepted.value = true;
-        print('Time slot accepted: Start: $_startTime, End: $_endTime');
         _startCounter(); // Start checking for time match
         //  start
-      } else {
-        print('Time slot issue');
-      }
-    } else {
-      print('Failed to fetch time slot');
-    }
+      } else {}
+    } else {}
   }
 
   void updateEndTime(String newEndTime) async {
@@ -3200,6 +3343,17 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     final service = FlutterBackgroundService();
     // This will send the 'updateTimer' event to the background service
     service.invoke('updateTimer', {'endTime': newEndTime});
+  }
+
+  void startRideTracking(
+      String customerLocation1, String customerLocation2) async {
+    setState(() {});
+    final service = FlutterBackgroundService();
+    // This will send the 'updateTimer' event to the background service
+    service.invoke('StartRide', {
+      'startRideEvent1': customerLocation1,
+      'startRideEvent2': customerLocation2
+    });
   }
 
   void setTsId(String tsId) async {
@@ -3271,7 +3425,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? endTimeString = prefs.getString('end-Time');
 
     if (startTimeString != null && endTimeString != null) {
-      print('the if condition in timer is works');
       startTime = DateTime.parse(startTimeString);
       endTime = DateTime.parse(endTimeString);
 
@@ -3292,8 +3445,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         await prefs.remove('end-Time');
       }
     } else {
-      print(
-          'the else condition in timer is works ${myController.timeSlotStarttime.value}');
       // Initialize fresh times if there's no saved state
       String dateString =
           myController.timeSlotDate.value; // Change date accordingly
@@ -3423,12 +3574,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         await prefs.remove('accepted');
         // Assuming the API returns time in "HH:mm:ss" format
         getTimeSlotFroApi();
-      } else {
-        print('Time slot issue');
-      }
-    } else {
-      print('Failed to fetch time slot');
-    }
+      } else {}
+    } else {}
   }
 
   Future<void> rejectTimeSlot() async {
@@ -3447,12 +3594,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       if (jsonResponse['status'] == true) {
         // Assuming the API returns time in "HH:mm:ss" format
         getTimeSlotFroApi();
-      } else {
-        print('Time slot issue');
-      }
-    } else {
-      print('Failed to fetch time slot');
-    }
+      } else {}
+    } else {}
   }
 
   void _restoreTimerState() async {
@@ -3496,7 +3639,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         final jsonMap = json.decode(response.body);
 
-        print("json data api call${jsonMap['data']}");
         bool status = jsonMap['status'];
 
         if (status == true) {
@@ -3504,7 +3646,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
           listFromPusher.clear();
 
-          print("json data api call${jsonMap['data']}");
           listFromPusher.add(Job(
               jobId: jsonMap['data'][0]['job_id'].toString() ?? "",
               bookId: jsonMap['data'][0]['book_id'].toString() ?? '',
@@ -3571,9 +3712,19 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       }
     } catch (e) {
       // Handle exceptions here
-      print('Error in jobDetailsFuture: $e');
       // Re-throw the exception to propagate it further if needed
     }
+  }
+
+  AudioPlayer player = AudioPlayer();
+  makeBeep() async {
+    player.setReleaseMode(ReleaseMode.stop);
+
+    // Start the player as soon as the app is displayed.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await player.setSource(AssetSource('audios/beep.mp3'));
+      await player.resume();
+    });
   }
 
   void startRingtoneAndVibrateLoop() {
@@ -3586,7 +3737,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     // );
     Vibration.vibrate(duration: 1000);
 
-    Timer(const Duration(seconds: 4), () {
+    Timer(const Duration(seconds: 34), () {
       FlutterRingtonePlayer().stop();
       Vibration.cancel();
     });
@@ -3607,19 +3758,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseBody);
-      print(jsonResponse);
       String totalCommission = jsonResponse['data']?['total_commission'] ?? '';
 
-      print(totalCommission);
       setState(() {
         dueBalance = totalCommission;
-        print('Total commission: $dueBalance');
       });
-
-      print('Total commission: $totalCommission');
-    } else {
-      print('Failed to fetch data: ${response.reasonPhrase}');
-    }
+    } else {}
   }
 
   Future<void> checkVehicleDocuments() async {
@@ -3636,15 +3780,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           jsonDecode(await response.stream.bytesToString());
       if (responseData['status'] == true) {
         status = true;
-        print('Success: ${responseData['message']}');
-        print('Success: ${responseData['status']}');
       } else {
-        print('Error: ${responseData['message']}');
-        print('Success: ${responseData['status']}');
         status = false;
       }
     } else {
-      print('Error: ${response.reasonPhrase}');
       status = false;
     }
   }
@@ -3652,7 +3791,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Future<void> saveIsLoginInPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLogin', true);
-    print('Saved isLogin: ${prefs.getBool('isLogin')}');
   }
 
   _loadSwitchStatus() async {
@@ -3661,7 +3799,6 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     setState(() {
       myController.initialLabelIndex.value = savedIndex;
     });
-    print(myController.initialLabelIndex.value);
   }
 
   saveSwitchStatus(int index) async {
@@ -3683,17 +3820,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         'd_id': dId.toString(),
         'status': index == 1 ? 'Online' : 'Offline',
       });
-      print(request.fields);
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-      }
-    } catch (e) {
-      print('Error in online: $e');
-    }
+      } else {}
+    } catch (e) {}
   }
 
   Future<void> sendLocationData(double latitude, double longitude) async {
@@ -3708,21 +3839,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         'longitude': longitude.toString()
       });
 
-      request.fields.forEach((key, value) {
-        print('$key: $value');
-      });
+      request.fields.forEach((key, value) {});
 
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-        print('issue in locaiton api');
-      }
-    } else {
-      print("Some fields are empty or invalid.");
-    }
+      } else {}
+    } else {}
   }
 
   void sendLocationDataPeriodically() {
@@ -3737,10 +3860,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         double longitude = position.longitude;
 
         await sendLocationData(latitude, longitude);
-        print('Latitude: $latitude, Longitude: $longitude');
-      } catch (e) {
-        print('Errors in latlng: $e');
-      }
+      } catch (e) {}
     });
   }
 
@@ -3762,18 +3882,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
             ),
           ),
         );
-        print(
-            " the lat ${myController.currentLocation!.latitude} and long ${myController.currentLocation!.longitude}");
       }
-      print(
-          " the lats ${myController.currentLocation!.latitude} and longs ${myController.currentLocation!.longitude}");
       if (mounted) {
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      print("Error getting location: $e");
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -3783,27 +3898,28 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   Future<List<Driver>> myProfile() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? dId = prefs.getString('d_id');
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? dId = prefs.getString('d_id');
 
-    final uri =
-        Uri.parse('https://minicaboffice.com/api/driver/view-profile.php');
-    final response = await http.post(uri, body: {'d_id': dId.toString()});
+      final uri =
+          Uri.parse('https://minicaboffice.com/api/driver/view-profile.php');
+      final response = await http.post(uri, body: {'d_id': dId.toString()});
 
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      final List<dynamic> data = jsonResponse['data'] ?? [];
-      print('profile api treeeeeeeeeeeeeee');
-      if (data is List) {
-        List<Driver> profileData =
-            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-        return profileData;
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final List<dynamic> data = jsonResponse['data'] ?? [];
+        if (data is List) {
+          List<Driver> profileData =
+              data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+          return profileData;
+        } else {
+          return [];
+        }
       } else {
-        print('Invalid data format received.');
         return [];
       }
-    } else {
-      print('Error profile: ${response.reasonPhrase}');
+    } catch (e) {
       return [];
     }
   }

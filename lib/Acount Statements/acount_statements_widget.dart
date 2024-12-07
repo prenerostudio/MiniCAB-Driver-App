@@ -75,13 +75,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
       String responseBody = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseBody);
       total = jsonResponse['total_amount'] ?? '0.00';
-      print(total);
       setState(() {
         total = total;
       });
-      print('weakly earning: $total');
     } else {
-      print('Failed to fetch data: ${response.reasonPhrase}');
     }
   }
 
@@ -141,18 +138,14 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      print('st the response is ${jsonResponse['data']}');
       if (data is List) {
         List<Invoice> paymentData =
             data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        print(paymentData);
         return paymentData;
       } else {
-        print('Invalid data format received.');
         return [];
       }
     } else {
-      print('Error: ${response.reasonPhrase}');
       return [];
     }
   }
@@ -169,14 +162,11 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
       if (data is List) {
         List<Invoice> paymentData =
             data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        print(paymentData);
         return paymentData;
       } else {
-        print('Invalid data format received.');
         return [];
       }
     } else {
-      print('Error: ${response.reasonPhrase}');
       return [];
     }
   }
@@ -193,14 +183,11 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
       if (data is List) {
         List<Invoice> paymentData =
             data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        print(paymentData);
         return paymentData;
       } else {
-        print('Invalid data format received.');
         return [];
       }
     } else {
-      print('Error: ${response.reasonPhrase}');
       return [];
     }
   }
@@ -273,12 +260,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
         final file = File(pdfPath);
         await file.writeAsBytes(await pdf.save());
         OpenFile.open(file.path);
-        print('PDF saved to: $pdfPath');
       } else {
-        print('Error: ${response.reasonPhrase}');
       }
     } catch (error) {
-      print('Error: $error');
     }
   }
 
@@ -514,7 +498,6 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                               elevation: 3,
                                               child: InkWell(
                                                 onTap: () {
-                                                  print('object');
                                                   Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
