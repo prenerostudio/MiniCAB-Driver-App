@@ -148,6 +148,7 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
     skypeAcountController.text = skypeAcount ?? '';
     dRemarksController.text = dRemarks ?? '';
     addressController.text = dAddress ?? '';
+
     licenceController.text = postalCode ?? '';
     _model.dropDownValueController1!.value = gender ?? '';
     _model.dropDownValueController2!.value = language ?? '';
@@ -866,7 +867,10 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
                                         'Please select an Authority.');
                                     return;
                                   }
-
+                                  print(
+                                      'the postal code ${licenceController.text}');
+                                  print(
+                                      'the licesnce authority ${_model.dropDownValue2}');
                                   try {
                                     var request = http.MultipartRequest(
                                       'POST',
@@ -880,7 +884,8 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
                                       'demail': demailController.text,
                                       'dgender': '${Gender.toString()}',
                                       'dlang': '${lang.toString()}',
-                                      'post_code': licenceController.text,
+                                      'd_post_code':
+                                          licenceController.text.toString(),
                                       'license_authority':
                                           '${_model.dropDownValue2}'
                                     });

@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
 import 'package:mini_cab/break_time/break_time_view.dart';
+import 'package:mini_cab/main.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -1856,8 +1857,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        AcountStatementsWidget()));
+                                    builder: (context) => NavBarPage(
+                                          initialPage: "AccountStatement",
+                                        )));
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,

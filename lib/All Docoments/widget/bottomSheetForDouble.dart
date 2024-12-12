@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -127,9 +128,23 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
                               child: SizedBox(
                                   height: 200,
                                   width: 200,
-                                  child: Image.network(
-                                      fit: BoxFit.contain,
-                                      "${widget.showImageUrl}$uploadedImage")),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CachedNetworkImage(
+                                        imageUrl:
+                                            "${widget.showImageUrl}$uploadedImage",
+                                        fit: BoxFit.contain,
+                                        placeholder: (context, url) =>
+                                            Center(child: Text('Loading..')),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                        fadeInDuration: Duration(
+                                            milliseconds:
+                                                500), // Optional fade-in effect
+                                      ),
+                                    ],
+                                  )),
                             ),
                           ),
                         ),
@@ -235,25 +250,37 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
               _imageFile2 == null && uploadedImage2.isNotEmpty
                   ? Stack(
                       children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 0, 0),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                _pickImage2(ImageSource.gallery);
-                                // context.pushNamed('DriverPCOLicense');
-                              },
-                              child: SizedBox(
-                                  height: 200,
-                                  width: 200,
-                                  child: Image.network(
+                        Padding(
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              _pickImage2(ImageSource.gallery);
+                              // context.pushNamed('DriverPCOLicense');
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                    height: 200,
+                                    width: 200,
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          "${widget.showImageUrl}$uploadedImage2",
                                       fit: BoxFit.contain,
-                                      "${widget.showImageUrl}$uploadedImage2")),
+                                      placeholder: (context, url) =>
+                                          Center(child: Text('Loading..')),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                      fadeInDuration: Duration(
+                                          milliseconds:
+                                              500), // Optional fade-in effect
+                                    )),
+                              ],
                             ),
                           ),
                         ),
@@ -437,7 +464,9 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
 
                     print('Button pressed ..$isloading.');
                   },
-                  text: 'Upload Now',
+                  text: uploadedImage.isNotEmpty || uploadedImage2.isNotEmpty
+                      ? "Update"
+                      : 'Upload Now',
                   icon: const Icon(
                     Icons.cloud_upload_outlined,
                     size: 15,

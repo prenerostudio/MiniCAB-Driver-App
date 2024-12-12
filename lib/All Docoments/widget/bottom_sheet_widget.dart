@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -110,9 +111,23 @@ class _DocumentBottomSheetState extends State<DocumentBottomSheet> {
                             child: SizedBox(
                                 height: 200,
                                 width: 200,
-                                child: Image.network(
-                                    fit: BoxFit.contain,
-                                    "${widget.showImageUrl}$uploadedImage")),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CachedNetworkImage(
+                                      imageUrl:
+                                          "${widget.showImageUrl}$uploadedImage",
+                                      fit: BoxFit.contain,
+                                      placeholder: (context, url) =>
+                                          Center(child: Text('Loading..')),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                      fadeInDuration: Duration(
+                                          milliseconds:
+                                              500), // Optional fade-in effect
+                                    ),
+                                  ],
+                                )),
                           ),
                         ),
                       ),
@@ -308,7 +323,7 @@ class _DocumentBottomSheetState extends State<DocumentBottomSheet> {
 
                   print('Button pressed ..$isloading.');
                 },
-                text: 'Upload Now',
+                text: uploadedImage.isNotEmpty ? 'Update' : 'Upload Now',
                 icon: const Icon(
                   Icons.cloud_upload_outlined,
                   size: 15,

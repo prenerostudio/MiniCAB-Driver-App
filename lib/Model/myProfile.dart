@@ -18,6 +18,7 @@ class Driver {
   String? skypeAcount;
   String? dRemarks;
   String? latitude;
+  String? postCode;
   String? longitude;
   String? status;
   String? regDate;
@@ -37,6 +38,7 @@ class Driver {
     this.dLicenceExp,
     this.pcoLicence,
     this.pcoExp,
+    this.postCode,
     this.skypeAcount,
     this.dRemarks,
     this.latitude,
@@ -56,8 +58,9 @@ class Driver {
       dPic: json['d_pic'],
       dGender: json['d_gender'],
       dLanguage: json['d_language'],
+      postCode: json['d_post_code'],
       vId: json['v_id'],
-      dLicence: json['d_licence'],
+      dLicence: json['licence_authority'],
       dLicenceExp: json['d_licence_exp'],
       pcoLicence: json['pco_licence'],
       pcoExp: json['pco_exp'],

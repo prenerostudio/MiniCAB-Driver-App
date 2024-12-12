@@ -173,25 +173,25 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                             Align(
                               alignment: Alignment(0, 0),
                               child: TabBar(
-                                isScrollable: true,
+                                // isScrollable: true,
                                 labelColor:
                                     FlutterFlowTheme.of(context).primaryText,
                                 unselectedLabelColor:
                                     FlutterFlowTheme.of(context).secondaryText,
-                                labelPadding: EdgeInsetsDirectional.fromSTEB(
-                                    15, 0, 15, 0),
+                                labelPadding:
+                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                                 labelStyle:
-                                    FlutterFlowTheme.of(context).titleMedium,
+                                    TextStyle(fontWeight: FontWeight.bold),
                                 unselectedLabelStyle: TextStyle(),
                                 indicatorColor:
                                     FlutterFlowTheme.of(context).primary,
                                 indicatorWeight: 3,
                                 tabs: [
                                   Tab(
-                                    text: 'Driving License\n    Verification',
+                                    text: 'Driving License Verification',
                                   ),
                                   Tab(
-                                    text: '  Vehicle\nVerification',
+                                    text: '  Vehicle Verification',
                                   ),
                                 ],
                                 controller: _model.tabBarController,
@@ -258,7 +258,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 EdgeInsetsDirectional.fromSTEB(
                                                     0, 20, 0, 0),
                                             child: Row(
-                                              mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
@@ -274,20 +273,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                         fontSize: 12.0,
                                                       ),
                                                 ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
-                                                  child: Text(
-                                                    '${Fornt == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          fontSize: 12.0,
-                                                        ),
-                                                  ),
+                                                Text(
+                                                  '${Fornt == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                      ),
                                                 ),
                                                 Padding(
                                                   padding: EdgeInsetsDirectional
@@ -463,13 +458,12 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 EdgeInsetsDirectional.fromSTEB(
                                                     0, 20, 0, 0),
                                             child: Row(
-                                              mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
                                                 Text(
-                                                  'Proof of Address',
+                                                  'Proof of Address         ',
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -490,66 +484,60 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                         fontSize: 12.0,
                                                       ),
                                                 ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DoubleDocumentBottomSheet(
-                                                                name2:
-                                                                    'Proof of Address Two ',
-                                                                forInsideArray2:
-                                                                    'ap_2',
-                                                                parameter2:
-                                                                    'pa2',
-                                                                name:
-                                                                    'Proof of Address One ',
-                                                                forInsideArray:
-                                                                    'ap_1',
-                                                                getUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/check-address-proof.php",
-                                                                parameter:
-                                                                    "pa1",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-address-proof.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/address-proof/");
-                                                          });
-                                                      // Navigator.push(
-                                                      //     context,
-                                                      //     MaterialPageRoute(
-                                                      //         builder: (context) => DocumentsUploadView(
-                                                      //             name:
-                                                      //                 'Proof of Address One ',
-                                                      //             forInsideArray:
-                                                      //                 'address_proof_1',
-                                                      //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-address-proof-1.php',
-                                                      //             parameter:
-                                                      //                 "pa1",
-                                                      //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-pa1.php",
-                                                      //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/address-proof/")));
-                                                    },
-                                                    child: Text(
-                                                      'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
-                                                    ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    showModalBottomSheet(
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DoubleDocumentBottomSheet(
+                                                              name2:
+                                                                  'Proof of Address Two ',
+                                                              forInsideArray2:
+                                                                  'ap_2',
+                                                              parameter2: 'pa2',
+                                                              name:
+                                                                  'Proof of Address One ',
+                                                              forInsideArray:
+                                                                  'ap_1',
+                                                              getUrl:
+                                                                  "https://www.minicaboffice.com/api/driver/check-address-proof.php",
+                                                              parameter: "pa1",
+                                                              postUrl:
+                                                                  "https://www.minicaboffice.com/api/driver/upload-address-proof.php",
+                                                              showImageUrl:
+                                                                  "https://minicaboffice.com/img/drivers/address-proof/");
+                                                        });
+                                                    // Navigator.push(
+                                                    //     context,
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (context) => DocumentsUploadView(
+                                                    //             name:
+                                                    //                 'Proof of Address One ',
+                                                    //             forInsideArray:
+                                                    //                 'address_proof_1',
+                                                    //             getUrl:
+                                                    //                 'https://minicaboffice.com/api/driver/check-address-proof-1.php',
+                                                    //             parameter:
+                                                    //                 "pa1",
+                                                    //             postUrl:
+                                                    //                 "https://www.minicaboffice.com/api/driver/upload-pa1.php",
+                                                    //             showImageUrl:
+                                                    //                 "https://minicaboffice.com/img/drivers/address-proof/")));
+                                                  },
+                                                  child: Text(
+                                                    'View Upload',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .bodyMedium
+                                                        .override(
+                                                            fontFamily:
+                                                                'Readex Pro',
+                                                            fontSize: 12.0,
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primary),
                                                   ),
                                                 ),
                                               ],
@@ -1455,13 +1443,12 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 EdgeInsetsDirectional.fromSTEB(
                                                     0, 30, 0, 0),
                                             child: Row(
-                                              mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
                                                 Text(
-                                                  'Vehicle Picture        ',
+                                                  'Vehicle Picture                 ',
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -1868,7 +1855,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       ),
                                                 ),
                                                 Text(
-                                                  '${InsuranceSchedule == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                  '${InsuranceSchedule == null ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -1950,7 +1937,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 EdgeInsetsDirectional.fromSTEB(
                                                     0, 30, 0, 0),
                                             child: Row(
-                                              mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
@@ -2144,6 +2130,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
 
         return Fornt;
       } else {
+        print('vFornt  img is exception');
         debugPrint('Failed to load address proof: ${response.statusCode}');
         return null;
       }
@@ -2442,6 +2429,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         setState(() {
           vFornt = jsonResponse['data'][0]['vehicle_picture_front'];
         });
+        print('vFornt  img is ${jsonResponse['data']}');
         return vFornt;
       } else {
         debugPrint('Failed to load : ${response.statusCode}');
@@ -2538,7 +2526,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         String responseString = await response.stream.bytesToString();
         Map<String, dynamic> jsonResponse = json.decode(responseString);
         setState(() {
-          InsuranceSchedule = jsonResponse['data'][0]['insurance_schedule'];
+          InsuranceSchedule = jsonResponse['data'][0]['is_img'];
         });
         return InsuranceSchedule;
       } else {
