@@ -2,19 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:mini_cab/Acount%20Statements/accountStatementDetails.dart';
-import 'package:mini_cab/Model/invoivce.dart';
 import 'package:mini_cab/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/invoiceDetails.dart';
-import '/components/filter_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -100,34 +95,7 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
       throw Exception('Failed to load invoice data');
     }
   }
-
-  // Future<Invoice> lastJob() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? dId = prefs.getString('d_id');
-
-  //   var request = http.MultipartRequest(
-  //     'POST',
-  //     Uri.parse(
-  //         'https://www.minicaboffice.com/api/driver/earning-last-job.php'),
-  //   );
-  //   request.fields.addAll({'d_id': dId.toString()});
-
-  //   http.StreamedResponse response = await request.send();
-
-  //   if (response.statusCode == 200) {
-  //     String responseBody = await response.stream.bytesToString();
-  //     Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
-
-  //     // Access the correct key in the JSON response
-  //     if (jsonResponse.containsKey('data') && jsonResponse['data'] != null) {
-  //       return Invoice.fromJson(jsonResponse['data']);
-  //     } else {
-  //       return jsonResponse['message'];
-  //     }
-  //   } else {
-  //     throw Exception('Failed to load data');
-  //   }
-  // }
+ 
   Future<List<Invoice>> lastJob() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
@@ -138,14 +106,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        return paymentData;
-      } else {
-        return [];
-      }
-    } else {
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      return paymentData;
+        } else {
       return [];
     }
   }
@@ -159,14 +123,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        return paymentData;
-      } else {
-        return [];
-      }
-    } else {
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      return paymentData;
+        } else {
       return [];
     }
   }
@@ -180,14 +140,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        return paymentData;
-      } else {
-        return [];
-      }
-    } else {
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      return paymentData;
+        } else {
       return [];
     }
   }

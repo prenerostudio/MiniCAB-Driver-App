@@ -322,9 +322,7 @@ class _InvoiecsWidgetState extends State<InvoiecsWidget> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   WeekDetailScreen(
-                                                weekData: weeksData[week] as List<
-                                                    Map<String,
-                                                        dynamic>>?, // Explicitly casting
+                                                weekData: weeksData[week], // Explicitly casting
                                               ),
                                             ),
                                           );

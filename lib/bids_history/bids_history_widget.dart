@@ -52,11 +52,6 @@ class _BidsHistoryWidgetState extends State<BidsHistoryWidget> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
-    if (dId == null) {
-      print('d_id not found in shared preferences.');
-      return [];
-    }
-
     try {
       final uri =
           Uri.parse('https://minicaboffice.com/api/driver/bid-history.php');

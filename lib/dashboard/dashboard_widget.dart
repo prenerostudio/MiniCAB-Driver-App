@@ -4,10 +4,16 @@ import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mini_cab/Acount%20Statements/accounts_bottomSheet.dart';
 import 'package:mini_cab/Data/Alart.dart';
 import 'package:mini_cab/Model/jobDetails.dart';
+import 'package:mini_cab/bids/bids_bottom_sheet.dart';
 import 'package:mini_cab/break_time/break_time_view.dart';
+import 'package:mini_cab/components/upcommingjob_widget.dart';
+import 'package:mini_cab/jobshistory/job_history_sheet.dart';
+import 'package:mini_cab/jobshistory/jobshistory_widget.dart';
 import 'package:mini_cab/main.dart';
+import 'package:mini_cab/zones/zone_bottomSheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -253,10 +259,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
       platformVersion = 'Failed to get platform version.';
     }
     if (!mounted) return;
-    if (platformVersion != null)
-      setState(() {
-        _platformVersion = platformVersion!;
-      });
+    setState(() {
+      _platformVersion = platformVersion!;
+    });
   }
 
   @override
@@ -1645,7 +1650,39 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('Upcomming');
+                            await showModalBottomSheet(
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              enableDrag: false,
+                              context: context,
+                              builder: (context) {
+                                return GestureDetector(
+                                  onVerticalDragUpdate: (details) {
+                                    if (details.primaryDelta! > 20) {
+                                      // Close the BottomSheet on a downward swipe
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  // onVerticalDragDown: (details) {
+                                  //   Navigator.pop(context);
+                                  //   debugPrint('downSwipped');
+                                  // },
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                          ? FocusScope.of(context)
+                                              .requestFocus(_model.unfocusNode)
+                                          : FocusScope.of(context).unfocus(),
+                                  child: Padding(
+                                    padding: MediaQuery.viewInsetsOf(context),
+                                    child: UpcommingjobWidget(
+                                      dId: '',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ).then((value) => safeSetState(() {}));
+
+                            // context.pushNamed('Upcomming');
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,
@@ -1698,7 +1735,38 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('jobshistory');
+                            await showModalBottomSheet(
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              enableDrag: false,
+                              context: context,
+                              builder: (context) {
+                                return GestureDetector(
+                                  onVerticalDragUpdate: (details) {
+                                    if (details.primaryDelta! > 2) {
+                                      // Close the BottomSheet on a downward swipe
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  // onVerticalDragDown: (details) {
+                                  //   Navigator.pop(context);
+                                  //   debugPrint('downSwipped');
+                                  // },
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                          ? FocusScope.of(context)
+                                              .requestFocus(_model.unfocusNode)
+                                          : FocusScope.of(context).unfocus(),
+                                  child: Padding(
+                                      padding: MediaQuery.viewInsetsOf(context),
+                                      child: JobHistorySheet(
+                                          // did: '',
+                                          )),
+                                );
+                              },
+                            ).then((value) => safeSetState(() {}));
+
+                            // context.pushNamed('jobshistory');
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,
@@ -1750,7 +1818,36 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('Bids');
+                            await showModalBottomSheet(
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              enableDrag: false,
+                              context: context,
+                              builder: (context) {
+                                return GestureDetector(
+                                  onVerticalDragUpdate: (details) {
+                                    if (details.primaryDelta! > 20) {
+                                      // Close the BottomSheet on a downward swipe
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  // onVerticalDragDown: (details) {
+                                  //   Navigator.pop(context);
+                                  //   debugPrint('downSwipped');
+                                  // },
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                          ? FocusScope.of(context)
+                                              .requestFocus(_model.unfocusNode)
+                                          : FocusScope.of(context).unfocus(),
+                                  child: Padding(
+                                      padding: MediaQuery.viewInsetsOf(context),
+                                      child: BidsBottomSheet()),
+                                );
+                              },
+                            ).then((value) => safeSetState(() {}));
+
+                            // context.pushNamed('Bids');
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,
@@ -1802,7 +1899,36 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('Zones');
+                            await showModalBottomSheet(
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              enableDrag: false,
+                              context: context,
+                              builder: (context) {
+                                return GestureDetector(
+                                  onVerticalDragUpdate: (details) {
+                                    if (details.primaryDelta! > 20) {
+                                      // Close the BottomSheet on a downward swipe
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  // onVerticalDragDown: (details) {
+                                  //   Navigator.pop(context);
+                                  //   debugPrint('downSwipped');
+                                  // },
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                          ? FocusScope.of(context)
+                                              .requestFocus(_model.unfocusNode)
+                                          : FocusScope.of(context).unfocus(),
+                                  child: Padding(
+                                      padding: MediaQuery.viewInsetsOf(context),
+                                      child: ZoneBottomsheet()),
+                                );
+                              },
+                            ).then((value) => safeSetState(() {}));
+
+                            // context.pushNamed('Zones');
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,
@@ -1854,12 +1980,41 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => NavBarPage(
-                                          initialPage: "AccountStatement",
-                                        )));
+                            await showModalBottomSheet(
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              enableDrag: false,
+                              context: context,
+                              builder: (context) {
+                                return GestureDetector(
+                                  onVerticalDragUpdate: (details) {
+                                    if (details.primaryDelta! > 20) {
+                                      // Close the BottomSheet on a downward swipe
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  // onVerticalDragDown: (details) {
+                                  //   Navigator.pop(context);
+                                  //   debugPrint('downSwipped');
+                                  // },
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                          ? FocusScope.of(context)
+                                              .requestFocus(_model.unfocusNode)
+                                          : FocusScope.of(context).unfocus(),
+                                  child: Padding(
+                                      padding: MediaQuery.viewInsetsOf(context),
+                                      child: AccountsBottomsheet()),
+                                );
+                              },
+                            ).then((value) => safeSetState(() {}));
+
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => NavBarPage(
+                            //               initialPage: "AccountStatement",
+                            //             )));
                           },
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.4,
@@ -1995,10 +2150,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
       } else {
         String totalCommission = jsonResponse['data']['total_commission'] ?? "";
         print(totalCommission);
-        setState(() {
-          dueBalance = totalCommission;
-          print('Total commission: $dueBalance');
-        });
+        if (mounted) {
+          setState(() {
+            dueBalance = totalCommission;
+            print('Total commission: $dueBalance');
+          });
+        }
 
         print('Total commission: $totalCommission');
       }
@@ -2011,11 +2168,6 @@ class _DashboardWidgetState extends State<DashboardWidget>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
-    if (dId == null) {
-      print('d_id not found in shared preferences.');
-      return [];
-    }
-
     final uri =
         Uri.parse('https://minicaboffice.com/api/driver/view-profile.php');
     final response = await http.post(uri, body: {'d_id': dId.toString()});
@@ -2024,15 +2176,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
 
-      if (data is List) {
-        List<Driver> profileData =
-            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-        return profileData;
-      } else {
-        print('Invalid data format received.');
-        return [];
-      }
-    } else {
+      List<Driver> profileData =
+          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      return profileData;
+        } else {
       print('Error: ${response.reasonPhrase}');
       return [];
     }
@@ -2068,7 +2215,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (latitude != null && longitude != null) {
+    if (longitude != null) {
       var request = http.MultipartRequest('POST',
           Uri.parse('https://minicaboffice.com/api/driver/real-location.php'));
       request.fields.addAll({
@@ -2144,7 +2291,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
         if (jsonResponse['status'] == true) {
           if (jsonResponse.containsKey('data')) {
             final Map<String, dynamic> userData = jsonResponse[''];
-            if (userData != null && userData.isNotEmpty) {
+            if (userData.isNotEmpty) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setBool('isLogin', true);
               userData.forEach((key, value) async {
@@ -2178,15 +2325,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''];
 
-      if (data is List) {
-        List<Driver> profileData =
-            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-        return profileData;
-      } else {
-        print('Invalid data format received.');
-        return []; // Return an empty list in case of invalid data format.
-      }
-    } else {
+      List<Driver> profileData =
+          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      return profileData;
+        } else {
       print('Error: ${response.reasonPhrase}');
       return []; // Return an empty list in case of an error.
     }

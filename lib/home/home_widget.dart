@@ -24,6 +24,7 @@ import 'package:mini_cab/home/home_view_controller.dart';
 import 'package:mini_cab/home/polyLinesAndMarker.dart';
 import 'package:mini_cab/main.dart';
 import 'package:mini_cab/review/review_screen.dart';
+import 'package:mini_cab/sms_view/sms_view.dart';
 import 'package:mini_cab/time_slot/time_slot_view.dart';
 import 'package:mini_cab/zones/new_class.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
@@ -1694,7 +1695,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () async {
-                              context.pushNamed('chat');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatScreen()));
+                              // context.pushNamed('chat');
                             },
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 150),
@@ -1722,7 +1727,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                         padding: const EdgeInsetsDirectional
                                             .fromSTEB(12, 0, 0, 0),
                                         child: Text(
-                                          'Massages',
+                                          'Messages',
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -2137,7 +2142,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 "Device is jailbreak");
                                                           } else {
                                                             if (status ==
-                                                                false) {
+                                                                true) {
                                                               await saveSwitchStatus(
                                                                   index!);
                                                               myController
@@ -3221,25 +3226,23 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? d_id = prefs.getString('d_id');
 
-      if (d_id != null) {
-        var request = http.MultipartRequest(
-            'POST',
-            Uri.parse(
-                'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'));
-        request.fields.addAll({'d_id': d_id});
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'));
+      request.fields.addAll({'d_id': d_id});
 
-        http.StreamedResponse response = await request.send();
+      http.StreamedResponse response = await request.send();
 
-        if (response.statusCode == 200) {
-          var responseString = await response.stream.bytesToString();
-          var responseData = jsonDecode(responseString);
+      if (response.statusCode == 200) {
+        var responseString = await response.stream.bytesToString();
+        var responseData = jsonDecode(responseString);
 
-          jobStatus = responseData['status'];
-          if (status) {
-          } else {}
+        jobStatus = responseData['status'];
+        if (status) {
         } else {}
       } else {}
-    } catch (e) {}
+        } catch (e) {}
   }
 
   void _animateToCurrentLocation() {
@@ -3424,7 +3427,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? startTimeString = prefs.getString('start-Time');
     String? endTimeString = prefs.getString('end-Time');
 
-    if (startTimeString != null && endTimeString != null) {
+    if (endTimeString != null) {
       startTime = DateTime.parse(startTimeString);
       endTime = DateTime.parse(endTimeString);
 
@@ -3759,10 +3762,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       String responseBody = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseBody);
       String totalCommission = jsonResponse['data']?['total_commission'] ?? '';
-
-      setState(() {
-        dueBalance = totalCommission;
-      });
+      if (mounted) {
+        setState(() {
+          dueBalance = totalCommission;
+        });
+      } else {}
     } else {}
   }
 
@@ -3830,7 +3834,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (latitude != null && longitude != null) {
+    if (longitude != null) {
       var request = http.MultipartRequest('POST',
           Uri.parse('https://minicaboffice.com/api/driver/real-location.php'));
       request.fields.addAll({
@@ -3909,14 +3913,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> data = jsonResponse['data'] ?? [];
-        if (data is List) {
-          List<Driver> profileData =
-              data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-          return profileData;
-        } else {
-          return [];
-        }
-      } else {
+        List<Driver> profileData =
+            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+        return profileData;
+            } else {
         return [];
       }
     } catch (e) {

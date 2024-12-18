@@ -10,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'EditBid_model.dart';
-import 'edit_bid_model.dart';
 export 'edit_bid_model.dart';
 
 class EditBidWidget extends StatefulWidget {

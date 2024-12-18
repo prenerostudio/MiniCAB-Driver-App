@@ -83,11 +83,6 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
-    if (dId == null) {
-      print('d_id not found in shared preferences.');
-      return [];
-    }
-
     try {
       final uri =
           Uri.parse('https://minicaboffice.com/api/driver/accepted-bids.php');
@@ -137,7 +132,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         appBar: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          automaticallyImplyLeading: false,
+          // automaticallyImplyLeading: false,
           // leading: FlutterFlowIconButton(
           //   borderColor: Colors.transparent,
           //   borderRadius: 30,
@@ -152,6 +147,7 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
           //     context.pop();
           //   },
           // ),
+
           title: Text(
             'On Bids',
             style: FlutterFlowTheme.of(context).headlineMedium.override(

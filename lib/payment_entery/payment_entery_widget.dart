@@ -662,6 +662,10 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         0.0, 0.0, 0.0, 16.0),
                                     child: FFButtonWidget(
                                       onPressed: () async {
+                                        SharedPreferences prefs =
+                                            await SharedPreferences
+                                                .getInstance();
+                                        // prefs.setInt('isRideStart', 4);
                                         if (extra ==
                                                 extraWaitingController.text &&
                                             parking == parkingController.text &&
@@ -672,7 +676,9 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      CompleteWidget()));
+                                                      CompleteWidget(
+                                                        isfromfare: true,
+                                                      )));
                                         } else {
                                           showDialog(
                                               context: context,
@@ -888,7 +894,9 @@ class _DailogForFareState extends State<DailogForFare> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CompleteWidget()));
+                            builder: (context) => CompleteWidget(
+                                  isfromfare: true,
+                                )));
                     setState(() {});
                     // if (isExcapted == 2) {
                     //   Navigator.push(

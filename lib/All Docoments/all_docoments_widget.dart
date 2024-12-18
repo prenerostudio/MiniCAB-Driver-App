@@ -2135,6 +2135,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
+    return null;
   }
 
   String? Back;
@@ -2163,6 +2164,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
+    return null;
   }
 
   String? AddressProof;
@@ -2223,6 +2225,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
+    return null;
   }
 
   String? PCO;
@@ -2250,6 +2253,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? DVLA;
@@ -2282,6 +2286,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? Insurance;
@@ -2309,6 +2314,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? Extra;
@@ -2336,6 +2342,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   // Vehicle Docments
@@ -2361,6 +2368,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? MotCertificate;
@@ -2386,6 +2394,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? Vpco;
@@ -2409,6 +2418,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? vFornt;
@@ -2435,6 +2445,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? vBack;
@@ -2460,6 +2471,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? roadTax;
@@ -2483,6 +2495,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? VRental;
@@ -2508,6 +2521,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? InsuranceSchedule;
@@ -2533,6 +2547,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? VInsurance;
@@ -2558,5 +2573,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 }

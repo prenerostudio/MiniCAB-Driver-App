@@ -75,14 +75,16 @@ class _PobWidgetState extends State<PobWidget> {
   List<LatLng> polylineCoordinates = [];
   String distanceText = '';
   String durationText = '';
-  late GoogleMapController _mapController;
+  // late GoogleMapController _mapController;
+  late GoogleMapController _controller;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  Completer<GoogleMapController> _controller = Completer();
+  // Completer<GoogleMapController> _controller = Completer();
   late CameraPosition _kGoogle;
   late Timer _locationTimer;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
-  late Position _currentPosition;
+  LatLng _currentPosition = LatLng(37.7749, -122.4194);
+  // late Position _currentPosition;
   bool isLoading = false;
   double dropffLat = 0;
   double dropffLng = 0;
@@ -190,21 +192,21 @@ class _PobWidgetState extends State<PobWidget> {
         child: Scaffold(
           key: scaffoldKey,
           backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            automaticallyImplyLeading: false,
-            title: Text(
-              'At DropOff',
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Outfit',
-                    color: FlutterFlowTheme.of(context).primary,
-                    fontSize: 22,
-                  ),
-            ),
-            actions: [],
-            centerTitle: true,
-            elevation: 2,
-          ),
+          // appBar: AppBar(
+          //   backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          //   automaticallyImplyLeading: false,
+          //   title: Text(
+          //     'At DropOff',
+          //     style: FlutterFlowTheme.of(context).headlineMedium.override(
+          //           fontFamily: 'Outfit',
+          //           color: FlutterFlowTheme.of(context).primary,
+          //           fontSize: 22,
+          //         ),
+          //   ),
+          //   actions: [],
+          //   centerTitle: true,
+          //   elevation: 2,
+          // ),
           body: SafeArea(
             top: true,
             child: SingleChildScrollView(
@@ -213,7 +215,7 @@ class _PobWidgetState extends State<PobWidget> {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: MediaQuery.sizeOf(context).height * 0.87,
+                    height: MediaQuery.sizeOf(context).height * 0.95,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                     ),
@@ -239,257 +241,404 @@ class _PobWidgetState extends State<PobWidget> {
                                 ),
                               )
                             : buildMap(),
-                        Align(
-                          alignment: AlignmentDirectional(0.00, 1.00),
-                          child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 0.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Container(
-                                  width: MediaQuery.sizeOf(context).width * 1.0,
-                                  height:
-                                      MediaQuery.sizeOf(context).height * 0.30,
-                                  decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Wrap(
-                                        children: [
-                                          Row(
-                                            mainAxisSize: MainAxisSize
-                                                .min, // Set this to MainAxisSize.min
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        10.0, 10.0, 0.0, 10.0),
-                                                child: Icon(
-                                                  Icons.pin_drop_outlined,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primary,
-                                                  size: 25,
-                                                ),
-                                              ),
-                                              Flexible(
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(10.0, 10.0, 0.0,
-                                                          20.0),
-                                                  child: Text(
-                                                    '${dropoff}',
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .labelMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondaryText,
-                                                          fontSize: 20.0,
-                                                          letterSpacing: 1.5,
-                                                        ),
-                                                    overflow: TextOverflow
-                                                        .ellipsis, // Handle text overflow with ellipsis
-                                                    maxLines:
-                                                        3, // Limit to a maximum of 2 lines
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            10, 10, 10, 0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+
+                        _buildTopNavigationBox(), // Display the navigation box
+                        Positioned(
+                          bottom: 0,
+                          child: Row(
+                            // mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Container(
+                                width: MediaQuery.sizeOf(context).width * 1.0,
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Column(
                                           children: [
-                                            FlutterFlowIconButton(
-                                              borderColor: Color(0xFF5B68F5),
-                                              borderWidth: 1,
-                                              buttonSize: 48,
-                                              fillColor: Color(0xFF5B68F5),
-                                              icon: FaIcon(
-                                                FontAwesomeIcons.ellipsisH,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
-                                                size: 24,
-                                              ),
-                                              onPressed: () async {
-                                                await showModalBottomSheet(
-                                                  isScrollControlled: true,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  enableDrag: false,
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return Padding(
-                                                      padding: MediaQuery
-                                                          .viewInsetsOf(
-                                                              context),
-                                                      child: WaydetailsWidget(
-                                                        time: '${pickTime}',
-                                                        date: '${pickDate}',
-                                                        passanger:
-                                                            '${passenger}',
-                                                        cName: '${cName}',
-                                                        cnumber: '${cnumber}',
-                                                        luggage: '${luggage}',
-                                                        pickup: '${pickup}',
-                                                        dropoff: '${dropoff}',
-                                                        cNote: '${note}',
-                                                        cemail: '${cemail}',
-                                                      ),
-                                                    );
-                                                  },
-                                                ).then((value) =>
-                                                    safeSetState(() {}));
-                                              },
+                                            Text(
+                                              'Distance',
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            FFButtonWidget(
-                                              onPressed: () async {
-                                                await showModalBottomSheet(
-                                                  isScrollControlled: true,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  enableDrag: false,
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return Padding(
-                                                      padding: MediaQuery
-                                                          .viewInsetsOf(
-                                                              context),
-                                                      child: ClientnotesWidget(
-                                                        name: '${cName}',
-                                                        notes: '${note}',
-                                                      ),
-                                                    );
-                                                  },
-                                                ).then((value) =>
-                                                    safeSetState(() {}));
-                                              },
-                                              text: 'VIEW NOTE',
-                                              icon: FaIcon(
-                                                FontAwesomeIcons.infoCircle,
-                                                size: 21,
-                                              ),
-                                              options: FFButtonOptions(
-                                                width:
-                                                    MediaQuery.sizeOf(context)
-                                                            .width *
-                                                        0.4,
-                                                height: 45,
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(24, 0, 24, 0),
-                                                iconPadding:
-                                                    EdgeInsetsDirectional
-                                                        .fromSTEB(0, 0, 0, 0),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                textStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .titleSmall
-                                                        .override(
-                                                          fontFamily:
-                                                              'Open Sans',
-                                                          color: Colors.white,
-                                                        ),
-                                                elevation: 3,
-                                                borderSide: BorderSide(
-                                                  color: Colors.transparent,
-                                                  width: 1,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
+                                            Text(
+                                              '$estDistance',
+                                              style: TextStyle(
+                                                fontSize: 13,
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            15, 20, 15, 0),
-                                        child: SwipeButton(
-                                          thumbPadding: EdgeInsets.all(3),
-                                          thumb: Icon(
-                                            Icons.chevron_right,
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                          ),
-                                          elevationThumb: 2,
-                                          elevationTrack: 2,
-                                          activeThumbColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primaryBackground,
-                                          activeTrackColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primary,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          child: Text(
-                                            'AT DROP OFF'.toUpperCase(),
-                                            style: TextStyle(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                        Container(
+                                          height: 20,
+                                          width: 1,
+                                          color: Colors.black,
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              'Duration',
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                          ),
-                                          onSwipe: () {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text('AT DROP OFF'),
-                                                backgroundColor:
+                                            Text(
+                                              '$duration',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Container(
+                                          height: 20,
+                                          width: 1,
+                                          color: Colors.black,
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              'Arrival Time',
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              '$arrivalTime',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                    // Text('Distance: $estDistance'),
+                                    // Text('Duration: $duration'),
+                                    // Text('Arrival Time: $arrivalTime'),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    // Text(
+                                    //   overflow: TextOverflow.ellipsis,
+                                    //   maxLines: 2,
+                                    //   'Address: $pickup $pickup $pickup',
+                                    //   style: TextStyle(
+                                    //       fontSize: 11,
+                                    //       fontWeight: FontWeight.bold),
+                                    // ),
+                                    Wrap(
+                                      children: [
+                                        Row(
+                                          mainAxisSize: MainAxisSize
+                                              .min, // Set this to MainAxisSize.min
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      10.0, 10.0, 0.0, 10.0),
+                                              child: Icon(
+                                                Icons.pin_drop_outlined,
+                                                color:
                                                     FlutterFlowTheme.of(context)
                                                         .primary,
+                                                size: 25,
                                               ),
-                                            );
-                                          },
-                                          onSwipeEnd: () async {
-                                            SharedPreferences sp =
-                                                await SharedPreferences
-                                                    .getInstance();
-
-                                            context.pushNamed(
-                                              'PaymentEntery',
-                                              queryParameters: {
-                                                'jobid': serializeParam(
-                                                    '${jobid}',
-                                                    ParamType.String),
-                                                'did': serializeParam(
-                                                    '${did}', ParamType.String),
-                                                'fare': serializeParam(
-                                                    '${fare}',
-                                                    ParamType.String),
-                                              }.withoutNulls,
-                                            );
-                                          },
+                                            ),
+                                            Flexible(
+                                              child: Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        10.0, 10.0, 0.0, 20.0),
+                                                child: Text(
+                                                  '${dropoff}',
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .labelMedium
+                                                      .override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .secondaryText,
+                                                        fontSize: 20.0,
+                                                        letterSpacing: 1.5,
+                                                      ),
+                                                  overflow: TextOverflow
+                                                      .ellipsis, // Handle text overflow with ellipsis
+                                                  maxLines:
+                                                      3, // Limit to a maximum of 2 lines
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          10, 10, 10, 0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          FlutterFlowIconButton(
+                                            borderColor: Color(0xFF5B68F5),
+                                            borderWidth: 1,
+                                            buttonSize: 48,
+                                            fillColor: Color(0xFF5B68F5),
+                                            icon: FaIcon(
+                                              FontAwesomeIcons.ellipsisH,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondaryBackground,
+                                              size: 24,
+                                            ),
+                                            onPressed: () async {
+                                              await showModalBottomSheet(
+                                                isScrollControlled: true,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                enableDrag: false,
+                                                context: context,
+                                                builder: (context) {
+                                                  return Padding(
+                                                    padding:
+                                                        MediaQuery.viewInsetsOf(
+                                                            context),
+                                                    child: WaydetailsWidget(
+                                                      time: '${pickTime}',
+                                                      date: '${pickDate}',
+                                                      passanger: '${passenger}',
+                                                      cName: '${cName}',
+                                                      cnumber: '${cnumber}',
+                                                      luggage: '${luggage}',
+                                                      pickup: '${pickup}',
+                                                      dropoff: '${dropoff}',
+                                                      cNote: '${note}',
+                                                      cemail: '${cemail}',
+                                                    ),
+                                                  );
+                                                },
+                                              ).then((value) =>
+                                                  safeSetState(() {}));
+                                            },
+                                          ),
+                                          FFButtonWidget(
+                                            onPressed: () async {
+                                              await showModalBottomSheet(
+                                                isScrollControlled: true,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                enableDrag: false,
+                                                context: context,
+                                                builder: (context) {
+                                                  return Padding(
+                                                    padding:
+                                                        MediaQuery.viewInsetsOf(
+                                                            context),
+                                                    child: ClientnotesWidget(
+                                                      name: '${cName}',
+                                                      notes: '${note}',
+                                                    ),
+                                                  );
+                                                },
+                                              ).then((value) =>
+                                                  safeSetState(() {}));
+                                            },
+                                            text: 'VIEW NOTE',
+                                            icon: FaIcon(
+                                              FontAwesomeIcons.infoCircle,
+                                              size: 21,
+                                            ),
+                                            options: FFButtonOptions(
+                                              width: MediaQuery.sizeOf(context)
+                                                      .width *
+                                                  0.4,
+                                              height: 45,
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(24, 0, 24, 0),
+                                              iconPadding: EdgeInsetsDirectional
+                                                  .fromSTEB(0, 0, 0, 0),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                              textStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .titleSmall
+                                                      .override(
+                                                        fontFamily: 'Open Sans',
+                                                        color: Colors.white,
+                                                      ),
+                                              elevation: 3,
+                                              borderSide: BorderSide(
+                                                color: Colors.transparent,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          15, 20, 15, 0),
+                                      child: SwipeButton(
+                                        thumbPadding: EdgeInsets.all(3),
+                                        thumb: Icon(
+                                          Icons.chevron_right,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                        ),
+                                        elevationThumb: 2,
+                                        elevationTrack: 2,
+                                        activeThumbColor:
+                                            FlutterFlowTheme.of(context)
+                                                .primaryBackground,
+                                        activeTrackColor:
+                                            FlutterFlowTheme.of(context)
+                                                .primary,
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Text(
+                                          'AT DROP OFF'.toUpperCase(),
+                                          style: TextStyle(
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryBackground,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        onSwipe: () {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text('AT DROP OFF'),
+                                              backgroundColor:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                            ),
+                                          );
+                                        },
+                                        onSwipeEnd: () async {
+                                          SharedPreferences sp =
+                                              await SharedPreferences
+                                                  .getInstance();
+
+                                          sp.setInt('isRideStart', 3);
+                                          context.pushNamed(
+                                            'PaymentEntery',
+                                            queryParameters: {
+                                              'jobid': serializeParam(
+                                                  '${jobid}', ParamType.String),
+                                              'did': serializeParam(
+                                                  '${did}', ParamType.String),
+                                              'fare': serializeParam(
+                                                  '${fare}', ParamType.String),
+                                            }.withoutNulls,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
+                        Positioned(
+                          bottom: MediaQuery.sizeOf(context).height * 0.40,
+                          right: 10,
+                          child: Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  await showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    enableDrag: false,
+                                    context: context,
+                                    builder: (context) {
+                                      return Padding(
+                                        padding:
+                                            MediaQuery.viewInsetsOf(context),
+                                        child: ClientnotesWidget(
+                                          name: '${cName}',
+                                          notes: '${note}',
+                                        ),
+                                      );
+                                    },
+                                  ).then((value) => safeSetState(() {}));
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      shape: BoxShape.circle),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.info_outline,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(
+                                height: 8,
+                              ),
+
+                              Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    shape: BoxShape.circle),
+                                child: Center(
+                                  child: Transform.rotate(
+                                    angle: _cameraRotation *
+                                        (3.14159265359 /
+                                            180), // Convert heading to radians
+                                    child: Icon(
+                                      Icons.navigation,
+                                      size: 30,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              // Container(
+                              //   height: 40,
+                              //   width: 40,
+                              //   decoration: BoxDecoration(
+                              //       color: Colors.black, shape: BoxShape.circle),
+                              // )
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -505,19 +654,18 @@ class _PobWidgetState extends State<PobWidget> {
   Widget buildMap() {
     return GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: LatLng(
-            latitude ?? 0.0,
-            longitude ?? 0.0,
-          ),
+          target: _currentPosition,
           zoom: 14,
         ),
         myLocationEnabled: false,
-        myLocationButtonEnabled: true,
+        myLocationButtonEnabled: false,
         compassEnabled: true,
         rotateGesturesEnabled: true,
         tiltGesturesEnabled: true,
         scrollGesturesEnabled: true,
+        zoomControlsEnabled: false,
         zoomGesturesEnabled: true,
+        onCameraMove: _onCameraMove,
         onMapCreated: _onMapCreated,
         markers: {
           Marker(
@@ -562,7 +710,7 @@ class _PobWidgetState extends State<PobWidget> {
       await _getPolyline(destinationLat, destinationLng);
 
       // Optionally, move the camera to the new current location
-      _mapController.animateCamera(
+      _controller.animateCamera(
         CameraUpdate.newLatLng(LatLng(latitude, longitude)),
       );
     } catch (e) {}
@@ -579,8 +727,7 @@ class _PobWidgetState extends State<PobWidget> {
 
         _getPolyline(locations.first.latitude, locations.first.longitude);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future _getPolyline(double destinationLat, double desLng) async {
@@ -599,6 +746,19 @@ class _PobWidgetState extends State<PobWidget> {
       // Parse the JSON response
       final data = jsonDecode(response.body);
       // print(data);
+
+      final steps = data['routes'][0]['legs'][0]['steps'];
+      double distanceInKm =
+          double.tryParse(distance!.replaceAll(' km', '')) ?? 0.0;
+      double distanceInMiles = distanceInKm * 0.621371;
+      _navigationSteps = steps.map<Map<String, dynamic>>((step) {
+        return {
+          'instruction': step['html_instructions'],
+          'distance': "${distanceInMiles.toStringAsFixed(2)} miles",
+          'duration': step['duration']['text'],
+          'polyline': step['polyline']['points'],
+        };
+      }).toList();
       if (data.containsKey('routes') && data['routes'].isNotEmpty) {
         final route = data['routes'][0];
         if (route.containsKey('legs') && route['legs'].isNotEmpty) {
@@ -606,6 +766,17 @@ class _PobWidgetState extends State<PobWidget> {
           setState(() {});
           if (leg.containsKey('distance')) {
             distance = leg['distance']['text'];
+            // time.value = leg['duration']['text'];
+            double distanceInKm =
+                double.tryParse(distance!.replaceAll(' km', '')) ?? 0.0;
+            double distanceInMiles = distanceInKm * 0.621371;
+            // time.value = leg['duration']['text'];
+            estDistance = "${distanceInMiles.toStringAsFixed(2)} miles";
+            // estDistance = leg['distance']['text'];
+            duration = leg['duration']['text'];
+            arrivalTime = leg['arrival_time'] != null
+                ? leg['arrival_time']['text']
+                : 'Unavailable';
             // time.value = leg['duration']['text'];
 
             final points = route['overview_polyline']['points'];
@@ -628,6 +799,91 @@ class _PobWidgetState extends State<PobWidget> {
         }
       }
     }
+  }
+
+  String estDistance = 'Calculating...';
+  String duration = 'Calculating...';
+  String arrivalTime = 'Calculating...';
+  IconData _getArrowIcon(String instruction) {
+    if (instruction.toLowerCase().contains('left')) {
+      return Icons.turn_left; // Left turn
+    } else if (instruction.toLowerCase().contains('right')) {
+      return Icons.turn_right; // Right turn
+    } else if (instruction.toLowerCase().contains('head')) {
+      return Icons.straight; // Straight ahead
+    } else if (instruction.toLowerCase().contains('u-turn')) {
+      return Icons.u_turn_left; // U-turn
+    } else {
+      return Icons.navigation; // Default navigation icon
+    }
+  }
+
+  void _onCameraMove(CameraPosition position) {
+    setState(() {
+      _heading = position.bearing; // Capture the camera's rotation
+      _cameraRotation = position.bearing; // Capture the camera's rotation
+    });
+  }
+
+  double _cameraRotation = 0.0; // Track camera's rotation angle
+  Widget _buildTopNavigationBox() {
+    if (_navigationSteps.isEmpty) return SizedBox.shrink();
+
+    final currentStep = _navigationSteps.first;
+
+    // Extracting the direction and text
+    String instruction = currentStep['instruction'];
+    String distance = currentStep['distance'];
+    IconData arrowIcon =
+        _getArrowIcon(instruction); // Get the appropriate arrow icon
+
+    return Positioned(
+      // top: 8,
+      // left: 5,
+      // right: 8,
+      child: Container(
+        height: 100,
+        padding: EdgeInsets.only(left: 11, right: 12, top: 18, bottom: 5),
+        decoration: BoxDecoration(
+          color: FlutterFlowTheme.of(context).primary,
+          // borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(color: Colors.black26, blurRadius: 5),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(arrowIcon, color: Colors.white, size: 32), // Arrow icon
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    instruction.replaceAll(RegExp(r'<[^>]*>'), ''),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'In $distance ',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   double convertedLat = 0;
@@ -674,10 +930,8 @@ class _PobWidgetState extends State<PobWidget> {
       });
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
-      } else {
-      }
-    } catch (error) {
-    }
+      } else {}
+    } catch (error) {}
   }
 
   GoogleDistanceMatrix googleDistanceMatrix = GoogleDistanceMatrix();
@@ -695,7 +949,7 @@ class _PobWidgetState extends State<PobWidget> {
   String distance1 = '';
   String? originAddresses;
   String? destinationAddresses;
-  String? duration;
+  // String? duration;
 
   Future<String?> getDistanceMatrix() async {
     var request = await http.Request(
@@ -740,13 +994,133 @@ class _PobWidgetState extends State<PobWidget> {
       );
 
       setState(() {
-        _currentPosition = position;
-        currentLatitude = position.latitude;
-        currentLongitude = position.longitude;
+        _currentPosition = LatLng(position.latitude, position.longitude);
+        latitude = position.latitude;
+        longitude = position.longitude;
       });
+
+      _updateCameraWithZoom(
+          _currentPosition); // Move the camera to the current location
+      debugPrint('the converted Latlng are ${convertedLat} ${convertedLng}');
+      // _getPolyline(convertedLat, convertedLng);
+      // (); // Fetch directions after getting the current location
+      _trackLocation(); // Start tracking the user's movement
     } catch (e) {
+      print('Error fetching current location: $e');
     }
   }
+
+  void _trackLocation() {
+    Geolocator.getPositionStream(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) {
+      setState(() {
+        _currentPosition = LatLng(position.latitude, position.longitude);
+        _heading = position.heading; // Get the heading from the location
+        print('the heading position ${position.heading}');
+      });
+      updatePolyline();
+      _updateCameraPosition(_currentPosition);
+      _updateCameraWithZoom(_currentPosition); // Auto-follow user
+      _checkStepCompletion(position);
+    });
+  }
+
+  double _heading = 0.0;
+  void _checkStepCompletion(Position position) {
+    if (_navigationSteps.isEmpty) return;
+
+    final currentStep = _navigationSteps[0];
+    final stepPolyline = PolylinePoints()
+        .decodePolyline(currentStep['polyline'])
+        .map((point) => LatLng(point.latitude, point.longitude))
+        .toList();
+
+    double distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      stepPolyline.last.latitude,
+      stepPolyline.last.longitude,
+    );
+
+    if (distance < 20) {
+      // Step completion threshold
+      // _speakInstruction(currentStep['instruction']); // Speak the instruction
+      setState(() {
+        _navigationSteps.removeAt(0);
+      });
+
+      if (_navigationSteps.isNotEmpty) {
+        final nextStepPolyline = PolylinePoints().decodePolyline(
+          _navigationSteps[0]['polyline'],
+        );
+
+        _controller.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(
+              nextStepPolyline.last.latitude,
+              nextStepPolyline.last.longitude,
+            ),
+            17.5,
+          ),
+        );
+      }
+    }
+  }
+
+  void _updateCameraPosition(LatLng position) {
+    _controller.animateCamera(CameraUpdate.newLatLng(position));
+  }
+
+  void _updateCameraWithZoom(LatLng position) {
+    _controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+            target: position,
+            zoom: 17.5, // Adjust zoom level for navigation
+            tilt: 60, // Add tilt for a 3D-like view
+            bearing: _calculateBearing()), // Zoom and tilt
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> _navigationSteps = [];
+  double _calculateBearing() {
+    if (_navigationSteps.isEmpty) return 0;
+
+    final nextStep = _navigationSteps.first;
+    final decodedPolyline =
+        PolylinePoints().decodePolyline(nextStep['polyline']);
+
+    if (decodedPolyline.length < 2) return 0;
+
+    final start = decodedPolyline.first;
+    final end = decodedPolyline.last;
+
+    return Geolocator.bearingBetween(
+      start.latitude,
+      start.longitude,
+      end.latitude,
+      end.longitude,
+    );
+  }
+
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+
+  //     setState(() {
+  //       _currentPosition = position;
+  //       currentLatitude = position.latitude;
+  //       currentLongitude = position.longitude;
+  //     });
+  //   } catch (e) {}
+  // }
 
   Future<void> _setupMarkersAndPolylines() async {
     setState(() {
@@ -822,17 +1196,16 @@ class _PobWidgetState extends State<PobWidget> {
         final location = geometry['location'];
         dropffLat = location['lat'];
         dropffLng = location['lng'];
-      } else {
-      }
-    } else {
-    }
+      } else {}
+    } else {}
   }
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
     await _getCurrentLocation();
     // await MapOptionDialog(context);
     setState(() {
-      _mapController = controller;
+      _controller = controller;
+      _getCurrentLocation();
     });
 
     final directionsService = DirectionsService();
@@ -870,8 +1243,7 @@ class _PobWidgetState extends State<PobWidget> {
             );
           }
         });
-      } else {
-      }
+      } else {}
     });
   }
 
@@ -906,43 +1278,4 @@ class _PobWidgetState extends State<PobWidget> {
     }
     return points;
   }
-
-  // Future MapOptionDialog(BuildContext context) {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Choose Map Option'),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             ListTile(
-  //               leading: SizedBox(
-  //                 width: 25,
-  //                 height: 25,
-  //                 child: Image.asset('assets/images/google.png'),
-  //               ),
-  //               title: Text('Using Google Maps'),
-  //               onTap: () {
-  //                 Navigator.pop(context);
-  //                 MapUtils.navigateTo(dropffLat, dropffLng);
-  //               },
-  //             ),
-  //             ListTile(
-  //               leading: SizedBox(
-  //                 width: 25,
-  //                 height: 25,
-  //                 child: Image.asset('assets/images/app_launcher_icon.png'),
-  //               ),
-  //               title: Text('Using Another App'),
-  //               onTap: () {
-  //                 Navigator.pop(context);
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }

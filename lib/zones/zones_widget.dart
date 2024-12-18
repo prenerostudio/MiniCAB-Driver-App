@@ -1,17 +1,10 @@
-import 'dart:isolate';
-import 'package:system_alert_window/system_alert_window.dart';
-import '../Data/overlay.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'zones_model.dart';
 export 'zones_model.dart';
 import 'package:http/http.dart' as http;
-import '../Model/Zone.dart';
 import 'dart:convert';
 
 class ZonesWidget extends StatefulWidget {
@@ -44,7 +37,8 @@ class _ZonesWidgetState extends State<ZonesWidget> {
 
   Future<void> getZonesData() async {
     try {
-      final Uri url = Uri.parse('https://minicaboffice.com/api/driver/zones.php');
+      final Uri url =
+          Uri.parse('https://minicaboffice.com/api/driver/zones.php');
       final response = await http.get(url);
 
       print('Response status: ${response.statusCode}');
@@ -55,7 +49,8 @@ class _ZonesWidgetState extends State<ZonesWidget> {
 
         // Ensure to map the dynamic list to a list of strings
         setState(() {
-          zones = List<String>.from(data.map((zone) => zone['zone_name'] as String)); // Corrected line
+          zones = List<String>.from(data
+              .map((zone) => zone['zone_name'] as String)); // Corrected line
           print('Successfully fetched zones: $zones');
         });
       } else {
@@ -98,26 +93,27 @@ class _ZonesWidgetState extends State<ZonesWidget> {
           title: Text(
             'Zones List',
             style: FlutterFlowTheme.of(context).headlineMedium.override(
-              fontFamily: 'Outfit',
-              color: FlutterFlowTheme.of(context).primary,
-              fontSize: 22,
-            ),
+                  fontFamily: 'Outfit',
+                  color: FlutterFlowTheme.of(context).primary,
+                  fontSize: 22,
+                ),
           ),
           centerTitle: true,
           elevation: 2,
         ),
         body: zones.isEmpty
-            ? Center(child: CircularProgressIndicator()) // Show loading indicator
+            ? Center(
+                child: CircularProgressIndicator()) // Show loading indicator
             : ListView.builder(
-          itemCount: zones.length,
-          itemBuilder: (context, index) {
-            return Container(
-              child: ListTile(
-                title: Text(zones[index]), // Display the zone name
+                itemCount: zones.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    child: ListTile(
+                      title: Text(zones[index]), // Display the zone name
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
     );
   }

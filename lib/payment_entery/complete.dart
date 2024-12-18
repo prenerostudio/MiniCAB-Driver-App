@@ -19,7 +19,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class CompleteWidget extends StatefulWidget {
-  const CompleteWidget({super.key});
+  bool? isfromfare;
+  CompleteWidget({super.key, this.isfromfare});
 
   @override
   State<CompleteWidget> createState() => _CompleteWidgetState();
@@ -31,7 +32,8 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   @override
   void initState() {
     super.initState();
-    getCompleteViewData();
+    fetchAndSaveFares();
+
     _model = createModel(context as BuildContext, () => OnWayModel());
   }
 
@@ -54,6 +56,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   String pickupTime = '--';
   String pickUplocation = '--';
   String dropOflocation = '--';
+
   getCompleteViewData() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     await sp.setInt('isRideStart', 3);
@@ -73,6 +76,77 @@ class _CompleteWidgetState extends State<CompleteWidget> {
     print('timer value $time');
     setState(() {});
 // sp.setString('timerValue', time)
+  }
+
+  Future<void> fetchAndSaveFares() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    jobid = sp.getString('jobId') ?? '';
+    setState(() {});
+    final url = Uri.parse(
+      'https://www.minicaboffice.com/api/driver/fetch-fares.php',
+    );
+
+    try {
+      final Map<String, String> body = {'job_id': jobid};
+
+      // Make POST request
+      final response = await http.post(
+        url,
+        // headers: {"Content-Type": "application/json"}, // Set headers
+        body: body, // Convert body to JSON string
+      );
+      print('the response is ${response.body}');
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+
+        // Check if the API call was successful and contains data
+        if (responseBody['status'] == true) {
+          final fare = responseBody['data'][0];
+
+          // Extract parameters
+          String journeyFare = fare['journey_fare'] ?? '0';
+          String carParking = fare['car_parking'] ?? '0';
+          String waiting = fare['waiting'] ?? '0';
+          String tolls = fare['tolls'] ?? '0';
+          String extras = fare['extras'] ?? '0';
+
+          // Calculate total fee
+          String totalFee = (double.parse(journeyFare) +
+                  double.parse(carParking) +
+                  double.parse(waiting) +
+                  double.parse(tolls) +
+                  double.parse(extras))
+              .toString();
+
+          // Save to SharedPreferences
+          await saveData(
+              journeyFare, carParking, extras, waiting, tolls, totalFee);
+
+          await getCompleteViewData();
+        } else {
+          print("No data available or invalid response status.");
+        }
+      } else {
+        print("API call failed with status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      await getCompleteViewData();
+      print("Error while fetching fares: $e");
+    }
+  }
+
+  // Function to save data to SharedPreferences
+  Future<void> saveData(String jfare, String carparking, String extra,
+      String waiting, String tolls, String totalFee) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('journey_fare', jfare);
+    await prefs.setString('car_parking', carparking);
+    await prefs.setString('extra', extra);
+    await prefs.setString('waiting', waiting);
+    await prefs.setString('tolls', tolls);
+    await prefs.setString('totalFee', totalFee);
+    setState(() {});
+    print("Data saved successfully to SharedPreferences!");
   }
 
   final JobController myController = Get.put(JobController());
@@ -159,108 +233,83 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       color: Color(0xFF1C1F28),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        IconButton(
+                          onPressed: () {
+                            // Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: widget.isfromfare == null
+                                ? Colors.transparent
+                                : Colors.transparent,
+                          ),
+                        ),
+                        Row(
                           children: [
-                            Text(
-                              'PAY BY',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                    fontSize: 16,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                            ),
-                            Row(
+                            Column(
                               mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                FaIcon(
-                                  FontAwesomeIcons.moneyBillWaveAlt,
-                                  color: Color(0xFF5B68F5),
-                                  size: 28,
+                                Text(
+                                  'PAY BY',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        fontFamily: 'Open Sans',
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryBackground,
+                                        fontSize: 16,
+                                        letterSpacing: 0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      8, 0, 0, 0),
-                                  child: Text(
-                                    'Cash',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
-                                          fontSize: 16,
-                                          letterSpacing: 0,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    FaIcon(
+                                      FontAwesomeIcons.moneyBillWaveAlt,
+                                      color: Color(0xFF5B68F5),
+                                      size: 28,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          8, 0, 0, 0),
+                                      child: Text(
+                                        'Cash',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'Open Sans',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
+                                              fontSize: 16,
+                                              letterSpacing: 0,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                        // SizedBox(
-                        //   height: 50,
-                        //   child: StyledVerticalDivider(
-                        //     width: 30,
-                        //     thickness: 3,
-                        //     color: FlutterFlowTheme.of(context).accent4,
-                        //     lineStyle: DividerLineStyle.dotted,
-                        //   ),
-                        // ),
-                        Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
-                              child: Text(
-                                'CLIENT PAYS',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
-                                      fontSize: 16,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text(
-                                    '£ $totalFee',
-                                    style: FlutterFlowTheme.of(context)
-                                        .titleLarge
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
-                                          letterSpacing: 0,
-                                        ),
-                                  ),
-                                  Text(
-                                    'Inc, VAT',
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 0, 5),
+                                  child: Text(
+                                    'CLIENT PAYS',
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -272,10 +321,49 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 0, 5),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Text(
+                                        '£ $totalFee',
+                                        style: FlutterFlowTheme.of(context)
+                                            .titleLarge
+                                            .override(
+                                              fontFamily: 'Open Sans',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
+                                              letterSpacing: 0,
+                                            ),
+                                      ),
+                                      Text(
+                                        'Inc, VAT',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              fontFamily: 'Open Sans',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
+                                              fontSize: 16,
+                                              letterSpacing: 0,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
+                        ),
+                        Icon(
+                          Icons.arrow_back,
+                          color: Colors.transparent,
                         ),
                       ],
                     ),

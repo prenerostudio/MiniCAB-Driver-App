@@ -50,16 +50,11 @@ class _AccountDetailsWidgetState extends State<AccountDetailsWidget> {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''] ?? [];
 
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        print(paymentData);
-        return paymentData;
-      } else {
-        print('Invalid data format received.');
-        return []; // Return an empty list in case of invalid data format.
-      }
-    } else {
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      print(paymentData);
+      return paymentData;
+        } else {
       print('Error: ${response.reasonPhrase}');
       return []; // Return an empty list in case of an error.
     }

@@ -56,7 +56,7 @@ void endBreak() async {
   String? breakId = prefs.getString('breakId');
   var request = http.MultipartRequest('POST', Uri.parse('https://www.minicaboffice.com/api/driver/end-break.php'));
   request.fields.addAll({
-    'bt_id': breakId!,
+    'bt_id': breakId,
     'd_id': dId.toString(),
     "total_time": _model.timerValue
   });

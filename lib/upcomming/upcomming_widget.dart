@@ -66,6 +66,16 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         context: context,
         builder: (context) {
           return GestureDetector(
+            onVerticalDragUpdate: (details) {
+              if (details.primaryDelta! > 20) {
+                // Close the BottomSheet on a downward swipe
+                Navigator.pop(context);
+              }
+            },
+            // onVerticalDragDown: (details) {
+            //   Navigator.pop(context);
+            //   debugPrint('downSwipped');
+            // },
             onTap: () => _model.unfocusNode.canRequestFocus
                 ? FocusScope.of(context).requestFocus(_model.unfocusNode)
                 : FocusScope.of(context).unfocus(),

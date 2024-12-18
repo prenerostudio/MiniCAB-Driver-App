@@ -101,6 +101,7 @@ dependencies:
   pdf: ^3.10.7
   open_file: ^3.3.2
 #  location: ^5.0.3
+  flutter_tts: ^3.7.0
   flutter_datetime_picker: ^1.5.1
   cupertino_icons: ^1.0.0
   google_maps_routes: ^1.1.2
@@ -118,6 +119,8 @@ dependencies:
   pusher_client_fixed: ^0.0.4+1
   get: ^4.6.6
   audioplayers: ^6.0.0
+  flutter_widget_from_html_core: ^0.15.2
+  # flutter_mapbox_navigation: ^0.2.2
 
 
 

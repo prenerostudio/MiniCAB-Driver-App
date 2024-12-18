@@ -636,11 +636,9 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                           firstDate: DateTime(2024),
                                           lastDate: DateTime(2040),
                                         );
-                                        if (selectedDate != null) {
-                                          String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
-                                          PHVEController.text = formattedDate;
-                                        }
-                                      },
+                                        String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
+                                        PHVEController.text = formattedDate;
+                                                                            },
                                       child: Icon(Icons.calendar_today),
                                     ),
                                     filled: true,
@@ -791,11 +789,9 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                         firstDate: DateTime(2024),
                                         lastDate: DateTime(2040),
                                       );
-                                      if (selectedDate != null) {
-                                        String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
-                                        TIEController.text = formattedDate;
-                                      }
-                                    },
+                                      String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
+                                      TIEController.text = formattedDate;
+                                                                        },
                                     child: Icon(Icons.calendar_today),
                                   ),
                                   filled: true,
@@ -944,11 +940,9 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                         firstDate: DateTime(2024),
                                         lastDate: DateTime(2040),
                                       );
-                                      if (selectedDate != null) {
-                                        String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
-                                        MOTEController.text = formattedDate;
-                                      }
-                                    },
+                                      String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
+                                      MOTEController.text = formattedDate;
+                                                                        },
                                     child: Icon(Icons.calendar_today),
                                   ),
                                   filled: true,

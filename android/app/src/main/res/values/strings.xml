@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">MiniCab</string>
-
+ <string name="mapbox_access_token">pk.eyJ1IjoicHJlbmVyb3N0dWRpb3MiLCJhIjoiY200cHZldHNwMHl3cTJrb2czb2cyYng1MyJ9.aSTxZ61cD1SEYJBcuDrx_w</string>
 </resources>
+
