@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'customer_details_widget.dart';
+import 'onway_widget.dart';
 import 'upcommingjob_model.dart';
 export 'upcommingjob_model.dart';
 import 'package:geolocator/geolocator.dart';
@@ -144,12 +146,13 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
           maxChildSize: 1,
           builder: (context, scrollController) {
             return Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 100.0, 0.0, 0.0),
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(0.0, 100.0, 0.0, 0.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
+                  const Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -186,8 +189,18 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                       color: FlutterFlowTheme.of(context).primaryBackground,
                       child: Column(
                         children: [
+                          SizedBox(
+                            height: 7,
+                          ),
+                          Container(
+                            height: 4,
+                            width: 36,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(38),
+                                color: Colors.grey.withOpacity(0.3)),
+                          ),
                           Align(
-                            alignment: Alignment(0, 0),
+                            alignment: const Alignment(0, 0),
                             child: TabBar(
                               labelColor: FlutterFlowTheme.of(context).primary,
                               unselectedLabelColor:
@@ -198,15 +211,15 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                     fontFamily: 'Open Sans',
                                     letterSpacing: 0,
                                   ),
-                              unselectedLabelStyle: TextStyle(),
+                              unselectedLabelStyle: const TextStyle(),
                               indicatorColor:
                                   FlutterFlowTheme.of(context).primary,
-                              padding: EdgeInsets.all(15),
+                              padding: const EdgeInsets.all(15),
                               tabs: [
-                                Tab(
+                                const Tab(
                                   text: 'Upcoming',
                                 ),
-                                Tab(
+                                const Tab(
                                   text: 'Next Week',
                                 ),
                               ],
@@ -229,8 +242,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            10.0, 10.0, 10.0, 30.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(10.0, 10.0, 10.0, 30.0),
                                         child: FutureBuilder<List<Job>>(
                                           future: jobDetails(),
                                           builder: (BuildContext context,
@@ -238,7 +251,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                   snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
-                                              return Center(
+                                              return const Center(
                                                   child:
                                                       CircularProgressIndicator(
                                                 valueColor:
@@ -252,9 +265,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Text(
+                                                    const Text(
                                                         'No Job is Available.'),
-                                                    SizedBox(height: 20),
+                                                    const SizedBox(height: 20),
                                                     FFButtonWidget(
                                                       onPressed: () async {
                                                         context.pushNamed(
@@ -264,8 +277,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                       options: FFButtonOptions(
                                                         width: double.infinity,
                                                         height: 40.0,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
                                                                 horizontal:
                                                                     24.0),
                                                         color:
@@ -283,7 +297,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                       .white,
                                                                 ),
                                                         elevation: 3.0,
-                                                        borderSide: BorderSide(
+                                                        borderSide:
+                                                            const BorderSide(
                                                           color: Colors
                                                               .transparent,
                                                           width: 1.0,
@@ -298,7 +313,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                               );
                                             } else if (!snapshot.hasData ||
                                                 snapshot.data!.isEmpty) {
-                                              return Center(
+                                              return const Center(
                                                   child: Text(
                                                       'No Job is Available.'));
                                             } else {
@@ -313,16 +328,18 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                   final jobItem =
                                                       jobDetails[index];
                                                   return Padding(
-                                                    padding: EdgeInsets.all(12),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
                                                     child: Column(
                                                       mainAxisSize:
                                                           MainAxisSize.max,
                                                       children: [
                                                         Padding(
                                                           padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(0,
-                                                                      0, 0, 8),
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                  0, 0, 0, 8),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -378,7 +395,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         ),
                                                                   ),
                                                                 ].divide(
-                                                                    SizedBox(
+                                                                    const SizedBox(
                                                                         height:
                                                                             4)),
                                                               ),
@@ -387,7 +404,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              EdgeInsets.all(0),
+                                                              const EdgeInsets
+                                                                  .all(0),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -399,7 +417,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                 CrossAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Icon(
+                                                              const Icon(
                                                                 Icons.business,
                                                                 color: Color(
                                                                     0xFF5B68F5),
@@ -427,8 +445,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
+                                                                    padding:
+                                                                        const EdgeInsetsDirectional
+                                                                            .fromSTEB(
                                                                             10,
                                                                             0,
                                                                             0,
@@ -449,7 +468,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                               ),
                                                                         ),
                                                                         Padding(
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          padding: const EdgeInsetsDirectional
+                                                                              .fromSTEB(
                                                                               0,
                                                                               15,
                                                                               0,
@@ -467,8 +487,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
+                                                                    padding:
+                                                                        const EdgeInsetsDirectional
+                                                                            .fromSTEB(
                                                                             80,
                                                                             0,
                                                                             0,
@@ -489,7 +510,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                               ),
                                                                         ),
                                                                         Padding(
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          padding: const EdgeInsetsDirectional
+                                                                              .fromSTEB(
                                                                               0,
                                                                               15,
                                                                               0,
@@ -508,14 +530,15 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                   ),
                                                                 ],
                                                               ),
-                                                            ].divide(SizedBox(
-                                                                width: 16)),
+                                                            ].divide(
+                                                                const SizedBox(
+                                                                    width: 16)),
                                                           ),
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              EdgeInsets.all(
-                                                                  12),
+                                                              const EdgeInsets
+                                                                  .all(12),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -540,7 +563,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                           30,
                                                                       decoration:
                                                                           BoxDecoration(
-                                                                        color: Color(
+                                                                        color: const Color(
                                                                             0xFF5B68F5),
                                                                         borderRadius:
                                                                             BorderRadius.circular(50),
@@ -549,7 +572,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         border:
                                                                             Border.all(
                                                                           color:
-                                                                              Color(0xFF5B68F5),
+                                                                              const Color(0xFF5B68F5),
                                                                           width:
                                                                               2,
                                                                         ),
@@ -573,7 +596,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                   ),
                                                                   Padding(
                                                                     padding:
-                                                                        EdgeInsets
+                                                                        const EdgeInsets
                                                                             .only(
                                                                       top: 5,
                                                                       left: 25,
@@ -591,14 +614,14 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                             height:
                                                                                 80,
                                                                             decoration:
-                                                                                BoxDecoration(
+                                                                                const BoxDecoration(
                                                                               color: Color(0xFFE5E7EB),
                                                                             ),
                                                                           ),
                                                                         ),
                                                                         Padding(
                                                                           padding:
-                                                                              EdgeInsets.only(
+                                                                              const EdgeInsets.only(
                                                                             top:
                                                                                 25,
                                                                           ),
@@ -609,7 +632,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                             height:
                                                                                 30,
                                                                             decoration:
-                                                                                BoxDecoration(
+                                                                                const BoxDecoration(
                                                                               color: Color.fromRGBO(0, 0, 0, 0.0),
                                                                               shape: BoxShape.circle,
                                                                             ),
@@ -619,10 +642,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsets
+                                                                    padding: const EdgeInsets
                                                                         .only(
-                                                                            top:
-                                                                                5),
+                                                                        top: 5),
                                                                     child:
                                                                         Container(
                                                                       width: 30,
@@ -630,14 +652,14 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                           30,
                                                                       decoration:
                                                                           BoxDecoration(
-                                                                        color: Color(
+                                                                        color: const Color(
                                                                             0xFF5B68F5),
                                                                         shape: BoxShape
                                                                             .circle,
                                                                         border:
                                                                             Border.all(
                                                                           color:
-                                                                              Color(0xFF5B68F5),
+                                                                              const Color(0xFF5B68F5),
                                                                           width:
                                                                               2,
                                                                         ),
@@ -661,7 +683,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                   ),
                                                                 ],
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                   width:
                                                                       20), // Added SizedBox for spacing
                                                               Expanded(
@@ -675,7 +697,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         Flexible(
                                                                           child:
                                                                               Padding(
-                                                                            padding: EdgeInsets.only(
+                                                                            padding: const EdgeInsets.only(
                                                                                 left: 10,
                                                                                 top: 10,
                                                                                 bottom: 20),
@@ -695,13 +717,14 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                       ],
                                                                     ),
                                                                     Padding(
-                                                                      padding: EdgeInsets.only(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
                                                                           bottom:
                                                                               40),
                                                                       child:
                                                                           Row(
                                                                         children: [
-                                                                          FaIcon(
+                                                                          const FaIcon(
                                                                             FontAwesomeIcons.bong,
                                                                             color:
                                                                                 Color(0xFF5B68F5),
@@ -710,7 +733,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                           ),
                                                                           Padding(
                                                                             padding:
-                                                                                EdgeInsets.only(left: 8),
+                                                                                const EdgeInsets.only(left: 8),
                                                                             child:
                                                                                 Text(
                                                                               '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Mailes ${jobItem.journeyType}',
@@ -729,7 +752,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         Flexible(
                                                                           child:
                                                                               Padding(
-                                                                            padding: EdgeInsets.only(
+                                                                            padding: const EdgeInsets.only(
                                                                                 left: 10,
                                                                                 top: 10,
                                                                                 bottom: 20),
@@ -760,10 +783,12 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                               .secondaryText,
                                                         ),
                                                       ]
-                                                          .divide(SizedBox(
-                                                              height: 4))
-                                                          .addToEnd(SizedBox(
-                                                              height: 12)),
+                                                          .divide(
+                                                              const SizedBox(
+                                                                  height: 4))
+                                                          .addToEnd(
+                                                              const SizedBox(
+                                                                  height: 12)),
                                                     ),
                                                   );
                                                 },
@@ -781,8 +806,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            10.0, 10.0, 10.0, 30.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(10.0, 10.0, 10.0, 30.0),
                                         child: FutureBuilder<List<Job>>(
                                           future: jobDetailsNextWeek(),
                                           builder: (BuildContext context,
@@ -790,7 +815,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                   snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
-                                              return Center(
+                                              return const Center(
                                                   child:
                                                       CircularProgressIndicator(
                                                 valueColor:
@@ -804,9 +829,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Text(
+                                                    const Text(
                                                         'No Job is Available.'),
-                                                    SizedBox(height: 20),
+                                                    const SizedBox(height: 20),
                                                     FFButtonWidget(
                                                       onPressed: () async {
                                                         context.pushNamed(
@@ -816,8 +841,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                       options: FFButtonOptions(
                                                         width: double.infinity,
                                                         height: 40.0,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
                                                                 horizontal:
                                                                     24.0),
                                                         color:
@@ -835,7 +861,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                       .white,
                                                                 ),
                                                         elevation: 3.0,
-                                                        borderSide: BorderSide(
+                                                        borderSide:
+                                                            const BorderSide(
                                                           color: Colors
                                                               .transparent,
                                                           width: 1.0,
@@ -850,7 +877,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                               );
                                             } else if (!snapshot.hasData ||
                                                 snapshot.data!.isEmpty) {
-                                              return Center(
+                                              return const Center(
                                                   child: Text(
                                                       'No Job is Available.'));
                                             } else {
@@ -865,16 +892,18 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                   final jobItem =
                                                       jobDetails[index];
                                                   return Padding(
-                                                    padding: EdgeInsets.all(12),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
                                                     child: Column(
                                                       mainAxisSize:
                                                           MainAxisSize.max,
                                                       children: [
                                                         Padding(
                                                           padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(0,
-                                                                      0, 0, 8),
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                  0, 0, 0, 8),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -930,7 +959,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         ),
                                                                   ),
                                                                 ].divide(
-                                                                    SizedBox(
+                                                                    const SizedBox(
                                                                         height:
                                                                             4)),
                                                               ),
@@ -939,7 +968,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              EdgeInsets.all(0),
+                                                              const EdgeInsets
+                                                                  .all(0),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -951,7 +981,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                 CrossAxisAlignment
                                                                     .center,
                                                             children: [
-                                                              Icon(
+                                                              const Icon(
                                                                 Icons.business,
                                                                 color: Color(
                                                                     0xFF5B68F5),
@@ -979,8 +1009,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
+                                                                    padding:
+                                                                        const EdgeInsetsDirectional
+                                                                            .fromSTEB(
                                                                             10,
                                                                             0,
                                                                             0,
@@ -1001,7 +1032,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                               ),
                                                                         ),
                                                                         Padding(
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          padding: const EdgeInsetsDirectional
+                                                                              .fromSTEB(
                                                                               0,
                                                                               15,
                                                                               0,
@@ -1019,8 +1051,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
+                                                                    padding:
+                                                                        const EdgeInsetsDirectional
+                                                                            .fromSTEB(
                                                                             80,
                                                                             0,
                                                                             0,
@@ -1041,7 +1074,8 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                               ),
                                                                         ),
                                                                         Padding(
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
+                                                                          padding: const EdgeInsetsDirectional
+                                                                              .fromSTEB(
                                                                               0,
                                                                               15,
                                                                               0,
@@ -1060,14 +1094,15 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                   ),
                                                                 ],
                                                               ),
-                                                            ].divide(SizedBox(
-                                                                width: 16)),
+                                                            ].divide(
+                                                                const SizedBox(
+                                                                    width: 16)),
                                                           ),
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              EdgeInsets.all(
-                                                                  12),
+                                                              const EdgeInsets
+                                                                  .all(12),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -1092,7 +1127,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                           30,
                                                                       decoration:
                                                                           BoxDecoration(
-                                                                        color: Color(
+                                                                        color: const Color(
                                                                             0xFF5B68F5),
                                                                         borderRadius:
                                                                             BorderRadius.circular(50),
@@ -1101,7 +1136,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         border:
                                                                             Border.all(
                                                                           color:
-                                                                              Color(0xFF5B68F5),
+                                                                              const Color(0xFF5B68F5),
                                                                           width:
                                                                               2,
                                                                         ),
@@ -1125,7 +1160,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                   ),
                                                                   Padding(
                                                                     padding:
-                                                                        EdgeInsets
+                                                                        const EdgeInsets
                                                                             .only(
                                                                       top: 5,
                                                                       left: 25,
@@ -1143,14 +1178,14 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                             height:
                                                                                 80,
                                                                             decoration:
-                                                                                BoxDecoration(
+                                                                                const BoxDecoration(
                                                                               color: Color(0xFFE5E7EB),
                                                                             ),
                                                                           ),
                                                                         ),
                                                                         Padding(
                                                                           padding:
-                                                                              EdgeInsets.only(
+                                                                              const EdgeInsets.only(
                                                                             top:
                                                                                 25,
                                                                           ),
@@ -1161,7 +1196,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                             height:
                                                                                 30,
                                                                             decoration:
-                                                                                BoxDecoration(
+                                                                                const BoxDecoration(
                                                                               color: Color.fromRGBO(0, 0, 0, 0.0),
                                                                               shape: BoxShape.circle,
                                                                             ),
@@ -1171,10 +1206,9 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsets
+                                                                    padding: const EdgeInsets
                                                                         .only(
-                                                                            top:
-                                                                                5),
+                                                                        top: 5),
                                                                     child:
                                                                         Container(
                                                                       width: 30,
@@ -1182,14 +1216,14 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                           30,
                                                                       decoration:
                                                                           BoxDecoration(
-                                                                        color: Color(
+                                                                        color: const Color(
                                                                             0xFF5B68F5),
                                                                         shape: BoxShape
                                                                             .circle,
                                                                         border:
                                                                             Border.all(
                                                                           color:
-                                                                              Color(0xFF5B68F5),
+                                                                              const Color(0xFF5B68F5),
                                                                           width:
                                                                               2,
                                                                         ),
@@ -1213,7 +1247,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                   ),
                                                                 ],
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                   width:
                                                                       20), // Added SizedBox for spacing
                                                               Expanded(
@@ -1227,7 +1261,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         Flexible(
                                                                           child:
                                                                               Padding(
-                                                                            padding: EdgeInsets.only(
+                                                                            padding: const EdgeInsets.only(
                                                                                 left: 10,
                                                                                 top: 10,
                                                                                 bottom: 20),
@@ -1247,13 +1281,14 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                       ],
                                                                     ),
                                                                     Padding(
-                                                                      padding: EdgeInsets.only(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
                                                                           bottom:
                                                                               40),
                                                                       child:
                                                                           Row(
                                                                         children: [
-                                                                          FaIcon(
+                                                                          const FaIcon(
                                                                             FontAwesomeIcons.bong,
                                                                             color:
                                                                                 Color(0xFF5B68F5),
@@ -1262,7 +1297,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                           ),
                                                                           Padding(
                                                                             padding:
-                                                                                EdgeInsets.only(left: 8),
+                                                                                const EdgeInsets.only(left: 8),
                                                                             child:
                                                                                 Text(
                                                                               '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Mailes ${jobItem.journeyType}',
@@ -1281,7 +1316,7 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                                         Flexible(
                                                                           child:
                                                                               Padding(
-                                                                            padding: EdgeInsets.only(
+                                                                            padding: const EdgeInsets.only(
                                                                                 left: 10,
                                                                                 top: 10,
                                                                                 bottom: 20),
@@ -1312,10 +1347,12 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
                                                               .secondaryText,
                                                         ),
                                                       ]
-                                                          .divide(SizedBox(
-                                                              height: 4))
-                                                          .addToEnd(SizedBox(
-                                                              height: 12)),
+                                                          .divide(
+                                                              const SizedBox(
+                                                                  height: 4))
+                                                          .addToEnd(
+                                                              const SizedBox(
+                                                                  height: 12)),
                                                     ),
                                                   );
                                                 },

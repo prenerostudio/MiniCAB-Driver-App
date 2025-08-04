@@ -1,8 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mini_cab/Data/Alart.dart';
-import 'package:mini_cab/upcomming/upcomming_widget.dart';
 
 import '../Model/bids.dart';
 import '../components/upcommingjob_widget.dart';
@@ -39,6 +38,37 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
   void initState() {
     super.initState();
     _model = createModel(context, () => BidHistoryFilterModel());
+    // SchedulerBinding.instance.addPostFrameCallback((_) async {
+    //     await showModalBottomSheet(
+    //       isScrollControlled: true,
+    //       backgroundColor: Colors.transparent,
+    //       enableDrag: false,
+    //       context: context,
+    //       builder: (context) {
+    //         return GestureDetector(
+    //           onVerticalDragUpdate: (details) {
+    //             if (details.primaryDelta! > 20) {
+    //               // Close the BottomSheet on a downward swipe
+    //               Navigator.pop(context);
+    //             }
+    //           },
+    //           // onVerticalDragDown: (details) {
+    //           //   Navigator.pop(context);
+    //           //   debugPrint('downSwipped');
+    //           // },
+    //           onTap: () => _model.unfocusNode.canRequestFocus
+    //               ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+    //               : FocusScope.of(context).unfocus(),
+    //           child: Padding(
+    //             padding: MediaQuery.viewInsetsOf(context),
+    //             child: UpcommingjobWidget(
+    //               dId: '',
+    //             ),
+    //           ),
+    //         );
+    //       },
+    //     ).then((value) => safeSetState(() {}));
+    //   });
 
     _model.tabBarController = TabController(
       vsync: this,
@@ -82,6 +112,11 @@ class _BidHistoryFilterWidgetState extends State<BidHistoryFilterWidget>
   Future<List<Bid>> acceptBids() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
+
+    if (dId == null) {
+      print('d_id not found in shared preferences.');
+      return [];
+    }
 
     try {
       final uri =

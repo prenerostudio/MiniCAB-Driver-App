@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
-import 'package:mini_cab/All%20Docoments/documents_view_upload.dart';
-import 'package:mini_cab/All%20Docoments/widget/bottomSheetForDouble.dart';
-import 'package:mini_cab/All%20Docoments/widget/bottom_sheet_widget.dart';
+import 'package:new_minicab_driver/All%20Docoments/widget/bottomSheetForDouble.dart';
+import 'package:new_minicab_driver/All%20Docoments/widget/bottom_sheet_widget.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -71,16 +70,13 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
   }
 
   void _showToastMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
 
   Future<void> document(ImageSource source) async {
     final picker = ImagePicker();
     try {
-      final pickedFile = await picker.getImage(source: source);
+      final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
         setState(() {
           selectedImage = File(pickedFile.path);
@@ -94,7 +90,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
   Future<void> vDocument(ImageSource source) async {
     final picker = ImagePicker();
     try {
-      final pickedFile = await picker.getImage(source: source);
+      final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
         setState(() {
           selectedImageV = File(pickedFile.path);
@@ -108,9 +104,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -134,10 +132,10 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
           title: Text(
             'Documents',
             style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  fontFamily: 'Open Sans',
-                  color: FlutterFlowTheme.of(context).secondaryText,
-                  fontSize: 22,
-                ),
+              fontFamily: 'Open Sans',
+              color: FlutterFlowTheme.of(context).secondaryText,
+              fontSize: 22,
+            ),
           ),
           actions: [],
           centerTitle: true,
@@ -178,21 +176,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                     FlutterFlowTheme.of(context).primaryText,
                                 unselectedLabelColor:
                                     FlutterFlowTheme.of(context).secondaryText,
-                                labelPadding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                                labelStyle:
-                                    TextStyle(fontWeight: FontWeight.bold),
+                                labelPadding: EdgeInsetsDirectional.fromSTEB(
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                ),
+                                labelStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 unselectedLabelStyle: TextStyle(),
                                 indicatorColor:
                                     FlutterFlowTheme.of(context).primary,
                                 indicatorWeight: 3,
                                 tabs: [
-                                  Tab(
-                                    text: 'Driving License Verification',
-                                  ),
-                                  Tab(
-                                    text: '  Vehicle Verification',
-                                  ),
+                                  Tab(text: 'Driving License Verification'),
+                                  Tab(text: '  Vehicle Verification'),
                                 ],
                                 controller: _model.tabBarController,
                                 onTap: (i) async {
@@ -207,7 +206,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                   // tap1
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        10, 20, 10, 30),
+                                      10,
+                                      20,
+                                      10,
+                                      30,
+                                    ),
                                     child: SingleChildScrollView(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -219,12 +222,18 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                             height: 60,
                                             decoration: BoxDecoration(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).secondaryText,
                                             ),
                                             child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(20, 0, 0, 0),
+                                              padding:
+                                                  EdgeInsetsDirectional.fromSTEB(
+                                                    20,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                  ),
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.max,
                                                 mainAxisAlignment:
@@ -232,21 +241,25 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 children: [
                                                   Text(
                                                     'Document Name',
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .titleMedium,
+                                                    style:
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).titleMedium,
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                50, 0, 0, 0),
+                                                        EdgeInsetsDirectional.fromSTEB(
+                                                          50,
+                                                          0,
+                                                          0,
+                                                          0,
+                                                        ),
                                                     child: Text(
                                                       'Status',
                                                       style:
                                                           FlutterFlowTheme.of(
-                                                                  context)
-                                                              .titleMedium,
+                                                            context,
+                                                          ).titleMedium,
                                                     ),
                                                   ),
                                                 ],
@@ -256,7 +269,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 20, 0, 0),
+                                                  0,
+                                                  20,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -265,67 +282,69 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Driving Licence Photo\nCard (Front)',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${Fornt == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DoubleDocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'License Number',
-                                                                dateTitle:
-                                                                    'License Expiry Date',
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                numberParamter:
-                                                                    'license_number',
-                                                                dateParamter:
-                                                                    'licence_exp',
-                                                                parameter2:
-                                                                    'dl_back',
-                                                                name:
-                                                                    'Driving Licence Photo Card (Front)',
-                                                                name2:
-                                                                    'Driving Licence Photo Card (Back)',
-                                                                forInsideArray:
-                                                                    'dl_front',
-                                                                forInsideArray2:
-                                                                    'dl_back',
-                                                                getUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/check-driving-license.php",
-                                                                parameter:
-                                                                    "dl_front",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-driving-license.php",
-                                                                showImageUrl:
-                                                                    "https://www.minicaboffice.com/img/drivers/driving-license/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DoubleDocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'License Number',
+                                                            dateTitle:
+                                                                'License Expiry Date',
+                                                            isfieldAvailable:
+                                                                true,
+                                                            isDateAvaiabl: true,
+                                                            numberParamter:
+                                                                'license_number',
+                                                            dateParamter:
+                                                                'licence_exp',
+                                                            parameter2:
+                                                                'dl_back',
+                                                            name:
+                                                                'Driving Licence Photo Card (Front)',
+                                                            name2:
+                                                                'Driving Licence Photo Card (Back)',
+                                                            forInsideArray:
+                                                                'dl_front',
+                                                            forInsideArray2:
+                                                                'dl_back',
+                                                            getUrl:
+                                                                "https://www.minicaboffice.com/api/driver/check-driving-license.php",
+                                                            parameter:
+                                                                "dl_front",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-driving-license.php",
+                                                            showImageUrl:
+                                                                "https://www.minicaboffice.com/img/drivers/driving-license/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -345,22 +364,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
+
                                           // Padding(
                                           //   padding:
                                           //       EdgeInsetsDirectional.fromSTEB(
@@ -452,11 +473,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     ],
                                           //   ),
                                           // ),
-
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 20, 0, 0),
+                                                  0,
+                                                  20,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -465,50 +489,47 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Proof of Address         ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${AddressProof == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 InkWell(
                                                   onTap: () {
                                                     showModalBottomSheet(
-                                                        isScrollControlled:
-                                                            true,
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return DoubleDocumentBottomSheet(
-                                                              name2:
-                                                                  'Proof of Address Two ',
-                                                              forInsideArray2:
-                                                                  'ap_2',
-                                                              parameter2: 'pa2',
-                                                              name:
-                                                                  'Proof of Address One ',
-                                                              forInsideArray:
-                                                                  'ap_1',
-                                                              getUrl:
-                                                                  "https://www.minicaboffice.com/api/driver/check-address-proof.php",
-                                                              parameter: "pa1",
-                                                              postUrl:
-                                                                  "https://www.minicaboffice.com/api/driver/upload-address-proof.php",
-                                                              showImageUrl:
-                                                                  "https://minicaboffice.com/img/drivers/address-proof/");
-                                                        });
+                                                      isScrollControlled: true,
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return DoubleDocumentBottomSheet(
+                                                          name2:
+                                                              'Proof of Address Two ',
+                                                          forInsideArray2:
+                                                              'ap_2',
+                                                          parameter2: 'pa2',
+                                                          name:
+                                                              'Proof of Address One ',
+                                                          forInsideArray:
+                                                              'ap_1',
+                                                          getUrl:
+                                                              "https://www.minicaboffice.com/api/driver/check-address-proof.php",
+                                                          parameter: "pa1",
+                                                          postUrl:
+                                                              "https://www.minicaboffice.com/api/driver/upload-address-proof.php",
+                                                          showImageUrl:
+                                                              "https://minicaboffice.com/img/drivers/address-proof/",
+                                                        );
+                                                      },
+                                                    );
                                                     // Navigator.push(
                                                     //     context,
                                                     //     MaterialPageRoute(
@@ -529,20 +550,21 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                   child: Text(
                                                     'View Upload',
                                                     style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                            fontFamily:
-                                                                'Readex Pro',
-                                                            fontSize: 12.0,
-                                                            color: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .primary),
+                                                      context,
+                                                    ).bodyMedium.override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                            context,
+                                                          ).primary,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
+
                                           // Padding(
                                           //   padding:
                                           //       EdgeInsetsDirectional.fromSTEB(
@@ -634,11 +656,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     ],
                                           //   ),
                                           // ),
-
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 20, 0, 0),
+                                                  0,
+                                                  20,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -648,61 +673,62 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'PCO Licence               ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${PCO == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'PCO License Number',
-                                                                dateTitle:
-                                                                    'PCO License Expiry Date',
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                dateParamter:
-                                                                    'pl_exp',
-                                                                numberParamter:
-                                                                    'pl_number',
-                                                                name:
-                                                                    'PCO Licence ',
-                                                                forInsideArray:
-                                                                    'pl_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-pco-license.php',
-                                                                parameter:
-                                                                    "pl_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-pco.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/pco-license/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'PCO License Number',
+                                                            dateTitle:
+                                                                'PCO License Expiry Date',
+                                                            isDateAvaiabl: true,
+                                                            isfieldAvailable:
+                                                                true,
+                                                            dateParamter:
+                                                                'pl_exp',
+                                                            numberParamter:
+                                                                'pl_number',
+                                                            name:
+                                                                'PCO Licence ',
+                                                            forInsideArray:
+                                                                'pl_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-pco-license.php',
+                                                            parameter: "pl_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-pco.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/pco-license/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -722,16 +748,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -741,7 +768,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 20, 0, 0),
+                                                  0,
+                                                  20,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -751,55 +782,58 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'DVLA Check Code      ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${DVLA == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'DVLA Check Number',
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                numberParamter:
-                                                                    'dvla_number',
-                                                                name:
-                                                                    'DVLA Check Code',
-                                                                forInsideArray:
-                                                                    'dvla_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-dvla-code.php',
-                                                                parameter:
-                                                                    "dvla_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-dvla.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/dvla/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'DVLA Check Number',
+                                                            isfieldAvailable:
+                                                                true,
+                                                            numberParamter:
+                                                                'dvla_number',
+                                                            name:
+                                                                'DVLA Check Code',
+                                                            forInsideArray:
+                                                                'dvla_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-dvla-code.php',
+                                                            parameter:
+                                                                "dvla_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-dvla.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/dvla/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -819,16 +853,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -838,7 +873,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 20, 0, 0),
+                                                  0,
+                                                  20,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -848,55 +887,57 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Proof of National        \n Insurance',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${Insurance == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'National Insurance Number',
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                numberParamter:
-                                                                    'ni_number',
-                                                                name:
-                                                                    'Proof of National Insurance',
-                                                                forInsideArray:
-                                                                    'ni_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-national-insurance.php',
-                                                                parameter:
-                                                                    "ni_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-ni.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/ni/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'National Insurance Number',
+                                                            isfieldAvailable:
+                                                                true,
+                                                            numberParamter:
+                                                                'ni_number',
+                                                            name:
+                                                                'Proof of National Insurance',
+                                                            forInsideArray:
+                                                                'ni_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-national-insurance.php',
+                                                            parameter: "ni_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-ni.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/ni/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -916,16 +957,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1083,7 +1125,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                   // tap2
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        10, 20, 10, 30),
+                                      10,
+                                      20,
+                                      10,
+                                      30,
+                                    ),
                                     child: SingleChildScrollView(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -1095,12 +1141,18 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                             height: 60,
                                             decoration: BoxDecoration(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).secondaryText,
                                             ),
                                             child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(20, 0, 0, 0),
+                                              padding:
+                                                  EdgeInsetsDirectional.fromSTEB(
+                                                    20,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                  ),
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.max,
                                                 mainAxisAlignment:
@@ -1108,21 +1160,25 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 children: [
                                                   Text(
                                                     'Document Name',
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .titleMedium,
+                                                    style:
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).titleMedium,
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                50, 0, 0, 0),
+                                                        EdgeInsetsDirectional.fromSTEB(
+                                                          50,
+                                                          0,
+                                                          0,
+                                                          0,
+                                                        ),
                                                     child: Text(
                                                       'Status',
                                                       style:
                                                           FlutterFlowTheme.of(
-                                                                  context)
-                                                              .titleMedium,
+                                                            context,
+                                                          ).titleMedium,
                                                     ),
                                                   ),
                                                 ],
@@ -1132,7 +1188,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1142,59 +1202,66 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle Log Book                ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
-                                                  child: Text(
-                                                    '${LogBook == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          fontSize: 12.0,
-                                                        ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
+                                                  child: Text(
+                                                    '${LogBook == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                    style: FlutterFlowTheme.of(
+                                                      context,
+                                                    ).bodyMedium.override(
+                                                      fontFamily: 'Readex Pro',
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                numberParamter:
-                                                                    'lb_number',
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                fieldTitle:
-                                                                    'Log Book Number',
-                                                                name:
-                                                                    "Vehicle Log Book",
-                                                                forInsideArray:
-                                                                    'lb_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-log-book.php',
-                                                                parameter:
-                                                                    "lb_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-log-book.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/log-book/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            numberParamter:
+                                                                'lb_number',
+                                                            isfieldAvailable:
+                                                                true,
+                                                            fieldTitle:
+                                                                'Log Book Number',
+                                                            name:
+                                                                "Vehicle Log Book",
+                                                            forInsideArray:
+                                                                'lb_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-log-book.php',
+                                                            parameter: "lb_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-log-book.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/log-book/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1216,16 +1283,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1235,7 +1303,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1245,61 +1317,63 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle Mot Certificate      ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${MotCertificate == "" ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                numberParamter:
-                                                                    'mot_num',
-                                                                dateParamter:
-                                                                    'mot_expiry',
-                                                                dateTitle:
-                                                                    'MOT Certificate Expiry',
-                                                                fieldTitle:
-                                                                    'MOT Certificate Number',
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                name:
-                                                                    "Vehicle Mot Certificate",
-                                                                forInsideArray:
-                                                                    'mot_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-mot-certificate.php',
-                                                                parameter:
-                                                                    "mot_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-mot.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/mot-certificate/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            isfieldAvailable:
+                                                                true,
+                                                            numberParamter:
+                                                                'mot_num',
+                                                            dateParamter:
+                                                                'mot_expiry',
+                                                            dateTitle:
+                                                                'MOT Certificate Expiry',
+                                                            fieldTitle:
+                                                                'MOT Certificate Number',
+                                                            isDateAvaiabl: true,
+                                                            name:
+                                                                "Vehicle Mot Certificate",
+                                                            forInsideArray:
+                                                                'mot_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-mot-certificate.php',
+                                                            parameter:
+                                                                "mot_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-mot.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/mot-certificate/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1319,16 +1393,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1338,7 +1413,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1348,61 +1427,62 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle PCO                       ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${Vpco == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                fieldTitle:
-                                                                    'Vehicle PCO Number',
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                dateTitle:
-                                                                    'Vehicle PCO Expiry',
-                                                                name:
-                                                                    'Vehicle PCO',
-                                                                forInsideArray:
-                                                                    'vpco_img',
-                                                                dateParamter:
-                                                                    'vpco_exp',
-                                                                numberParamter:
-                                                                    "vpco_num",
-                                                                getUrl:
-                                                                    'https://www.minicaboffice.com/api/driver/check-pco.php',
-                                                                parameter:
-                                                                    "vpco_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-vpco.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/pco/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            isfieldAvailable:
+                                                                true,
+                                                            fieldTitle:
+                                                                'Vehicle PCO Number',
+                                                            isDateAvaiabl: true,
+                                                            dateTitle:
+                                                                'Vehicle PCO Expiry',
+                                                            name: 'Vehicle PCO',
+                                                            forInsideArray:
+                                                                'vpco_img',
+                                                            dateParamter:
+                                                                'vpco_exp',
+                                                            numberParamter:
+                                                                "vpco_num",
+                                                            getUrl:
+                                                                'https://www.minicaboffice.com/api/driver/check-pco.php',
+                                                            parameter:
+                                                                "vpco_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-vpco.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/pco/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1422,16 +1502,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1441,7 +1522,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -1450,55 +1535,56 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle Picture                 ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${vFornt == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DoubleDocumentBottomSheet(
-                                                                name2:
-                                                                    'Vehicle Picture Back',
-                                                                forInsideArray2:
-                                                                    'vp_back',
-                                                                parameter2:
-                                                                    'pic2',
-                                                                name:
-                                                                    'Vehicle Picture Fornt',
-                                                                forInsideArray:
-                                                                    'vp_front',
-                                                                getUrl:
-                                                                    'https://www.minicaboffice.com/api/driver/check-pictures.php',
-                                                                parameter:
-                                                                    "pic1",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-vehicle-pictures.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/picture/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DoubleDocumentBottomSheet(
+                                                            name2:
+                                                                'Vehicle Picture Back',
+                                                            forInsideArray2:
+                                                                'vp_back',
+                                                            parameter2: 'pic2',
+                                                            name:
+                                                                'Vehicle Picture Fornt',
+                                                            forInsideArray:
+                                                                'vp_front',
+                                                            getUrl:
+                                                                'https://www.minicaboffice.com/api/driver/check-pictures.php',
+                                                            parameter: "pic1",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-vehicle-pictures.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/picture/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1518,16 +1604,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1626,11 +1713,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     ],
                                           //   ),
                                           // ),
-
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1640,61 +1730,62 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle Road Tax              ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${roadTax == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'Road TAX Number',
-                                                                dateTitle:
-                                                                    'Road TAX Expiry',
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                dateParamter:
-                                                                    'rt_exp',
-                                                                numberParamter:
-                                                                    'rt_num',
-                                                                name:
-                                                                    'Vehicle Road Tax',
-                                                                forInsideArray:
-                                                                    'rt_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-road-tax.php',
-                                                                parameter:
-                                                                    "rt_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-road-tax.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/road-tax/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'Road TAX Number',
+                                                            dateTitle:
+                                                                'Road TAX Expiry',
+                                                            isDateAvaiabl: true,
+                                                            isfieldAvailable:
+                                                                true,
+                                                            dateParamter:
+                                                                'rt_exp',
+                                                            numberParamter:
+                                                                'rt_num',
+                                                            name:
+                                                                'Vehicle Road Tax',
+                                                            forInsideArray:
+                                                                'rt_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-road-tax.php',
+                                                            parameter: "rt_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-road-tax.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/road-tax/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1714,16 +1805,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1733,7 +1825,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1743,61 +1839,62 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle Rental Agreement',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${VRental == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'Vehicle Rental Agreement Number',
-                                                                dateTitle:
-                                                                    'Vehicle Rental Agreement Expiry',
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                dateParamter:
-                                                                    'ra_exp',
-                                                                numberParamter:
-                                                                    'ra_num',
-                                                                name:
-                                                                    'Vehicle Rental Agreement',
-                                                                forInsideArray:
-                                                                    'ra_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-rental-agreement.php',
-                                                                parameter:
-                                                                    "ra_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-rental-agreement.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/rental-agreement/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'Vehicle Rental Agreement Number',
+                                                            dateTitle:
+                                                                'Vehicle Rental Agreement Expiry',
+                                                            isDateAvaiabl: true,
+                                                            isfieldAvailable:
+                                                                true,
+                                                            dateParamter:
+                                                                'ra_exp',
+                                                            numberParamter:
+                                                                'ra_num',
+                                                            name:
+                                                                'Vehicle Rental Agreement',
+                                                            forInsideArray:
+                                                                'ra_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-rental-agreement.php',
+                                                            parameter: "ra_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-rental-agreement.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/rental-agreement/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1817,16 +1914,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1836,7 +1934,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1846,57 +1948,59 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Insurance Schedule          ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${InsuranceSchedule == null ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'Insurance Schedule Number',
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                // dateParamter:
-                                                                //     'is_img',
-                                                                numberParamter:
-                                                                    'is_num',
-                                                                name:
-                                                                    'Insurance Schedule',
-                                                                forInsideArray:
-                                                                    'is_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
-                                                                parameter:
-                                                                    "is_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-ins-sche.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/insurance-schedule/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'Insurance Schedule Number',
+                                                            isfieldAvailable:
+                                                                true,
+                                                            // dateParamter:
+                                                            //     'is_img',
+                                                            numberParamter:
+                                                                'is_num',
+                                                            name:
+                                                                'Insurance Schedule',
+                                                            forInsideArray:
+                                                                'is_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
+                                                            parameter: "is_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-ins-sche.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/insurance-schedule/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -1916,16 +2020,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -1935,7 +2040,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 30, 0, 0),
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -1944,61 +2053,154 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                 Text(
                                                   'Vehicle Insurance            ',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${VInsurance == '' ? "Awaited\nUpload" : "Uploaded"}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        fontSize: 12.0,
-                                                      ),
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 0, 0, 0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
                                                   child: InkWell(
                                                     onTap: () {
                                                       showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return DocumentBottomSheet(
-                                                                fieldTitle:
-                                                                    'Vehicle Insurance Number',
-                                                                dateTitle:
-                                                                    'Vehicle Insurance Expiry',
-                                                                isDateAvaiabl:
-                                                                    true,
-                                                                isfieldAvailable:
-                                                                    true,
-                                                                dateParamter:
-                                                                    'vi_exp',
-                                                                numberParamter:
-                                                                    'vi_num',
-                                                                name:
-                                                                    'Vehicle Insurance',
-                                                                forInsideArray:
-                                                                    'vi_img',
-                                                                getUrl:
-                                                                    'https://minicaboffice.com/api/driver/check-insurance.php',
-                                                                parameter:
-                                                                    "vi_img",
-                                                                postUrl:
-                                                                    "https://www.minicaboffice.com/api/driver/upload-insurance.php",
-                                                                showImageUrl:
-                                                                    "https://minicaboffice.com/img/drivers/vehicle/insurance/");
-                                                          });
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'Vehicle Insurance Number',
+                                                            dateTitle:
+                                                                'Vehicle Insurance Expiry',
+                                                            isDateAvaiabl: true,
+                                                            isfieldAvailable:
+                                                                true,
+                                                            dateParamter:
+                                                                'vi_exp',
+                                                            numberParamter:
+                                                                'vi_num',
+                                                            name:
+                                                                'Vehicle Insurance',
+                                                            forInsideArray:
+                                                                'vi_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-insurance.php',
+                                                            parameter: "vi_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-insurance.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/insurance/",
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'View Upload',
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                  0,
+                                                  30,
+                                                  0,
+                                                  0,
+                                                ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'Vehicle Extra            ',
+                                                  style: FlutterFlowTheme.of(
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${VInsurance == '' ? "Awaited\nUpload" : "Uploaded"}',
+                                                  style: FlutterFlowTheme.of(
+                                                    context,
+                                                  ).bodyMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                      ),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        isScrollControlled:
+                                                            true,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return DocumentBottomSheet(
+                                                            fieldTitle:
+                                                                'Vehicle Insurance Number',
+                                                            dateTitle:
+                                                                'Vehicle Insurance Expiry',
+                                                            isDateAvaiabl: true,
+                                                            isfieldAvailable:
+                                                                true,
+                                                            dateParamter:
+                                                                'vi_exp',
+                                                            numberParamter:
+                                                                'vi_num',
+                                                            name:
+                                                                'Vehicle Insurance',
+                                                            forInsideArray:
+                                                                'vi_img',
+                                                            getUrl:
+                                                                'https://minicaboffice.com/api/driver/check-insurance.php',
+                                                            parameter: "vi_img",
+                                                            postUrl:
+                                                                "https://www.minicaboffice.com/api/driver/upload-insurance.php",
+                                                            showImageUrl:
+                                                                "https://minicaboffice.com/img/drivers/vehicle/insurance/",
+                                                          );
+                                                        },
+                                                      );
                                                       // Navigator.push(
                                                       //     context,
                                                       //     MaterialPageRoute(
@@ -2018,16 +2220,17 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                              fontFamily:
-                                                                  'Readex Pro',
-                                                              fontSize: 12.0,
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .primary),
+                                                      style: FlutterFlowTheme.of(
+                                                        context,
+                                                      ).bodyMedium.override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        fontSize: 12.0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                              context,
+                                                            ).primary,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -2114,9 +2317,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-d-license-front.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-d-license-front.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2135,7 +2340,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
-    return null;
   }
 
   String? Back;
@@ -2145,9 +2349,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-d-license-back.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-d-license-back.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2164,7 +2370,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
-    return null;
   }
 
   String? AddressProof;
@@ -2173,9 +2378,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-address-proof-1.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-address-proof-1.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2206,9 +2413,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-address-proof-2.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-address-proof-2.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2225,7 +2434,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
-    return null;
   }
 
   String? PCO;
@@ -2235,9 +2443,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-pco-license.php'));
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-pco-license.php'),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2253,7 +2461,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? DVLA;
@@ -2263,9 +2470,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-dvla-code.php'));
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-dvla-code.php'),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2286,7 +2493,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? Insurance;
@@ -2296,9 +2502,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-national-insurance.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-national-insurance.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2314,7 +2522,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? Extra;
@@ -2324,9 +2531,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-extra-document.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-extra-document.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
 
       http.StreamedResponse response = await request.send();
@@ -2342,7 +2551,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   // Vehicle Docments
@@ -2353,8 +2561,10 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/check-log-book.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-log-book.php'),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2368,7 +2578,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? MotCertificate;
@@ -2378,9 +2587,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-mot-certificate.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-mot-certificate.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2394,7 +2605,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? Vpco;
@@ -2403,8 +2613,10 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/check-pco.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-pco.php'),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2418,7 +2630,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? vFornt;
@@ -2428,9 +2639,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-v-pic-front.php'));
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-v-pic-front.php'),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2445,7 +2656,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? vBack;
@@ -2455,9 +2665,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-v-pic-back.php'));
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-v-pic-back.php'),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2471,7 +2681,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? roadTax;
@@ -2480,8 +2689,10 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/check-road-tax.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-road-tax.php'),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2495,7 +2706,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? VRental;
@@ -2505,9 +2715,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-rental-agreement.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-rental-agreement.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2521,7 +2733,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? InsuranceSchedule;
@@ -2531,9 +2742,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-insurance-schedule.php'));
+        'POST',
+        Uri.parse(
+          'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
+        ),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2547,7 +2760,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 
   String? VInsurance;
@@ -2557,9 +2769,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/check-insurance.php'));
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/check-insurance.php'),
+      );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -2573,6 +2785,5 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
-    return null;
   }
 }

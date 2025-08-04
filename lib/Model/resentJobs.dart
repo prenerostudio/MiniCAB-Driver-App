@@ -1,4 +1,3 @@
-
 export '../jobshistory/jobshistory_widget.dart';
 
 class Booked {
@@ -7,6 +6,9 @@ class Booked {
   String? cId;
   String? dId;
   String? fare;
+  String? extra;
+  String? toll;
+  String? waiting;
   String? note;
   String? status;
   String? dateAdded;
@@ -26,6 +28,16 @@ class Booked {
   String? journeyType;
   String? vId;
   String? bookingStatus;
+  String? jobRoutes;
+
+  String? jobAccptTime;
+
+  String? jobStart;
+  String? waytoPickup;
+  String? arrivalTime;
+  String? pobTime;
+  String? dropOffTime;
+  String? completetime;
 
   Booked({
     this.jobId,
@@ -33,6 +45,9 @@ class Booked {
     this.cId,
     this.dId,
     this.fare,
+    this.extra,
+    this.toll,
+    this.waiting,
     this.note,
     this.status,
     this.dateAdded,
@@ -43,6 +58,7 @@ class Booked {
     this.dName,
     this.dEmail,
     this.dPhone,
+    this.jobRoutes,
     this.pickup,
     this.destination,
     this.passenger,
@@ -52,6 +68,13 @@ class Booked {
     this.journeyType,
     this.vId,
     this.bookingStatus,
+    this.jobAccptTime,
+    this.jobStart,
+    this.waytoPickup,
+    this.arrivalTime,
+    this.pobTime,
+    this.dropOffTime,
+    this.completetime,
   });
 
   factory Booked.fromJson(Map<String, dynamic> json) {
@@ -60,7 +83,11 @@ class Booked {
       bookId: json['book_id'],
       cId: json['c_id'],
       dId: json['d_id'],
-      fare: json['fare'],
+      fare: json['journey_fare'],
+      extra: json['extra'],
+      toll: json['tolls'],
+      waiting: json['waiting'],
+      jobRoutes: json['driver_route'],
       note: json['note'],
       status: json['job_status'],
       dateAdded: json['date_added'],
@@ -80,6 +107,13 @@ class Booked {
       journeyType: json['journey_type'],
       vId: json['v_id'],
       bookingStatus: json['booking_status'],
+      jobAccptTime: json['job_accepted_time'],
+      jobStart: json['job_started_time'],
+      waytoPickup: json['way_to_pickup_time'],
+      arrivalTime: json['arrived_at_pickup_time'],
+      pobTime: json['pob_time'],
+      dropOffTime: json['dropoff_time'],
+      completetime: json['job_completed_time'],
     );
   }
 }

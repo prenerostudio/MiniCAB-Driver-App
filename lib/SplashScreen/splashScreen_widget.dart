@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:mini_cab/payment_entery/complete.dart';
-import 'package:system_alert_window/system_alert_window.dart';
+
+
+
+import 'package:new_minicab_driver/payment_entery/complete.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -110,7 +112,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
 
   Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
     final permissionStatus = await Permission.location.request();
-    final currentStatus = await Permission.location.status;
+    final currentStatus = await Permission.location.status  ;
     if (permissionStatus.isDenied) {
       openAppSettings();
     } else {}

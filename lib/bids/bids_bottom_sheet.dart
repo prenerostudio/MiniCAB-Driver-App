@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mini_cab/Data/Alart.dart';
-import 'package:mini_cab/upcomming/upcomming_widget.dart';
+
 
 import '../BidHistory/bid_history_filter_model.dart';
 import '../Model/bids.dart';
@@ -82,6 +81,11 @@ class _BidsBottomSheetState extends State<BidsBottomSheet>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
+    if (dId == null) {
+      print('d_id not found in shared preferences.');
+      return [];
+    }
+
     try {
       final uri =
           Uri.parse('https://minicaboffice.com/api/driver/accepted-bids.php');
@@ -136,10 +140,20 @@ class _BidsBottomSheetState extends State<BidsBottomSheet>
             return Container(
               // height: 600,
               width: double.infinity,
-              color: Colors.white,
+              color: FlutterFlowTheme.of(context).primaryBackground,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Container(
+                    height: 4,
+                    width: 36,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(38),
+                        color: Colors.grey.withOpacity(0.3)),
+                  ),
                   Expanded(
                     child: Column(
                       children: [

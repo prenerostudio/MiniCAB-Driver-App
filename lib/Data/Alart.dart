@@ -7,14 +7,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:glowy_borders/glowy_borders.dart';
-import 'package:mini_cab/flutter_flow/flutter_flow_util.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
-import 'package:mini_cab/index.dart';
-import 'package:mini_cab/main.dart';
+import 'package:new_minicab_driver/flutter_flow/flutter_flow_util.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:vibration/vibration.dart';
 import '../Model/jobDetails.dart';
+import '../components/upcommingjob_Accepted_widget.dart';
+import '../components/upcommingjob_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

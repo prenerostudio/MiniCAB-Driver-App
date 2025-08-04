@@ -1,4 +1,6 @@
-import 'package:mini_cab/break_time/break_time_view.dart';
+
+
+import 'package:new_minicab_driver/break_time/break_time_view.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_timer.dart';

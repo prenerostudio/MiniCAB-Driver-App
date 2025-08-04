@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:mini_cab/Acount%20Statements/accountStatementDetails.dart';
-import 'package:mini_cab/main.dart';
+import 'package:new_minicab_driver/Acount%20Statements/accountStatementDetails.dart';
+import 'package:new_minicab_driver/main.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/invoiceDetails.dart';
@@ -106,10 +107,14 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      List<Invoice> paymentData =
-          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-      return paymentData;
-        } else {
+      if (data is List) {
+        List<Invoice> paymentData =
+            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+        return paymentData;
+      } else {
+        return [];
+      }
+    } else {
       return [];
     }
   }
@@ -123,10 +128,14 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      List<Invoice> paymentData =
-          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-      return paymentData;
-        } else {
+      if (data is List) {
+        List<Invoice> paymentData =
+            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+        return paymentData;
+      } else {
+        return [];
+      }
+    } else {
       return [];
     }
   }
@@ -140,10 +149,14 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      List<Invoice> paymentData =
-          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-      return paymentData;
-        } else {
+      if (data is List) {
+        List<Invoice> paymentData =
+            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+        return paymentData;
+      } else {
+        return [];
+      }
+    } else {
       return [];
     }
   }

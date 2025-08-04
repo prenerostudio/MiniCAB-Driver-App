@@ -88,6 +88,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),
               child: SingleChildScrollView(
+                controller: scrollController,
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
@@ -121,8 +122,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                     .titleLarge
                                     .override(
                                       fontFamily: 'Open Sans',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+                                      // color: FlutterFlowTheme.of(context)
+                                      //     .secondaryBackground,
                                       fontSize: 20,
                                     ),
                               ),
@@ -141,8 +142,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                     .titleLarge
                                     .override(
                                       fontFamily: 'Open Sans',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+                                      // color: FlutterFlowTheme.of(context)
+                                      //     .secondaryBackground,
                                       fontSize: 20,
                                     ),
                               ),
@@ -158,8 +159,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                     .titleLarge
                                     .override(
                                       fontFamily: 'Open Sans',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+                                      // color: FlutterFlowTheme.of(context)
+                                      //     .secondaryBackground,
                                       fontSize: 20,
                                     ),
                               ),
@@ -178,8 +179,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                     .titleLarge
                                     .override(
                                       fontFamily: 'Open Sans',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+                                      // color: FlutterFlowTheme.of(context)
+                                      //     .secondaryBackground,
                                       fontSize: 20,
                                     ),
                               ),
@@ -206,8 +207,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                       .titleLarge
                                       .override(
                                         fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
+                                        // color: FlutterFlowTheme.of(context)
+                                        //     .secondaryBackground,
                                         fontSize: 20,
                                       ),
                                 ),
@@ -234,8 +235,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                       .titleLarge
                                       .override(
                                         fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
+                                        // color: FlutterFlowTheme.of(context)
+                                        //     .secondaryBackground,
                                         fontSize: 20,
                                       ),
                                 ),
@@ -371,8 +372,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                           .bodyMedium
                                           .override(
                                             fontFamily: 'Open Sans',
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                            // color: FlutterFlowTheme.of(context)
+                                            //     .secondaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w300,
                                           ),
@@ -433,8 +434,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                           .bodyMedium
                                           .override(
                                             fontFamily: 'Open Sans',
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                            // color: FlutterFlowTheme.of(context)
+                                            //     .secondaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.w300,
                                           ),

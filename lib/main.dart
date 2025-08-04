@@ -5,44 +5,31 @@ import 'dart:ui';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:mini_cab/BidHistory/bid_history_filter_widget.dart';
-import 'package:mini_cab/Data/Alart.dart';
-import 'package:mini_cab/Model/jobDetails.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
-import 'package:mini_cab/home/timer_controller.dart';
-import 'package:mini_cab/main_overlay_example/true_call_overlay.dart';
-import 'package:mini_cab/upcomming/upcomming_widget.dart';
-import 'package:mini_cab/zones/new_class.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:new_minicab_driver/Acount%20Statements/accounts_bottomSheet.dart';
+import 'package:new_minicab_driver/bids/bids_bottom_sheet.dart';
+import 'package:new_minicab_driver/components/upcommingjob_widget.dart';
+import 'package:new_minicab_driver/dashboard/dashboard_bottom_sheet.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
+import 'package:new_minicab_driver/home/timer_controller.dart';
+import 'package:new_minicab_driver/upcomming/upcomming_widget.dart';
+
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Acount Statements/acount_statements_widget.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'backend/firebase/firebase_config.dart';
-import 'bids/bids_widget.dart';
-import 'dashboard/dashboard_widget.dart';
 import 'flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'flutter_flow/nav/nav.dart';
 import 'package:http/http.dart' as http;
 
@@ -51,13 +38,19 @@ import 'home/home_widget.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
-  await initFirebase();
+  try {
+    await initFirebase();
+    print('firebase succesffuly');
+  } catch (e) {
+    print('firebase make issue');
+  }
   notification();
   initializeService();
   runApp(MyApp());
 }
 
 // @pragma("vm:entry-point")
+// ss
 // void overlayMain() {
 //   WidgetsFlutterBinding.ensureInitialized();
 //   runApp(
@@ -67,6 +60,7 @@ Future<void> main() async {
 //     ),
 //   );
 // }
+// final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 JobController myController = Get.put(JobController());
 
 class St extends StatefulWidget {
@@ -81,13 +75,7 @@ class _StState extends State<St> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        children: [
-          Container(
-            height: 300,
-            width: 400,
-            color: Colors.red,
-          )
-        ],
+        children: [Container(height: 300, width: 400, color: Colors.red)],
       ),
     );
   }
@@ -124,7 +112,8 @@ Future<void> initializeService() async {
 
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(channel);
 
   await service.configure(
@@ -205,7 +194,10 @@ void onStart(ServiceInstance service) async {
         String pickLng = event['startRideThirdEvent2'];
         String timeCount = event['timecount'];
         startTrackingfordropOf(
-            double.parse(pickLat), double.parse(pickLng), timeCount);
+          double.parse(pickLat),
+          double.parse(pickLng),
+          timeCount,
+        );
       }
     });
     service.on('updateTimer').listen((event) async {
@@ -236,8 +228,9 @@ void onStart(ServiceInstance service) async {
     // print('check current time ${timerController.currentTime.value}');
 
     if (timerController.currentTime.value == timerController.endTime.value) {
-      completeTimeSlot(timerController
-          .tsId.value); // Send complete status if time is finished
+      completeTimeSlot(
+        timerController.tsId.value,
+      ); // Send complete status if time is finished
       timer.cancel(); // Stop the timer
     }
   });
@@ -271,13 +264,10 @@ void onStart(ServiceInstance service) async {
       final iosInfo = await deviceInfo.iosInfo;
       device = iosInfo.model;
     }
-    service.invoke(
-      'update',
-      {
-        "current_date": DateTime.now().toIso8601String(),
-        "device": device,
-      },
-    );
+    service.invoke('update', {
+      "current_date": DateTime.now().toIso8601String(),
+      "device": device,
+    });
   });
 }
 
@@ -288,7 +278,8 @@ Future startTracking(double pickLat, double pickLng) async {
   locationTrackingTimer?.cancel(); // Stop the tracking
   locationTrackingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
     double distance = Geolocator.distanceBetween(
       position.latitude,
@@ -303,7 +294,9 @@ Future startTracking(double pickLat, double pickLng) async {
       print("first listner");
       //  await     _showOverlay();c
       showNotificationFor1(
-          'Customer Location', 'You have reached on customer location.');
+        'Customer Location',
+        'You have reached on customer location.',
+      );
       locationTrackingTimer?.cancel(); // Stop the tracking
       locationTrackingTimer = null; // Stop the tracking
       // Navigator.pop(context);
@@ -329,7 +322,8 @@ Future startTrackingforpickUp(double pickLat, double pickLng) async {
   locationTrackingTimer1?.cancel(); // Stop the tracking
   locationTrackingTimer1 = Timer.periodic(Duration(seconds: 5), (timer) async {
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
     double distance = Geolocator.distanceBetween(
       position.latitude,
@@ -344,7 +338,9 @@ Future startTrackingforpickUp(double pickLat, double pickLng) async {
       print("secnd listner");
       //  await     _showOverlay();
       await showNotificationFor1(
-          'Customer Location', 'You have reached on customer location.');
+        'Customer Location',
+        'You have reached on customer location.',
+      );
       locationTrackingTimer1?.cancel(); // Stop the tracking
       locationTrackingTimer1 = null;
     } else {
@@ -354,7 +350,10 @@ Future startTrackingforpickUp(double pickLat, double pickLng) async {
 }
 
 Future startTrackingfordropOf(
-    double pickLat, double pickLng, String _timerDisplayValue) async {
+  double pickLat,
+  double pickLng,
+  String _timerDisplayValue,
+) async {
   SharedPreferences sp = await SharedPreferences.getInstance();
   String? did = sp.getString('d_id');
   String? jobid = sp.getString('job_id');
@@ -364,7 +363,8 @@ Future startTrackingfordropOf(
   locationTrackingTimer2?.cancel(); // Cancel if not null
   locationTrackingTimer2 = Timer.periodic(Duration(seconds: 5), (timer) async {
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
     double distance = Geolocator.distanceBetween(
       position.latitude,
@@ -379,7 +379,9 @@ Future startTrackingfordropOf(
       print("third listner!");
       //  await     _showOverlay();
       await showNotificationFor1(
-          'Ride Complete', 'You have reached on destination');
+        'Ride Complete',
+        'You have reached on destination',
+      );
 
       locationTrackingTimer2?.cancel();
       locationTrackingTimer2 = null; // Set to null to avoid reuse
@@ -388,13 +390,15 @@ Future startTrackingfordropOf(
 
       await sp.remove('isWaitingTrue');
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php'));
+        'POST',
+        Uri.parse(
+          'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php',
+        ),
+      );
       request.fields.addAll({
         'd_id': '${did}',
         'job_id': '${jobid}',
-        'waiting_time': _timerDisplayValue
+        'waiting_time': _timerDisplayValue,
         // 'waiting_time': _model.timerValue.toString()
       });
 
@@ -427,7 +431,8 @@ Future<void> completeTimeSlot(String tsid) async {
 
   final response = await http.post(
     Uri.parse(
-        'https://www.minicaboffice.com/api/driver/complete-time-slot.php'),
+      'https://www.minicaboffice.com/api/driver/complete-time-slot.php',
+    ),
     body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
   );
   if (response.statusCode == 200) {
@@ -477,7 +482,9 @@ Future<bool> checkLatestTimeslot() async {
 
       if (parsedResponse['status'] == true) {
         await prefs.setString(
-            "ts_id", parsedResponse['data'][0]['ts_id'].toString());
+          "ts_id",
+          parsedResponse['data'][0]['ts_id'].toString(),
+        );
         // print('New job available: ${DateTime.now()}');
         return true;
       }
@@ -496,15 +503,16 @@ showNotificationFor1(String title, String subtitle) async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id',
-    'your_channel_name',
-    channelDescription: 'your_channel_description',
-    importance: Importance.max,
-    ticker: 'ticker',
-  );
+        'your_channel_id',
+        'your_channel_name',
+        channelDescription: 'your_channel_description',
+        importance: Importance.max,
+        ticker: 'ticker',
+      );
 
-  const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
+  );
 
   await flutterLocalNotificationsPlugin.show(
     0,
@@ -519,15 +527,16 @@ void showNotification() async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id',
-    'your_channel_name',
-    channelDescription: 'your_channel_description',
-    importance: Importance.max,
-    ticker: 'ticker',
-  );
+        'your_channel_id',
+        'your_channel_name',
+        channelDescription: 'your_channel_description',
+        importance: Importance.max,
+        ticker: 'ticker',
+      );
 
-  const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
+  );
 
   await flutterLocalNotificationsPlugin.show(
     0,
@@ -542,15 +551,16 @@ void showtimeSlotNoti() async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id',
-    'your_channel_name',
-    channelDescription: 'your_channel_description',
-    importance: Importance.max,
-    ticker: 'ticker',
-  );
+        'your_channel_id',
+        'your_channel_name',
+        channelDescription: 'your_channel_description',
+        importance: Importance.max,
+        ticker: 'ticker',
+      );
 
-  const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
+  );
 
   await flutterLocalNotificationsPlugin.show(
     0,
@@ -561,6 +571,9 @@ void showtimeSlotNoti() async {
   );
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+// final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
@@ -572,7 +585,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Locale? _locale;
   ThemeMode _themeMode = FlutterFlowTheme.themeMode;
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   late Stream<BaseAuthUser> userStream;
 
   late AppStateNotifier _appStateNotifier;
@@ -584,8 +597,9 @@ class _MyAppState extends State<MyApp> {
     service.invoke("stopService");
     _appStateNotifier = AppStateNotifier.instance;
     _router = createRouter(_appStateNotifier);
-    userStream = miniCabFirebaseUserStream()
-      ..listen((user) => _appStateNotifier.update(user));
+    userStream =
+        miniCabFirebaseUserStream()
+          ..listen((user) => _appStateNotifier.update(user));
     jwtTokenStream.listen((_) {});
     _appStateNotifier.stopShowingSplashImage();
   }
@@ -595,13 +609,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   void setThemeMode(ThemeMode mode) => setState(() {
-        _themeMode = mode;
-        FlutterFlowTheme.saveThemeMode(mode);
-      });
+    _themeMode = mode;
+    FlutterFlowTheme.saveThemeMode(mode);
+  });
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      // scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'MiniCab',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -647,15 +662,122 @@ class _NavBarPageState extends State<NavBarPage> {
     _currentPage = widget.page;
   }
 
+  void _showupcomming() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: false,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if (details.primaryDelta! > 20) {
+              // Close the BottomSheet on a downward swipe
+              Navigator.pop(context);
+            }
+          },
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: MediaQuery.viewInsetsOf(context),
+            child: UpcommingjobWidget(dId: ''),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showbids() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: false,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if (details.primaryDelta! > 20) {
+              // Close the BottomSheet on a downward swipe
+              Navigator.pop(context);
+            }
+          },
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: MediaQuery.viewInsetsOf(context),
+            child: BidsBottomSheet(),
+          ),
+        );
+      },
+    ).then((value) => safeSetState(() {}));
+  }
+
+  void _showAccounts() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: false,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if (details.primaryDelta! > 20) {
+              // Close the BottomSheet on a downward swipe
+              Navigator.pop(context);
+            }
+          },
+          // onVerticalDragDown: (details) {
+          //   Navigator.pop(context);
+          //   debugPrint('downSwipped');
+          // },
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: MediaQuery.viewInsetsOf(context),
+            child: AccountsBottomsheet(),
+          ),
+        );
+      },
+    ).then((value) => safeSetState(() {}));
+  }
+
+  void _showDashoboard() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: false,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if (details.primaryDelta! > 20) {
+              // Close the BottomSheet on a downward swipe
+              Navigator.pop(context);
+            }
+          },
+          // onVerticalDragDown: (details) {
+          //   Navigator.pop(context);
+          //   debugPrint('downSwipped');
+          // },
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: MediaQuery.viewInsetsOf(context),
+            child: DashboardBottomSheet(),
+          ),
+        );
+      },
+    ).then((value) => safeSetState(() {}));
+  }
+
   @override
   Widget build(BuildContext context) {
     // checkUserSession();
     final tabs = {
       'Home': HomeWidget(),
       'Upcomming': UpcommingWidget(),
-      'Dashboard': DashboardWidget(),
-      'Bids': BidHistoryFilterWidget(),
-      'AccountStatement': AcountStatementsWidget(),
+      'Dashboard': HomeWidget(),
+      // 'Dashboard': DashboardWidget(),
+      'Bids': HomeWidget(),
+      // 'Bids': BidHistoryFilterWidget(),
+      'AccountStatement': HomeWidget(),
+      // 'AccountStatement': AcountStatementsWidget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
@@ -671,10 +793,36 @@ class _NavBarPageState extends State<NavBarPage> {
       backgroundColor: Colors.white,
       bottomNavigationBar: FloatingNavbar(
         currentIndex: currentIndex,
-        onTap: (i) => setState(() {
-          _currentPage = null;
-          _currentPageName = tabs.keys.toList()[i];
-        }),
+        onTap: (index) async {
+          bool isjobAvailable = false;
+          debugPrint('the current index is $index');
+          if (index == 0) {
+            myController.isscreenHome.value = true;
+          } else if (index == 1) {
+            myController.isscreenHome.value = false;
+            _showupcomming();
+          } else if (index == 2) {
+            myController.isscreenHome.value = false;
+            _showDashoboard();
+          } else if (index == 3) {
+            myController.isscreenHome.value = false;
+            _showbids();
+          } else if (index == 4) {
+            myController.isscreenHome.value = false;
+            _showAccounts();
+          } else {
+            myController.isscreenHome.value = false;
+          }
+          SharedPreferences sp = await SharedPreferences.getInstance();
+          isjobAvailable = sp.getBool('jobDispatched') ?? false;
+          setState(() {});
+          if (isjobAvailable == false) {
+            _currentPage = null;
+            _currentPageName = tabs.keys.toList()[index];
+          } else {
+            Fluttertoast.showToast(msg: 'Complete Job First');
+          }
+        },
         backgroundColor: Colors.white,
         selectedItemColor: FlutterFlowTheme.of(context).primary,
         unselectedItemColor: Color(0x8A000000),
@@ -692,18 +840,20 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 Icon(
                   currentIndex == 0 ? Icons.home_outlined : Icons.home_outlined,
-                  color: currentIndex == 0
-                      ? FlutterFlowTheme.of(context).primary
-                      : Color(0x8A000000),
+                  color:
+                      currentIndex == 0
+                          ? FlutterFlowTheme.of(context).primary
+                          : Color(0x8A000000),
                   size: currentIndex == 0 ? 24.0 : 24.0,
                 ),
                 Text(
                   'Home',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: currentIndex == 0
-                        ? FlutterFlowTheme.of(context).primary
-                        : Color(0x8A000000),
+                    color:
+                        currentIndex == 0
+                            ? FlutterFlowTheme.of(context).primary
+                            : Color(0x8A000000),
                     fontSize: 11.0,
                   ),
                 ),
@@ -718,18 +868,20 @@ class _NavBarPageState extends State<NavBarPage> {
                   currentIndex == 1
                       ? FontAwesomeIcons.carAlt
                       : FontAwesomeIcons.carAlt,
-                  color: currentIndex == 1
-                      ? FlutterFlowTheme.of(context).primary
-                      : Color(0x8A000000),
+                  color:
+                      currentIndex == 1
+                          ? FlutterFlowTheme.of(context).primary
+                          : Color(0x8A000000),
                   size: currentIndex == 1 ? 24.0 : 24.0,
                 ),
                 Text(
                   'UpComing',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: currentIndex == 1
-                        ? FlutterFlowTheme.of(context).primary
-                        : Color(0x8A000000),
+                    color:
+                        currentIndex == 1
+                            ? FlutterFlowTheme.of(context).primary
+                            : Color(0x8A000000),
                     fontSize: 11.0,
                   ),
                 ),
@@ -742,18 +894,20 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 Icon(
                   Icons.dashboard_sharp,
-                  color: currentIndex == 2
-                      ? FlutterFlowTheme.of(context).primary
-                      : Color(0x8A000000),
+                  color:
+                      currentIndex == 2
+                          ? FlutterFlowTheme.of(context).primary
+                          : Color(0x8A000000),
                   size: 24.0,
                 ),
                 Text(
                   'Dashboard',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: currentIndex == 2
-                        ? FlutterFlowTheme.of(context).primary
-                        : Color(0x8A000000),
+                    color:
+                        currentIndex == 2
+                            ? FlutterFlowTheme.of(context).primary
+                            : Color(0x8A000000),
                     fontSize: 11.0,
                   ),
                 ),
@@ -766,18 +920,20 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 Icon(
                   FontAwesomeIcons.capsules,
-                  color: currentIndex == 3
-                      ? FlutterFlowTheme.of(context).primary
-                      : Color(0x8A000000),
+                  color:
+                      currentIndex == 3
+                          ? FlutterFlowTheme.of(context).primary
+                          : Color(0x8A000000),
                   size: 24.0,
                 ),
                 Text(
                   'Bids',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: currentIndex == 3
-                        ? FlutterFlowTheme.of(context).primary
-                        : Color(0x8A000000),
+                    color:
+                        currentIndex == 3
+                            ? FlutterFlowTheme.of(context).primary
+                            : Color(0x8A000000),
                     fontSize: 11.0,
                   ),
                 ),
@@ -790,24 +946,26 @@ class _NavBarPageState extends State<NavBarPage> {
               children: [
                 Icon(
                   Icons.payments_rounded,
-                  color: currentIndex == 4
-                      ? FlutterFlowTheme.of(context).primary
-                      : Color(0x8A000000),
+                  color:
+                      currentIndex == 4
+                          ? FlutterFlowTheme.of(context).primary
+                          : Color(0x8A000000),
                   size: 24.0,
                 ),
                 Text(
                   'AccountStatement',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: currentIndex == 4
-                        ? FlutterFlowTheme.of(context).primary
-                        : Color(0x8A000000),
+                    color:
+                        currentIndex == 4
+                            ? FlutterFlowTheme.of(context).primary
+                            : Color(0x8A000000),
                     fontSize: 11.0,
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

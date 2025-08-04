@@ -63,7 +63,7 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      final List<dynamic> data = jsonResponse['data'];
+      final List<dynamic> data = jsonResponse['data']??[];
 
       List<Booked> bookingList =
           data.map((item) => Booked.fromJson(item)).cast<Booked>().toList();
@@ -186,10 +186,11 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                         FlutterFlowTheme.of(context).info,
                                     unselectedLabelColor:
                                         FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                    unselectedBackgroundColor:
+                                            .secondaryText,
+                                    unselectedBackgroundColor: Colors.black,
+                                    // FlutterFlowTheme.of(context).primary,
+                                    backgroundColor:
                                         FlutterFlowTheme.of(context).primary,
-                                    backgroundColor: Colors.black,
                                     borderColor: FlutterFlowTheme.of(context)
                                         .secondaryText,
                                     borderWidth: 1.0,
@@ -279,6 +280,9 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                                     highlightColor:
                                                         Colors.transparent,
                                                     onTap: () async {
+                                                      print(
+                                                          'job fare ${bookingData.jobRoutes}');
+
                                                       context.pushNamed(
                                                         'JobHistoryDetails',
                                                         queryParameters: {
@@ -286,27 +290,33 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                                             '${bookingData.jobId}',
                                                             ParamType.String,
                                                           ),
-                                                          'pickup': serializeParam(
+                                                          'pickup':
+                                                              serializeParam(
                                                             '${bookingData.pickup}',
                                                             ParamType.String,
                                                           ),
-                                                          'dropoff': serializeParam(
+                                                          'dropoff':
+                                                              serializeParam(
                                                             '${bookingData.destination}',
                                                             ParamType.String,
                                                           ),
-                                                          'bookId': serializeParam(
+                                                          'bookId':
+                                                              serializeParam(
                                                             '${bookingData.bookId}',
                                                             ParamType.String,
                                                           ),
-                                                          'date': serializeParam(
+                                                          'date':
+                                                              serializeParam(
                                                             '${bookingData.bookDate}',
                                                             ParamType.String,
                                                           ),
-                                                          'time': serializeParam(
+                                                          'time':
+                                                              serializeParam(
                                                             '${bookingData.bookTime}',
                                                             ParamType.String,
                                                           ),
-                                                          'passanger': serializeParam(
+                                                          'passanger':
+                                                              serializeParam(
                                                             '${bookingData.passenger}',
                                                             ParamType.String,
                                                           ),
@@ -314,20 +324,78 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                                             '${bookingData.cId}',
                                                             ParamType.String,
                                                           ),
-                                                          'cName': serializeParam(
+                                                          'cName':
+                                                              serializeParam(
                                                             '${bookingData.cName}',
                                                             ParamType.String,
                                                           ),
-                                                          'cNotes': serializeParam(
+                                                          'cNotes':
+                                                              serializeParam(
                                                             '${bookingData.note}',
                                                             ParamType.String,
                                                           ),
-                                                          'cNumber': serializeParam(
+                                                          'cNumber':
+                                                              serializeParam(
                                                             '${bookingData.cPhone}',
                                                             ParamType.String,
                                                           ),
-                                                          'fare': serializeParam(
+                                                          'fare':
+                                                              serializeParam(
                                                             '${bookingData.fare}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'extra':
+                                                              serializeParam(
+                                                            '${bookingData.extra}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'stopTime':
+                                                              serializeParam(
+                                                            '${bookingData.waiting}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'toll':
+                                                              serializeParam(
+                                                            '${bookingData.toll}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'jobaccept':
+                                                              serializeParam(
+                                                            '${bookingData.jobAccptTime}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'jobstart':
+                                                              serializeParam(
+                                                            '${bookingData.jobStart}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'waytopickup':
+                                                              serializeParam(
+                                                            '${bookingData.waytoPickup}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'arrivalNow':
+                                                              serializeParam(
+                                                            '${bookingData.arrivalTime}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'pob': serializeParam(
+                                                            '${bookingData.pobTime}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'ridePath':
+                                                              serializeParam(
+                                                            '${bookingData.jobRoutes}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'dropOfftime':
+                                                              serializeParam(
+                                                            '${bookingData.dropOffTime}',
+                                                            ParamType.String,
+                                                          ),
+                                                          'completime':
+                                                              serializeParam(
+                                                            '${bookingData.completetime}',
                                                             ParamType.String,
                                                           ),
                                                         }.withoutNulls,
@@ -396,14 +464,14 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                                                             0.0,
                                                                             0.0),
                                                                         child:
-                                                                        Text(
+                                                                            Text(
                                                                           ' ${bookingData.status}',
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .bodyLarge
                                                                               .override(
-                                                                            fontFamily: 'Readex Pro',
-                                                                            color: FlutterFlowTheme.of(context).primary,
-                                                                          ),
+                                                                                fontFamily: 'Readex Pro',
+                                                                                color: FlutterFlowTheme.of(context).primary,
+                                                                              ),
                                                                         ),
                                                                       ),
                                                                     ],
@@ -642,52 +710,114 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                                         context.pushNamed(
                                                           'JobHistoryDetails',
                                                           queryParameters: {
-                                                            'did': serializeParam(
+                                                            'did':
+                                                                serializeParam(
                                                               '${bookingData.jobId}',
                                                               ParamType.String,
                                                             ),
-                                                            'pickup': serializeParam(
+                                                            'pickup':
+                                                                serializeParam(
                                                               '${bookingData.pickup}',
                                                               ParamType.String,
                                                             ),
-                                                            'dropoff': serializeParam(
+                                                            'dropoff':
+                                                                serializeParam(
                                                               '${bookingData.destination}',
                                                               ParamType.String,
                                                             ),
-                                                            'bookId': serializeParam(
+                                                            'bookId':
+                                                                serializeParam(
                                                               '${bookingData.bookId}',
                                                               ParamType.String,
                                                             ),
-                                                            'date': serializeParam(
+                                                            'date':
+                                                                serializeParam(
                                                               '${bookingData.bookDate}',
                                                               ParamType.String,
                                                             ),
-                                                            'time': serializeParam(
+                                                            'time':
+                                                                serializeParam(
                                                               '${bookingData.bookTime}',
                                                               ParamType.String,
                                                             ),
-                                                            'passanger': serializeParam(
+                                                            'passanger':
+                                                                serializeParam(
                                                               '${bookingData.passenger}',
                                                               ParamType.String,
                                                             ),
-                                                            'cId': serializeParam(
+                                                            'cId':
+                                                                serializeParam(
                                                               '${bookingData.cId}',
                                                               ParamType.String,
                                                             ),
-                                                            'cName': serializeParam(
+                                                            'cName':
+                                                                serializeParam(
                                                               '${bookingData.cName}',
                                                               ParamType.String,
                                                             ),
-                                                            'cNotes': serializeParam(
+                                                            'cNotes':
+                                                                serializeParam(
                                                               '${bookingData.note}',
                                                               ParamType.String,
                                                             ),
-                                                            'cNumber': serializeParam(
+                                                            'cNumber':
+                                                                serializeParam(
                                                               '${bookingData.cPhone}',
                                                               ParamType.String,
                                                             ),
-                                                            'fare': serializeParam(
+                                                            'fare':
+                                                                serializeParam(
                                                               '${bookingData.fare}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'extra':
+                                                                serializeParam(
+                                                              '${bookingData.extra}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'stopTime':
+                                                                serializeParam(
+                                                              '${bookingData.waiting}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'toll':
+                                                                serializeParam(
+                                                              '${bookingData.toll}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'jobaccept':
+                                                                serializeParam(
+                                                              '${bookingData.jobAccptTime}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'jobstart':
+                                                                serializeParam(
+                                                              '${bookingData.jobStart}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'waytopickup':
+                                                                serializeParam(
+                                                              '${bookingData.waytoPickup}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'arrivalNow':
+                                                                serializeParam(
+                                                              '${bookingData.arrivalTime}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'pob':
+                                                                serializeParam(
+                                                              '${bookingData.pobTime}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'dropOfftime':
+                                                                serializeParam(
+                                                              '${bookingData.dropOffTime}',
+                                                              ParamType.String,
+                                                            ),
+                                                            'completime':
+                                                                serializeParam(
+                                                              '${bookingData.completetime}',
                                                               ParamType.String,
                                                             ),
                                                           }.withoutNulls,
@@ -753,14 +883,12 @@ class _JobshistoryWidgetState extends State<JobshistoryWidget>
                                                                               0.0,
                                                                               0.0),
                                                                           child:
-                                                                          Text(
+                                                                              Text(
                                                                             ' ${bookingData.status}',
-                                                                            style: FlutterFlowTheme.of(context)
-                                                                                .bodyLarge
-                                                                                .override(
-                                                                              fontFamily: 'Readex Pro',
-                                                                              color: FlutterFlowTheme.of(context).primary,
-                                                                            ),
+                                                                            style: FlutterFlowTheme.of(context).bodyLarge.override(
+                                                                                  fontFamily: 'Readex Pro',
+                                                                                  color: FlutterFlowTheme.of(context).primary,
+                                                                                ),
                                                                           ),
                                                                         ),
                                                                       ],

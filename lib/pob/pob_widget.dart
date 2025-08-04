@@ -1,11 +1,16 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
+import 'package:new_minicab_driver/pob/pob_dropOff_veiewModel.dart';
+
+import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:ui' as ui;
-import '../Data/links.dart';
 import '../components/clientnotes_widget.dart';
 import '../components/waydetails_widget.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
@@ -13,20 +18,17 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'pob_model.dart';
 export 'pob_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:latlong2/latlong.dart' as latlong;
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:google_directions_api/google_directions_api.dart';
+
 import 'dart:async';
-import 'dart:convert';
-import 'package:google_distance_matrix/google_distance_matrix.dart';
+import 'dart:ui' as ui;
 
 class PobWidget extends StatefulWidget {
   const PobWidget({
@@ -68,40 +70,54 @@ class PobWidget extends StatefulWidget {
 
 class _PobWidgetState extends State<PobWidget> {
   late PobModel _model;
-  late GoogleMapController mapController;
-  late PolylinePoints polylinePoints;
-  // Map<PolylineId, Polyline> polylines = {};
-  Set<Polyline> polylines = {};
-  List<LatLng> polylineCoordinates = [];
+
   String distanceText = '';
   String durationText = '';
   // late GoogleMapController _mapController;
-  late GoogleMapController _controller;
+
   final scaffoldKey = GlobalKey<ScaffoldState>();
   // Completer<GoogleMapController> _controller = Completer();
-  late CameraPosition _kGoogle;
+
   late Timer _locationTimer;
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {};
-  LatLng _currentPosition = LatLng(37.7749, -122.4194);
+
+  // final LatLng _currentPosition = LatLng(37.7749, -122.4194);
   // late Position _currentPosition;
   bool isLoading = false;
   double dropffLat = 0;
   double dropffLng = 0;
-  double currentLatitude = 0;
-  double currentLongitude = 0;
+  // double currentLatitude = 0;
+  // double currentLongitude = 0;
   String distance = '';
 
-  List<Marker> markers = [];
-  List<LatLng> _polylineCoordinates = [];
+  // List<Marker> markers = [];
+  // List<LatLng> _polylineCoordinates = [];
+
+  CameraPosition initialCameraPosition = CameraPosition(
+    target: LatLng(31.234234, -122.234234),
+  );
+  Set<Marker> markers = {};
+  Set<Polyline> polyline = {};
+  LatLng? originlatlng;
+  LatLng? destlatlng;
+  // LatLngBounds latLngBounds=LatLngBounds(southwest: southwest, northeast: northeast)
+  List<LatLng> polylineCoordinate = [];
+  PolylinePoints polylinePoints = PolylinePoints();
   @override
   void initState() {
     super.initState();
+    pushercallbg();
     loadata().then((s) {});
     sendOnRideRequest();
+
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    _setupMarkersAndPolylines();
-    _trackLocationChanges();
+    // dropOffViewModel.getLatLngFromCurrentLocation().then((value) {
+    //   dropOffViewModel.kGoogleplay.value = CameraPosition(
+    //       target: LatLng(dropOffViewModel.latitude.value,
+    //           dropOffViewModel.longitude.value),
+    //       zoom: 17);
+    // });
+    // dropOffViewModel.setcustommarkeritem();
+
     _model = createModel(context, () => PobModel());
   }
 
@@ -128,20 +144,7 @@ class _PobWidgetState extends State<PobWidget> {
     SharedPreferences sp = await SharedPreferences.getInstance();
     // isWaiting = sp.getBool('isWaitingTrue') ?? false;
     setState(() {});
-    // widget.did = sp.getString('did');
-    // widget.jobid = sp.getString('jobId');
-    // widget.pickup = sp.getString('pickup');
-    // widget.dropoff = sp.getString('destination');
-    // widget.cName = sp.getString('cName');
-    // widget.fare = sp.getString('journeyFare');
-    // widget.distance = sp.getString('journeyDistance');
-    // widget.note = sp.getString('note');
-    // widget.pickTime = sp.getString('pickTime');
-    // widget.pickDate = sp.getString('pickDate');
-    // widget.passenger = sp.getString('passenger');
-    // widget.luggage = sp.getString('laggage');
-    // widget.cnumber = sp.getString('cPhone');
-    // widget.cemail = sp.getString('cEmail');
+
     await myController.acceptedJobDetails().then((value) {
       if (value != null) {
         did = value.dId;
@@ -162,7 +165,7 @@ class _PobWidgetState extends State<PobWidget> {
         // Handle the null case, e.g., show an error message, redirect, etc.
       }
     });
-    getCoordinatesFromAddress(dropoff);
+    await getCoordinatesFromAddress(dropoff);
   }
 
   @override
@@ -184,9 +187,11 @@ class _PobWidgetState extends State<PobWidget> {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
@@ -215,34 +220,15 @@ class _PobWidgetState extends State<PobWidget> {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: MediaQuery.sizeOf(context).height * 0.95,
+                    height: MediaQuery.sizeOf(context).height * 0.96,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                     ),
                     child: Stack(
                       children: [
-                        isLoading
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          FlutterFlowTheme.of(context).primary),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      'Finding Route...',
-                                      style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : buildMap(),
+                        buildMap(),
 
-                        _buildTopNavigationBox(), // Display the navigation box
+                        // _buildTopNavigationBox(), // Display the navigation box
                         Positioned(
                           bottom: 0,
                           child: Row(
@@ -251,88 +237,65 @@ class _PobWidgetState extends State<PobWidget> {
                               Container(
                                 width: MediaQuery.sizeOf(context).width * 1.0,
                                 height:
-                                    MediaQuery.sizeOf(context).height * 0.40,
+                                    MediaQuery.sizeOf(context).height * 0.30,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color:
+                                      FlutterFlowTheme.of(
+                                        context,
+                                      ).primaryBackground,
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    SizedBox(
-                                      height: 12,
-                                    ),
+                                    SizedBox(height: 12),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                          MainAxisAlignment.start,
                                       children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Distance',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              '$estDistance',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
+                                        SizedBox(width: 15),
+                                        Text(
+                                          'Remaining Distance:',
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                        Container(
-                                          height: 20,
-                                          width: 1,
-                                          color: Colors.black,
+                                        SizedBox(width: 20),
+                                        Text(
+                                          '$distanceKm',
+                                          style: TextStyle(fontSize: 17),
                                         ),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Duration',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              '$duration',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          height: 20,
-                                          width: 1,
-                                          color: Colors.black,
-                                        ),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Arrival Time',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              '$arrivalTime',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
-                                        )
+                                        // Container(
+                                        //   height: 20,
+                                        //   width: 1,
+                                        //   color: Colors.black,
+                                        // ),
+                                        // Column(
+                                        //   children: [
+                                        //     Text(
+                                        //       'Arrival Time',
+                                        //       style: TextStyle(
+                                        //           fontSize: 15,
+                                        //           fontWeight: FontWeight.bold),
+                                        //     ),
+                                        //     Text(
+                                        //       '$arrivalTime',
+                                        //       style: TextStyle(
+                                        //         fontSize: 13,
+                                        //       ),
+                                        //     ),
+                                        //   ],
+                                        // )
                                       ],
                                     ),
-                                    // Text('Distance: $estDistance'),
-                                    // Text('Duration: $duration'),
-                                    // Text('Arrival Time: $arrivalTime'),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
+                                    // // Text('Distance: $estDistance'),
+                                    // // Text('Duration: $duration'),
+                                    // // Text('Arrival Time: $arrivalTime'),
+                                    // SizedBox(
+                                    //   height: 20,
+                                    // ),
                                     // Text(
                                     //   overflow: TextOverflow.ellipsis,
                                     //   maxLines: 2,
@@ -344,43 +307,52 @@ class _PobWidgetState extends State<PobWidget> {
                                     Wrap(
                                       children: [
                                         Row(
-                                          mainAxisSize: MainAxisSize
-                                              .min, // Set this to MainAxisSize.min
+                                          mainAxisSize:
+                                              MainAxisSize
+                                                  .min, // Set this to MainAxisSize.min
                                           children: [
                                             Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
-                                                      10.0, 10.0, 0.0, 10.0),
+                                              padding:
+                                                  EdgeInsetsDirectional.fromSTEB(
+                                                    10.0,
+                                                    10.0,
+                                                    0.0,
+                                                    10.0,
+                                                  ),
                                               child: Icon(
                                                 Icons.pin_drop_outlined,
                                                 color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
+                                                    FlutterFlowTheme.of(
+                                                      context,
+                                                    ).primary,
                                                 size: 25,
                                               ),
                                             ),
                                             Flexible(
                                               child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        10.0, 10.0, 0.0, 20.0),
+                                                padding:
+                                                    EdgeInsetsDirectional.fromSTEB(
+                                                      10.0,
+                                                      10.0,
+                                                      0.0,
+                                                      20.0,
+                                                    ),
                                                 child: Text(
                                                   '${dropoff}',
                                                   style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        fontSize: 20.0,
-                                                        letterSpacing: 1.5,
-                                                      ),
-                                                  overflow: TextOverflow
-                                                      .ellipsis, // Handle text overflow with ellipsis
+                                                    context,
+                                                  ).labelMedium.override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color:
+                                                        FlutterFlowTheme.of(
+                                                          context,
+                                                        ).secondaryText,
+                                                    fontSize: 20.0,
+                                                    letterSpacing: 1.5,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow
+                                                          .ellipsis, // Handle text overflow with ellipsis
                                                   maxLines:
                                                       3, // Limit to a maximum of 2 lines
                                                 ),
@@ -392,7 +364,11 @@ class _PobWidgetState extends State<PobWidget> {
                                     ),
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          10, 10, 10, 0),
+                                        10,
+                                        10,
+                                        10,
+                                        0,
+                                      ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
                                         mainAxisAlignment:
@@ -406,8 +382,9 @@ class _PobWidgetState extends State<PobWidget> {
                                             icon: FaIcon(
                                               FontAwesomeIcons.ellipsisH,
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).secondaryBackground,
                                               size: 24,
                                             ),
                                             onPressed: () async {
@@ -421,7 +398,8 @@ class _PobWidgetState extends State<PobWidget> {
                                                   return Padding(
                                                     padding:
                                                         MediaQuery.viewInsetsOf(
-                                                            context),
+                                                          context,
+                                                        ),
                                                     child: WaydetailsWidget(
                                                       time: '${pickTime}',
                                                       date: '${pickDate}',
@@ -436,8 +414,9 @@ class _PobWidgetState extends State<PobWidget> {
                                                     ),
                                                   );
                                                 },
-                                              ).then((value) =>
-                                                  safeSetState(() {}));
+                                              ).then(
+                                                (value) => safeSetState(() {}),
+                                              );
                                             },
                                           ),
                                           FFButtonWidget(
@@ -452,15 +431,17 @@ class _PobWidgetState extends State<PobWidget> {
                                                   return Padding(
                                                     padding:
                                                         MediaQuery.viewInsetsOf(
-                                                            context),
+                                                          context,
+                                                        ),
                                                     child: ClientnotesWidget(
                                                       name: '${cName}',
                                                       notes: '${note}',
                                                     ),
                                                   );
                                                 },
-                                              ).then((value) =>
-                                                  safeSetState(() {}));
+                                              ).then(
+                                                (value) => safeSetState(() {}),
+                                              );
                                             },
                                             text: 'VIEW NOTE',
                                             icon: FaIcon(
@@ -468,24 +449,36 @@ class _PobWidgetState extends State<PobWidget> {
                                               size: 21,
                                             ),
                                             options: FFButtonOptions(
-                                              width: MediaQuery.sizeOf(context)
-                                                      .width *
+                                              width:
+                                                  MediaQuery.sizeOf(
+                                                    context,
+                                                  ).width *
                                                   0.4,
                                               height: 45,
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(24, 0, 24, 0),
-                                              iconPadding: EdgeInsetsDirectional
-                                                  .fromSTEB(0, 0, 0, 0),
+                                              padding:
+                                                  EdgeInsetsDirectional.fromSTEB(
+                                                    24,
+                                                    0,
+                                                    24,
+                                                    0,
+                                                  ),
+                                              iconPadding:
+                                                  EdgeInsetsDirectional.fromSTEB(
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                  ),
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                              textStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleSmall
-                                                      .override(
-                                                        fontFamily: 'Open Sans',
-                                                        color: Colors.white,
-                                                      ),
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).primary,
+                                              textStyle: FlutterFlowTheme.of(
+                                                context,
+                                              ).titleSmall.override(
+                                                fontFamily: 'Open Sans',
+                                                color: Colors.white,
+                                              ),
                                               elevation: 3,
                                               borderSide: BorderSide(
                                                 color: Colors.transparent,
@@ -500,59 +493,81 @@ class _PobWidgetState extends State<PobWidget> {
                                     ),
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          15, 20, 15, 0),
+                                        15,
+                                        20,
+                                        15,
+                                        0,
+                                      ),
                                       child: SwipeButton(
                                         thumbPadding: EdgeInsets.all(3),
                                         thumb: Icon(
                                           Icons.chevron_right,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
+                                          color:
+                                              FlutterFlowTheme.of(
+                                                context,
+                                              ).primary,
                                         ),
                                         elevationThumb: 2,
                                         elevationTrack: 2,
                                         activeThumbColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primaryBackground,
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).primaryBackground,
                                         activeTrackColor:
-                                            FlutterFlowTheme.of(context)
-                                                .primary,
+                                            FlutterFlowTheme.of(
+                                              context,
+                                            ).primary,
                                         borderRadius: BorderRadius.circular(8),
                                         child: Text(
                                           'AT DROP OFF'.toUpperCase(),
                                           style: TextStyle(
-                                            color: FlutterFlowTheme.of(context)
-                                                .primaryBackground,
+                                            color:
+                                                FlutterFlowTheme.of(
+                                                  context,
+                                                ).primaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         onSwipe: () {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
                                             SnackBar(
                                               content: Text('AT DROP OFF'),
                                               backgroundColor:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                                  FlutterFlowTheme.of(
+                                                    context,
+                                                  ).primary,
                                             ),
                                           );
                                         },
                                         onSwipeEnd: () async {
                                           SharedPreferences sp =
-                                              await SharedPreferences
-                                                  .getInstance();
-
+                                              await SharedPreferences.getInstance();
+                                          stopRideTracking();
+                                          await sp.setString(
+                                            'jobAtDropOffTime',
+                                            formattedTime,
+                                          );
                                           sp.setInt('isRideStart', 3);
                                           context.pushNamed(
                                             'PaymentEntery',
-                                            queryParameters: {
-                                              'jobid': serializeParam(
-                                                  '${jobid}', ParamType.String),
-                                              'did': serializeParam(
-                                                  '${did}', ParamType.String),
-                                              'fare': serializeParam(
-                                                  '${fare}', ParamType.String),
-                                            }.withoutNulls,
+                                            queryParameters:
+                                                {
+                                                  'jobid': serializeParam(
+                                                    '${jobid}',
+                                                    ParamType.String,
+                                                  ),
+                                                  'did': serializeParam(
+                                                    '${did}',
+                                                    ParamType.String,
+                                                  ),
+                                                  'fare': serializeParam(
+                                                    '${fare}',
+                                                    ParamType.String,
+                                                  ),
+                                                }.withoutNulls,
                                           );
                                         },
                                       ),
@@ -563,6 +578,7 @@ class _PobWidgetState extends State<PobWidget> {
                             ],
                           ),
                         ),
+
                         Positioned(
                           bottom: MediaQuery.sizeOf(context).height * 0.40,
                           right: 10,
@@ -577,8 +593,9 @@ class _PobWidgetState extends State<PobWidget> {
                                     context: context,
                                     builder: (context) {
                                       return Padding(
-                                        padding:
-                                            MediaQuery.viewInsetsOf(context),
+                                        padding: MediaQuery.viewInsetsOf(
+                                          context,
+                                        ),
                                         child: ClientnotesWidget(
                                           name: '${cName}',
                                           notes: '${note}',
@@ -591,9 +608,9 @@ class _PobWidgetState extends State<PobWidget> {
                                   height: 40,
                                   width: 40,
                                   decoration: BoxDecoration(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      shape: BoxShape.circle),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    shape: BoxShape.circle,
+                                  ),
                                   child: Center(
                                     child: Icon(
                                       Icons.info_outline,
@@ -604,32 +621,28 @@ class _PobWidgetState extends State<PobWidget> {
                                 ),
                               ),
 
-                              SizedBox(
-                                height: 8,
-                              ),
+                              SizedBox(height: 8),
 
-                              Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    shape: BoxShape.circle),
-                                child: Center(
-                                  child: Transform.rotate(
-                                    angle: _cameraRotation *
-                                        (3.14159265359 /
-                                            180), // Convert heading to radians
-                                    child: Icon(
-                                      Icons.navigation,
-                                      size: 30,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
+                              // Container(
+                              //   height: 40,
+                              //   width: 40,
+                              //   decoration: BoxDecoration(
+                              //       color: FlutterFlowTheme.of(context).primary,
+                              //       shape: BoxShape.circle),
+                              //   child: Center(
+                              //     child: Transform.rotate(
+                              //       angle: _cameraRotation *
+                              //           (3.14159265359 /
+                              //               180), // Convert heading to radians
+                              //       child: Icon(
+                              //         Icons.navigation,
+                              //         size: 30,
+                              //         color: Colors.red,
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                              SizedBox(height: 8),
                               // Container(
                               //   height: 40,
                               //   width: 40,
@@ -638,7 +651,7 @@ class _PobWidgetState extends State<PobWidget> {
                               // )
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -651,631 +664,319 @@ class _PobWidgetState extends State<PobWidget> {
     );
   }
 
-  Widget buildMap() {
-    return GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: _currentPosition,
-          zoom: 14,
+  String distanceKm = '';
+  String address = '';
+  _getpolylines() async {
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: "AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA",
+      request: PolylineRequest(
+        origin: PointLatLng(originlatlng!.latitude, originlatlng!.longitude),
+        destination: PointLatLng(
+          dropOffViewModel.convertedLat.value,
+          dropOffViewModel.convertedLng.value,
         ),
-        myLocationEnabled: false,
-        myLocationButtonEnabled: false,
-        compassEnabled: true,
-        rotateGesturesEnabled: true,
-        tiltGesturesEnabled: true,
-        scrollGesturesEnabled: true,
-        zoomControlsEnabled: false,
-        zoomGesturesEnabled: true,
-        onCameraMove: _onCameraMove,
-        onMapCreated: _onMapCreated,
-        markers: {
-          Marker(
-              markerId: const MarkerId('Source'),
-              position: LatLng(latitude, longitude),
-              icon: sourceicon),
-          Marker(
-              markerId: const MarkerId('destination'),
-              position: LatLng(convertedLat, convertedLng),
-              icon: destinationicon),
-        },
-        // markers: Set<Marker>.of(markers),
-        polylines: polylines);
+        mode: TravelMode.driving,
+      ),
+    );
+    polylineCoordinate.clear();
+
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinate.add(LatLng(point.latitude, point.longitude));
+      });
+    }
+    double distanceinKm = result.totalDistanceValue! / 1600;
+    distanceKm = "${distanceinKm.toStringAsFixed(1)} miles";
+    address = result.endAddress.toString();
+    polyline.add(
+      Polyline(
+        polylineId: PolylineId('polyline'),
+        color: Colors.blue,
+        width: 10,
+        points: polylineCoordinate,
+      ),
+    );
+    googleMapController.animateCamera(
+      CameraUpdate.newLatLngZoom(originlatlng!, 16),
+    );
+    setState(() {});
   }
 
-  StreamSubscription<Position>? positionStream;
-  void _trackLocationChanges() {
-    positionStream = Geolocator.getPositionStream(
-      locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
-    ).listen((Position position) {
+  Future<void> saveRouteToStorage(List<LatLng> route) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> routeData =
+        route.map((point) => '${point.latitude},${point.longitude}').toList();
+    print("the saved route is ${routeData}");
+    await prefs.setStringList('user_route', routeData);
+  }
+
+  void stopRideTracking() {
+    _positionStreamSubscription?.cancel();
+    setState(() {});
+    // Save route to SharedPreferences (or pass directly to the next screen)
+    saveRouteToStorage(userRoute);
+  }
+
+  Set<Circle> geofenceCircles = {}; // Set for geofence circles
+  void addGeofenceCircle() {
+    // Add a circle around the destination
+    geofenceCircles.add(
+      Circle(
+        circleId: CircleId('destination_geofence'),
+        center: originlatlng!, // Destination LatLng
+        radius: 100, // Radius in meters
+        strokeWidth: 2, // Border width
+        strokeColor: Colors.blue.withOpacity(0.5), // Border color
+        fillColor: Colors.blue.withOpacity(0.2), // Fill color
+      ),
+    );
+    setState(() {});
+  }
+
+  List<LatLng> userRoute = [];
+  StreamSubscription<Position>? _positionStreamSubscription;
+  Future getLiveLocationAndlistner() async {
+    userRoute.clear(); // Clear old routes if any
+    _positionStreamSubscription = Geolocator.getPositionStream().listen((
+      position,
+    ) {
       setState(() {});
-//       _currentPosition!.latitude=
-//       // Update current location variables
-      latitude = position.latitude;
-      longitude = position.longitude;
-// // currentLocation.latitude = position.latitude;
-//       longitude.value = position.longitude;
-      // Update polyline with new user location
-      updatePolyline();
+
+      originlatlng = LatLng(position.latitude, position.longitude);
+      LatLng currentPosition = LatLng(position.latitude, position.longitude);
+      userRoute.add(currentPosition);
+      // print("the user route is ${userRoute}");
+      initialCameraPosition = CameraPosition(target: originlatlng!, zoom: 15);
+      setCustomMarkerForCurrent();
+      // if (destlatlng != null) {
+      _getpolylines();
+      // }
+      addGeofenceCircle();
+
+      // Check proximity to destination
+      double distanceInMeters = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        dropOffViewModel.convertedLat.value, // Destination latitude
+        dropOffViewModel.convertedLng.value, // Destination longitude
+      );
+      log('the distance in meter is ${distanceInMeters}');
+      if (distanceInMeters <= 200) {
+        // isReached = true;
+        // if (isReached) {
+        //   _showArrivalAlert(); // Show alert if within 200 meters
+        // }
+      }
+      markers.removeWhere(
+        (element) => element.mapsId.value.compareTo('origin') == 0,
+      );
+      markers.add(
+        Marker(
+          markerId: MarkerId('origin'),
+          position: originlatlng!,
+          icon: sourceicon,
+        ),
+      );
+      markers.add(
+        Marker(
+          markerId: MarkerId('destination'),
+          position:
+              LatLng(
+                dropOffViewModel.convertedLat.value,
+                dropOffViewModel.convertedLng.value,
+              )!,
+          icon: destination,
+        ),
+      );
     });
   }
 
-  double longitude = 0.0;
-  double latitude = 0.0;
-  Future<void> updatePolyline() async {
-    try {
-      // Get destination coordinates
-      final destinationLat = convertedLat;
-      final destinationLng = convertedLng;
-      setState(() {});
-      // Recalculate distance and polyline with the new current location
-      await _getPolyline(destinationLat, destinationLng);
+  BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor destination = BitmapDescriptor.defaultMarker;
+  void setCustomMarkerForCurrent() async {
+    sourceicon = await _resizeAndCreateBitmapDescriptor(
+      "assets/images/car2.png",
+      width: 120, // Set desired width
+      height: 120, // Set desired height
+    );
 
-      // Optionally, move the camera to the new current location
-      _controller.animateCamera(
-        CameraUpdate.newLatLng(LatLng(latitude, longitude)),
-      );
-    } catch (e) {}
+    destination = await _resizeAndCreateBitmapDescriptor(
+      "assets/images/userg.png",
+      width: 70,
+      height: 70,
+    );
   }
+
+  Future<BitmapDescriptor> _resizeAndCreateBitmapDescriptor(
+    String imagePath, {
+    required int width,
+    required int height,
+  }) async {
+    final ByteData data = await rootBundle.load(imagePath);
+    final Uint8List bytes = data.buffer.asUint8List();
+
+    // Decode and resize the image
+    final img.Image? originalImage = img.decodeImage(bytes);
+    if (originalImage == null) throw Exception("Failed to decode image");
+    final img.Image resizedImage = img.copyResize(
+      originalImage,
+      width: width,
+      height: height,
+    );
+
+    // Convert resized image back to Uint8List
+    final Uint8List resizedBytes = Uint8List.fromList(
+      img.encodePng(resizedImage),
+    );
+
+    // Convert to BitmapDescriptor
+    final ui.Codec codec = await ui.instantiateImageCodec(resizedBytes);
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
+
+    return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
+  }
+
+  late GoogleMapController googleMapController;
+  Widget buildMap() {
+    return
+    //  initialCameraPosition == null
+    //     ? Center(
+    //         child: CircularProgressIndicator(),
+    //       )
+    //     :
+    GoogleMap(
+      // circles: geofenceCircles,
+      initialCameraPosition: initialCameraPosition!,
+      myLocationEnabled: false,
+      myLocationButtonEnabled: false,
+      mapType: MapType.satellite, // Keep this as 'normal' (not satellite etc.)
+      tiltGesturesEnabled: true,
+      compassEnabled: true,
+      rotateGesturesEnabled: true,
+
+      buildingsEnabled: true, // 3D buildings dikhayein
+      scrollGesturesEnabled: true,
+      zoomControlsEnabled: false,
+      zoomGesturesEnabled: true,
+      // onCameraMove: _onCameraMove,
+      onMapCreated: (controller) {
+        googleMapController = controller;
+        setState(() {});
+        // dropOffViewModel.setMapController(controller);
+      },
+      markers: markers,
+      // markers: Set<Marker>.of(markers),
+      polylines: polyline,
+    );
+  }
+
+  DropOffViewModel dropOffViewModel = Get.put(DropOffViewModel());
 
   Future getCoordinatesFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
       if (locations.isNotEmpty) {
         setState(() {});
-        convertedLat = locations.first.latitude;
-        convertedLng = locations.first.longitude;
-        setcustommarkeritem();
+        dropOffViewModel.convertedLat.value = locations.first.latitude;
+        dropOffViewModel.convertedLng.value = locations.first.longitude;
+        await dropOffViewModel.mapApicall().then((s) {
+          Future.delayed(Duration(seconds: 2)).then((s) {
+            setState(() {});
+          });
+        });
+        await getLiveLocationAndlistner();
+        // setcustommarkeritem();
 
-        _getPolyline(locations.first.latitude, locations.first.longitude);
+        // _getPolyline(locations.first.latitude, locations.first.longitude);
       }
     } catch (e) {}
   }
 
-  Future _getPolyline(double destinationLat, double desLng) async {
-    const apiKey =
-        'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
-    var origin =
-        '${latitude},${longitude}'; // Replace with your source coordinates
-    var destination =
-        // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-        '${destinationLat},${desLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    final response = await http.post(Uri.parse(// can be get and post request
-        // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
-
-    if (response.statusCode == 200) {
-      // Parse the JSON response
-      final data = jsonDecode(response.body);
-      // print(data);
-
-      final steps = data['routes'][0]['legs'][0]['steps'];
-      double distanceInKm =
-          double.tryParse(distance!.replaceAll(' km', '')) ?? 0.0;
-      double distanceInMiles = distanceInKm * 0.621371;
-      _navigationSteps = steps.map<Map<String, dynamic>>((step) {
-        return {
-          'instruction': step['html_instructions'],
-          'distance': "${distanceInMiles.toStringAsFixed(2)} miles",
-          'duration': step['duration']['text'],
-          'polyline': step['polyline']['points'],
-        };
-      }).toList();
-      if (data.containsKey('routes') && data['routes'].isNotEmpty) {
-        final route = data['routes'][0];
-        if (route.containsKey('legs') && route['legs'].isNotEmpty) {
-          final leg = route['legs'][0];
-          setState(() {});
-          if (leg.containsKey('distance')) {
-            distance = leg['distance']['text'];
-            // time.value = leg['duration']['text'];
-            double distanceInKm =
-                double.tryParse(distance!.replaceAll(' km', '')) ?? 0.0;
-            double distanceInMiles = distanceInKm * 0.621371;
-            // time.value = leg['duration']['text'];
-            estDistance = "${distanceInMiles.toStringAsFixed(2)} miles";
-            // estDistance = leg['distance']['text'];
-            duration = leg['duration']['text'];
-            arrivalTime = leg['arrival_time'] != null
-                ? leg['arrival_time']['text']
-                : 'Unavailable';
-            // time.value = leg['duration']['text'];
-
-            final points = route['overview_polyline']['points'];
-
-            // Decode polyline points and add them to the map
-            decodedPoints = PolylinePoints()
-                .decodePolyline(points)
-                .map((point) => LatLng(point.latitude, point.longitude))
-                .toList();
-            // polylines.value.clear();
-            polylines.add(Polyline(
-              // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
-              // patterns: points,
-              polylineId: const PolylineId('route'),
-              color: Colors.blue,
-              width: 5,
-              points: decodedPoints,
-            ));
-          }
-        }
-      }
-    }
+  String stripHtmlTags(String html) {
+    final regExp = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: false);
+    return html.replaceAll(regExp, '').trim();
   }
 
+  String formattedTime = "";
+  // List<dynamic> _instructions = [];
   String estDistance = 'Calculating...';
   String duration = 'Calculating...';
   String arrivalTime = 'Calculating...';
-  IconData _getArrowIcon(String instruction) {
-    if (instruction.toLowerCase().contains('left')) {
-      return Icons.turn_left; // Left turn
-    } else if (instruction.toLowerCase().contains('right')) {
-      return Icons.turn_right; // Right turn
-    } else if (instruction.toLowerCase().contains('head')) {
-      return Icons.straight; // Straight ahead
-    } else if (instruction.toLowerCase().contains('u-turn')) {
-      return Icons.u_turn_left; // U-turn
-    } else {
-      return Icons.navigation; // Default navigation icon
-    }
-  }
-
-  void _onCameraMove(CameraPosition position) {
-    setState(() {
-      _heading = position.bearing; // Capture the camera's rotation
-      _cameraRotation = position.bearing; // Capture the camera's rotation
-    });
-  }
-
-  double _cameraRotation = 0.0; // Track camera's rotation angle
-  Widget _buildTopNavigationBox() {
-    if (_navigationSteps.isEmpty) return SizedBox.shrink();
-
-    final currentStep = _navigationSteps.first;
-
-    // Extracting the direction and text
-    String instruction = currentStep['instruction'];
-    String distance = currentStep['distance'];
-    IconData arrowIcon =
-        _getArrowIcon(instruction); // Get the appropriate arrow icon
-
-    return Positioned(
-      // top: 8,
-      // left: 5,
-      // right: 8,
-      child: Container(
-        height: 100,
-        padding: EdgeInsets.only(left: 11, right: 12, top: 18, bottom: 5),
-        decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).primary,
-          // borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(color: Colors.black26, blurRadius: 5),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(arrowIcon, color: Colors.white, size: 32), // Arrow icon
-            SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    instruction.replaceAll(RegExp(r'<[^>]*>'), ''),
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'In $distance ',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  double convertedLat = 0;
-  double convertedLng = 0;
-  void setcustommarkeritem() async {
-    setState(() {});
-    final Uint8List sourceImage =
-        await getbytesfromimages('assets/images/car.png', 80, 80);
-    final Uint8List destinationImage =
-        await getbytesfromimages('assets/images/flag.png', 80, 80);
-
-    sourceicon = BitmapDescriptor.fromBytes(sourceImage);
-    destinationicon = BitmapDescriptor.fromBytes(destinationImage);
-  }
-
-  Future<Uint8List> getbytesfromimages(
-      String path, int width, int height) async {
-    setState(() {});
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: width,
-      targetHeight: height,
-    );
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-  }
-
   final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
 
   List<LatLng> decodedPoints = <LatLng>[];
-  BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
-  BitmapDescriptor destinationicon = BitmapDescriptor.defaultMarker;
+  // BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
+  // BitmapDescriptor destinationicon = BitmapDescriptor.defaultMarker;
   Future<void> sendOnRideRequest() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/on-ride.php'));
-      request.fields.addAll({
-        'd_id': dId.toString(),
-      });
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/on-ride.php'),
+      );
+      request.fields.addAll({'d_id': dId.toString()});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
       } else {}
     } catch (error) {}
   }
 
-  GoogleDistanceMatrix googleDistanceMatrix = GoogleDistanceMatrix();
-  void _getDistanceMatrix() async {
-    var distanceMatrix = await googleDistanceMatrix.getDistance(
-      'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA',
-      origin: Coordinate(latitude: '-7.7665339', longitude: '110.3333601'),
-      destination: Coordinate(latitude: '-7.7602694', longitude: '110.4051345'),
+  pushercallbg() async {
+    var pusher = PusherClient(
+      '28691ac9c0c5ac41b64a',
+      const PusherOptions(
+        host: 'https://www.minicaboffice.com/api/driver/check-job-status.php',
+        cluster: 'ap2',
+        encrypted: false,
+      ),
     );
-    setState(() {
-      distance = distanceMatrix as String;
+    pusher.connect();
+
+    var channel = pusher.subscribe('jobs-channel');
+
+    // Listen for new events
+    channel.bind('job-withdrawn', (event) {
+      Map<String, dynamic> jsonMap = json.decode(event!.data!);
+      jobStatus();
+
+      // });
     });
+  }
+
+  Future<void> jobStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? dId = prefs.getString('d_id');
+    String? jobId = prefs.getString('jobId');
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://www.minicaboffice.com/api/driver/check-job-status.php',
+        ),
+        body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == false) {
+          prefs.remove("isRideStart");
+          setState(() {});
+          myController.visiblecontainer.value = false;
+          myController.polylines.clear();
+          context.pushNamed('Home');
+        } else {
+          // Handle the job details as normal
+        }
+      } else {
+        // Handle the error
+      }
+    } catch (e) {}
   }
 
   String distance1 = '';
   String? originAddresses;
   String? destinationAddresses;
-  // String? duration;
-
-  Future<String?> getDistanceMatrix() async {
-    var request = await http.Request(
-        'GET',
-        Uri.parse(
-            'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${pickup}&destinations=${dropoff}&key=AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'));
-    try {
-      var response = await request.send();
-
-      if (response.statusCode == 200) {
-        var streamString = await response.stream.bytesToString();
-        return streamString;
-      } else {
-        return response.reasonPhrase;
-      }
-    } catch (e) {
-      return 'Error: $e';
-    }
-  }
-
-  Future<void> updateDistance() async {
-    try {
-      var result = await getDistanceMatrix();
-      if (result != null) {
-        final jsonResponse = json.decode(result);
-        originAddresses = jsonResponse['origin_addresses'][0];
-        destinationAddresses = jsonResponse['destination_addresses'][0];
-        distance1 = jsonResponse['rows'][0]['elements'][0]['distance']['text'];
-        duration = jsonResponse['rows'][0]['elements'][0]['duration']['text'];
-      }
-    } catch (e) {
-      setState(() {
-        distance = 'Error: $e';
-      });
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-        latitude = position.latitude;
-        longitude = position.longitude;
-      });
-
-      _updateCameraWithZoom(
-          _currentPosition); // Move the camera to the current location
-      debugPrint('the converted Latlng are ${convertedLat} ${convertedLng}');
-      // _getPolyline(convertedLat, convertedLng);
-      // (); // Fetch directions after getting the current location
-      _trackLocation(); // Start tracking the user's movement
-    } catch (e) {
-      print('Error fetching current location: $e');
-    }
-  }
-
-  void _trackLocation() {
-    Geolocator.getPositionStream(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
-    ).listen((Position position) {
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-        _heading = position.heading; // Get the heading from the location
-        print('the heading position ${position.heading}');
-      });
-      updatePolyline();
-      _updateCameraPosition(_currentPosition);
-      _updateCameraWithZoom(_currentPosition); // Auto-follow user
-      _checkStepCompletion(position);
-    });
-  }
-
-  double _heading = 0.0;
-  void _checkStepCompletion(Position position) {
-    if (_navigationSteps.isEmpty) return;
-
-    final currentStep = _navigationSteps[0];
-    final stepPolyline = PolylinePoints()
-        .decodePolyline(currentStep['polyline'])
-        .map((point) => LatLng(point.latitude, point.longitude))
-        .toList();
-
-    double distance = Geolocator.distanceBetween(
-      position.latitude,
-      position.longitude,
-      stepPolyline.last.latitude,
-      stepPolyline.last.longitude,
-    );
-
-    if (distance < 20) {
-      // Step completion threshold
-      // _speakInstruction(currentStep['instruction']); // Speak the instruction
-      setState(() {
-        _navigationSteps.removeAt(0);
-      });
-
-      if (_navigationSteps.isNotEmpty) {
-        final nextStepPolyline = PolylinePoints().decodePolyline(
-          _navigationSteps[0]['polyline'],
-        );
-
-        _controller.animateCamera(
-          CameraUpdate.newLatLngZoom(
-            LatLng(
-              nextStepPolyline.last.latitude,
-              nextStepPolyline.last.longitude,
-            ),
-            17.5,
-          ),
-        );
-      }
-    }
-  }
-
-  void _updateCameraPosition(LatLng position) {
-    _controller.animateCamera(CameraUpdate.newLatLng(position));
-  }
-
-  void _updateCameraWithZoom(LatLng position) {
-    _controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-            target: position,
-            zoom: 17.5, // Adjust zoom level for navigation
-            tilt: 60, // Add tilt for a 3D-like view
-            bearing: _calculateBearing()), // Zoom and tilt
-      ),
-    );
-  }
-
-  List<Map<String, dynamic>> _navigationSteps = [];
-  double _calculateBearing() {
-    if (_navigationSteps.isEmpty) return 0;
-
-    final nextStep = _navigationSteps.first;
-    final decodedPolyline =
-        PolylinePoints().decodePolyline(nextStep['polyline']);
-
-    if (decodedPolyline.length < 2) return 0;
-
-    final start = decodedPolyline.first;
-    final end = decodedPolyline.last;
-
-    return Geolocator.bearingBetween(
-      start.latitude,
-      start.longitude,
-      end.latitude,
-      end.longitude,
-    );
-  }
-
-  // Future<void> _getCurrentLocation() async {
-  //   try {
-  //     Position position = await Geolocator.getCurrentPosition(
-  //       desiredAccuracy: LocationAccuracy.high,
-  //     );
-
-  //     setState(() {
-  //       _currentPosition = position;
-  //       currentLatitude = position.latitude;
-  //       currentLongitude = position.longitude;
-  //     });
-  //   } catch (e) {}
-  // }
-
-  Future<void> _setupMarkersAndPolylines() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    await _getCurrentLocation();
-
-    if (currentLatitude != null && currentLongitude != null) {
-      _kGoogle = CameraPosition(
-        target: LatLng(currentLatitude, currentLongitude),
-        zoom: 14,
-      );
-
-      _markers.add(
-        Marker(
-          markerId: MarkerId('currentLocation'),
-          position: LatLng(currentLatitude, currentLongitude),
-          infoWindow: InfoWindow(
-            title: 'Your Location',
-          ),
-          icon: BitmapDescriptor.defaultMarker,
-        ),
-      );
-    }
-
-    await getLocationFromAddress();
-
-    List<LatLng> latLen = [
-      LatLng(currentLatitude, currentLongitude),
-      LatLng(dropffLat, dropffLng),
-    ];
-
-    for (int i = 0; i < latLen.length; i++) {
-      _markers.add(
-        Marker(
-          markerId: MarkerId(i.toString()),
-          position: latLen[i],
-          infoWindow: InfoWindow(
-            title: i == 0 ? 'Your Location' : 'Pickup Location',
-          ),
-          // icon: BitmapDescriptor.defaultMarker,
-        ),
-      );
-    }
-
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId('1'),
-        points: latLen,
-        color: FlutterFlowTheme.of(context).primary,
-        // Colors.deepOrange,
-      ),
-    );
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Future<void> getLocationFromAddress() async {
-    final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
-    final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
-    final address = dropoff;
-    final response = await http.post(
-      Uri.parse('$apiUrl?address=$address&key=$apiKey'),
-    );
-    if (response.statusCode == 200) {
-      final decodedData = json.decode(response.body);
-      if (decodedData['status'] == 'OK') {
-        final results = decodedData['results'][0];
-        final geometry = results['geometry'];
-        final location = geometry['location'];
-        dropffLat = location['lat'];
-        dropffLng = location['lng'];
-      } else {}
-    } else {}
-  }
-
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    await _getCurrentLocation();
-    // await MapOptionDialog(context);
-    setState(() {
-      _controller = controller;
-      _getCurrentLocation();
-    });
-
-    final directionsService = DirectionsService();
-    final request = DirectionsRequest(
-      origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
-      destination: '${dropoff}',
-    );
-    directionsService.route(request,
-        (DirectionsResult? response, DirectionsStatus? status) {
-      if (status == DirectionsStatus.ok && response != null) {
-        setState(() {
-          final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
-          if (encodedPolyline != null) {
-            _polylineCoordinates = decodePolyline(encodedPolyline)!;
-
-            markers.add(
-              Marker(
-                markerId: MarkerId('origin'),
-                position: LatLng(
-                  response.routes![0]!.legs![0].startLocation!.latitude,
-                  response.routes![0]!.legs![0].startLocation!.longitude,
-                ),
-              ),
-            );
-            markers.add(
-              Marker(
-                markerId: MarkerId('destination'),
-                position: LatLng(
-                  response.routes![0]!.legs![0].endLocation!.latitude,
-                  response.routes![0]!.legs![0].endLocation!.longitude,
-                ),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueGreen),
-              ),
-            );
-          }
-        });
-      } else {}
-    });
-  }
-
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> points = [];
-    int index = 0;
-    int lat = 0, lng = 0;
-
-    while (index < encoded.length) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      double latitude = lat / 1E5;
-      double longitude = lng / 1E5;
-      points.add(LatLng(latitude, longitude));
-    }
-    return points;
-  }
 }

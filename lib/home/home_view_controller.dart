@@ -8,18 +8,20 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mini_cab/Model/jobDetails.dart';
-import 'package:mini_cab/home/start_ride_alert.dart';
+import 'package:new_minicab_driver/Model/jobDetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
 
 class JobController extends GetxController {
   var isPeriodicVisible = false.obs;
+  final isscreenHome = false.obs;
   var isJobDetailDone = false.obs;
-  Rx<CameraPosition> kGoogleplay = const CameraPosition(
-          target: LatLng(31.4064054, 73.0413076), zoom: 12.4746)
-      .obs;
+  Rx<CameraPosition> kGoogleplay =
+      const CameraPosition(
+        target: LatLng(31.4064054, 73.0413076),
+        zoom: 12.4746,
+      ).obs;
   var visiblecontainer = false.obs;
   var jobPusherContainer = false.obs;
   var currentLoggedInid = ''.obs;
@@ -42,10 +44,12 @@ class JobController extends GetxController {
   final longitude = 0.0.obs;
   final latitude = 0.0.obs;
   RxInt initialLabelIndex = 0.obs;
+
   Rx<BitmapDescriptor> sourceicon = BitmapDescriptor.defaultMarker.obs;
   Rx<BitmapDescriptor> destinationicon = BitmapDescriptor.defaultMarker.obs;
-  var parsedResponse =
-      RxMap<String, dynamic>({}); // Reactive map for parsed response
+  var parsedResponse = RxMap<String, dynamic>(
+    {},
+  ); // Reactive map for parsed response
   var data = ''.obs; // Reactive variable for 'data' (booking ID)
   var jobId = ''.obs; // Reactive variable for 'data' (booking ID)
   var cid = ''.obs; // Reactive variable for 'data' (booking ID)
@@ -74,7 +78,8 @@ class JobController extends GetxController {
 
     final response = await http.post(
       Uri.parse(
-          'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php'),
+        'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php',
+      ),
       body: {'d_id': dId.toString()},
     );
     print('before if condition');
@@ -107,11 +112,14 @@ class JobController extends GetxController {
         await prefs.setString('tolls', tolls.value);
         await prefs.setString('pickDate', pickUpdate.value);
         await prefs.setString(
-            'totalFee', parsedResponse['data'][0]['totalFee'] ?? '');
+          'totalFee',
+          parsedResponse['data'][0]['totalFee'] ?? '',
+        );
         await prefs.setString('pickTime', pickuptime.value);
         await prefs.setString('pickLocation', pickupLocatoin.value);
         await prefs.setString('dropLocation', dropLocation.value);
-        listFromPusher.add(Job(
+        listFromPusher.add(
+          Job(
             jobId: parsedResponse['data'][0]['job_id'].toString() ?? "",
             bookId: parsedResponse['data'][0]['book_id'].toString() ?? '',
             cId: parsedResponse['data'][0]['00000003'].toString() ?? "",
@@ -162,21 +170,23 @@ class JobController extends GetxController {
             bidStatus: parsedResponse['data'][0]['bid_status'].toString() ?? '',
             bidNote: parsedResponse['data'][0]['bid_note'].toString() ?? '',
             bookAddDate:
-                parsedResponse['data'][0]['bid_status'].toString() ?? ''));
+                parsedResponse['data'][0]['bid_status'].toString() ?? '',
+          ),
+        );
         getCoordinatesFromAddress(listFromPusher[0].pickup);
         visiblecontainer.value = true;
         isJobDetailDone.value = false;
-//        if (mounted) {
-//   showDialog(
-//     barrierDismissible: false,
-//     context: context,
-//     builder: (context) {
-//       return StartRideAlert(
-//         st: listFromPusher,
-//       );
-//     },
-//   );
-// }
+        //        if (mounted) {
+        //   showDialog(
+        //     barrierDismissible: false,
+        //     context: context,
+        //     builder: (context) {
+        //       return StartRideAlert(
+        //         st: listFromPusher,
+        //       );
+        //     },
+        //   );
+        // }
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           getCoordinatesFromAddress('');
@@ -217,7 +227,8 @@ class JobController extends GetxController {
 
       final response = await http.post(
         Uri.parse(
-            'https://www.minicaboffice.com/api/driver/accepted-job-details.php'),
+          'https://www.minicaboffice.com/api/driver/accepted-job-details.php',
+        ),
         body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
       );
 
@@ -273,7 +284,9 @@ class JobController extends GetxController {
   }
 
   Future<void> getdistanceandtime(
-      double destinationLat, double destinationLng) async {
+    double destinationLat,
+    double destinationLng,
+  ) async {
     const apiKey =
         'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
     var origin =
@@ -281,9 +294,13 @@ class JobController extends GetxController {
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
         '${destinationLat},${destinationLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    final response = await http.post(Uri.parse(// can be get and post request
+    final response = await http.post(
+      Uri.parse(
+        // can be get and post request
         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey',
+      ),
+    );
 
     if (response.statusCode == 200) {
       // Parse the JSON response
@@ -301,21 +318,24 @@ class JobController extends GetxController {
             final points = route['overview_polyline']['points'];
 
             // Decode polyline points and add them to the map
-            decodedPoints.value = PolylinePoints()
-                .decodePolyline(points)
-                .map((point) => LatLng(point.latitude, point.longitude))
-                .toList();
+            decodedPoints.value =
+                PolylinePoints()
+                    .decodePolyline(points)
+                    .map((point) => LatLng(point.latitude, point.longitude))
+                    .toList();
             // polylines.value.clear();
             polylines.clear(); // Clear previous polyline
-            polylines.add(Polyline(
-              // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
-              // patterns: points,
-              // polylineId: const PolylineId('updated_route'),
-              polylineId: const PolylineId('route'),
-              color: Colors.blue,
-              width: 5,
-              points: decodedPoints,
-            ));
+            polylines.add(
+              Polyline(
+                // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
+                // patterns: points,
+                // polylineId: const PolylineId('updated_route'),
+                polylineId: const PolylineId('route'),
+                color: Colors.blue,
+                width: 5,
+                points: decodedPoints,
+              ),
+            );
           }
         }
       }
@@ -323,7 +343,10 @@ class JobController extends GetxController {
   }
 
   Future<Uint8List> getbytesfromimages(
-      String path, int width, int height) async {
+    String path,
+    int width,
+    int height,
+  ) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(),
@@ -331,16 +354,22 @@ class JobController extends GetxController {
       targetHeight: height,
     );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    return (await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    ))!.buffer.asUint8List();
   }
 
   void setcustommarkeritem() async {
-    final Uint8List sourceImage =
-        await getbytesfromimages('assets/images/car.png', 80, 80);
-    final Uint8List destinationImage =
-        await getbytesfromimages('assets/images/userg.png', 80, 80);
+    final Uint8List sourceImage = await getbytesfromimages(
+      'assets/images/car.png',
+      80,
+      80,
+    );
+    final Uint8List destinationImage = await getbytesfromimages(
+      'assets/images/userg.png',
+      80,
+      80,
+    );
 
     sourceicon.value = BitmapDescriptor.fromBytes(sourceImage);
     destinationicon.value = BitmapDescriptor.fromBytes(destinationImage);
@@ -364,7 +393,9 @@ class JobController extends GetxController {
 
           getLatLngFromCurrentLocation().then((value) {
             getdistanceandtime(
-                locations.first.latitude, locations.first.longitude);
+              locations.first.latitude,
+              locations.first.longitude,
+            );
 
             kGoogleplay.value = CameraPosition(
               target: LatLng(latitude.value, longitude.value),
@@ -378,37 +409,6 @@ class JobController extends GetxController {
       print("polylines updation exception $e");
     }
   }
-
-  // Future getCoordinatesFromAddress(String address) async {
-  //   try {
-  //     if (address.isEmpty) {
-  //       print('if getCoordinatesFromAddress');
-  //       // Reset polylines when the pickup address is empty
-  //       polylines.clear();
-  //       return;
-  //     } else {
-  //       print('else getCoordinatesFromAddress');
-  //       List<Location> locations = await locationFromAddress(address);
-  //       if (locations.isNotEmpty) {
-  //         convertedLat.value = locations.first.latitude;
-  //         convertedLng.value = locations.first.longitude;
-
-  //         getLatLngFromCurrentLocation().then((value) {
-  //           getdistanceandtime(
-  //               locations.first.latitude, locations.first.longitude);
-
-  //           kGoogleplay.value = CameraPosition(
-  //             target: LatLng(latitude.value, longitude.value),
-  //             zoom: 12.4746,
-  //           );
-  //           setcustommarkeritem();
-  //         });
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print("polylines updation exception $e");
-  //   }
-  // }
 
   Future<void> updatePolyline() async {
     try {
@@ -427,12 +427,37 @@ class JobController extends GetxController {
   }
 
   StreamSubscription<Position>? positionStream;
-
   @override
   void onInit() {
     super.onInit();
     _trackLocationChanges();
+
+    // Listen to changes in showAlert and show a dialog when it becomes true
+    // ever(visiblecontainer, (bool value) {
+    //   if (value) {
+    //     Get.dialog(
+    //       AlertDialog(
+    //         title: Text("Alert"),
+    //         content: Text("This is an alert dialog."),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: () {
+    //               // Close the dialog and reset the value
+    //               Get.back();
+    //               showAlert.value = false;
+    //             },
+    //             child: Text("OK"),
+    //           ),
+    //         ],
+    //       ),
+    //       barrierDismissible:
+    //           false, // Prevent dialog from closing by tapping outside
+    //     );
+    //   }
+    // });
   }
+
+  RxBool showAlert = false.obs;
 
   void _trackLocationChanges() {
     positionStream = Geolocator.getPositionStream(
@@ -441,7 +466,7 @@ class JobController extends GetxController {
       // Update current location variables
       latitude.value = position.latitude;
       longitude.value = position.longitude;
-// currentLocation.latitude = position.latitude;
+      // currentLocation.latitude = position.latitude;
       longitude.value = position.longitude;
       // Update polyline with new user location
       updatePolyline();

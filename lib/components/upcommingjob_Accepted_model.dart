@@ -1,4 +1,5 @@
-import 'package:mini_cab/components/upcommingjob_Accepted_widget.dart';
+
+import 'package:new_minicab_driver/components/upcommingjob_Accepted_widget.dart';
 
 import '/components/notes_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';

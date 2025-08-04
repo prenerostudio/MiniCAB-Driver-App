@@ -1,7 +1,8 @@
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glowy_borders/glowy_borders.dart';
-import 'package:mini_cab/Data/Alart.dart';
+import 'package:new_minicab_driver/Data/Alart.dart';
+
 // import 'package:mini_cab/components/upcommingjob_Accepted_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'customer_details_widget.dart';
+import 'onway_widget.dart';
 // import 'Upcommingjob_Accepted_model.dart';
 // export 'Upcommingjob_Accepted_model.dart';
 import 'package:geolocator/geolocator.dart';

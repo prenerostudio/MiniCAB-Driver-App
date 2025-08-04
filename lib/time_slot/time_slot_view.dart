@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_minicab_driver/time_slot/time_slot_model.dart';
  
-import 'package:mini_cab/time_slot/time_slot_model.dart';
+ 
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimeSlotView extends StatefulWidget {

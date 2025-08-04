@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:mini_cab/invoiecs/view_reports_details.dart';
+import 'package:new_minicab_driver/invoiecs/view_reports_details.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../flutter_flow/flutter_flow_icon_button.dart';
@@ -322,7 +322,9 @@ class _InvoiecsWidgetState extends State<InvoiecsWidget> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   WeekDetailScreen(
-                                                weekData: weeksData[week], // Explicitly casting
+                                                weekData: weeksData[week] as List<
+                                                    Map<String,
+                                                        dynamic>>?, // Explicitly casting
                                               ),
                                             ),
                                           );

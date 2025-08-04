@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
-import 'package:mini_cab/payment_entery/complete.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
+import 'package:new_minicab_driver/payment_entery/complete.dart';
+
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:new_minicab_driver/BidHistory/bid_history_filter_widget.dart';
+import 'package:new_minicab_driver/otp%202/otp2_widget.dart';
 
-import 'package:mini_cab/BidHistory/bid_history_filter_widget.dart';
 
-import 'package:mini_cab/otp%202/otp2_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import '../../Acount Statements/acount_statements_widget.dart';
@@ -94,6 +94,7 @@ class AppStateNotifier extends ChangeNotifier {
 }
 
 GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
+      navigatorKey: navigatorKey,
       initialLocation: '/',
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
@@ -226,6 +227,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             cNotes: params.getParam('cNotes', ParamType.String),
             cNumber: params.getParam('cNumber', ParamType.String),
             fare: params.getParam('fare', ParamType.String),
+            extra: params.getParam('extra', ParamType.String),
+            toll: params.getParam('toll', ParamType.String),
+            stopTime: params.getParam('stopTime', ParamType.String),
+            jobaccept: params.getParam('jobaccept', ParamType.String),
+            jobstart: params.getParam('jobstart', ParamType.String),
+            waytopickup: params.getParam('waytopickup', ParamType.String),
+            arrivalNow: params.getParam('arrivalNow', ParamType.String),
+            ridePath: params.getParam('ridePath', ParamType.String),
+            pob: params.getParam('pob', ParamType.String),
+            dropOfftime: params.getParam('dropOfftime', ParamType.String),
+            completime: params.getParam('completime', ParamType.String),
+            // fare: params.getParam('fare', ParamType.String),
           ),
         ),
         FFRoute(

@@ -1,38 +1,23 @@
-import 'dart:developer';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mini_cab/Acount%20Statements/accounts_bottomSheet.dart';
-import 'package:mini_cab/Data/Alart.dart';
-import 'package:mini_cab/Model/jobDetails.dart';
-import 'package:mini_cab/bids/bids_bottom_sheet.dart';
-import 'package:mini_cab/break_time/break_time_view.dart';
-import 'package:mini_cab/components/upcommingjob_widget.dart';
-import 'package:mini_cab/jobshistory/job_history_sheet.dart';
-import 'package:mini_cab/jobshistory/jobshistory_widget.dart';
-import 'package:mini_cab/main.dart';
-import 'package:mini_cab/zones/zone_bottomSheet.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:system_alert_window/system_alert_window.dart';
+import 'package:new_minicab_driver/Acount%20Statements/accounts_bottomSheet.dart';
+import 'package:new_minicab_driver/bids/bids_bottom_sheet.dart';
+import 'package:new_minicab_driver/break_time/break_time_view.dart';
+import 'package:new_minicab_driver/components/upcommingjob_widget.dart';
+import 'package:new_minicab_driver/jobshistory/job_history_sheet.dart';
+import 'package:new_minicab_driver/zones/zone_bottomSheet.dart';
+// import 'package:system_alert_window/system_alert_window.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../Acount Statements/acount_statements_widget.dart';
-import '../components/changepaymentmethod/changepaymentmethod_widget.dart';
-import '../components/upcommingjob_Accepted_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'dashboard_model.dart';
 export 'dashboard_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,16 +26,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import '../Model/myProfile.dart';
-import 'package:url_launcher/url_launcher.dart';
 // library flutter_overlay_window;
-import 'package:flutter/services.dart';
-import 'dart:async';
-import 'dart:developer';
-import 'dart:isolate';
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:system_alert_window/system_alert_window.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({Key? key}) : super(key: key);
@@ -225,7 +201,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
   }
 
   Future<void> _checkPermissions() async {
-    await SystemAlertWindow.requestPermissions;
+    // await SystemAlertWindow.requestPermissions;
   }
 
   int? SwitchStatus;
@@ -242,7 +218,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
   String _platformVersion = 'Unknown';
   bool _isShowingWindow = false;
   bool _isUpdatedWindow = false;
-  SystemWindowPrefMode prefMode = SystemWindowPrefMode.OVERLAY;
+  // SystemWindowPrefMode prefMode = SystemWindowPrefMode.OVERLAY;
   static const String _mainAppPort = 'MainApp';
   final _receivePort = ReceivePort();
   SendPort? homePort;
@@ -250,18 +226,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> _initPlatformState() async {
-    await SystemAlertWindow.enableLogs(true);
+    // await SystemAlertWindow.enableLogs(true);
     String? platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await SystemAlertWindow.platformVersion;
+      // platformVersion = await SystemAlertWindow.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
     if (!mounted) return;
-    setState(() {
-      _platformVersion = platformVersion!;
-    });
+    if (platformVersion != null)
+      setState(() {
+        _platformVersion = platformVersion!;
+      });
   }
 
   @override
@@ -2168,6 +2145,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
+    if (dId == null) {
+      print('d_id not found in shared preferences.');
+      return [];
+    }
+
     final uri =
         Uri.parse('https://minicaboffice.com/api/driver/view-profile.php');
     final response = await http.post(uri, body: {'d_id': dId.toString()});
@@ -2176,10 +2158,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
 
-      List<Driver> profileData =
-          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-      return profileData;
-        } else {
+      if (data is List) {
+        List<Driver> profileData =
+            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+        return profileData;
+      } else {
+        print('Invalid data format received.');
+        return [];
+      }
+    } else {
       print('Error: ${response.reasonPhrase}');
       return [];
     }
@@ -2215,7 +2202,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (longitude != null) {
+    if (latitude != null && longitude != null) {
       var request = http.MultipartRequest('POST',
           Uri.parse('https://minicaboffice.com/api/driver/real-location.php'));
       request.fields.addAll({
@@ -2291,7 +2278,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
         if (jsonResponse['status'] == true) {
           if (jsonResponse.containsKey('data')) {
             final Map<String, dynamic> userData = jsonResponse[''];
-            if (userData.isNotEmpty) {
+            if (userData != null && userData.isNotEmpty) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setBool('isLogin', true);
               userData.forEach((key, value) async {
@@ -2325,10 +2312,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''];
 
-      List<Driver> profileData =
-          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-      return profileData;
-        } else {
+      if (data is List) {
+        List<Driver> profileData =
+            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+        return profileData;
+      } else {
+        print('Invalid data format received.');
+        return []; // Return an empty list in case of invalid data format.
+      }
+    } else {
       print('Error: ${response.reasonPhrase}');
       return []; // Return an empty list in case of an error.
     }

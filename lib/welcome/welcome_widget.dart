@@ -1,4 +1,4 @@
-import 'package:system_alert_window/system_alert_window.dart';
+// import 'package:system_alert_window/system_alert_window.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -30,8 +30,8 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
   void initState() {
     checkLoginStatus();
     super.initState();
-    checkAndRequestPermissions();
-    checkLocationPermissionAndNavigate(context);
+    // checkAndRequestPermissions();
+    // checkLocationPermissionAndNavigate(context);
     _model = createModel(context, () => WelcomeModel());
   }
 
@@ -43,10 +43,12 @@ class _WelcomeWidgetState extends State<WelcomeWidget> {
   }
 
   void checkAndRequestPermissions() async {
-    bool? isGrantedNullable = await SystemAlertWindow.checkPermissions();
+    // bool? isGrantedNullable = await SystemAlertWindow.checkPermissions();
+    bool? isGrantedNullable = false;
     bool isGranted = isGrantedNullable ?? false; // Default to false if null
     if (!isGranted) {
-      bool requested = await SystemAlertWindow.requestPermissions() ?? false;
+      bool requested =false;
+      // bool requested = await SystemAlertWindow.requestPermissions() ?? false;
       if (!requested) {
         // Navigate to app settings
         showDialog(

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mini_cab/login/login_widget.dart';
+import 'package:new_minicab_driver/login/login_widget.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '/flutter_flow/flutter_flow_animations.dart';

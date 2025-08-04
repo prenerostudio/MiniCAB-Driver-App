@@ -7,7 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:mini_cab/flutter_flow/flutter_flow_widgets.dart';
+import 'package:new_minicab_driver/flutter_flow/flutter_flow_widgets.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../flutter_flow/flutter_flow_theme.dart';

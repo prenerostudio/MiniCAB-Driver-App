@@ -1,7 +1,5 @@
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_directions_api/google_directions_api.dart';
-import 'package:mini_cab/main.dart';
 
 import '../Model/jobDetails.dart';
 import '../home/home_widget.dart';
@@ -58,39 +56,41 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     super.initState();
     _getLocation();
     _getCurrentLocation();
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await showModalBottomSheet(
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        enableDrag: false,
-        context: context,
-        builder: (context) {
-          return GestureDetector(
-            onVerticalDragUpdate: (details) {
-              if (details.primaryDelta! > 20) {
-                // Close the BottomSheet on a downward swipe
-                Navigator.pop(context);
-              }
-            },
-            // onVerticalDragDown: (details) {
-            //   Navigator.pop(context);
-            //   debugPrint('downSwipped');
-            // },
-            onTap: () => _model.unfocusNode.canRequestFocus
-                ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-                : FocusScope.of(context).unfocus(),
-            child: Padding(
-              padding: MediaQuery.viewInsetsOf(context),
-              child: UpcommingjobWidget(
-                dId: '',
-              ),
-            ),
-          );
-        },
-      ).then((value) => safeSetState(() {}));
-    });
+    // SchedulerBinding.instance.addPostFrameCallback((_) async {
+    // await
+    // showModalBottomSheet(
+    //   isScrollControlled: true,
+    //   backgroundColor: Colors.transparent,
+    //   enableDrag: false,
+    //   context: context,
+    //   builder: (context) {
+    //     return GestureDetector(
+    //       onVerticalDragUpdate: (details) {
+    //         if (details.primaryDelta! > 20) {
+    //           // Close the BottomSheet on a downward swipe
+    //           Navigator.pop(context);
+    //         }
+    //       },
+    //       // onVerticalDragDown: (details) {
+    //       //   Navigator.pop(context);
+    //       //   debugPrint('downSwipped');
+    //       // },
+    //       onTap: () => _model.unfocusNode.canRequestFocus
+    //           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+    //           : FocusScope.of(context).unfocus(),
+    //       child: Padding(
+    //         padding: MediaQuery.viewInsetsOf(context),
+    //         child: UpcommingjobWidget(
+    //           dId: '',
+    //         ),
+    //       ),
+    //     );
+    //   },
+    // );
+
+    // });
     jobDetailsFuture();
-    DirectionsService.init('AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA');
+    // DirectionsService.init('AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA');
     _setupMarkersAndPolylines();
     _model = createModel(context, () => UpcommingModel());
   }
@@ -109,10 +109,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       if (currentLocation != null) {
         mapController.animateCamera(
           CameraUpdate.newLatLng(
-            LatLng(
-              currentLocation!.latitude,
-              currentLocation!.longitude,
-            ),
+            LatLng(currentLocation!.latitude, currentLocation!.longitude),
           ),
         );
       }
@@ -140,9 +137,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     print(dId);
     final response = await http.post(
       Uri.parse('https://minicaboffice.com/api/driver/upcoming-jobs.php'),
-      body: {
-        'd_id': dId.toString(),
-      },
+      body: {'d_id': dId.toString()},
     );
 
     if (response.statusCode == 200) {
@@ -174,18 +169,20 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     }
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
               DateTime.now().difference(lastBackPressed!) >
                   Duration(seconds: 2)) {
             context.pushNamed('Home');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Press again to exit')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Press again to exit')));
             lastBackPressed = DateTime.now();
             return false;
           } else {
@@ -196,40 +193,41 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         child: Scaffold(
           key: scaffoldKey,
           backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-          appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            automaticallyImplyLeading: false,
-            leading: FlutterFlowIconButton(
-              borderColor: Colors.transparent,
-              borderRadius: 30,
-              borderWidth: 1,
-              buttonSize: 60,
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: FlutterFlowTheme.of(context).primary,
-                size: 30,
-              ),
-              onPressed: () async {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => NavBarPage(
-                              page: HomeWidget(),
-                            )));
-              },
-            ),
-            title: Text(
-              'Upcoming Booking',
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Outfit',
-                    color: FlutterFlowTheme.of(context).primary,
-                    fontSize: 22,
-                  ),
-            ),
-            actions: [],
-            centerTitle: true,
-            elevation: 2,
-          ),
+
+          // appBar: AppBar(
+          //   backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          //   automaticallyImplyLeading: false,
+          //   leading: FlutterFlowIconButton(
+          //     borderColor: Colors.transparent,
+          //     borderRadius: 30,
+          //     borderWidth: 1,
+          //     buttonSize: 60,
+          //     icon: Icon(
+          //       Icons.arrow_back_rounded,
+          //       color: FlutterFlowTheme.of(context).primary,
+          //       size: 30,
+          //     ),
+          //     onPressed: () async {
+          //       Navigator.push(
+          //           context,
+          //           MaterialPageRoute(
+          //               builder: (context) => NavBarPage(
+          //                     page: HomeWidget(),
+          //                   )));
+          //     },
+          //   ),
+          //   title: Text(
+          //     'Upcoming Booking',
+          //     style: FlutterFlowTheme.of(context).headlineMedium.override(
+          //           fontFamily: 'Outfit',
+          //           color: FlutterFlowTheme.of(context).primary,
+          //           fontSize: 22,
+          //         ),
+          //   ),
+          //   actions: [],
+          //   centerTitle: true,
+          //   elevation: 2,
+          // ),
           body: SafeArea(
             top: true,
             child: Column(
@@ -241,23 +239,24 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                     ),
-                    child: isLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                FlutterFlowTheme.of(context).primary,
-                              ),
-                            ),
-                          )
-                        : currentLocation != null
-                            ? buildMap()
-                            : Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    FlutterFlowTheme.of(context).primary,
-                                  ),
+                    child:
+                        isLoading
+                            ? Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  FlutterFlowTheme.of(context).primary,
                                 ),
                               ),
+                            )
+                            : currentLocation != null
+                            ? buildMap()
+                            : Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  FlutterFlowTheme.of(context).primary,
+                                ),
+                              ),
+                            ),
                   ),
                 ),
               ],
@@ -270,6 +269,8 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
 
   Widget buildMap() {
     return GoogleMap(
+      mapType: MapType.satellite, // Keep this as 'normal' (not satellite etc.)
+      tiltGesturesEnabled: true,
       initialCameraPosition: CameraPosition(
         target: LatLng(
           _currentPosition?.latitude ?? 0.0,
@@ -281,7 +282,9 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       myLocationButtonEnabled: false,
       compassEnabled: true,
       rotateGesturesEnabled: true,
-      tiltGesturesEnabled: true,
+
+      // tiltGesturesEnabled: true,
+      buildingsEnabled: true, // 3D buildings dikhayein
       scrollGesturesEnabled: true,
       zoomControlsEnabled: false,
       zoomGesturesEnabled: true,
@@ -304,48 +307,48 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       mapController = controller;
     });
 
-    final directionsService = DirectionsService();
-    final request = DirectionsRequest(
-      origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
-      destination: '${pickup}',
-    );
-    print(request);
-    directionsService.route(request,
-        (DirectionsResult? response, DirectionsStatus? status) {
-      if (status == DirectionsStatus.ok && response != null) {
-        setState(() {
-          final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
-          print('encoded    ${encodedPolyline}');
-          if (encodedPolyline != null) {
-            _polylineCoordinates = decodePolyline(encodedPolyline)!;
-            print('polylineCoordinates ${_polylineCoordinates}');
+    // final directionsService = DirectionsService();
+    // final request = DirectionsRequest(
+    //   origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
+    //   destination: '${pickup}',
+    // );
+    // print(request);
+    // directionsService.route(request,
+    //     (DirectionsResult? response, DirectionsStatus? status) {
+    //   if (status == DirectionsStatus.ok && response != null) {
+    //     setState(() {
+    //       final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
+    //       print('encoded    ${encodedPolyline}');
+    //       if (encodedPolyline != null) {
+    //         _polylineCoordinates = decodePolyline(encodedPolyline)!;
+    //         print('polylineCoordinates ${_polylineCoordinates}');
 
-            markers.add(
-              Marker(
-                markerId: MarkerId('origin'),
-                position: LatLng(
-                  response.routes![0]!.legs![0].startLocation!.latitude,
-                  response.routes![0]!.legs![0].startLocation!.longitude,
-                ),
-              ),
-            );
-            markers.add(
-              Marker(
-                markerId: MarkerId('destination'),
-                position: LatLng(
-                  response.routes![0]!.legs![0].endLocation!.latitude,
-                  response.routes![0]!.legs![0].endLocation!.longitude,
-                ),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueGreen),
-              ),
-            );
-          }
-        });
-      } else {
-        print('Failed to fetch directions: $status');
-      }
-    });
+    //         markers.add(
+    //           Marker(
+    //             markerId: MarkerId('origin'),
+    //             position: LatLng(
+    //               response.routes![0]!.legs![0].startLocation!.latitude,
+    //               response.routes![0]!.legs![0].startLocation!.longitude,
+    //             ),
+    //           ),
+    //         );
+    //         markers.add(
+    //           Marker(
+    //             markerId: MarkerId('destination'),
+    //             position: LatLng(
+    //               response.routes![0]!.legs![0].endLocation!.latitude,
+    //               response.routes![0]!.legs![0].endLocation!.longitude,
+    //             ),
+    //             icon: BitmapDescriptor.defaultMarkerWithHue(
+    //                 BitmapDescriptor.hueGreen),
+    //           ),
+    //         );
+    //       }
+    //     });
+    //   } else {
+    //     print('Failed to fetch directions: $status');
+    //   }
+    // });
   }
 
   List<LatLng> decodePolyline(String encoded) {
@@ -391,12 +394,10 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         print('d_id not found in shared preferences.');
       }
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://minicaboffice.com/api/driver/passenger-waiting.php'));
-      request.fields.addAll({
-        'd_id': dId.toString(),
-      });
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/passenger-waiting.php'),
+      );
+      request.fields.addAll({'d_id': dId.toString()});
 
       http.StreamedResponse response = await request.send();
 
@@ -421,11 +422,11 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       if (dId == null) {
         print('d_id not found in shared preferences.');
       }
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'));
-      request.fields.addAll({
-        'd_id': dId.toString(),
-      });
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'),
+      );
+      request.fields.addAll({'d_id': dId.toString()});
 
       http.StreamedResponse response = await request.send();
 

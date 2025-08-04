@@ -56,7 +56,16 @@ class _BidDetailsWidgetState extends State<BidDetailsWidget> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
+    if (dId == null) {
+      print('d_id not found in shared preferences.');
+      return [];
+    }
+
     String? bidId = widget.bidId;
+    if (bidId == null) {
+      print('not found in bidId.');
+      return [];
+    }
     print(bidId);
     String bidAmount = emailAddressController.text;
 

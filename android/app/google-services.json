@@ -1,29 +1,29 @@
 {
-  "project_info": {
-    "project_number": "746952981784",
-    "project_id": "new-mini-cab-driver",
-    "storage_bucket": "new-mini-cab-driver.appspot.com"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:746952981784:android:a5ea79e652001f1547b26d",
-        "android_client_info": {
-          "package_name": "com.mycompany.driverminicab"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
+    "project_info": {
+        "project_number": "746952981784",
+        "project_id": "new-mini-cab-driver",
+        "storage_bucket": "new-mini-cab-driver.appspot.com"
+    },
+    "client": [
         {
-          "current_key": "AIzaSyAjF6Z92cfx1PN6un1tKevakCjx7Yf0eio"
+            "client_info": {
+                "mobilesdk_app_id": "1:746952981784:android:a5ea79e652001f1547b26d",
+                "android_client_info": {
+                    "package_name": "com.mycompany.driverminicab"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyAjF6Z92cfx1PN6un1tKevakCjx7Yf0eio"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
         }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
+    ],
+    "configuration_version": "1"
 }

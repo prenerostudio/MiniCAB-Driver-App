@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/components/at_dropoff_widget.dart';

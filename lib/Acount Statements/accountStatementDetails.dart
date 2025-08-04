@@ -1,10 +1,9 @@
+import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:mini_cab/Acount%20Statements/acount_statements_widget.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
-import 'package:mini_cab/index.dart';
-import 'package:mini_cab/main.dart';
-import 'package:mini_cab/on_way/on_way_model.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
+import 'package:new_minicab_driver/on_way/on_way_model.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';

@@ -15,6 +15,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class DocumentsWidget extends StatefulWidget {
   const DocumentsWidget({

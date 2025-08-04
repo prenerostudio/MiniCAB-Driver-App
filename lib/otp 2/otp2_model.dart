@@ -1,4 +1,4 @@
-import 'package:mini_cab/otp%202/otp2_widget.dart';
+
 
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';

@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:mini_cab/Acount%20Statements/acount_statements_widget.dart';
-import 'package:mini_cab/home/home_view_controller.dart';
-import 'package:mini_cab/index.dart';
-import 'package:mini_cab/main.dart';
-import 'package:mini_cab/on_way/on_way_model.dart';
+import 'package:new_minicab_driver/Acount%20Statements/acount_statements_widget.dart';
+import 'package:new_minicab_driver/home/home_view_controller.dart';
+import 'package:new_minicab_driver/main.dart';
+import 'package:new_minicab_driver/on_way/on_way_model.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -73,6 +73,12 @@ class _CompleteWidgetState extends State<CompleteWidget> {
     pickupTime = sp.getString('pickTime') ?? '';
     pickUplocation = sp.getString('pickLocation') ?? '';
     dropOflocation = sp.getString('dropLocation') ?? '';
+    jobAccptTime = sp.getString('jobAcceptedTime') ?? '';
+    jobStart = sp.getString('jobStartTime') ?? '';
+    waytoPickup = sp.getString('jobWayToPickupTime') ?? '';
+    arrivalTime = sp.getString('jobArrivalNowTime') ?? '';
+    pobTime = sp.getString('jobPOBTime') ?? '';
+    dropOffTime = sp.getString('jobAtDropOffTime') ?? '';
     print('timer value $time');
     setState(() {});
 // sp.setString('timerValue', time)
@@ -153,12 +159,17 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   completeJob() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {});
+    _getCurrentTime();
     try {
       isrequest = true;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
       String? cid = prefs.getString('c_id');
-      print('the cid is $cid');
+      List<String>? routeData2 = prefs.getStringList('user_route');
+
+      String coordinatesString = routeData2!.join(",");
+
+      print('the cid is $coordinatesString');
       // print('d_id not found in shared preferences.${widget.jobid}');
       // print('d_id not found in shared preferences.${dId}');
       // print('d_id not found in shared preferences.${parkingController.text}');
@@ -177,6 +188,14 @@ class _CompleteWidgetState extends State<CompleteWidget> {
             'extra': extra,
             'waiting': waiting,
             'tolls': tolls,
+            'job_accepted_time': jobAccptTime,
+            'job_started_time': jobStart,
+            'way_to_pickup_time': waytoPickup,
+            'arrived_at_pickup_time': arrivalTime,
+            'pob_time': pobTime,
+            'dropoff_time': dropOffTime,
+            'job_completed_time': formattedTime,
+            'driver_route': coordinatesString,
           });
 
       if (response.statusCode == 200) {
@@ -187,6 +206,15 @@ class _CompleteWidgetState extends State<CompleteWidget> {
         final data = json.decode(response.body);
         await sp.remove('isWaitingTrue');
         await sp.remove('arrivalDone');
+        await sp.remove('jobDispatched');
+        await sp.remove('jobAcceptedTime');
+        await sp.remove('jobAtDropOffTime');
+        await sp.remove('jobPOBTime');
+        await sp.remove('jobArrivalNowTime');
+        await sp.remove('jobWayToPickupTime');
+        await sp.remove('jobStartTime');
+        await sp.remove('user_route');
+        myController.polylines.clear();
         sp.setInt('isRideStart', 0);
         // context.pushNamed('AcountStatements');
         Navigator.push(
@@ -208,6 +236,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
     }
   }
 
+  String jobAccptTime = '--';
+  String jobStart = '--';
+  String waytoPickup = '--';
+  String arrivalTime = '--';
+  String pobTime = '--';
+  String dropOffTime = '--';
+
+  void _getCurrentTime() {
+    final now = DateTime.now();
+    final formatter = DateFormat('HH:mm a');
+    setState(() {
+      formattedTime = formatter.format(now);
+    });
+  }
+
+  String formattedTime = "";
   bool isrequest = false;
   late OnWayModel _model;
   @override
@@ -261,8 +305,9 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                       .bodyMedium
                                       .override(
                                         fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
+                                        color: Colors.white,
+                                        // color: FlutterFlowTheme.of(context)
+                                        //     .primaryBackground,
                                         fontSize: 16,
                                         letterSpacing: 0,
                                         fontWeight: FontWeight.w500,
@@ -286,10 +331,11 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
+                                              color: Colors.white,
                                               fontFamily: 'Open Sans',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
+                                              // color:
+                                              //     FlutterFlowTheme.of(context)
+                                              //         .primaryBackground,
                                               fontSize: 16,
                                               letterSpacing: 0,
                                               fontWeight: FontWeight.w600,
@@ -314,8 +360,9 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                         .bodyMedium
                                         .override(
                                           fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
+                                          color: Colors.white,
+                                          // color: FlutterFlowTheme.of(context)
+                                          //     .primaryBackground,
                                           fontSize: 16,
                                           letterSpacing: 0,
                                           fontWeight: FontWeight.w500,
@@ -329,14 +376,17 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Text(
-                                        '£ $totalFee',
+                                        totalFee.isEmpty
+                                            ? "£ $jounreryFare"
+                                            : '£ $totalFee',
                                         style: FlutterFlowTheme.of(context)
                                             .titleLarge
                                             .override(
                                               fontFamily: 'Open Sans',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
+                                              color: Colors.white,
+                                              // color:
+                                              //     FlutterFlowTheme.of(context)
+                                              //         .primaryBackground,
                                               letterSpacing: 0,
                                             ),
                                       ),
@@ -346,9 +396,10 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                             .bodyMedium
                                             .override(
                                               fontFamily: 'Open Sans',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
+                                              color: Colors.white,
+                                              // color:
+                                              //     FlutterFlowTheme.of(context)
+                                              //         .primaryBackground,
                                               fontSize: 16,
                                               letterSpacing: 0,
                                               fontWeight: FontWeight.w500,
@@ -565,6 +616,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       ],
                     ),
                   ),
+
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
                     child: Row(
@@ -750,6 +802,228 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Time tracking',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Job Accepted',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          '${jobAccptTime}',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Job Started',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          '${jobStart}',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Way to pickup',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          '${waytoPickup}',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Arrival at pickup',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          '${arrivalTime}',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'POB',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          '${pobTime}',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Dropoff',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          '${dropOffTime}',
+                          style: FlutterFlowTheme.of(context)
+                              .headlineSmall
+                              .override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // completed button
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0, 40, 0, 0),
                     child: Row(
