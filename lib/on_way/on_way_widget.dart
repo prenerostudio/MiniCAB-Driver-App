@@ -22,7 +22,7 @@ import '../components/waydetails_widget.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_timer.dart';
 import 'dart:ui' as ui;
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +38,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class OnWayWidget extends StatefulWidget {
-  OnWayWidget({
-    Key? key,
+  const OnWayWidget({
+    super.key,
     // this.did,
     // this.jobid = '',
     // this.pickup = '',
@@ -56,7 +57,7 @@ class OnWayWidget extends StatefulWidget {
     // this.luggage = '',
     // this.cnumber = '',
     // this.cemail = '',
-  }) : super(key: key);
+  });
 
   @override
   _OnWayWidgetState createState() => _OnWayWidgetState();
@@ -175,7 +176,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     jobStatus();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-    _model = createModel(context as BuildContext, () => OnWayModel());
+    _model = createModel(context, () => OnWayModel());
   }
 
   String distanceKm = '';
@@ -198,9 +199,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     polylineCoordinate.clear();
 
     if (result.points.isNotEmpty) {
-      result.points.forEach((PointLatLng point) {
+      for (var point in result.points) {
         polylineCoordinate.add(LatLng(point.latitude, point.longitude));
-      });
+      }
     }
     double distanceinKm = result.totalDistanceValue! / 1600;
     distanceKm = "${distanceinKm.toStringAsFixed(1)} miles";
@@ -224,7 +225,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       position,
     ) {
       setState(() {});
-      print("the position is ${position}");
+      print("the position is $position");
       originlatlng = LatLng(position.latitude, position.longitude);
       initialCameraPosition = CameraPosition(target: originlatlng!, zoom: 15);
       setCustomMarkerForCurrent();
@@ -241,7 +242,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         accpetingOrderViewModel.convertedLat.value, // Destination latitude
         accpetingOrderViewModel.convertedLng.value, // Destination longitude
       );
-      log('the distance in meter is ${distanceInMeters}');
+      log('the distance in meter is $distanceInMeters');
       if (distanceInMeters <= 200) {
         // isReached = true;
         // if (isReached) {
@@ -261,11 +262,10 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       markers.add(
         Marker(
           markerId: MarkerId('destination'),
-          position:
-              LatLng(
-                accpetingOrderViewModel.convertedLat.value,
-                accpetingOrderViewModel.convertedLng.value,
-              )!,
+          position: LatLng(
+            accpetingOrderViewModel.convertedLat.value,
+            accpetingOrderViewModel.convertedLng.value,
+          ),
           icon: destination,
         ),
       );
@@ -397,9 +397,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         await sp.remove('isWaitingTrue');
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse(
-            'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php',
-          ),
+          Uri.parse(ApiService.driverCalculateWaitingTime),
         );
         request.fields.addAll({
           'd_id': '$did',
@@ -489,8 +487,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   }
 
   recive_jobidid() async {
-    SharedPreferences prefs =
-        await SharedPreferences.getInstance() as SharedPreferences;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
     jobId = jobid.toString();
 
@@ -555,9 +552,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
   pushercallbg() async {
     var pusher = PusherClient(
-      '28691ac9c0c5ac41b64a',
+      'ef80ba163503f394d9c3',
       const PusherOptions(
-        host: 'https://www.minicaboffice.com/api/driver/check-job-status.php',
+        host: ApiService.driverCheckJobStatus,
         cluster: 'ap2',
         encrypted: false,
       ),
@@ -573,6 +570,11 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
       // });
     });
+
+    var dispatchChannel = pusher.subscribe('dispatch-booking');
+    dispatchChannel.bind('booking-withdraw', (event) {
+      jobStatus();
+    });
   }
 
   // late GoogleMapController _mapController;
@@ -582,9 +584,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     String? jobId = prefs.getString('jobId');
     try {
       final response = await http.post(
-        Uri.parse(
-          'https://www.minicaboffice.com/api/driver/check-job-status.php',
-        ),
+        Uri.parse(ApiService.driverCheckJobStatus),
         body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
       );
 
@@ -691,7 +691,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          backgroundColor: context.appTheme.secondaryBackground,
           body: SafeArea(
             top: true,
             child: Column(
@@ -702,11 +702,11 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                   width: double.infinity,
                   height: MediaQuery.sizeOf(context).height * 0.99,
                   decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                   ),
                   child: Stack(
                     children: [
-                      Container(
+                      SizedBox(
                         width: double.infinity,
                         height: MediaQuery.sizeOf(context).height * 0.7,
                         child:
@@ -741,7 +741,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                               tappedLocation = argument;
                             });
                             // _getRouteFromTappedLocation();
-                            debugPrint('the selected lat lng ${argument}');
+                            debugPrint('the selected lat lng $argument');
                           },
                           onMapCreated: (controller) {
                             googleMapController = controller;
@@ -788,7 +788,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                     height: 50,
                                     decoration: BoxDecoration(
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Row(
@@ -799,7 +799,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         Icon(
                                           Icons.timer_sharp,
                                           color:
-                                              FlutterFlowTheme.of(context).info,
+                                              context.appTheme.info,
                                           size: 24,
                                         ),
                                         Text(
@@ -815,18 +815,16 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                   ),
                                   FlutterFlowIconButton(
                                     borderColor:
-                                        FlutterFlowTheme.of(context).info,
+                                        context.appTheme.info,
                                     borderRadius: 20,
                                     borderWidth: 1,
                                     buttonSize: 40,
                                     fillColor:
-                                        FlutterFlowTheme.of(context).info,
+                                        context.appTheme.info,
                                     icon: Icon(
                                       Icons.menu,
                                       color:
-                                          FlutterFlowTheme.of(
-                                            context,
-                                          ).primaryText,
+                                          context.appTheme.primaryText,
                                       size: 24,
                                     ),
                                     onPressed: () async {
@@ -866,9 +864,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                           return Container(
                             decoration: BoxDecoration(
                               color:
-                                  FlutterFlowTheme.of(
-                                    context,
-                                  ).primaryBackground,
+                                  context.appTheme.primaryBackground,
                               borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(16),
                               ),
@@ -911,7 +907,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         ),
                                         SizedBox(width: 20),
                                         Text(
-                                          '$distanceKm',
+                                          distanceKm,
                                           style: const TextStyle(fontSize: 17),
                                         ),
                                         // Container(
@@ -947,9 +943,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                             Icon(
                                               Icons.pin_drop_outlined,
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primary,
+                                                  context.appTheme.primary,
                                               size: 25,
                                             ),
                                             Flexible(
@@ -989,14 +983,10 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         ),
                                         Text(
                                           pickTime ?? '--',
-                                          style: FlutterFlowTheme.of(
-                                            context,
-                                          ).titleLarge.override(
+                                          style: context.appTheme.titleLarge.override(
                                             fontFamily: 'Open Sans',
                                             color:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).primaryText,
+                                                context.appTheme.primaryText,
                                             fontSize: 20,
                                           ),
                                         ),
@@ -1016,14 +1006,10 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         ),
                                         Text(
                                           pickDate ?? '--',
-                                          style: FlutterFlowTheme.of(
-                                            context,
-                                          ).titleLarge.override(
+                                          style: context.appTheme.titleLarge.override(
                                             fontFamily: 'Open Sans',
                                             color:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).primaryText,
+                                                context.appTheme.primaryText,
                                             fontSize: 20,
                                           ),
                                         ),
@@ -1058,14 +1044,10 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                           ),
                                           Text(
                                             luggage ?? '0',
-                                            style: FlutterFlowTheme.of(
-                                              context,
-                                            ).titleLarge.override(
+                                            style: context.appTheme.titleLarge.override(
                                               fontFamily: 'Open Sans',
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primaryText,
+                                                  context.appTheme.primaryText,
                                               fontSize: 20,
                                             ),
                                           ),
@@ -1093,14 +1075,10 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                           ),
                                           Text(
                                             passenger ?? '--',
-                                            style: FlutterFlowTheme.of(
-                                              context,
-                                            ).titleLarge.override(
+                                            style: context.appTheme.titleLarge.override(
                                               fontFamily: 'Open Sans',
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primaryText,
+                                                  context.appTheme.primaryText,
                                               fontSize: 20,
                                             ),
                                           ),
@@ -1115,20 +1093,14 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         thumb: Icon(
                                           Icons.chevron_right,
                                           color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).primary,
+                                              context.appTheme.primary,
                                         ),
                                         elevationThumb: 2,
                                         elevationTrack: 2,
                                         activeThumbColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primaryBackground,
+                                            context.appTheme.primaryBackground,
                                         activeTrackColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primary,
+                                            context.appTheme.primary,
                                         borderRadius: BorderRadius.circular(8),
                                         child: Text(
                                           isRideStarted
@@ -1139,9 +1111,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                   .toUpperCase(),
                                           style: TextStyle(
                                             color:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).primaryBackground,
+                                                context.appTheme.primaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1160,9 +1130,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                         : 'Way to Pickup'),
                                               ),
                                               backgroundColor:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primary,
+                                                  context.appTheme.primary,
                                             ),
                                           );
                                         },
@@ -1231,7 +1199,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                           width: 25,
                                                           height: 25,
                                                           child: Image.asset(
-                                                            'assets/images/app_launcher_icon.png',
+                                                            'assets/driver-app-icon.jpg',
                                                           ), // Replace 'your_image.png' with your image asset path
                                                         ),
                                                         title: const Text(
@@ -1256,7 +1224,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                               http.MultipartRequest(
                                                                 'POST',
                                                                 Uri.parse(
-                                                                  'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php',
+                                                                  ApiService
+                                                                      .driverCalculateWaitingTime,
                                                                 ),
                                                               );
                                                           request.fields.addAll({
@@ -1398,7 +1367,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                           width: 25,
                                                           height: 25,
                                                           child: Image.asset(
-                                                            'assets/images/app_launcher_icon.png',
+                                                            'assets/driver-app-icon.jpg',
                                                           ), // Replace 'your_image.png' with your image asset path
                                                         ),
                                                         title: const Text(
@@ -1505,9 +1474,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                             icon: FaIcon(
                                               FontAwesomeIcons.ellipsisH,
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).secondaryBackground,
+                                                  context.appTheme.secondaryBackground,
                                               size: 24,
                                             ),
                                             onPressed: () async {
@@ -1593,12 +1560,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                     0,
                                                   ),
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primary,
-                                              textStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).titleSmall.override(
+                                                  context.appTheme.primary,
+                                              textStyle: context.appTheme.titleSmall.override(
                                                 fontFamily: 'Open Sans',
                                                 color: Colors.white,
                                               ),
@@ -1719,7 +1682,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       if (dId == null) {}
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'),
+        Uri.parse(ApiService.driverWayToPickup),
       );
       request.fields.addAll({'d_id': dId.toString()});
 
@@ -1738,7 +1701,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       if (dId == null) {}
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/passenger-waiting.php'),
+        Uri.parse(ApiService.driverPassengerWaiting),
       );
       request.fields.addAll({'d_id': dId.toString()});
 

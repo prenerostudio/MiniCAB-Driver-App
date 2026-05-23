@@ -1,4 +1,4 @@
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,7 @@ class _FilterWidgetState extends State<FilterWidget> {
         width: MediaQuery.sizeOf(context).width * 0.8,
         height: 300,
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).primaryBackground,
+          color: context.appTheme.primaryBackground,
         ),
         child: Padding(
           padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
@@ -67,7 +67,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                   children: [
                     Text(
                       ' Start To End Date',
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                      style: context.appTheme.bodyMedium.override(
                         fontFamily: 'Open Sans',
                         letterSpacing: 0,
                         fontWeight: FontWeight.bold,
@@ -75,7 +75,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                     ),
                     Icon(
                       Icons.close,
-                      color: FlutterFlowTheme.of(context).secondaryText,
+                      color: context.appTheme.secondaryText,
                       size: 24,
                     ),
                   ],
@@ -83,7 +83,7 @@ class _FilterWidgetState extends State<FilterWidget> {
               ),
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 20),
-                child: Container(
+                child: SizedBox(
                   width: MediaQuery.sizeOf(context).width,
                   child: TextFormField(
                     controller: _model.startDateTextController1,
@@ -92,51 +92,45 @@ class _FilterWidgetState extends State<FilterWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       labelText: 'Start Date',
-                      labelStyle:
-                      FlutterFlowTheme.of(context).labelMedium.override(
+                      labelStyle: context.appTheme.labelMedium.override(
                         fontFamily: 'Open Sans',
                         fontSize: 14,
                         letterSpacing: 0,
                       ),
                       hintText: 'Start Date',
-                      hintStyle:
-                      FlutterFlowTheme.of(context).labelMedium.override(
-                        fontFamily: 'Open Sans',
-                        letterSpacing: 0,
-                      ),
+                      hintStyle: context.appTheme.labelMedium
+                          .override(fontFamily: 'Open Sans', letterSpacing: 0),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).alternate,
+                          color: context.appTheme.alternate,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).primary,
+                          color: context.appTheme.primary,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).error,
+                          color: context.appTheme.error,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).error,
+                          color: context.appTheme.error,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      prefixIcon: Icon(
-                        Icons.calendar_today,
-                      ),
+                      prefixIcon: Icon(Icons.calendar_today),
                     ),
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    style: context.appTheme.bodyMedium.override(
                       fontFamily: 'Open Sans',
                       fontSize: 14,
                       letterSpacing: 0,
@@ -148,7 +142,7 @@ class _FilterWidgetState extends State<FilterWidget> {
               ),
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 20),
-                child: Container(
+                child: SizedBox(
                   width: MediaQuery.sizeOf(context).width,
                   child: TextFormField(
                     controller: _model.startDateTextController2,
@@ -157,51 +151,45 @@ class _FilterWidgetState extends State<FilterWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       labelText: 'End Date',
-                      labelStyle:
-                      FlutterFlowTheme.of(context).labelMedium.override(
+                      labelStyle: context.appTheme.labelMedium.override(
                         fontFamily: 'Open Sans',
                         fontSize: 14,
                         letterSpacing: 0,
                       ),
                       hintText: 'End Date',
-                      hintStyle:
-                      FlutterFlowTheme.of(context).labelMedium.override(
-                        fontFamily: 'Open Sans',
-                        letterSpacing: 0,
-                      ),
+                      hintStyle: context.appTheme.labelMedium
+                          .override(fontFamily: 'Open Sans', letterSpacing: 0),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).alternate,
+                          color: context.appTheme.alternate,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).primary,
+                          color: context.appTheme.primary,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).error,
+                          color: context.appTheme.error,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).error,
+                          color: context.appTheme.error,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      prefixIcon: Icon(
-                        Icons.calendar_today,
-                      ),
+                      prefixIcon: Icon(Icons.calendar_today),
                     ),
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    style: context.appTheme.bodyMedium.override(
                       fontFamily: 'Open Sans',
                       fontSize: 14,
                       letterSpacing: 0,
@@ -224,9 +212,8 @@ class _FilterWidgetState extends State<FilterWidget> {
                       height: 40,
                       padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                       iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      color: FlutterFlowTheme.of(context).primary,
-                      textStyle:
-                      FlutterFlowTheme.of(context).titleSmall.override(
+                      color: context.appTheme.primary,
+                      textStyle: context.appTheme.titleSmall.override(
                         fontFamily: 'Open Sans',
                         color: Colors.white,
                         letterSpacing: 0,

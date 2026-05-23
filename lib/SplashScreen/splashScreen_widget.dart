@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-
-
-
 import 'package:new_minicab_driver/payment_entery/complete.dart';
 
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/gestures.dart';
@@ -20,9 +17,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class SplashScreenWidget extends StatefulWidget {
-  const SplashScreenWidget({Key? key}) : super(key: key);
+  const SplashScreenWidget({super.key});
 
   @override
   _SplashScreenWidgetState createState() => _SplashScreenWidgetState();
@@ -104,7 +102,9 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
       //   // checkUserSession();
       // });
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => CompleteWidget()));
+        context,
+        MaterialPageRoute(builder: (context) => CompleteWidget()),
+      );
     } else {
       context.pushNamed('Welcome');
     }
@@ -112,7 +112,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
 
   Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
     final permissionStatus = await Permission.location.request();
-    final currentStatus = await Permission.location.status  ;
+    final currentStatus = await Permission.location.status;
     if (permissionStatus.isDenied) {
       openAppSettings();
     } else {}
@@ -125,7 +125,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   //   // String? jobId = prefs.getString('jobId');
   //   final response = await http.post(
   //     Uri.parse(
-  //         'https://www.minicaboffice.com/api/driver/check-login-token.php'),
+  //         ApiService.driverCheckLoginToken),
   //     body: {'token': token.toString()},
   //   );
 
@@ -158,14 +158,16 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           body: SafeArea(
             top: true,
             child: Column(
@@ -174,7 +176,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
               children: [
                 Center(
                   child: Image.asset(
-                    'assets/images/app_launcher_icon.png',
+                    'assets/driver-app-icon.jpg',
                     width: MediaQuery.sizeOf(context).width * 0.5,
                     height: MediaQuery.sizeOf(context).height * 0.5,
                     fit: BoxFit.fitWidth,

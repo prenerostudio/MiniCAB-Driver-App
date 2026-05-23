@@ -1,4 +1,4 @@
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'notes_widget.dart' show NotesWidget;
@@ -11,8 +11,10 @@ import 'package:provider/provider.dart';
 class NotesModel extends FlutterFlowModel<NotesWidget> {
   /// Initialization and disposal methods.
 
+  @override
   void initState(BuildContext context) {}
 
+  @override
   void dispose() {}
 
   /// Action blocks are added here.

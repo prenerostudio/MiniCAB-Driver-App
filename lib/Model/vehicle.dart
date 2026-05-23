@@ -8,18 +8,18 @@ class vehicie {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['status'] = this.status;
+    data['status'] = status;
     return data;
   }
 }
@@ -37,18 +37,19 @@ class Data {
   String? vImg;
   String? dateAdded;
 
-  Data(
-      {this.vId,
-        this.vName,
-        this.vSeat,
-        this.vBags,
-        this.vWchair,
-        this.vTrailer,
-        this.vBooster,
-        this.vBaby,
-        this.vPricing,
-        this.vImg,
-        this.dateAdded});
+  Data({
+    this.vId,
+    this.vName,
+    this.vSeat,
+    this.vBags,
+    this.vWchair,
+    this.vTrailer,
+    this.vBooster,
+    this.vBaby,
+    this.vPricing,
+    this.vImg,
+    this.dateAdded,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     vId = json['v_id'];
@@ -65,18 +66,18 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['v_id'] = this.vId;
-    data['v_name'] = this.vName;
-    data['v_seat'] = this.vSeat;
-    data['v_bags'] = this.vBags;
-    data['v_wchair'] = this.vWchair;
-    data['v_trailer'] = this.vTrailer;
-    data['v_booster'] = this.vBooster;
-    data['v_baby'] = this.vBaby;
-    data['v_pricing'] = this.vPricing;
-    data['v_img'] = this.vImg;
-    data['date_added'] = this.dateAdded;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['v_id'] = vId;
+    data['v_name'] = vName;
+    data['v_seat'] = vSeat;
+    data['v_bags'] = vBags;
+    data['v_wchair'] = vWchair;
+    data['v_trailer'] = vTrailer;
+    data['v_booster'] = vBooster;
+    data['v_baby'] = vBaby;
+    data['v_pricing'] = vPricing;
+    data['v_img'] = vImg;
+    data['date_added'] = dateAdded;
     return data;
   }
 }

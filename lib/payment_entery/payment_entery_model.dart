@@ -1,4 +1,4 @@
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'payment_entery_widget.dart' show PaymentEnteryWidget;
@@ -31,8 +31,10 @@ class PaymentEnteryModel extends FlutterFlowModel<PaymentEnteryWidget> {
 
   /// Initialization and disposal methods.
 
+  @override
   void initState(BuildContext context) {}
 
+  @override
   void dispose() {
     unfocusNode.dispose();
     journeyFocusNode?.dispose();

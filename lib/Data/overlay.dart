@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import '../components/upcommingjob_Accepted_widget.dart';
 
 class CustomOverlay extends StatefulWidget {
+  const CustomOverlay({super.key});
+
   @override
   State<CustomOverlay> createState() => _CustomOverlayState();
 }
@@ -31,10 +33,8 @@ class _CustomOverlayState extends State<CustomOverlay> {
   }
 
   void callBackFunction(String tag) {
-    print("Got tag " + tag);
-    mainAppPort ??= IsolateNameServer.lookupPortByName(
-      _mainAppPort,
-    );
+    print("Got tag $tag");
+    mainAppPort ??= IsolateNameServer.lookupPortByName(_mainAppPort);
     mainAppPort?.send('Date: ${DateTime.now()}');
     mainAppPort?.send(tag);
   }
@@ -63,22 +63,24 @@ class _CustomOverlayState extends State<CustomOverlay> {
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
-                      Text(update ? "outgoing" : "Incoming",
-                          style:
-                              TextStyle(fontSize: 10, color: Colors.black45)),
+                      Text(
+                        update ? "outgoing" : "Incoming",
+                        style: TextStyle(fontSize: 10, color: Colors.black45),
+                      ),
                       Text(
                         "123456",
                         style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 14,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 TextButton(
                   style: ButtonStyle(
-                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
                     callBackFunction("Close");
@@ -89,8 +91,9 @@ class _CustomOverlayState extends State<CustomOverlay> {
                     margin: EdgeInsets.only(left: 30),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        color: update ? Colors.grey : Colors.deepOrange),
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      color: update ? Colors.grey : Colors.deepOrange,
+                    ),
                     child: Center(
                       child: Text(
                         "Close",
@@ -98,7 +101,7 @@ class _CustomOverlayState extends State<CustomOverlay> {
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -111,7 +114,7 @@ class _CustomOverlayState extends State<CustomOverlay> {
           ),
           TextButton(
             style: ButtonStyle(
-              overlayColor: MaterialStateProperty.all(Colors.transparent),
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
             ),
             onPressed: () {
               callBackFunction("Action");
@@ -121,8 +124,9 @@ class _CustomOverlayState extends State<CustomOverlay> {
               height: (MediaQuery.of(context).size.height) / 3.5,
               width: MediaQuery.of(context).size.width / 1.05,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  color: update ? Colors.grey : Colors.deepOrange),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: update ? Colors.grey : Colors.deepOrange,
+              ),
               child: Center(
                 child: Text(
                   "Action",
@@ -130,7 +134,7 @@ class _CustomOverlayState extends State<CustomOverlay> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -139,8 +143,6 @@ class _CustomOverlayState extends State<CustomOverlay> {
   // SystemWindowPrefMode prefMode = SystemWindowPrefMode.OVERLAY;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: overlay(),
-    );
+    return Scaffold(body: overlay());
   }
 }

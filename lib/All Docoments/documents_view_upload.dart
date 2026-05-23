@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -59,9 +59,9 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+      backgroundColor: context.appTheme.secondaryBackground,
       appBar: AppBar(
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+        backgroundColor: context.appTheme.secondaryBackground,
         automaticallyImplyLeading: false,
         leading: FlutterFlowIconButton(
           borderColor: Colors.transparent,
@@ -70,7 +70,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
           buttonSize: 60,
           icon: Icon(
             Icons.chevron_left_outlined,
-            color: FlutterFlowTheme.of(context).secondaryText,
+            color: context.appTheme.secondaryText,
             size: 30,
           ),
           onPressed: () async {
@@ -92,126 +92,139 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
               children: [
                 Text(
                   widget.name,
-                  style: FlutterFlowTheme.of(context).headlineMedium.override(
-                        fontFamily: 'Open Sans',
-                        letterSpacing: 0,
-                      ),
+                  style: context.appTheme.headlineMedium.override(
+                    fontFamily: 'Open Sans',
+                    letterSpacing: 0,
+                  ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 _imageFile == null && uploadedImage.isNotEmpty
                     ? Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 20, 0, 0),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                _pickImage(ImageSource.gallery);
-                                // context.pushNamed('DriverPCOLicense');
-                              },
-                              child: SizedBox(
-                                  height: 500,
-                                  width: 400,
-                                  child: Image.network(
-                                      fit: BoxFit.contain,
-                                      "${widget.showImageUrl}$uploadedImage")),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            20,
+                            0,
+                            0,
+                          ),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              _pickImage(ImageSource.gallery);
+                              // context.pushNamed('DriverPCOLicense');
+                            },
+                            child: SizedBox(
+                              height: 500,
+                              width: 400,
+                              child: Image.network(
+                                fit: BoxFit.contain,
+                                "${widget.showImageUrl}$uploadedImage",
+                              ),
                             ),
                           ),
-                          Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                    color: Colors.blue, shape: BoxShape.circle),
-                                child: const Center(
-                                  child: Icon(
-                                    color: Colors.white,
-                                    Icons.add,
-                                    size: 30,
-                                  ),
-                                ),
-                              ))
-                        ],
-                      )
-                    : _imageFile != null
-                        ? Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0, 20, 0, 0),
-                                child: InkWell(
-                                  splashColor: Colors.transparent,
-                                  focusColor: Colors.transparent,
-                                  hoverColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  onTap: () async {
-                                    _pickImage(ImageSource.gallery);
-                                    // context.pushNamed('DriverPCOLicense');
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: SizedBox(
-                                        height: 500,
-                                        width: 400,
-                                        child: Image.file(
-                                          File(
-                                            _imageFile!.path,
-                                          ),
-                                          fit: BoxFit.contain,
-                                        )),
-                                  ),
-                                ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                color: Colors.white,
+                                Icons.add,
+                                size: 30,
                               ),
-                              Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.blue,
-                                        shape: BoxShape.circle),
-                                    child: const Center(
-                                      child: Icon(
-                                        color: Colors.white,
-                                        Icons.add,
-                                        size: 30,
-                                      ),
-                                    ),
-                                  ))
-                            ],
-                          )
-                        : Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 20, 0, 0),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                _pickImage(ImageSource.gallery);
-                                // context.pushNamed('DriverPCOLicense');
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  'assets/images/pngwing.com.png',
-                                  width: MediaQuery.sizeOf(context).width,
-                                  height:
-                                      MediaQuery.sizeOf(context).height * 0.25,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    : _imageFile != null
+                    ? Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            20,
+                            0,
+                            0,
+                          ),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              _pickImage(ImageSource.gallery);
+                              // context.pushNamed('DriverPCOLicense');
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: SizedBox(
+                                height: 500,
+                                width: 400,
+                                child: Image.file(
+                                  File(_imageFile!.path),
                                   fit: BoxFit.contain,
                                 ),
                               ),
                             ),
                           ),
-                const SizedBox(
-                  height: 10,
-                ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                color: Colors.white,
+                                Icons.add,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    : Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                        0,
+                        20,
+                        0,
+                        0,
+                      ),
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          _pickImage(ImageSource.gallery);
+                          // context.pushNamed('DriverPCOLicense');
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'assets/images/pngwing.com.png',
+                            width: MediaQuery.sizeOf(context).width,
+                            height: MediaQuery.sizeOf(context).height * 0.25,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(0, 24, 0, 12),
                   child: FFButtonWidget(
@@ -223,23 +236,23 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
                       print('Button pressed ..$isloading.');
                     },
                     text: 'Upload Now',
-                    icon: const Icon(
-                      Icons.cloud_upload_outlined,
-                      size: 15,
-                    ),
+                    icon: const Icon(Icons.cloud_upload_outlined, size: 15),
                     options: FFButtonOptions(
                       width: double.infinity,
                       height: 54,
                       padding: const EdgeInsets.all(0),
-                      iconPadding:
-                          const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      color: FlutterFlowTheme.of(context).primary,
-                      textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
-                                fontFamily: 'Open Sans',
-                                color: Colors.white,
-                                letterSpacing: 0,
-                              ),
+                      iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0,
+                        0,
+                        0,
+                        0,
+                      ),
+                      color: context.appTheme.primary,
+                      textStyle: context.appTheme.titleSmall.override(
+                        fontFamily: 'Open Sans',
+                        color: Colors.white,
+                        letterSpacing: 0,
+                      ),
                       elevation: 4,
                       borderSide: const BorderSide(
                         color: Colors.transparent,
@@ -325,7 +338,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
     if (response.statusCode == 200) {
       String responseString = await response.stream.bytesToString();
       Map<String, dynamic> jsonResponse = json.decode(responseString);
-      print('Now the condition is true ${jsonResponse}');
+      print('Now the condition is true $jsonResponse');
       setState(() {
         _imageFile == null;
         uploadedImage = jsonResponse['data'][0][widget.forInsideArray] ?? '';
@@ -338,9 +351,6 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
   String uploadedImage = '';
 
   void _showToastMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
 }

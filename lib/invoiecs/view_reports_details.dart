@@ -7,7 +7,7 @@ import 'dart:io';
 class WeekDetailScreen extends StatelessWidget {
   final List<Map<String, dynamic>>? weekData;
 
-  WeekDetailScreen({required this.weekData});
+  const WeekDetailScreen({super.key, required this.weekData});
 
   @override
   Widget build(BuildContext context) {
@@ -23,42 +23,51 @@ class WeekDetailScreen extends StatelessWidget {
               if (filePath != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('PDF saved successfully at $filePath')),
+                    content: Text('PDF saved successfully at $filePath'),
+                  ),
                 );
               }
             },
           ),
         ],
       ),
-      body: weekData == null || weekData!.isEmpty
-          ? Center(child: Text('No data available'))
-          : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 20,
-                dataRowHeight: 100,
-                columns: [
-                  DataColumn(
-                      label: Text('Inv ID', style: TextStyle(fontSize: 14))),
-                  DataColumn(label: Text('Job Details')),
-                  DataColumn(label: Text('Driver Name')),
-                  DataColumn(label: Text('Customer Name')),
-                  DataColumn(label: Text('Job Fare')),
-                  DataColumn(label: Text('Driver Commission')),
-                ],
-                rows: weekData!.map((data) {
-                  return DataRow(cells: [
-                    DataCell(Text(data['invoice_id'] ?? '')),
-                    DataCell(Text(
-                        '${data['pickup']}\n ---> \n${data['destination']}')),
-                    DataCell(Text(data['d_name'] ?? '')),
-                    DataCell(Text(data['c_name'] ?? '')),
-                    DataCell(Text(data['journey_fare'] ?? '')),
-                    DataCell(Text(data['driver_commission'] ?? '')),
-                  ]);
-                }).toList(),
+      body:
+          weekData == null || weekData!.isEmpty
+              ? Center(child: Text('No data available'))
+              : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columnSpacing: 20,
+                  dataRowHeight: 100,
+                  columns: [
+                    DataColumn(
+                      label: Text('Inv ID', style: TextStyle(fontSize: 14)),
+                    ),
+                    DataColumn(label: Text('Job Details')),
+                    DataColumn(label: Text('Driver Name')),
+                    DataColumn(label: Text('Customer Name')),
+                    DataColumn(label: Text('Job Fare')),
+                    DataColumn(label: Text('Driver Commission')),
+                  ],
+                  rows:
+                      weekData!.map((data) {
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(data['invoice_id'] ?? '')),
+                            DataCell(
+                              Text(
+                                '${data['pickup']}\n ---> \n${data['destination']}',
+                              ),
+                            ),
+                            DataCell(Text(data['d_name'] ?? '')),
+                            DataCell(Text(data['c_name'] ?? '')),
+                            DataCell(Text(data['journey_fare'] ?? '')),
+                            DataCell(Text(data['driver_commission'] ?? '')),
+                          ],
+                        );
+                      }).toList(),
+                ),
               ),
-            ),
     );
   }
 
@@ -96,18 +105,19 @@ class WeekDetailScreen extends StatelessWidget {
               'Driver Name',
               'Customer Name',
               'Job Fare',
-              'Driver Commission'
+              'Driver Commission',
             ],
-            data: weekData!.map((data) {
-              return [
-                data['invoice_id'],
-                data['pickup'] + ' ---> ' + data['destination'],
-                data['d_name'],
-                data['c_name'],
-                data['journey_fare'],
-                data['driver_commission']
-              ];
-            }).toList(),
+            data:
+                weekData!.map((data) {
+                  return [
+                    data['invoice_id'],
+                    data['pickup'] + ' ---> ' + data['destination'],
+                    data['d_name'],
+                    data['c_name'],
+                    data['journey_fare'],
+                    data['driver_commission'],
+                  ];
+                }).toList(),
           );
         },
       ),

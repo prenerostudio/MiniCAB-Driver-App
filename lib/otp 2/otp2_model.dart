@@ -1,7 +1,5 @@
-
-
 import '/flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'otp2_widget.dart' show Otp2Widget;
@@ -15,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class Otp2Model extends FlutterFlowModel<Otp2Widget> {
-
   final unfocusNode = FocusNode();
   // State field(s) for PinCode widget.
   TextEditingController? pinCodeController;
@@ -23,10 +20,12 @@ class Otp2Model extends FlutterFlowModel<Otp2Widget> {
 
   /// Initialization and disposal methods.
 
+  @override
   void initState(BuildContext context) {
     pinCodeController = TextEditingController();
   }
 
+  @override
   void dispose() {
     unfocusNode.dispose();
     pinCodeController?.dispose();

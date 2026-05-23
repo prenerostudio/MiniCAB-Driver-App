@@ -95,8 +95,8 @@
 //         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
 //         '${destinationLat},${destinationLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
 //     final response = await http.post(Uri.parse(// can be get and post request
-//         // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
-//         'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+//         ApiService.googleDirectionsUrl(origin: origin, destination: destination, apiKey: apiKey),
+//       ));
 
 //     if (response.statusCode == 200) {
 //       // Parse the JSON response

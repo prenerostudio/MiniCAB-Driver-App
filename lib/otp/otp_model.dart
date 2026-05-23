@@ -1,5 +1,5 @@
 // import '/flutter_flow/flutter_flow_animations.dart';
-// import '/flutter_flow/flutter_flow_theme.dart';
+// import 'package:new_minicab_driver/theme/app_theme.dart';
 // import '/flutter_flow/flutter_flow_util.dart';
 // import '/flutter_flow/flutter_flow_widgets.dart';
 // import 'otp_widget.dart' show OtpWidget;

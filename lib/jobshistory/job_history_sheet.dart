@@ -1,19 +1,13 @@
-import '../flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_button_tabbar.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'jobshistory_model.dart';
 export 'jobshistory_model.dart';
 import '../Model/resentJobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class JobHistorySheet extends StatefulWidget {
   const JobHistorySheet({super.key});
@@ -52,8 +46,7 @@ class _JobHistorySheetState extends State<JobHistorySheet>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
-    final uri =
-        Uri.parse('https://minicaboffice.com/api/driver/job-history.php');
+    final uri = Uri.parse(ApiService.driverJobHistory);
     final response = await http.post(uri, body: {'d_id': dId.toString()});
 
     if (response.statusCode == 200) {
@@ -72,155 +65,156 @@ class _JobHistorySheetState extends State<JobHistorySheet>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onVerticalDragUpdate: (details) {
-          if (details.primaryDelta! > 20) {
-            // Close the BottomSheet on a downward swipe
-            Navigator.pop(context);
-          }
-        },
-        child: DraggableScrollableSheet(
-            initialChildSize: 0.8,
-            maxChildSize: 1,
-            builder: (context, scrollController) {
-              return Container(
-                height: 600,
-                width: double.infinity,
-                color: Colors.white,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 3.0,
-                            color: Color(0x33000000),
-                            offset: Offset(0.0, 1.0),
-                          )
-                        ],
+      onVerticalDragUpdate: (details) {
+        if (details.primaryDelta! > 20) {
+          // Close the BottomSheet on a downward swipe
+          Navigator.pop(context);
+        }
+      },
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.8,
+        maxChildSize: 1,
+        builder: (context, scrollController) {
+          return Container(
+            height: 600,
+            width: double.infinity,
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: context.appTheme.secondaryBackground,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 3.0,
+                        color: Color(0x33000000),
+                        offset: Offset(0.0, 1.0),
                       ),
-                      child: Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  10.0, 10.0, 10.0, 10.0),
-                              child: Text(
-                                ' Jobs History',
-                                style: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .override(
-                                      fontFamily: 'Readex Pro',
-                                      fontSize: 24.0,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                      0.0,
+                      10.0,
+                      0.0,
+                      0.0,
                     ),
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment(0.0, 0),
-                            child: MediaQuery(
-                              data: MediaQueryData(
-                                size: MediaQuery.of(context).size,
-                              ),
-                              child: FlutterFlowButtonTabBar(
-                                useToggleButtonStyle: true,
-                                isScrollable: true,
-                                labelStyle:
-                                    FlutterFlowTheme.of(context).titleMedium,
-                                unselectedLabelStyle: TextStyle(),
-                                labelColor: FlutterFlowTheme.of(context).info,
-                                unselectedLabelColor:
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                unselectedBackgroundColor:
-                                    FlutterFlowTheme.of(context).primary,
-                                backgroundColor: Colors.black,
-                                borderColor:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                borderWidth: 1.0,
-                                borderRadius: 12.0,
-                                elevation: 0.0,
-                                labelPadding: EdgeInsetsDirectional.fromSTEB(
-                                  MediaQuery.of(context).size.width * 0.05,
-                                  0.0,
-                                  MediaQuery.of(context).size.width * 0.05,
-                                  0.0,
-                                ),
-                                tabs: [
-                                  Tab(
-                                    text: 'This Week',
-                                  ),
-                                  Tab(
-                                    text: 'Last Week',
-                                  ),
-                                ],
-                                controller: _model.tabBarController,
-                              ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            10.0,
+                            10.0,
+                            10.0,
+                            10.0,
+                          ),
+                          child: Text(
+                            ' Jobs History',
+                            style: context.appTheme.labelMedium.override(
+                              fontFamily: 'Readex Pro',
+                              fontSize: 24.0,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _model.tabBarController,
-                        children: [
-                          FutureBuilder<List<Booked>>(
-                            future:
-                                fetchBookings(), // Assuming you've renamed the function from 'Booking' to 'fetchBookings'
-                            builder: (BuildContext context,
-                                AsyncSnapshot<List<Booked>> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                        top: MediaQuery.of(context)
-                                                .size
-                                                .height *
-                                            0.2), // 50% padding from the top
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          FlutterFlowTheme.of(context).primary),
-                                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment(0.0, 0),
+                        child: MediaQuery(
+                          data: MediaQueryData(
+                            size: MediaQuery.of(context).size,
+                          ),
+                          child: FlutterFlowButtonTabBar(
+                            useToggleButtonStyle: true,
+                            isScrollable: true,
+                            labelStyle:
+                                context.appTheme.titleMedium,
+                            unselectedLabelStyle: TextStyle(),
+                            labelColor: context.appTheme.info,
+                            unselectedLabelColor:
+                                context.appTheme.primaryBackground,
+                            unselectedBackgroundColor:
+                                context.appTheme.primary,
+                            backgroundColor: Colors.black,
+                            borderColor:
+                                context.appTheme.secondaryText,
+                            borderWidth: 1.0,
+                            borderRadius: 12.0,
+                            elevation: 0.0,
+                            labelPadding: EdgeInsetsDirectional.fromSTEB(
+                              MediaQuery.of(context).size.width * 0.05,
+                              0.0,
+                              MediaQuery.of(context).size.width * 0.05,
+                              0.0,
+                            ),
+                            tabs: [
+                              Tab(text: 'This Week'),
+                              Tab(text: 'Last Week'),
+                            ],
+                            controller: _model.tabBarController,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _model.tabBarController,
+                    children: [
+                      FutureBuilder<List<Booked>>(
+                        future:
+                            fetchBookings(), // Assuming you've renamed the function from 'Booking' to 'fetchBookings'
+                        builder: (
+                          BuildContext context,
+                          AsyncSnapshot<List<Booked>> snapshot,
+                        ) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).size.height * 0.2,
+                                ), // 50% padding from the top
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    context.appTheme.primary,
                                   ),
-                                );
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text('No History available.'),
-                                );
-                              } else if (!snapshot.hasData ||
-                                  snapshot.data!.isEmpty) {
-                                return Center(
-                                  child: Text('No History available.'),
-                                );
-                              } else {
-                                List<Booked>? bookingList = snapshot.data;
-                                return ListView(
-                                  controller: scrollController,
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  children:
-                                      (bookingList ?? []).map((bookingData) {
+                                ),
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('No History available.'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(child: Text('No History available.'));
+                          } else {
+                            List<Booked>? bookingList = snapshot.data;
+                            return ListView(
+                              controller: scrollController,
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              children:
+                                  (bookingList ?? []).map((bookingData) {
                                     return SingleChildScrollView(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 30.0),
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          30.0,
+                                        ),
                                         child: GestureDetector(
                                           // onVerticalDragUpdate: (details) {
                                           //   if (details.primaryDelta! > 20) {
@@ -236,56 +230,57 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                           onTap: () async {
                                             context.pushNamed(
                                               'JobHistoryDetails',
-                                              queryParameters: {
-                                                'did': serializeParam(
-                                                  '${bookingData.jobId}',
-                                                  ParamType.String,
-                                                ),
-                                                'pickup': serializeParam(
-                                                  '${bookingData.pickup}',
-                                                  ParamType.String,
-                                                ),
-                                                'dropoff': serializeParam(
-                                                  '${bookingData.destination}',
-                                                  ParamType.String,
-                                                ),
-                                                'bookId': serializeParam(
-                                                  '${bookingData.bookId}',
-                                                  ParamType.String,
-                                                ),
-                                                'date': serializeParam(
-                                                  '${bookingData.bookDate}',
-                                                  ParamType.String,
-                                                ),
-                                                'time': serializeParam(
-                                                  '${bookingData.bookTime}',
-                                                  ParamType.String,
-                                                ),
-                                                'passanger': serializeParam(
-                                                  '${bookingData.passenger}',
-                                                  ParamType.String,
-                                                ),
-                                                'cId': serializeParam(
-                                                  '${bookingData.cId}',
-                                                  ParamType.String,
-                                                ),
-                                                'cName': serializeParam(
-                                                  '${bookingData.cName}',
-                                                  ParamType.String,
-                                                ),
-                                                'cNotes': serializeParam(
-                                                  '${bookingData.note}',
-                                                  ParamType.String,
-                                                ),
-                                                'cNumber': serializeParam(
-                                                  '${bookingData.cPhone}',
-                                                  ParamType.String,
-                                                ),
-                                                'fare': serializeParam(
-                                                  '${bookingData.fare}',
-                                                  ParamType.String,
-                                                ),
-                                              }.withoutNulls,
+                                              queryParameters:
+                                                  {
+                                                    'did': serializeParam(
+                                                      '${bookingData.jobId}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'pickup': serializeParam(
+                                                      '${bookingData.pickup}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'dropoff': serializeParam(
+                                                      '${bookingData.destination}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'bookId': serializeParam(
+                                                      '${bookingData.bookId}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'date': serializeParam(
+                                                      '${bookingData.bookDate}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'time': serializeParam(
+                                                      '${bookingData.bookTime}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'passanger': serializeParam(
+                                                      '${bookingData.passenger}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'cId': serializeParam(
+                                                      '${bookingData.cId}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'cName': serializeParam(
+                                                      '${bookingData.cName}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'cNotes': serializeParam(
+                                                      '${bookingData.note}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'cNumber': serializeParam(
+                                                      '${bookingData.cPhone}',
+                                                      ParamType.String,
+                                                    ),
+                                                    'fare': serializeParam(
+                                                      '${bookingData.fare}',
+                                                      ParamType.String,
+                                                    ),
+                                                  }.withoutNulls,
                                             );
                                           },
                                           child: Container(
@@ -299,12 +294,12 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                 Expanded(
                                                   child: Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                20.0,
-                                                                10.0,
-                                                                20.0,
-                                                                0.0),
+                                                        EdgeInsetsDirectional.fromSTEB(
+                                                          20.0,
+                                                          10.0,
+                                                          20.0,
+                                                          0.0,
+                                                        ),
                                                     child: Column(
                                                       mainAxisSize:
                                                           MainAxisSize.max,
@@ -324,58 +319,50 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                           children: [
                                                             Padding(
                                                               padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          4.0),
+                                                                  EdgeInsetsDirectional.fromSTEB(
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                    4.0,
+                                                                  ),
                                                               child: Text(
                                                                 ' Job Id #${bookingData.jobId}',
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyLarge
-                                                                    .override(
-                                                                      fontFamily:
-                                                                          'Readex Pro',
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .secondaryText,
-                                                                    ),
+                                                                style: context.appTheme.bodyLarge.override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color:
+                                                                      context.appTheme.secondaryText,
+                                                                ),
                                                               ),
                                                             ),
                                                             Padding(
                                                               padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0.0,
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0),
+                                                                  EdgeInsetsDirectional.fromSTEB(
+                                                                    0.0,
+                                                                    10.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                  ),
                                                               child: Text(
                                                                 ' ${bookingData.status}',
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyLarge
-                                                                    .override(
-                                                                      fontFamily:
-                                                                          'Readex Pro',
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                    ),
+                                                                style: context.appTheme.bodyLarge.override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color:
+                                                                      context.appTheme.primary,
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
                                                         ),
                                                         Padding(
                                                           padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      0.0,
-                                                                      0.0,
-                                                                      0.0,
-                                                                      10.0),
+                                                              EdgeInsetsDirectional.fromSTEB(
+                                                                0.0,
+                                                                0.0,
+                                                                0.0,
+                                                                10.0,
+                                                              ),
                                                           child: Row(
                                                             mainAxisSize:
                                                                 MainAxisSize
@@ -384,65 +371,59 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                               FaIcon(
                                                                 FontAwesomeIcons
                                                                     .clock,
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryText,
+                                                                color:
+                                                                    context.appTheme.secondaryText,
                                                                 size: 18.0,
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      10.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                    ),
                                                                 child: Text(
                                                                   '${bookingData.bookTime}',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .labelMedium,
+                                                                  style:
+                                                                      context.appTheme.labelMedium,
                                                                 ),
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      10.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                    ),
                                                                 child: Text(
                                                                   '${bookingData.bookDate}',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .labelMedium,
+                                                                  style:
+                                                                      context.appTheme.labelMedium,
                                                                 ),
                                                               ),
                                                               SizedBox(
                                                                 height: 10.0,
-                                                                child:
-                                                                    VerticalDivider(
+                                                                child: VerticalDivider(
                                                                   thickness:
                                                                       1.0,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
+                                                                  color:
+                                                                      context.appTheme.secondaryText,
                                                                 ),
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      10.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                    ),
                                                                 child: Text(
                                                                   'cash',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .labelLarge,
+                                                                  style:
+                                                                      context.appTheme.labelLarge,
                                                                 ),
                                                               ),
                                                             ],
@@ -458,38 +439,35 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 Icon(
                                                                   Icons
                                                                       .arrow_circle_up,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                  size: MediaQuery.sizeOf(
-                                                                              context)
-                                                                          .width *
+                                                                  color:
+                                                                      context.appTheme.primary,
+                                                                  size:
+                                                                      MediaQuery.sizeOf(
+                                                                        context,
+                                                                      ).width *
                                                                       0.05,
                                                                 ),
                                                                 Flexible(
                                                                   // Wrap the Text widget with Flexible
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10.0,
-                                                                            10.0,
-                                                                            0.0,
-                                                                            20.0),
+                                                                  child: Padding(
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          10.0,
+                                                                          10.0,
+                                                                          0.0,
+                                                                          20.0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${bookingData.pickup}',
 
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                15.0,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            15.0,
+                                                                      ),
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis, // Handle text overflow with ellipsis
@@ -512,38 +490,35 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 Icon(
                                                                   Icons
                                                                       .arrow_circle_down,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                  size: MediaQuery.sizeOf(
-                                                                              context)
-                                                                          .width *
+                                                                  color:
+                                                                      context.appTheme.primary,
+                                                                  size:
+                                                                      MediaQuery.sizeOf(
+                                                                        context,
+                                                                      ).width *
                                                                       0.05,
                                                                 ),
                                                                 Flexible(
                                                                   // Wrap the Text widget with Flexible
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10.0,
-                                                                            10.0,
-                                                                            0.0,
-                                                                            20.0),
+                                                                  child: Padding(
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          10.0,
+                                                                          10.0,
+                                                                          0.0,
+                                                                          20.0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${bookingData.destination}',
 
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                15.0,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            15.0,
+                                                                      ),
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis, // Handle text overflow with ellipsis
@@ -558,9 +533,8 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                         ),
                                                         Divider(
                                                           thickness: 1.0,
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondaryText,
+                                                          color:
+                                                              context.appTheme.secondaryText,
                                                         ),
                                                       ],
                                                     ),
@@ -573,57 +547,58 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                       ),
                                     );
                                   }).toList(),
-                                );
-                              }
-                            },
-                          ),
-                          FutureBuilder<List<Booked>>(
-                            future:
-                                fetchBookings(), // Assuming you've renamed the function from 'Booking' to 'fetchBookings'
-                            builder: (BuildContext context,
-                                AsyncSnapshot<List<Booked>> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                        top: MediaQuery.of(context)
-                                                .size
-                                                .height *
-                                            0.2), // 50% padding from the top
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          FlutterFlowTheme.of(context).primary),
-                                    ),
+                            );
+                          }
+                        },
+                      ),
+                      FutureBuilder<List<Booked>>(
+                        future:
+                            fetchBookings(), // Assuming you've renamed the function from 'Booking' to 'fetchBookings'
+                        builder: (
+                          BuildContext context,
+                          AsyncSnapshot<List<Booked>> snapshot,
+                        ) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).size.height * 0.2,
+                                ), // 50% padding from the top
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    context.appTheme.primary,
                                   ),
-                                );
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text('No History available.'),
-                                );
-                              } else if (!snapshot.hasData ||
-                                  snapshot.data!.isEmpty) {
-                                return Center(
-                                  child: Text('No History available.'),
-                                );
-                              } else {
-                                List<Booked>? bookingList = snapshot.data;
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom:
-                                          20.0), // Adjust the bottom padding as needed
-                                  child: ListView(
-                                    controller: scrollController,
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.vertical,
-                                    children:
-                                        (bookingList ?? []).map((bookingData) {
+                                ),
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('No History available.'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(child: Text('No History available.'));
+                          } else {
+                            List<Booked>? bookingList = snapshot.data;
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom: 20.0,
+                              ), // Adjust the bottom padding as needed
+                              child: ListView(
+                                controller: scrollController,
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                children:
+                                    (bookingList ?? []).map((bookingData) {
                                       return SingleChildScrollView(
                                         child: Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 0.0, 0.0, 15.0),
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                15.0,
+                                              ),
                                           child: InkWell(
                                             splashColor: Colors.transparent,
                                             focusColor: Colors.transparent,
@@ -632,56 +607,57 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                             onTap: () async {
                                               context.pushNamed(
                                                 'JobHistoryDetails',
-                                                queryParameters: {
-                                                  'did': serializeParam(
-                                                    '${bookingData.jobId}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'pickup': serializeParam(
-                                                    '${bookingData.pickup}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'dropoff': serializeParam(
-                                                    '${bookingData.destination}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'bookId': serializeParam(
-                                                    '${bookingData.bookId}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'date': serializeParam(
-                                                    '${bookingData.bookDate}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'time': serializeParam(
-                                                    '${bookingData.bookTime}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'passanger': serializeParam(
-                                                    '${bookingData.passenger}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cId': serializeParam(
-                                                    '${bookingData.cId}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cName': serializeParam(
-                                                    '${bookingData.cName}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cNotes': serializeParam(
-                                                    '${bookingData.note}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'cNumber': serializeParam(
-                                                    '${bookingData.cPhone}',
-                                                    ParamType.String,
-                                                  ),
-                                                  'fare': serializeParam(
-                                                    '${bookingData.fare}',
-                                                    ParamType.String,
-                                                  ),
-                                                }.withoutNulls,
+                                                queryParameters:
+                                                    {
+                                                      'did': serializeParam(
+                                                        '${bookingData.jobId}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'pickup': serializeParam(
+                                                        '${bookingData.pickup}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'dropoff': serializeParam(
+                                                        '${bookingData.destination}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'bookId': serializeParam(
+                                                        '${bookingData.bookId}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'date': serializeParam(
+                                                        '${bookingData.bookDate}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'time': serializeParam(
+                                                        '${bookingData.bookTime}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'passanger': serializeParam(
+                                                        '${bookingData.passenger}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'cId': serializeParam(
+                                                        '${bookingData.cId}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'cName': serializeParam(
+                                                        '${bookingData.cName}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'cNotes': serializeParam(
+                                                        '${bookingData.note}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'cNumber': serializeParam(
+                                                        '${bookingData.cPhone}',
+                                                        ParamType.String,
+                                                      ),
+                                                      'fare': serializeParam(
+                                                        '${bookingData.fare}',
+                                                        ParamType.String,
+                                                      ),
+                                                    }.withoutNulls,
                                               );
                                             },
                                             child: Container(
@@ -695,12 +671,12 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                   Expanded(
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  20.0,
-                                                                  10.0,
-                                                                  20.0,
-                                                                  0.0),
+                                                          EdgeInsetsDirectional.fromSTEB(
+                                                            20.0,
+                                                            10.0,
+                                                            20.0,
+                                                            0.0,
+                                                          ),
                                                       child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
@@ -721,56 +697,50 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                             children: [
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            4.0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      4.0,
+                                                                    ),
                                                                 child: Text(
                                                                   'Job Id #${bookingData.jobId}',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Readex Pro',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .secondaryText,
-                                                                      ),
+                                                                  style: context.appTheme.bodyLarge.override(
+                                                                    fontFamily:
+                                                                        'Readex Pro',
+                                                                    color:
+                                                                        context.appTheme.secondaryText,
+                                                                  ),
                                                                 ),
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0.0,
-                                                                            10.0,
-                                                                            0.0,
-                                                                            0.0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0.0,
+                                                                      10.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                    ),
                                                                 child: Text(
                                                                   ' ${bookingData.status}',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Readex Pro',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
-                                                                      ),
+                                                                  style: context.appTheme.bodyLarge.override(
+                                                                    fontFamily:
+                                                                        'Readex Pro',
+                                                                    color:
+                                                                        context.appTheme.primary,
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ],
                                                           ),
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        0.0,
-                                                                        0.0,
-                                                                        0.0,
-                                                                        10.0),
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  10.0,
+                                                                ),
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -779,62 +749,59 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 FaIcon(
                                                                   FontAwesomeIcons
                                                                       .clock,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
+                                                                  color:
+                                                                      context.appTheme.secondaryText,
                                                                   size: 18.0,
                                                                 ),
                                                                 Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
+                                                                  padding:
+                                                                      EdgeInsetsDirectional.fromSTEB(
+                                                                        10.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                      ),
                                                                   child: Text(
                                                                     '${bookingData.bookTime}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium,
+                                                                    style:
+                                                                        context.appTheme.labelMedium,
                                                                   ),
                                                                 ),
                                                                 Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
+                                                                  padding:
+                                                                      EdgeInsetsDirectional.fromSTEB(
+                                                                        10.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                      ),
                                                                   child: Text(
                                                                     '${bookingData.bookDate}',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelMedium,
+                                                                    style:
+                                                                        context.appTheme.labelMedium,
                                                                   ),
                                                                 ),
                                                                 SizedBox(
                                                                   height: 10.0,
-                                                                  child:
-                                                                      VerticalDivider(
+                                                                  child: VerticalDivider(
                                                                     thickness:
                                                                         1.0,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .secondaryText,
+                                                                    color:
+                                                                        context.appTheme.secondaryText,
                                                                   ),
                                                                 ),
                                                                 Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
+                                                                  padding:
+                                                                      EdgeInsetsDirectional.fromSTEB(
+                                                                        10.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                      ),
                                                                   child: Text(
                                                                     'cash',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .labelLarge,
+                                                                    style:
+                                                                        context.appTheme.labelLarge,
                                                                   ),
                                                                 ),
                                                               ],
@@ -850,33 +817,35 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   Icon(
                                                                     Icons
                                                                         .arrow_circle_up,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: MediaQuery.sizeOf(context)
-                                                                            .width *
+                                                                    color:
+                                                                        context.appTheme.primary,
+                                                                    size:
+                                                                        MediaQuery.sizeOf(
+                                                                          context,
+                                                                        ).width *
                                                                         0.05,
                                                                   ),
                                                                   Flexible(
                                                                     // Wrap the Text widget with Flexible
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                                                          10.0,
-                                                                          10.0,
-                                                                          0.0,
-                                                                          20.0),
-                                                                      child:
-                                                                          Text(
+                                                                    child: Padding(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            10.0,
+                                                                            10.0,
+                                                                            0.0,
+                                                                            20.0,
+                                                                          ),
+                                                                      child: Text(
                                                                         '${bookingData.pickup}',
 
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .labelMedium
-                                                                            .override(
-                                                                              fontFamily: 'Readex Pro',
-                                                                              color: FlutterFlowTheme.of(context).secondaryText,
-                                                                              fontSize: 15.0,
-                                                                            ),
+                                                                        style: context.appTheme.labelMedium.override(
+                                                                          fontFamily:
+                                                                              'Readex Pro',
+                                                                          color:
+                                                                              context.appTheme.secondaryText,
+                                                                          fontSize:
+                                                                              15.0,
+                                                                        ),
                                                                         overflow:
                                                                             TextOverflow.ellipsis, // Handle text overflow with ellipsis
                                                                         maxLines:
@@ -898,32 +867,34 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   Icon(
                                                                     Icons
                                                                         .arrow_circle_down,
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    size: MediaQuery.sizeOf(context)
-                                                                            .width *
+                                                                    color:
+                                                                        context.appTheme.primary,
+                                                                    size:
+                                                                        MediaQuery.sizeOf(
+                                                                          context,
+                                                                        ).width *
                                                                         0.05,
                                                                   ),
                                                                   Flexible(
                                                                     // Wrap the Text widget with Flexible
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                                                          10.0,
-                                                                          10.0,
-                                                                          0.0,
-                                                                          20.0),
-                                                                      child:
-                                                                          Text(
+                                                                    child: Padding(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            10.0,
+                                                                            10.0,
+                                                                            0.0,
+                                                                            20.0,
+                                                                          ),
+                                                                      child: Text(
                                                                         '${bookingData.destination}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .labelMedium
-                                                                            .override(
-                                                                              fontFamily: 'Readex Pro',
-                                                                              color: FlutterFlowTheme.of(context).secondaryText,
-                                                                              fontSize: 15.0,
-                                                                            ),
+                                                                        style: context.appTheme.labelMedium.override(
+                                                                          fontFamily:
+                                                                              'Readex Pro',
+                                                                          color:
+                                                                              context.appTheme.secondaryText,
+                                                                          fontSize:
+                                                                              15.0,
+                                                                        ),
                                                                         overflow:
                                                                             TextOverflow.ellipsis, // Handle text overflow with ellipsis
                                                                         maxLines:
@@ -937,9 +908,8 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                           ),
                                                           Divider(
                                                             thickness: 1.0,
-                                                            color: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .secondaryText,
+                                                            color:
+                                                                context.appTheme.secondaryText,
                                                           ),
                                                         ],
                                                       ),
@@ -952,17 +922,19 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                         ),
                                       );
                                     }).toList(),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ],
+                              ),
+                            );
+                          }
+                        },
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            }));
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }

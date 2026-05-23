@@ -6,7 +6,7 @@ import 'package:new_minicab_driver/on_way/on_way_model.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 
@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class AccountStatementDetails extends StatefulWidget {
   String totalFee;
@@ -31,21 +32,22 @@ class AccountStatementDetails extends StatefulWidget {
   String pickupTime;
   String pickUplocation;
   String dropOflocation;
-  AccountStatementDetails(
-      {super.key,
-      required this.totalFee,
-      required this.jounreryFare,
-      required this.parking,
-      required this.tolls,
-      required this.did,
-      required this.waiting,
-      required this.time,
-      required this.jobid,
-      required this.pickupDate,
-      required this.pickUplocation,
-      required this.dropOflocation,
-      required this.pickupTime,
-      required this.extra});
+  AccountStatementDetails({
+    super.key,
+    required this.totalFee,
+    required this.jounreryFare,
+    required this.parking,
+    required this.tolls,
+    required this.did,
+    required this.waiting,
+    required this.time,
+    required this.jobid,
+    required this.pickupDate,
+    required this.pickUplocation,
+    required this.dropOflocation,
+    required this.pickupTime,
+    required this.extra,
+  });
 
   @override
   State<AccountStatementDetails> createState() =>
@@ -59,7 +61,7 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
   void initState() {
     super.initState();
 
-    _model = createModel(context as BuildContext, () => OnWayModel());
+    _model = createModel(context, () => OnWayModel());
   }
 
   @override
@@ -85,7 +87,7 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
 
   //     var response = await http.post(
   //         Uri.parse(
-  //             'https://www.minicaboffice.com/api/driver/complete-job.php'),
+  //             ApiService.driverCompleteJob),
   //         body: {
   //           'job_id': jobid,
   //           'd_id': dId.toString(),
@@ -134,7 +136,7 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           body: SafeArea(
             top: true,
             child: SingleChildScrollView(
@@ -144,9 +146,7 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                   Container(
                     width: MediaQuery.sizeOf(context).width,
                     height: 100,
-                    decoration: BoxDecoration(
-                      color: Color(0xFF1C1F28),
-                    ),
+                    decoration: BoxDecoration(color: Color(0xFF1C1F28)),
                     child: Row(
                       // mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -156,10 +156,7 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                          ),
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
                         ),
                         Row(
                           children: [
@@ -170,16 +167,14 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                               children: [
                                 Text(
                                   'PAY BY',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryBackground,
-                                        fontSize: 16,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Open Sans',
+                                    color:
+                                        context.appTheme.primaryBackground,
+                                    fontSize: 16,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -193,20 +188,21 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                                     ),
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          8, 0, 0, 0),
+                                        8,
+                                        0,
+                                        0,
+                                        0,
+                                      ),
                                       child: Text(
                                         'Cash',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'Open Sans',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
-                                              fontSize: 16,
-                                              letterSpacing: 0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                        style: context.appTheme.bodyMedium.override(
+                                          fontFamily: 'Open Sans',
+                                          color:
+                                              context.appTheme.primaryBackground,
+                                          fontSize: 16,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -220,52 +216,52 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                               children: [
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 5),
+                                    0,
+                                    0,
+                                    0,
+                                    5,
+                                  ),
                                   child: Text(
                                     'CLIENT PAYS',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
-                                          fontSize: 16,
-                                          letterSpacing: 0,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Open Sans',
+                                      color:
+                                          context.appTheme.primaryBackground,
+                                      fontSize: 16,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 5),
+                                    0,
+                                    0,
+                                    0,
+                                    5,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Text(
                                         '£ ${widget.totalFee}',
-                                        style: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .override(
-                                              fontFamily: 'Open Sans',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
-                                              letterSpacing: 0,
-                                            ),
+                                        style: context.appTheme.titleLarge.override(
+                                          fontFamily: 'Open Sans',
+                                          color:
+                                              context.appTheme.primaryBackground,
+                                          letterSpacing: 0,
+                                        ),
                                       ),
                                       Text(
                                         'Inc, VAT',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'Open Sans',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
-                                              fontSize: 16,
-                                              letterSpacing: 0,
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                        style: context.appTheme.bodyMedium.override(
+                                          fontFamily: 'Open Sans',
+                                          color:
+                                              context.appTheme.primaryBackground,
+                                          fontSize: 16,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -278,8 +274,10 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                           onPressed: () {
                             // Navigator.pop(context);
                           },
-                          icon:
-                              Icon(Icons.arrow_back, color: Colors.transparent),
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.transparent,
+                          ),
                         ),
                       ],
                     ),
@@ -292,14 +290,12 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Job Details',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -312,27 +308,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Job id',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${widget.jobid}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          widget.jobid,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -345,27 +336,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           "Pick-up date",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${widget.pickupDate}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          widget.pickupDate,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -378,27 +364,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           "Pick-up time",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${widget.pickupTime}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          widget.pickupTime,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -411,34 +392,30 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           "Pickup",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 70,
                           child: SingleChildScrollView(
                             child: Text(
                               widget.pickUplocation,
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    fontSize: 18,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.appTheme.headlineSmall.override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    context.appTheme.secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -450,34 +427,30 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           "Dropoff",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        Container(
+                        SizedBox(
                           width: 130,
                           height: 60,
                           child: SingleChildScrollView(
                             child: Text(
                               widget.dropOflocation,
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    fontSize: 18,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.appTheme.headlineSmall.override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    context.appTheme.secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -489,14 +462,12 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Fare Details',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -509,27 +480,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Journey',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           '£${widget.jounreryFare}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -542,27 +508,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           widget.time,
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           '£${widget.waiting}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -575,27 +536,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Parking',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           '£${widget.parking}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -608,27 +564,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Tolls',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           '£${widget.tolls}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -641,27 +592,22 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                       children: [
                         Text(
                           'Extra',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           '£${widget.extra}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -689,7 +635,7 @@ class _AccountStatementDetailsState extends State<AccountStatementDetails> {
                   //                 iconPadding: EdgeInsetsDirectional.fromSTEB(
                   //                     0, 0, 0, 0),
                   //                 color: Color(0xFF1C1F28),
-                  //                 textStyle: FlutterFlowTheme.of(context)
+                  //                 textStyle: context.appTheme
                   //                     .titleSmall
                   //                     .override(
                   //                       fontFamily: 'Open Sans',

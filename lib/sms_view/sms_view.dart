@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
-  ChatScreen({Key? key}) : super(key: key);
+  ChatScreen({super.key});
 
   // Sample chat data
   final List<Map<String, String>> messages = [
@@ -21,15 +21,9 @@ class ChatScreen extends StatelessWidget {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
+          child: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        title: Text(
-          "Chat",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text("Chat", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color.fromARGB(255, 47, 33, 243),
       ),
       body: Column(
@@ -48,20 +42,25 @@ class ChatScreen extends StatelessWidget {
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 4.0),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 10.0),
+                      horizontal: 16.0,
+                      vertical: 10.0,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSender
-                          ? Color.fromARGB(255, 47, 33, 243)
-                          : Colors.grey[300],
+                      color:
+                          isSender
+                              ? Color.fromARGB(255, 47, 33, 243)
+                              : Colors.grey[300],
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(12.0),
                         topRight: const Radius.circular(12.0),
-                        bottomLeft: isSender
-                            ? const Radius.circular(12.0)
-                            : const Radius.circular(0),
-                        bottomRight: isSender
-                            ? const Radius.circular(0)
-                            : const Radius.circular(12.0),
+                        bottomLeft:
+                            isSender
+                                ? const Radius.circular(12.0)
+                                : const Radius.circular(0),
+                        bottomRight:
+                            isSender
+                                ? const Radius.circular(0)
+                                : const Radius.circular(12.0),
                       ),
                     ),
                     child: Text(
@@ -95,7 +94,9 @@ class ChatScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 10.0),
+                  horizontal: 16.0,
+                  vertical: 10.0,
+                ),
               ),
             ),
           ),
@@ -104,13 +105,10 @@ class ChatScreen extends StatelessWidget {
             onPressed: () {
               // Add your send message logic here
             },
-            child: Icon(
-              Icons.send,
-              color: Colors.white,
-            ),
             mini: true,
             backgroundColor: Color.fromARGB(255, 47, 33, 243),
-          )
+            child: Icon(Icons.send, color: Colors.white),
+          ),
         ],
       ),
     );

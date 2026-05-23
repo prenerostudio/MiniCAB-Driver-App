@@ -2,15 +2,12 @@ import '/components/clientnotes_widget.dart';
 import '/components/dropoff_widget.dart';
 import '/components/waydetails_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 // import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'onway_model.dart';
 export 'onway_model.dart';
@@ -77,7 +74,7 @@ class _OnwayWidgetState extends State<OnwayWidget> {
       width: MediaQuery.sizeOf(context).width,
       height: MediaQuery.sizeOf(context).height * 1,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
+        color: context.appTheme.secondaryBackground,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -89,7 +86,7 @@ class _OnwayWidgetState extends State<OnwayWidget> {
               child: Divider(
                 height: 20,
                 thickness: 2,
-                color: FlutterFlowTheme.of(context).secondaryText,
+                color: context.appTheme.secondaryText,
               ),
             ),
           ),
@@ -108,31 +105,25 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                       children: [
                         Icon(
                           Icons.person,
-                          color: FlutterFlowTheme.of(context).primary,
+                          color: context.appTheme.primary,
                           size: 24,
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                           child: Text(
                             '36, Bohun Grove, BARNET',
-                            style: FlutterFlowTheme.of(context)
-                                .labelLarge
-                                .override(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                ),
+                            style: context.appTheme.labelLarge
+                                .override(fontFamily: 'Poppins', fontSize: 14),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
                           child: Text(
                             'EN4 8UA',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Open Sans',
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -144,7 +135,7 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                         child: Divider(
                           height: 20,
                           thickness: 2,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -169,34 +160,25 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                       builder: (context) {
                         return Padding(
                           padding: MediaQuery.viewInsetsOf(context),
-                          child: ClientnotesWidget(
-                            name: '',
-                            notes: '',
-                          ),
+                          child: ClientnotesWidget(name: '', notes: ''),
                         );
                       },
                     ).then((value) => safeSetState(() {}));
                   },
                   text: 'VIEW NOTE',
-                  icon: FaIcon(
-                    FontAwesomeIcons.infoCircle,
-                    size: 21,
-                  ),
+                  icon: FaIcon(FontAwesomeIcons.infoCircle, size: 21),
                   options: FFButtonOptions(
                     width: MediaQuery.sizeOf(context).width * 0.5,
                     height: 45,
                     padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                     iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                    color: FlutterFlowTheme.of(context).primary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Open Sans',
-                          color: Colors.white,
-                        ),
-                    elevation: 3,
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                      width: 1,
+                    color: context.appTheme.primary,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Open Sans',
+                      color: Colors.white,
                     ),
+                    elevation: 3,
+                    borderSide: BorderSide(color: Colors.transparent, width: 1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -215,7 +197,7 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                   fillColor: Color(0xFF5B68F5),
                   icon: FaIcon(
                     FontAwesomeIcons.ellipsisH,
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                     size: 24,
                   ),
                   onPressed: () async {
@@ -278,15 +260,12 @@ class _OnwayWidgetState extends State<OnwayWidget> {
                     padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                     iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                     color: Color(0xFF1C1F28),
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Open Sans',
-                          color: Colors.white,
-                        ),
-                    elevation: 3,
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                      width: 1,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Open Sans',
+                      color: Colors.white,
                     ),
+                    elevation: 3,
+                    borderSide: BorderSide(color: Colors.transparent, width: 1),
                     borderRadius: BorderRadius.circular(0),
                   ),
                 ),

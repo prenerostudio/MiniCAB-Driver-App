@@ -1,221 +1,313 @@
-import 'package:new_minicab_driver/login/login_widget.dart';
-import 'package:new_minicab_driver/otp/otp_widget.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'dart:convert';
 
-import '/flutter_flow/flutter_flow_drop_down.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import '/flutter_flow/form_field_controller.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'signup_model.dart';
-export 'signup_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:new_minicab_driver/theme/app_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'signup_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
+export 'signup_model.dart';
 
 class SignupWidget extends StatefulWidget {
-  const SignupWidget({Key? key}) : super(key: key);
+  const SignupWidget({super.key});
 
   @override
-  _SignupWidgetState createState() => _SignupWidgetState();
+  State<SignupWidget> createState() => _SignupWidgetState();
 }
 
 class _SignupWidgetState extends State<SignupWidget> {
-  // late SignupModel _model;
-  String? dropDownValue2;
-  FormFieldController<String>? dropDownValueController2;
-  String? enteredPhoneNumber;
-  String? varifyId = "";
-  // bool isLoading = false;
-  bool? checkboxValue;
+  static const _logoAsset = 'assets/driver-app-icon.jpg';
+  static const _registerEndpoint = ApiService.driverAuthenticationRegister;
+  static const _zonesEndpoint = ApiService.driverZones;
+  static const _vehiclesEndpoint = ApiService.driverActivityFetchVehicles;
+  static const _ink = Color(0xFF101820);
+  static const _green = Color(0xFF0E7C66);
+  static const _gold = Color(0xFFE2A84F);
+  static const _mist = Color(0xFFF4F7F5);
 
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController PasswordController = TextEditingController();
-  TextEditingController emailAddressController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  static const _shiftOptions = [
+    'Day Shift',
+    'Afternoon Shift',
+    'Evening Shift',
+    'Night Shift',
+  ];
+
+  late SignupModel _model;
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _tflController = TextEditingController();
+  final _carMakeController = TextEditingController();
+  final _carModelController = TextEditingController();
+
+  final _fullNameFocusNode = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _phoneFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _tflFocusNode = FocusNode();
+  final _carMakeFocusNode = FocusNode();
+  final _carModelFocusNode = FocusNode();
+
+  List<String> _postCodeOptions = [];
+  List<String> _vehicleTypeOptions = [];
+
+  String _phoneNumber = '';
+  String? _postCode;
+  String? _shiftTiming;
+  String? _vehicleType;
+
+  bool _acceptedTerms = false;
+  bool _passwordVisible = false;
+  bool _isSubmitting = false;
+  bool _loadingPostCodes = true;
+  bool _loadingVehicleTypes = true;
+
   @override
   void initState() {
     super.initState();
-    // _model = createModel(context, () => SignupModel());
-    checkLocationPermissionAndNavigate(context);
-
-    textController1 ??= TextEditingController();
-    textFieldFocusNode ??= FocusNode();
-    passwordController ??= TextEditingController();
-    passwordFocusNode ??= FocusNode();
-    phoneNumberController ??= TextEditingController();
-    phoneNumberFocusNode ??= FocusNode();
+    _model = createModel(context, () => SignupModel());
+    _loadDropdowns();
   }
 
-  final unfocusNode = FocusNode();
-  final formKey = GlobalKey<FormState>();
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode;
-  TextEditingController? textController1;
-  String? Function(BuildContext, String?)? textController1Validator;
-  // State field(s) for TextField widget.
-  FocusNode? passwordFocusNode;
-  TextEditingController? passwordController;
-  bool passwordVisibility = true;
-  String? Function(BuildContext, String?)? passwordControllerValidator;
-  // State field(s) for DropDown widget.
-  String? dropDownValue1;
-  FormFieldController<String>? dropDownValueController1;
-  // State field(s) for PhoneNumber widget.
-  FocusNode? phoneNumberFocusNode;
-  TextEditingController? phoneNumberController;
-  String? Function(BuildContext, String?)? phoneNumberControllerValidator;
-  // State field(s) for DropDown widget.
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _tflController.dispose();
+    _carMakeController.dispose();
+    _carModelController.dispose();
 
-  void _verifyPhoneNumber() async {
-    print('the phone number is: +${countryCode}${phoneController.text}');
-    setState(() {});
-    isLoading = true;
+    _fullNameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _tflFocusNode.dispose();
+    _carMakeFocusNode.dispose();
+    _carModelFocusNode.dispose();
+    _model.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadDropdowns() async {
+    await Future.wait([_loadPostCodes(), _loadVehicleTypes()]);
+  }
+
+  Future<void> _loadPostCodes() async {
+    setState(() => _loadingPostCodes = true);
     try {
-      await _auth.verifyPhoneNumber(
-        phoneNumber: "+${countryCode}${phoneController.text}",
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-retrieval or instant verification
-          await _auth.signInWithCredential(credential);
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => HomeScreen()),
-          // );
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          isLoading = false;
-          setState(() {});
-          Fluttertoast.showToast(msg: e.message.toString(), fontSize: 16.0);
-          print('Failed to verify phone number: ${e.message}');
-          // Handle error
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          print('verificationId to verify phone number: ${verificationId}');
-          print('resendToken to verify phone number: ${resendToken}');
-          isLoading = false;
-          setState(() {});
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) => OtpWidget(
-                    dropDownValue2: dropDownValue2,
-                    name: nameController.text,
-                    phoneNumber: "+${countryCode}${phoneController.text}",
-                    varifyId: verificationId,
-                    email: emailAddressController.text,
-                    password: PasswordController.text,
-                    licenseAuth: phoneNumberController.text,
-                  ),
-            ),
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle auto retrieval timeout
-        },
-      );
-    } catch (e) {
-      isLoading = false;
-      setState(() {});
-      Fluttertoast.showToast(msg: e.toString(), fontSize: 16.0);
-    }
-  }
+      final options = await _fetchDropdownOptions(_zonesEndpoint, [
+        'post_code',
+        'postcode',
+        'zone_name',
+        'name',
+        'starting_point',
+      ]);
 
-  Future<void> saveDataIdInSharedPreferences(String dataId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('d_id', dataId);
-    print('Data ID saved in SharedPreferences: $dataId');
-  }
-
-  Future<void> registerUser(BuildContext context) async {
-    isLoading = true;
-    if (!mounted) return; // Check if the widget is still mounted
-    setState(() {});
-
-    try {
-      print('the picked number +${countryCode}${phoneController.text}');
-      print('${passwordController.text}');
-      final response = await http.post(
-        Uri.parse('https://www.minicaboffice.com/api/driver/register.php'),
-        body: {
-          'd_name':
-              nameController.text ?? '', // Use default values or handle nulls
-          'd_email': emailAddressController.text ?? '',
-
-          'd_phone': "${enteredPhoneNumber}" ?? '',
-          // 'd_phone': "+${countryCode}${phoneController.text}" ?? '',
-          'd_password': PasswordController.text.toString() ?? '',
-          'licence_authority': dropDownValue2 ?? '',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['status'] == true) {
-          int dataId = responseData['data'];
-          print('The else condition is ${dataId}');
-          await saveDataIdInSharedPreferences(dataId.toString());
-          if (!mounted) return; // Check if the widget is still mounted
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LoginWidget()),
-          );
-          _showToastMessage(responseData['message']);
-        } else {
-          print('The else condition is ${responseData['message']}');
-          isLoading = false;
-          if (!mounted) return; // Check if the widget is still mounted
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LoginWidget()),
-          );
-          _showToastMessage(responseData['message']);
-        }
-      } else {
-        isLoading = false;
-        _showToastMessage("Check your internet connection. Please try again.");
-        print(response.reasonPhrase);
+      if (!mounted) {
+        return;
       }
-    } catch (e) {
-      print('The register exception ${e}');
-      _showToastMessage(e.toString());
-      isLoading = false;
+
+      setState(() => _postCodeOptions = options);
+    } catch (_) {
+      _showToastMessage('Could not load post codes. Pull down and try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _loadingPostCodes = false);
+      }
     }
   }
 
-  // @override
-  // void dispose() {
-  //   _model.dispose();
+  Future<void> _loadVehicleTypes() async {
+    setState(() => _loadingVehicleTypes = true);
+    try {
+      final options = await _fetchDropdownOptions(_vehiclesEndpoint, [
+        'vehicle_type',
+        'vt_name',
+        'v_name',
+        'name',
+        'title',
+      ]);
 
-  //   super.dispose();
-  // }
+      if (!mounted) {
+        return;
+      }
+
+      setState(() => _vehicleTypeOptions = options);
+    } catch (_) {
+      _showToastMessage(
+        'Could not load vehicle types. Pull down and try again.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loadingVehicleTypes = false);
+      }
+    }
+  }
+
+  Future<List<String>> _fetchDropdownOptions(
+    String endpoint,
+    List<String> keys,
+  ) async {
+    final response = await http.get(Uri.parse(endpoint));
+    if (response.statusCode != 200) {
+      throw Exception('Dropdown request failed');
+    }
+
+    final decoded = json.decode(response.body);
+    final dynamic data = decoded is Map ? decoded['data'] : decoded;
+    final items = data is List ? data : <dynamic>[];
+    final values = <String>[];
+
+    for (final item in items) {
+      if (item is String) {
+        values.add(item);
+        continue;
+      }
+
+      if (item is Map) {
+        for (final key in keys) {
+          final value = item[key];
+          if (value != null && value.toString().trim().isNotEmpty) {
+            values.add(value.toString().trim());
+            break;
+          }
+        }
+      }
+    }
+
+    return values.toSet().toList()..sort();
+  }
+
+  Future<void> _registerUser() async {
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (!_acceptedTerms) {
+      _showToastMessage('Please accept the driver terms to continue.');
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(_registerEndpoint),
+      );
+      request.fields.addAll({
+        'full_name': _fullNameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'phone':
+            _phoneNumber.trim().isEmpty
+                ? _phoneController.text.trim()
+                : _phoneNumber.trim(),
+        'password': _passwordController.text,
+        'post_code': _postCode ?? '',
+        'tfl_num': _tflController.text.trim(),
+        'shift_timing': _shiftTiming ?? '',
+        'vehicle_type': _vehicleType ?? '',
+        'car_make': _carMakeController.text.trim(),
+        'model': _carModelController.text.trim(),
+      });
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      final decoded = _decodeResponse(responseBody);
+
+      if (response.statusCode == 200 && _isSuccess(decoded['status'])) {
+        await _saveRegistrationHints(decoded);
+
+        if (!mounted) {
+          return;
+        }
+
+        _showToastMessage(
+          _responseMessage(decoded, 'Registration successful. Please sign in.'),
+        );
+        context.goNamed('Login');
+        return;
+      }
+
+      _showToastMessage(
+        _responseMessage(decoded, 'Registration failed. Please try again.'),
+      );
+    } catch (error) {
+      _showToastMessage('Registration failed. Please check your connection.');
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  Map<String, dynamic> _decodeResponse(String responseBody) {
+    if (responseBody.trim().isEmpty) {
+      return <String, dynamic>{};
+    }
+
+    final decoded = json.decode(responseBody);
+    if (decoded is Map<String, dynamic>) {
+      return decoded;
+    }
+
+    return <String, dynamic>{'data': decoded};
+  }
+
+  bool _isSuccess(dynamic value) {
+    final normalized = value?.toString().toLowerCase().trim();
+    return value == true ||
+        value == 1 ||
+        normalized == 'true' ||
+        normalized == '1' ||
+        normalized == 'success';
+  }
+
+  String _responseMessage(Map<String, dynamic> response, String fallback) {
+    final message = response['message'] ?? response['error'];
+    if (message == null) {
+      return fallback;
+    }
+
+    final text = message.toString().trim();
+    return text.isEmpty ? fallback : text;
+  }
+
+  Future<void> _saveRegistrationHints(Map<String, dynamic> response) async {
+    final data = response['data'];
+    final prefs = await SharedPreferences.getInstance();
+
+    final driverId =
+        data is Map
+            ? data['d_id'] ?? data['driver_id'] ?? data['id']
+            : response['d_id'] ?? response['driver_id'] ?? response['id'];
+    if (driverId != null && driverId.toString().trim().isNotEmpty) {
+      await prefs.setString('d_id', driverId.toString());
+    }
+  }
 
   void _showToastMessage(String message) {
     Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
 
-  Future<void> checkLocationPermissionAndNavigate(BuildContext context) async {
-    final permissionStatus = await Permission.location.request();
-    final currentStatus = await Permission.location.status;
-    print(currentStatus);
-    if (permissionStatus.isDenied) {
-      openAppSettings();
-    } else {}
+  Future<void> _refreshDropdowns() async {
+    await Future.wait([_loadPostCodes(), _loadVehicleTypes()]);
   }
 
-  String countryCode = '';
   @override
   Widget build(BuildContext context) {
     if (isiOS) {
@@ -228,700 +320,280 @@ class _SignupWidgetState extends State<SignupWidget> {
     }
 
     return GestureDetector(
-      // onTap: () => _model.unfocusNode.canRequestFocus
-      //     ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-      //     : FocusScope.of(context).unfocus(),
-      child: WillPopScope(
-        onWillPop: () async => true,
-        child: Scaffold(
-          key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          body: SafeArea(
-            top: true,
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: _mist,
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _refreshDropdowns,
+            color: _green,
             child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(20.0, 50.0, 20.0, 0.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: MediaQuery.sizeOf(context).width,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          'assets/images/app_launcher_icon.png',
-                          width: MediaQuery.sizeOf(context).width * 0.5,
-                          height: 100,
-                          fit: BoxFit.fitHeight,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 620),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _TopBar(onBack: () => context.goNamed('Welcome')),
+                      const SizedBox(height: 16),
+                      const _SignupHeader(),
+                      const SizedBox(height: 24),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFE1E7E3)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 24,
+                              offset: Offset(0, 14),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                _buildTextField(
+                                  controller: _fullNameController,
+                                  focusNode: _fullNameFocusNode,
+                                  label: 'Full name',
+                                  icon: Icons.badge_rounded,
+                                  keyboardType: TextInputType.name,
+                                  textInputAction: TextInputAction.next,
+                                  validator:
+                                      (value) =>
+                                          _required(value, 'Enter full name'),
+                                ),
+                                const SizedBox(height: 14),
+                                _buildTextField(
+                                  controller: _emailController,
+                                  focusNode: _emailFocusNode,
+                                  label: 'Email address',
+                                  icon: Icons.alternate_email_rounded,
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.next,
+                                  validator: _emailValidator,
+                                ),
+                                const SizedBox(height: 14),
+                                IntlPhoneField(
+                                  controller: _phoneController,
+                                  focusNode: _phoneFocusNode,
+                                  initialCountryCode: 'GB',
+                                  disableLengthCheck: true,
+                                  decoration: _inputDecoration(
+                                    label: 'Phone number',
+                                    icon: Icons.phone_rounded,
+                                  ),
+                                  style:
+                                      context.appTheme.bodyMedium,
+                                  keyboardType: TextInputType.phone,
+                                  onChanged:
+                                      (phone) =>
+                                          _phoneNumber = phone.completeNumber,
+                                  validator: (phone) {
+                                    final value =
+                                        phone?.number.trim() ??
+                                        _phoneController.text.trim();
+                                    if (value.isEmpty) {
+                                      return 'Enter phone number';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 14),
+                                _buildTextField(
+                                  controller: _passwordController,
+                                  focusNode: _passwordFocusNode,
+                                  label: 'Password',
+                                  icon: Icons.lock_rounded,
+                                  obscureText: !_passwordVisible,
+                                  textInputAction: TextInputAction.next,
+                                  suffixIcon: IconButton(
+                                    tooltip:
+                                        _passwordVisible
+                                            ? 'Hide password'
+                                            : 'Show password',
+                                    onPressed:
+                                        () => setState(
+                                          () =>
+                                              _passwordVisible =
+                                                  !_passwordVisible,
+                                        ),
+                                    icon: Icon(
+                                      _passwordVisible
+                                          ? Icons.visibility_off_rounded
+                                          : Icons.visibility_rounded,
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Enter password';
+                                    }
+
+                                    if (value.length < 8) {
+                                      return 'Password must be at least 8 characters';
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 14),
+                                _buildDropdown(
+                                  value:
+                                      _postCodeOptions.contains(_postCode)
+                                          ? _postCode
+                                          : null,
+                                  label: 'Post code',
+                                  icon: Icons.location_on_rounded,
+                                  items: _postCodeOptions,
+                                  isLoading: _loadingPostCodes,
+                                  onChanged:
+                                      (value) =>
+                                          setState(() => _postCode = value),
+                                  onRetry: _loadPostCodes,
+                                ),
+                                const SizedBox(height: 14),
+                                _buildTextField(
+                                  controller: _tflController,
+                                  focusNode: _tflFocusNode,
+                                  label: 'TFL number',
+                                  icon: Icons.confirmation_number_rounded,
+                                  textInputAction: TextInputAction.next,
+                                  validator:
+                                      (value) =>
+                                          _required(value, 'Enter TFL number'),
+                                ),
+                                const SizedBox(height: 14),
+                                _buildDropdown(
+                                  value: _shiftTiming,
+                                  label: 'Shift timing',
+                                  icon: Icons.schedule_rounded,
+                                  items: _shiftOptions,
+                                  onChanged:
+                                      (value) =>
+                                          setState(() => _shiftTiming = value),
+                                ),
+                                const SizedBox(height: 14),
+                                _buildDropdown(
+                                  value:
+                                      _vehicleTypeOptions.contains(_vehicleType)
+                                          ? _vehicleType
+                                          : null,
+                                  label: 'Vehicle type',
+                                  icon: Icons.local_taxi_rounded,
+                                  items: _vehicleTypeOptions,
+                                  isLoading: _loadingVehicleTypes,
+                                  onChanged:
+                                      (value) =>
+                                          setState(() => _vehicleType = value),
+                                  onRetry: _loadVehicleTypes,
+                                ),
+                                const SizedBox(height: 14),
+                                _buildTextField(
+                                  controller: _carMakeController,
+                                  focusNode: _carMakeFocusNode,
+                                  label: 'Car make',
+                                  icon: Icons.directions_car_filled_rounded,
+                                  textInputAction: TextInputAction.next,
+                                  validator:
+                                      (value) =>
+                                          _required(value, 'Enter car make'),
+                                ),
+                                const SizedBox(height: 14),
+                                _buildTextField(
+                                  controller: _carModelController,
+                                  focusNode: _carModelFocusNode,
+                                  label: 'Model',
+                                  icon: Icons.taxi_alert_rounded,
+                                  textInputAction: TextInputAction.done,
+                                  validator:
+                                      (value) =>
+                                          _required(value, 'Enter car model'),
+                                  onFieldSubmitted: (_) => _registerUser(),
+                                ),
+                                const SizedBox(height: 16),
+                                _TermsRow(
+                                  value: _acceptedTerms,
+                                  onChanged:
+                                      (value) => setState(
+                                        () => _acceptedTerms = value ?? false,
+                                      ),
+                                ),
+                                const SizedBox(height: 20),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 52,
+                                  child: ElevatedButton.icon(
+                                    onPressed:
+                                        _isSubmitting ? null : _registerUser,
+                                    icon:
+                                        _isSubmitting
+                                            ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                            : const Icon(
+                                              Icons.person_add_alt_1_rounded,
+                                              size: 20,
+                                            ),
+                                    label: Text(
+                                      _isSubmitting
+                                          ? 'Creating account'
+                                          : 'Create driver account',
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _green,
+                                      foregroundColor: Colors.white,
+                                      disabledBackgroundColor: _green
+                                          .withValues(alpha: 0.58),
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      textStyle: context.appTheme.titleSmall.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
+                      const SizedBox(height: 22),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Become a driver',
-                            style: FlutterFlowTheme.of(context).headlineLarge,
+                            'Already approved?',
+                            style: context.appTheme.bodyMedium
+                                .copyWith(color: const Color(0xFF59655F)),
+                          ),
+                          TextButton(
+                            onPressed: () => context.goNamed('Login'),
+                            child: const Text('Sign in'),
                           ),
                         ],
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                        0.0,
-                        25.0,
-                        0.0,
-                        0.0,
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        child: Form(
-                          key: formKey,
-                          autovalidateMode: AutovalidateMode.disabled,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0,
-                                  0.0,
-                                  8.0,
-                                  15.0,
-                                ),
-                                child: Container(
-                                  width: double.infinity,
-                                  child: TextFormField(
-                                    controller: nameController,
-                                    autofocus: true,
-                                    obscureText: false,
-                                    decoration: InputDecoration(
-                                      labelText: 'Full Name',
-                                      labelStyle: FlutterFlowTheme.of(
-                                        context,
-                                      ).labelMedium.override(
-                                        fontFamily: 'Open Sans',
-                                        fontSize: 16,
-                                      ),
-                                      hintText: 'Enter full name...',
-                                      hintStyle:
-                                          FlutterFlowTheme.of(
-                                            context,
-                                          ).labelMedium,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).alternate,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).primary,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).error,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).error,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    style:
-                                        FlutterFlowTheme.of(context).bodyMedium,
-                                    keyboardType: TextInputType.name,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0,
-                                  0.0,
-                                  8.0,
-                                  0.0,
-                                ),
-                                child: Container(
-                                  width: double.infinity,
-                                  child: TextFormField(
-                                    controller: emailAddressController,
-                                    focusNode: textFieldFocusNode,
-                                    autofocus: true,
-                                    obscureText: false,
-                                    decoration: InputDecoration(
-                                      labelText: 'Email Address',
-                                      labelStyle: FlutterFlowTheme.of(
-                                        context,
-                                      ).labelMedium.override(
-                                        fontFamily: 'Open Sans',
-                                        fontSize: 16,
-                                      ),
-                                      hintText: 'Enter email address',
-                                      hintStyle:
-                                          FlutterFlowTheme.of(
-                                            context,
-                                          ).labelMedium,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).alternate,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).primary,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).error,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).error,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    style:
-                                        FlutterFlowTheme.of(context).bodyMedium,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: textController1Validator
-                                        .asValidator(context),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                  8,
-                                  20,
-                                  8,
-                                  0,
-                                ),
-                                child: Container(
-                                  width: double.infinity,
-                                  child: TextFormField(
-                                    controller: PasswordController,
-                                    focusNode: passwordFocusNode,
-                                    autofocus: true,
-                                    autofillHints: [AutofillHints.password],
-                                    obscureText: passwordVisibility,
-                                    decoration: InputDecoration(
-                                      labelText: 'Password',
-                                      labelStyle: FlutterFlowTheme.of(
-                                        context,
-                                      ).labelMedium.override(
-                                        fontFamily: 'Open Sans',
-                                        fontSize: 14,
-                                      ),
-                                      hintText: 'Enter Password',
-                                      hintStyle:
-                                          FlutterFlowTheme.of(
-                                            context,
-                                          ).labelMedium,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).alternate,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).primary,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).error,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).error,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      suffixIcon: InkWell(
-                                        onTap:
-                                            () => setState(
-                                              () =>
-                                                  passwordVisibility =
-                                                      !passwordVisibility,
-                                            ),
-                                        focusNode: FocusNode(
-                                          skipTraversal: true,
-                                        ),
-                                        child: Icon(
-                                          passwordVisibility
-                                              ? Icons.visibility_off_outlined
-                                              : Icons.visibility_outlined,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                    style:
-                                        FlutterFlowTheme.of(context).bodyMedium,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: passwordControllerValidator
-                                        .asValidator(context),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0,
-                                        20.0,
-                                        8.0,
-                                        0.0,
-                                      ),
-                                      child: Container(
-                                        width: double.infinity,
-                                        child: IntlPhoneField(
-                                          controller: phoneController,
-                                          focusNode: phoneNumberFocusNode,
-                                          autofocus: true,
-                                          obscureText: false,
-                                          initialCountryCode: 'GB',
-                                          onChanged: (phone) {
-                                            enteredPhoneNumber =
-                                                phone.completeNumber ?? '';
-                                            print(enteredPhoneNumber);
-                                          },
-                                          onCountryChanged: (country) {
-                                            setState(() {});
-                                            countryCode = country.dialCode;
-                                            print(
-                                              'Country changed to: ' +
-                                                  country.dialCode,
-                                            );
-                                          },
-                                          decoration: InputDecoration(
-                                            labelText: 'Mobile number',
-                                            labelStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).labelMedium.override(
-                                              fontFamily: 'Open Sans',
-                                              fontSize: 14,
-                                            ),
-                                            hintText: 'Enter Mobile Number',
-                                            hintStyle:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).labelMedium,
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color:
-                                                    FlutterFlowTheme.of(
-                                                      context,
-                                                    ).alternate,
-                                                width: 2,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color:
-                                                    FlutterFlowTheme.of(
-                                                      context,
-                                                    ).primary,
-                                                width: 2,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            errorBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color:
-                                                    FlutterFlowTheme.of(
-                                                      context,
-                                                    ).error,
-                                                width: 2,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            focusedErrorBorder:
-                                                OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color:
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).error,
-                                                    width: 2,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                          ),
-                                          keyboardType: TextInputType.phone,
-                                          style:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0,
-                                  20.0,
-                                  8.0,
-                                  0.0,
-                                ),
-                                child: FlutterFlowDropDown<String>(
-                                  controller:
-                                      dropDownValueController2 ??=
-                                          FormFieldController<String>(null),
-                                  options: [
-                                    'London',
-                                    'The North East',
-                                    'North West',
-                                    'Yorkshire',
-                                    'East Midlands',
-                                    'West Midlands',
-                                    'South East',
-                                    'East of England',
-                                    'South West',
-                                  ],
-                                  onChanged: (val) {
-                                    setState(() {
-                                      dropDownValue2 = val;
-                                      print("Selected value: $dropDownValue2");
-                                    });
-                                  },
-                                  width: MediaQuery.sizeOf(context).width,
-                                  textStyle:
-                                      FlutterFlowTheme.of(context).bodyMedium,
-                                  hintText: 'Select Authority',
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    color:
-                                        FlutterFlowTheme.of(
-                                          context,
-                                        ).secondaryText,
-                                    size: 24.0,
-                                  ),
-                                  fillColor:
-                                      FlutterFlowTheme.of(
-                                        context,
-                                      ).primaryBackground,
-                                  elevation: 2.0,
-                                  borderColor:
-                                      FlutterFlowTheme.of(context).alternate,
-                                  borderWidth: 2.0,
-                                  borderRadius: 8.0,
-                                  margin: EdgeInsetsDirectional.fromSTEB(
-                                    16.0,
-                                    4.0,
-                                    16.0,
-                                    4.0,
-                                  ),
-                                  hidesUnderline: true,
-                                  isSearchable: false,
-                                  isMultiSelect: false,
-                                ),
-                              ),
-                              // Generated code for this Row Widget...
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                  0,
-                                  15,
-                                  0,
-                                  0,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Theme(
-                                      data: ThemeData(
-                                        checkboxTheme: CheckboxThemeData(
-                                          visualDensity: VisualDensity.compact,
-                                          materialTapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                        ),
-                                        unselectedWidgetColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                      ),
-                                      child: Checkbox(
-                                        value: checkboxValue ??= false,
-                                        onChanged: (newValue) async {
-                                          setState(
-                                            () => checkboxValue = newValue!,
-                                          );
-                                        },
-                                        activeColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primary,
-                                        checkColor:
-                                            FlutterFlowTheme.of(context).info,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                          8,
-                                          0,
-                                          0,
-                                          0,
-                                        ),
-                                        child: Text(
-                                          'By signing up, you agree to our Terms and Conditions and confirm that you have read and understood the Privacy Policy for Drivers applicable for your country of operation.',
-                                          textAlign: TextAlign.justify,
-                                          style: FlutterFlowTheme.of(
-                                            context,
-                                          ).bodyMedium.override(
-                                            fontFamily: 'Open Sans',
-                                            color:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).secondaryText,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              isLoading
-                                  ? Center(child: CircularProgressIndicator())
-                                  : Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      30.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        if (nameController.text.isEmpty) {
-                                          _showToastMessage(
-                                            'Please enter full name',
-                                          );
-                                          return;
-                                        }
-                                        if (!emailAddressController.text
-                                            .contains("@")) {
-                                          _showToastMessage(
-                                            'Please enter a valid email address with "@"',
-                                          );
-                                          return;
-                                        }
-                                        if (phoneController.text.isEmpty ||
-                                            emailAddressController
-                                                .text
-                                                .isEmpty) {
-                                          _showToastMessage(
-                                            'Please enter a phone number and an email address',
-                                          );
-                                          return;
-                                        }
-
-                                        if (PasswordController.text.length <
-                                            8) {
-                                          _showToastMessage(
-                                            'Password must be at least 8 characters long',
-                                          );
-                                          return;
-                                        }
-
-                                        if (dropDownValue2 == null ||
-                                            dropDownValue2!.isEmpty) {
-                                          _showToastMessage(
-                                            'Please select a value for licensing Authority',
-                                          );
-                                          return;
-                                        }
-
-                                        if (checkboxValue != true) {
-                                          _showToastMessage(
-                                            'Please fill the checkbox',
-                                          );
-                                          return;
-                                        }
-                                        try {
-                                          registerUser(context);
-                                        } catch (e) {}
-                                      },
-                                      text: 'Sign up as a Driver',
-                                      options: FFButtonOptions(
-                                        width: double.infinity,
-                                        height: 52.0,
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                          44.0,
-                                          0.0,
-                                          44.0,
-                                          0.0,
-                                        ),
-                                        iconPadding:
-                                            EdgeInsetsDirectional.fromSTEB(
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                            ),
-                                        color:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primary,
-                                        textStyle:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).titleMedium,
-                                        elevation: 3.0,
-                                        borderSide: BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          12.0,
-                                        ),
-                                        hoverColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).accent1,
-                                        hoverBorderSide: BorderSide(
-                                          color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).primary,
-                                          width: 1.0,
-                                        ),
-                                        hoverTextColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primaryText,
-                                        hoverElevation: 0.0,
-                                      ),
-                                    ),
-                                  ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                        0.0,
-                        24.0,
-                        0.0,
-                        64.0,
-                      ),
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          context.pushNamed('Login');
-                        },
-                        child: RichText(
-                          textScaleFactor:
-                              MediaQuery.of(context).textScaleFactor,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Already have an account?',
-                                style: TextStyle(),
-                              ),
-                              TextSpan(
-                                text: ' Log In!',
-                                style: FlutterFlowTheme.of(
-                                  context,
-                                ).bodyLarge.override(
-                                  fontFamily: 'Readex Pro',
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                            style: FlutterFlowTheme.of(context).labelLarge,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -931,5 +603,265 @@ class _SignupWidgetState extends State<SignupWidget> {
     );
   }
 
-  bool isLoading = false;
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+    void Function(String)? onFieldSubmitted,
+  }) {
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
+      decoration: _inputDecoration(
+        label: label,
+        icon: icon,
+      ).copyWith(suffixIcon: suffixIcon),
+      style: context.appTheme.bodyMedium,
+      validator: validator,
+      onFieldSubmitted: onFieldSubmitted,
+    );
+  }
+
+  Widget _buildDropdown({
+    required String? value,
+    required String label,
+    required IconData icon,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+    bool isLoading = false,
+    VoidCallback? onRetry,
+  }) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      isExpanded: true,
+      decoration: _inputDecoration(label: label, icon: icon).copyWith(
+        suffixIcon:
+            isLoading
+                ? const Padding(
+                  padding: EdgeInsets.all(14),
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+                : items.isEmpty && onRetry != null
+                ? IconButton(
+                  tooltip: 'Reload',
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                )
+                : null,
+      ),
+      hint: Text(isLoading ? 'Loading $label' : 'Select $label'),
+      items:
+          items
+              .map(
+                (item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item, overflow: TextOverflow.ellipsis),
+                ),
+              )
+              .toList(),
+      onChanged: isLoading ? null : onChanged,
+      validator: (selected) {
+        if (selected == null || selected.isEmpty) {
+          return 'Select $label';
+        }
+        return null;
+      },
+    );
+  }
+
+  String? _required(String? value, String message) {
+    if (value == null || value.trim().isEmpty) {
+      return message;
+    }
+    return null;
+  }
+
+  String? _emailValidator(String? value) {
+    final email = value?.trim() ?? '';
+    if (email.isEmpty) {
+      return 'Enter email address';
+    }
+
+    if (!RegExp(
+      kTextValidatorEmailRegex,
+      caseSensitive: false,
+    ).hasMatch(email)) {
+      return 'Enter a valid email address';
+    }
+
+    return null;
+  }
+
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: _green),
+      filled: true,
+      fillColor: const Color(0xFFF9FBFA),
+      labelStyle: const TextStyle(color: Color(0xFF59655F)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFDDE5E0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _green, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFE65454)),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFE65454), width: 1.4),
+      ),
+    );
+  }
+}
+
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.onBack});
+
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: IconButton.filledTonal(
+        tooltip: 'Back',
+        onPressed: onBack,
+        icon: const Icon(Icons.arrow_back_rounded),
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: _SignupWidgetState._ink,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+    );
+  }
+}
+
+class _SignupHeader extends StatelessWidget {
+  const _SignupHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            Container(
+              width: 112,
+              height: 112,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE2E8E4)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x18000000),
+                    blurRadius: 22,
+                    offset: Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  _SignupWidgetState._logoAsset,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: _SignupWidgetState._gold,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+              child: const Icon(
+                Icons.verified_user_rounded,
+                color: _SignupWidgetState._ink,
+                size: 18,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 22),
+        Text(
+          'Join the driver network',
+          textAlign: TextAlign.center,
+          style: context.appTheme.displaySmall.copyWith(
+            color: _SignupWidgetState._ink,
+            fontWeight: FontWeight.w700,
+            fontSize: 31,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Create your profile so dispatch can match you with the right work.',
+          textAlign: TextAlign.center,
+          style: context.appTheme.bodyMedium.copyWith(color: const Color(0xFF59655F), height: 1.45),
+        ),
+      ],
+    );
+  }
+}
+
+class _TermsRow extends StatelessWidget {
+  const _TermsRow({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            value: value,
+            onChanged: onChanged,
+            activeColor: _SignupWidgetState._green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            'I confirm these driver details are accurate and agree to the driver terms.',
+            style: context.appTheme.bodySmall.copyWith(color: const Color(0xFF59655F), height: 1.4),
+          ),
+        ),
+      ],
+    );
+  }
 }

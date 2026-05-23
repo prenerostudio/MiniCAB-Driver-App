@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:new_minicab_driver/Model/jobDetails.dart';
-import 'package:new_minicab_driver/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import 'package:new_minicab_driver/home/home_screen_alert.dart';
 import 'package:new_minicab_driver/main.dart';
 
@@ -32,7 +32,7 @@ class MyController extends ChangeNotifier {
                       Colors.transparent,
                       Colors.transparent,
                       if (myController.initialLabelIndex.value == 1)
-                        FlutterFlowTheme.of(context).primary
+                        context.appTheme.primary
                       else
                         Colors.transparent,
                     ],

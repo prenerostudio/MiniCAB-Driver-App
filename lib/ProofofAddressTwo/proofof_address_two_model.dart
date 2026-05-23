@@ -1,11 +1,6 @@
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'proofof_address_two_widget.dart' show ProofofAddressTwoWidget;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class ProofofAddressTwoModel extends FlutterFlowModel<ProofofAddressTwoWidget> {
   ///  State fields for stateful widgets in this page.
@@ -22,7 +17,7 @@ class ProofofAddressTwoModel extends FlutterFlowModel<ProofofAddressTwoWidget> {
     unfocusNode.dispose();
   }
 
-/// Action blocks are added here.
+  /// Action blocks are added here.
 
-/// Additional helper methods are added here.
+  /// Additional helper methods are added here.
 }

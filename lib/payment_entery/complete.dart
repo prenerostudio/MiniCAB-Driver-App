@@ -8,7 +8,7 @@ import 'package:new_minicab_driver/on_way/on_way_model.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 
@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class CompleteWidget extends StatefulWidget {
   bool? isfromfare;
@@ -34,7 +35,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
     super.initState();
     fetchAndSaveFares();
 
-    _model = createModel(context as BuildContext, () => OnWayModel());
+    _model = createModel(context, () => OnWayModel());
   }
 
   @override
@@ -81,16 +82,14 @@ class _CompleteWidgetState extends State<CompleteWidget> {
     dropOffTime = sp.getString('jobAtDropOffTime') ?? '';
     print('timer value $time');
     setState(() {});
-// sp.setString('timerValue', time)
+    // sp.setString('timerValue', time)
   }
 
   Future<void> fetchAndSaveFares() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     jobid = sp.getString('jobId') ?? '';
     setState(() {});
-    final url = Uri.parse(
-      'https://www.minicaboffice.com/api/driver/fetch-fares.php',
-    );
+    final url = Uri.parse(ApiService.driverFetchFares);
 
     try {
       final Map<String, String> body = {'job_id': jobid};
@@ -117,16 +116,23 @@ class _CompleteWidgetState extends State<CompleteWidget> {
           String extras = fare['extras'] ?? '0';
 
           // Calculate total fee
-          String totalFee = (double.parse(journeyFare) +
-                  double.parse(carParking) +
-                  double.parse(waiting) +
-                  double.parse(tolls) +
-                  double.parse(extras))
-              .toString();
+          String totalFee =
+              (double.parse(journeyFare) +
+                      double.parse(carParking) +
+                      double.parse(waiting) +
+                      double.parse(tolls) +
+                      double.parse(extras))
+                  .toString();
 
           // Save to SharedPreferences
           await saveData(
-              journeyFare, carParking, extras, waiting, tolls, totalFee);
+            journeyFare,
+            carParking,
+            extras,
+            waiting,
+            tolls,
+            totalFee,
+          );
 
           await getCompleteViewData();
         } else {
@@ -142,8 +148,14 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   }
 
   // Function to save data to SharedPreferences
-  Future<void> saveData(String jfare, String carparking, String extra,
-      String waiting, String tolls, String totalFee) async {
+  Future<void> saveData(
+    String jfare,
+    String carparking,
+    String extra,
+    String waiting,
+    String tolls,
+    String totalFee,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('journey_fare', jfare);
     await prefs.setString('car_parking', carparking);
@@ -177,26 +189,26 @@ class _CompleteWidgetState extends State<CompleteWidget> {
       // print('d_id not found in shared preferences.${watingController.text}');
 
       var response = await http.post(
-          Uri.parse(
-              'https://www.minicaboffice.com/api/driver/complete-job.php'),
-          body: {
-            'job_id': jobid,
-            'd_id': dId.toString(),
-            'c_id': cid ?? '',
-            'journey_fare': jounreryFare,
-            'car_parking': parking,
-            'extra': extra,
-            'waiting': waiting,
-            'tolls': tolls,
-            'job_accepted_time': jobAccptTime,
-            'job_started_time': jobStart,
-            'way_to_pickup_time': waytoPickup,
-            'arrived_at_pickup_time': arrivalTime,
-            'pob_time': pobTime,
-            'dropoff_time': dropOffTime,
-            'job_completed_time': formattedTime,
-            'driver_route': coordinatesString,
-          });
+        Uri.parse(ApiService.driverCompleteJob),
+        body: {
+          'job_id': jobid,
+          'd_id': dId.toString(),
+          'c_id': cid ?? '',
+          'journey_fare': jounreryFare,
+          'car_parking': parking,
+          'extra': extra,
+          'waiting': waiting,
+          'tolls': tolls,
+          'job_accepted_time': jobAccptTime,
+          'job_started_time': jobStart,
+          'way_to_pickup_time': waytoPickup,
+          'arrived_at_pickup_time': arrivalTime,
+          'pob_time': pobTime,
+          'dropoff_time': dropOffTime,
+          'job_completed_time': formattedTime,
+          'driver_route': coordinatesString,
+        },
+      );
 
       if (response.statusCode == 200) {
         isrequest = false;
@@ -218,14 +230,17 @@ class _CompleteWidgetState extends State<CompleteWidget> {
         sp.setInt('isRideStart', 0);
         // context.pushNamed('AcountStatements');
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NavBarPage(
-                      initialPage: 'AcountStatements',
-                      page: AcountStatementsWidget(),
-                    )));
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => NavBarPage(
+                  initialPage: 'AcountStatements',
+                  page: AcountStatementsWidget(),
+                ),
+          ),
+        );
         // Navigator.push(context,MaterialPageRoute(builder: (context)=>account))
-        print('the complete job data is ${data}');
+        print('the complete job data is $data');
       } else {
         isrequest = false;
         print('Failed to add fares: ${response.reasonPhrase}');
@@ -263,7 +278,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
         onWillPop: () async => true,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           body: SafeArea(
             top: true,
             child: SingleChildScrollView(
@@ -273,9 +288,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                   Container(
                     width: MediaQuery.sizeOf(context).width,
                     height: 100,
-                    decoration: BoxDecoration(
-                      color: Color(0xFF1C1F28),
-                    ),
+                    decoration: BoxDecoration(color: Color(0xFF1C1F28)),
                     child: Row(
                       // mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -287,9 +300,10 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                           },
                           icon: Icon(
                             Icons.arrow_back,
-                            color: widget.isfromfare == null
-                                ? Colors.transparent
-                                : Colors.transparent,
+                            color:
+                                widget.isfromfare == null
+                                    ? Colors.transparent
+                                    : Colors.transparent,
                           ),
                         ),
                         Row(
@@ -301,17 +315,15 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                               children: [
                                 Text(
                                   'PAY BY',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        color: Colors.white,
-                                        // color: FlutterFlowTheme.of(context)
-                                        //     .primaryBackground,
-                                        fontSize: 16,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Open Sans',
+                                    color: Colors.white,
+                                    // color: context.appTheme
+                                    //     .primaryBackground,
+                                    fontSize: 16,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                                 Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -325,21 +337,23 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                     ),
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          8, 0, 0, 0),
+                                        8,
+                                        0,
+                                        0,
+                                        0,
+                                      ),
                                       child: Text(
                                         'Cash',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              color: Colors.white,
-                                              fontFamily: 'Open Sans',
-                                              // color:
-                                              //     FlutterFlowTheme.of(context)
-                                              //         .primaryBackground,
-                                              fontSize: 16,
-                                              letterSpacing: 0,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                        style: context.appTheme.bodyMedium.override(
+                                          color: Colors.white,
+                                          fontFamily: 'Open Sans',
+                                          // color:
+                                          //     context.appTheme
+                                          //         .primaryBackground,
+                                          fontSize: 16,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -353,25 +367,31 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                               children: [
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 5),
+                                    0,
+                                    0,
+                                    0,
+                                    5,
+                                  ),
                                   child: Text(
                                     'CLIENT PAYS',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: Colors.white,
-                                          // color: FlutterFlowTheme.of(context)
-                                          //     .primaryBackground,
-                                          fontSize: 16,
-                                          letterSpacing: 0,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Open Sans',
+                                      color: Colors.white,
+                                      // color: context.appTheme
+                                      //     .primaryBackground,
+                                      fontSize: 16,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 5),
+                                    0,
+                                    0,
+                                    0,
+                                    5,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
@@ -379,31 +399,27 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                                         totalFee.isEmpty
                                             ? "£ $jounreryFare"
                                             : '£ $totalFee',
-                                        style: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .override(
-                                              fontFamily: 'Open Sans',
-                                              color: Colors.white,
-                                              // color:
-                                              //     FlutterFlowTheme.of(context)
-                                              //         .primaryBackground,
-                                              letterSpacing: 0,
-                                            ),
+                                        style: context.appTheme.titleLarge.override(
+                                          fontFamily: 'Open Sans',
+                                          color: Colors.white,
+                                          // color:
+                                          //     context.appTheme
+                                          //         .primaryBackground,
+                                          letterSpacing: 0,
+                                        ),
                                       ),
                                       Text(
                                         'Inc, VAT',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'Open Sans',
-                                              color: Colors.white,
-                                              // color:
-                                              //     FlutterFlowTheme.of(context)
-                                              //         .primaryBackground,
-                                              fontSize: 16,
-                                              letterSpacing: 0,
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                        style: context.appTheme.bodyMedium.override(
+                                          fontFamily: 'Open Sans',
+                                          color: Colors.white,
+                                          // color:
+                                          //     context.appTheme
+                                          //         .primaryBackground,
+                                          fontSize: 16,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -412,10 +428,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                             ),
                           ],
                         ),
-                        Icon(
-                          Icons.arrow_back,
-                          color: Colors.transparent,
-                        ),
+                        Icon(Icons.arrow_back, color: Colors.transparent),
                       ],
                     ),
                   ),
@@ -427,14 +440,12 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Job Details',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -447,27 +458,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Job id',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${jobid}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          jobid,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -480,27 +486,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           "Pick-up date",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${pickupDate}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          pickupDate,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -513,27 +514,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           "Pick-up time",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${pickupTime}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          pickupTime,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -546,34 +542,30 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           "Pickup",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 70,
                           child: SingleChildScrollView(
                             child: Text(
                               pickUplocation,
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    fontSize: 18,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.appTheme.headlineSmall.override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    context.appTheme.secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -585,34 +577,30 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           "Dropoff",
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        Container(
+                        SizedBox(
                           width: 130,
                           height: 60,
                           child: SingleChildScrollView(
                             child: Text(
                               dropOflocation,
-                              style: FlutterFlowTheme.of(context)
-                                  .headlineSmall
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    fontSize: 18,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.appTheme.headlineSmall.override(
+                                fontFamily: 'Open Sans',
+                                color:
+                                    context.appTheme.secondaryText,
+                                fontSize: 18,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -625,14 +613,12 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Fare Details',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -645,27 +631,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Journey',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '£${jounreryFare}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          '£$jounreryFare',
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -678,27 +659,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           time,
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '£${waiting}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          '£$waiting',
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -711,27 +687,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Parking',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '£${parking}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          '£$parking',
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -744,27 +715,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Tolls',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '£${tolls}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          '£$tolls',
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -777,27 +743,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Extra',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '£${extra}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          '£$extra',
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -810,14 +771,12 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Time tracking',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -830,27 +789,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Job Accepted',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${jobAccptTime}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          jobAccptTime,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -863,27 +817,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Job Started',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${jobStart}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          jobStart,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -897,27 +846,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Way to pickup',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${waytoPickup}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          waytoPickup,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -930,27 +874,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Arrival at pickup',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${arrivalTime}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          arrivalTime,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -964,27 +903,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'POB',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${pobTime}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          pobTime,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -997,27 +931,22 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                       children: [
                         Text(
                           'Dropoff',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                fontSize: 16,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            fontSize: 16,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          '${dropOffTime}',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .override(
-                                fontFamily: 'Open Sans',
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 18,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          dropOffTime,
+                          style: context.appTheme.headlineSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 18,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -1033,37 +962,42 @@ class _CompleteWidgetState extends State<CompleteWidget> {
                         isrequest
                             ? CircularProgressIndicator()
                             : FFButtonWidget(
-                                onPressed: () {
-                                  completeJob();
-                                  print('Button pressed ...');
-                                },
-                                text: 'COMPLETE',
-                                options: FFButtonOptions(
-                                  width:
-                                      MediaQuery.sizeOf(context).width * 0.85,
-                                  height: 49,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      24, 0, 24, 0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  color: Color(0xFF1C1F28),
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                  elevation: 3,
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(0),
+                              onPressed: () {
+                                completeJob();
+                                print('Button pressed ...');
+                              },
+                              text: 'COMPLETE',
+                              options: FFButtonOptions(
+                                width: MediaQuery.sizeOf(context).width * 0.85,
+                                height: 49,
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  24,
+                                  0,
+                                  24,
+                                  0,
                                 ),
+                                iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                ),
+                                color: Color(0xFF1C1F28),
+                                textStyle: context.appTheme.titleSmall.override(
+                                  fontFamily: 'Open Sans',
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                elevation: 3,
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(0),
                               ),
+                            ),
                       ],
                     ),
                   ),

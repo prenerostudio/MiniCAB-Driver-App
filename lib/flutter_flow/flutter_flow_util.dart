@@ -53,20 +53,9 @@ Color colorFromCssString(String color, {Color? defaultColor}) {
   return defaultColor ?? Colors.black;
 }
 
-enum FormatType {
-  decimal,
-  percent,
-  scientific,
-  compact,
-  compactLong,
-  custom,
-}
+enum FormatType { decimal, percent, scientific, compact, compactLong, custom }
 
-enum DecimalType {
-  automatic,
-  periodDecimal,
-  commaDecimal,
-}
+enum DecimalType { automatic, periodDecimal, commaDecimal }
 
 String formatNumber(
   num? value, {
@@ -112,8 +101,10 @@ String formatNumber(
       break;
     case FormatType.custom:
       final hasLocale = locale != null && locale.isNotEmpty;
-      formattedValue =
-          NumberFormat(format, hasLocale ? locale : null).format(value);
+      formattedValue = NumberFormat(
+        format,
+        hasLocale ? locale : null,
+      ).format(value);
   }
 
   if (formattedValue.isEmpty) {
@@ -121,9 +112,10 @@ String formatNumber(
   }
 
   if (currency != null) {
-    final currencySymbol = currency.isNotEmpty
-        ? currency
-        : NumberFormat.simpleCurrency().format(0.0).substring(0, 1);
+    final currencySymbol =
+        currency.isNotEmpty
+            ? currency
+            : NumberFormat.simpleCurrency().format(0.0).substring(0, 1);
     formattedValue = '$currencySymbol$formattedValue';
   }
 
@@ -202,7 +194,7 @@ bool responsiveVisibility({
 const kTextValidatorUsernameRegex = r'^[a-zA-Z][a-zA-Z0-9_-]{2,16}$';
 // https://stackoverflow.com/a/201378
 const kTextValidatorEmailRegex =
-    "^(?:[a-z0-9!#\$%&\'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&\'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])\$";
+    "^(?:[a-z0-9!#\$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])\$";
 const kTextValidatorWebsiteRegex =
     r'(https?:\/\/)?(www\.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,10}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)|(https?:\/\/)?(www\.)?(?!ww)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,10}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)';
 
@@ -212,14 +204,16 @@ extension FFTextEditingControllerExt on TextEditingController? {
 }
 
 extension IterableExt<T> on Iterable<T> {
-  List<T> sortedList<S extends Comparable>([S Function(T)? keyOf]) => toList()
-    ..sort(keyOf == null ? null : ((a, b) => keyOf(a).compareTo(keyOf(b))));
+  List<T> sortedList<S extends Comparable>([S Function(T)? keyOf]) =>
+      toList()
+        ..sort(keyOf == null ? null : ((a, b) => keyOf(a).compareTo(keyOf(b))));
 
-  List<S> mapIndexed<S>(S Function(int, T) func) => toList()
-      .asMap()
-      .map((index, value) => MapEntry(index, func(index, value)))
-      .values
-      .toList();
+  List<S> mapIndexed<S>(S Function(int, T) func) =>
+      toList()
+          .asMap()
+          .map((index, value) => MapEntry(index, func(index, value)))
+          .values
+          .toList();
 }
 
 void setAppLanguage(BuildContext context, String language) =>
@@ -242,12 +236,10 @@ void showSnackbar(
           if (loading)
             Padding(
               padding: EdgeInsetsDirectional.only(end: 10.0),
-              child: Container(
+              child: SizedBox(
                 height: 20,
                 width: 20,
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                ),
+                child: const CircularProgressIndicator(color: Colors.white),
               ),
             ),
           Text(message),
@@ -272,10 +264,11 @@ extension ListFilterExt<T> on Iterable<T?> {
 extension ListDivideExt<T extends Widget> on Iterable<T> {
   Iterable<MapEntry<int, Widget>> get enumerate => toList().asMap().entries;
 
-  List<Widget> divide(Widget t) => isEmpty
-      ? []
-      : (enumerate.map((e) => [e.value, t]).expand((i) => i).toList()
-        ..removeLast());
+  List<Widget> divide(Widget t) =>
+      isEmpty
+          ? []
+          : (enumerate.map((e) => [e.value, t]).expand((i) => i).toList()
+            ..removeLast());
 
   List<Widget> around(Widget t) => addToStart(t).addToEnd(t);
 
@@ -286,8 +279,9 @@ extension ListDivideExt<T extends Widget> on Iterable<T> {
       enumerate.map((e) => e.value).toList()..add(t);
 
   List<Padding> paddingTopEach(double val) =>
-      map((w) => Padding(padding: EdgeInsets.only(top: val), child: w))
-          .toList();
+      map(
+        (w) => Padding(padding: EdgeInsets.only(top: val), child: w),
+      ).toList();
 }
 
 extension StatefulWidgetExtensions on State<StatefulWidget> {

@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/invoiceDetails.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -19,6 +19,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'acount_statements_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 export 'acount_statements_model.dart';
 
 class AcountStatementsWidget extends StatefulWidget {
@@ -60,12 +61,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     String? dId = prefs.getString('d_id');
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/total-earnings-last-week.php'),
+      Uri.parse(ApiService.driverTotalEarningsLastWeek),
     );
-    request.fields.addAll({
-      'd_id': dId.toString(),
-    });
+    request.fields.addAll({'d_id': dId.toString()});
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
@@ -74,17 +72,16 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
       setState(() {
         total = total;
       });
-    } else {
-    }
+    } else {}
   }
 
   Future<Map<String, dynamic>> fetchInvoiceData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://www.minicaboffice.com/api/driver/earning-last-job.php'));
+      'POST',
+      Uri.parse(ApiService.driverEarningLastJob),
+    );
     request.fields.addAll({'d_id': dId.toString()});
 
     http.StreamedResponse response = await request.send();
@@ -96,24 +93,19 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
       throw Exception('Failed to load invoice data');
     }
   }
- 
+
   Future<List<Invoice>> lastJob() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
-    final uri = Uri.parse(
-        'https://www.minicaboffice.com/api/driver/earning-last-job.php');
+    final uri = Uri.parse(ApiService.driverEarningLastJob);
     final response = await http.post(uri, body: {'d_id': dId.toString()});
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        return paymentData;
-      } else {
-        return [];
-      }
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      return paymentData;
     } else {
       return [];
     }
@@ -122,19 +114,14 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
   Future<List<Invoice>> todayJobs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
-    final uri =
-        Uri.parse('https://www.minicaboffice.com/api/driver/earning-today.php');
+    final uri = Uri.parse(ApiService.driverEarningToday);
     final response = await http.post(uri, body: {'d_id': dId.toString()});
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        return paymentData;
-      } else {
-        return [];
-      }
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      return paymentData;
     } else {
       return [];
     }
@@ -143,19 +130,14 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
   Future<List<Invoice>> lastWeekJobs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
-    final uri = Uri.parse(
-        'https://www.minicaboffice.com/api/driver/earning-last-week.php');
+    final uri = Uri.parse(ApiService.driverEarningLastWeek);
     final response = await http.post(uri, body: {'d_id': dId.toString()});
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
-      if (data is List) {
-        List<Invoice> paymentData =
-            data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
-        return paymentData;
-      } else {
-        return [];
-      }
+      List<Invoice> paymentData =
+          data.map((item) => Invoice.fromJson(item)).cast<Invoice>().toList();
+      return paymentData;
     } else {
       return [];
     }
@@ -166,8 +148,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
     String? dId = prefs.getString('d_id');
 
     try {
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://www.minicaboffice.com/api/driver/report.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiService.driverReport),
+      );
       request.fields.addAll({
         'd_id': dId.toString(),
         'start_date': start,
@@ -190,7 +174,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                   pw.Table.fromTextArray(
                     cellAlignment: pw.Alignment.center,
                     cellPadding: pw.EdgeInsets.symmetric(
-                        vertical: 3.0, horizontal: 3.0), // Adjust as needed
+                      vertical: 3.0,
+                      horizontal: 3.0,
+                    ), // Adjust as needed
                     headerDecoration: pw.BoxDecoration(
                       color: PdfColors.grey200,
                     ),
@@ -200,18 +186,19 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                       'Pick Time',
                       'Pick Date',
                       'pickup - destination',
-                      'Total Pay Amount'
+                      'Total Pay Amount',
                     ],
-                    data: data.map<List<String>>((item) {
-                      return [
-                        item['job_id'].toString(),
-                        item['total_pay'].toString(),
-                        item['pick_time'].toString(),
-                        item['pick_date'].toString(),
-                        '${item['pickup']} -\n ${item['destination']}',
-                        item['total_pay_amount'].toString()
-                      ];
-                    }).toList(),
+                    data:
+                        data.map<List<String>>((item) {
+                          return [
+                            item['job_id'].toString(),
+                            item['total_pay'].toString(),
+                            item['pick_time'].toString(),
+                            item['pick_date'].toString(),
+                            '${item['pickup']} -\n ${item['destination']}',
+                            item['total_pay_amount'].toString(),
+                          ];
+                        }).toList(),
                     tableWidth: pw.TableWidth.max,
                     cellHeight: 40.0,
                   ),
@@ -229,19 +216,19 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
         final file = File(pdfPath);
         await file.writeAsBytes(await pdf.save());
         OpenFile.open(file.path);
-      } else {
-      }
-    } catch (error) {
-    }
+      } else {}
+    } catch (error) {}
   }
 
   DateTime? lastBackPressed;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           // if (lastBackPressed == null ||
@@ -260,9 +247,9 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
         },
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+            backgroundColor: context.appTheme.primaryBackground,
             automaticallyImplyLeading: false,
             leading: FlutterFlowIconButton(
               borderColor: Colors.transparent,
@@ -271,25 +258,26 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
               buttonSize: 60,
               icon: Icon(
                 Icons.arrow_back_rounded,
-                color: FlutterFlowTheme.of(context).primary,
+                color: context.appTheme.primary,
                 size: 30,
               ),
               onPressed: () async {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            NavBarPage(initialPage: 'Dashboard')));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavBarPage(initialPage: 'Dashboard'),
+                  ),
+                );
               },
             ),
             title: Text(
               'Account Statement',
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Open Sans',
-                    color: FlutterFlowTheme.of(context).primary,
-                    fontSize: 22,
-                    letterSpacing: 0,
-                  ),
+              style: context.appTheme.headlineMedium.override(
+                fontFamily: 'Open Sans',
+                color: context.appTheme.primary,
+                fontSize: 22,
+                letterSpacing: 0,
+              ),
             ),
             centerTitle: true,
             elevation: 2,
@@ -308,18 +296,16 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                       Text(
                         'Earning',
                         maxLines: 1,
-                        style: FlutterFlowTheme.of(context).bodyLarge.override(
-                              fontFamily: 'Open Sans',
-                            ),
+                        style: context.appTheme.bodyLarge.override(fontFamily: 'Open Sans'),
                       ),
                       Text(
-                        '£ ${total}',
+                        '£ $total',
                         maxLines: 1,
-                        style: FlutterFlowTheme.of(context).bodyLarge.override(
-                              fontFamily: 'Open Sans',
-                              fontSize: 25,
-                              color: FlutterFlowTheme.of(context).primary,
-                            ),
+                        style: context.appTheme.bodyLarge.override(
+                          fontFamily: 'Open Sans',
+                          fontSize: 25,
+                          color: context.appTheme.primary,
+                        ),
                       ),
                     ],
                   ),
@@ -341,16 +327,16 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                       //     padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                       //     iconPadding:
                       //         EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      //     color: FlutterFlowTheme.of(context).primaryBackground,
+                      //     color: context.appTheme.primaryBackground,
                       //     textStyle:
-                      //         FlutterFlowTheme.of(context).titleSmall.override(
+                      //         context.appTheme.titleSmall.override(
                       //               fontFamily: 'Open Sans',
-                      //               color: FlutterFlowTheme.of(context).primary,
+                      //               color: context.appTheme.primary,
                       //               letterSpacing: 0,
                       //             ),
                       //     elevation: 3,
                       //     borderSide: BorderSide(
-                      //       color: FlutterFlowTheme.of(context).primary,
+                      //       color: context.appTheme.primary,
                       //       width: 1,
                       //     ),
                       //     borderRadius: BorderRadius.circular(8),
@@ -365,35 +351,24 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                       Align(
                         alignment: Alignment(0, 0),
                         child: TabBar(
-                          labelColor: FlutterFlowTheme.of(context).primary,
+                          labelColor: context.appTheme.primary,
                           unselectedLabelColor:
-                              FlutterFlowTheme.of(context).secondaryText,
-                          labelStyle:
-                              FlutterFlowTheme.of(context).titleMedium.override(
-                                    fontFamily: 'Open Sans',
-                                    letterSpacing: 0,
-                                  ),
+                              context.appTheme.secondaryText,
+                          labelStyle: context.appTheme.titleMedium.override(
+                            fontFamily: 'Open Sans',
+                            letterSpacing: 0,
+                          ),
                           unselectedLabelStyle: TextStyle(),
-                          indicatorColor: FlutterFlowTheme.of(context).primary,
+                          indicatorColor: context.appTheme.primary,
                           padding: EdgeInsets.all(4),
                           tabs: [
-                            Tab(
-                              text: 'Last job',
-                            ),
-                            Tab(
-                              text: 'Today jobs',
-                            ),
-                            Tab(
-                              text: 'Weekly jobs',
-                            ),
+                            Tab(text: 'Last job'),
+                            Tab(text: 'Today jobs'),
+                            Tab(text: 'Weekly jobs'),
                           ],
                           controller: _model.tabBarController,
                           onTap: (i) async {
-                            [
-                              () async {},
-                              () async {},
-                              () async {},
-                            ][i]();
+                            [() async {}, () async {}, () async {}][i]();
                           },
                         ),
                       ),
@@ -406,24 +381,27 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                               padding: const EdgeInsets.all(15.0),
                               child: FutureBuilder<List<Invoice>>(
                                 future: lastJob(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<Invoice>> snapshot) {
+                                builder: (
+                                  BuildContext context,
+                                  AsyncSnapshot<List<Invoice>> snapshot,
+                                ) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     // Display a loading indicator while waiting for data
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
                                               0.2, // 30% padding from the top
                                         ),
                                         child: CircularProgressIndicator(
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary),
+                                                context.appTheme.primary,
+                                              ),
                                         ),
                                       ),
                                     );
@@ -431,9 +409,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
                                               0.2, // 30% padding from the top
                                         ),
                                         child: Text('No Data Found'),
@@ -449,62 +428,83 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     }
                                     return Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          0, 15, 0, 0),
+                                        0,
+                                        15,
+                                        0,
+                                        0,
+                                      ),
                                       child: ListView.builder(
                                         padding: EdgeInsets.zero,
                                         shrinkWrap: true,
                                         scrollDirection: Axis.vertical,
                                         itemCount: data.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
+                                        itemBuilder: (
+                                          BuildContext context,
+                                          int index,
+                                        ) {
                                           final invoice = data[index];
                                           return Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
+                                                  0,
+                                                  10,
+                                                  0,
+                                                  10,
+                                                ),
                                             child: Material(
                                               color: Colors.transparent,
                                               elevation: 3,
                                               child: InkWell(
                                                 onTap: () {
                                                   Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) => AccountStatementDetails(
-                                                              totalFee:
-                                                                  invoice.totalPay ??
-                                                                      '0',
-                                                              jounreryFare: invoice
-                                                                  .journeyFare!,
-                                                              parking: invoice
-                                                                  .carParking!,
-                                                              tolls: invoice
-                                                                  .tolls!,
-                                                              did: invoice.dId!,
-                                                              waiting: invoice
-                                                                  .waiting!,
-                                                              time: invoice
-                                                                  .pickTime!,
-                                                              jobid: invoice
-                                                                  .jobId!,
-                                                              pickupDate: invoice
-                                                                  .pickDate!,
-                                                              pickUplocation:
-                                                                  invoice
-                                                                      .pickup!,
-                                                              dropOflocation:
-                                                                  invoice
-                                                                      .destination!,
-                                                              pickupTime: invoice
-                                                                  .pickTime!,
-                                                              extra: invoice
-                                                                  .extra!)));
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (
+                                                            context,
+                                                          ) => AccountStatementDetails(
+                                                            totalFee:
+                                                                invoice
+                                                                    .totalPay ??
+                                                                '0',
+                                                            jounreryFare:
+                                                                invoice
+                                                                    .journeyFare!,
+                                                            parking:
+                                                                invoice
+                                                                    .carParking!,
+                                                            tolls:
+                                                                invoice.tolls!,
+                                                            did: invoice.dId!,
+                                                            waiting:
+                                                                invoice
+                                                                    .waiting!,
+                                                            time:
+                                                                invoice
+                                                                    .pickTime!,
+                                                            jobid:
+                                                                invoice.jobId!,
+                                                            pickupDate:
+                                                                invoice
+                                                                    .pickDate!,
+                                                            pickUplocation:
+                                                                invoice.pickup!,
+                                                            dropOflocation:
+                                                                invoice
+                                                                    .destination!,
+                                                            pickupTime:
+                                                                invoice
+                                                                    .pickTime!,
+                                                            extra:
+                                                                invoice.extra!,
+                                                          ),
+                                                    ),
+                                                  );
                                                 },
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryBackground,
+                                                    color:
+                                                        context.appTheme.secondaryBackground,
                                                   ),
                                                   child: InkWell(
                                                     splashColor:
@@ -518,19 +518,20 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              15.0),
+                                                            15.0,
+                                                          ),
                                                       child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
                                                         children: [
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        7,
-                                                                        10,
-                                                                        7,
-                                                                        5),
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  7,
+                                                                  10,
+                                                                  7,
+                                                                  5,
+                                                                ),
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -546,29 +547,23 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                   children: [
                                                                     Text(
                                                                       'Booking ID ',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primary,
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
+                                                                      style: context.appTheme.bodyMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.primary,
+                                                                        fontSize:
+                                                                            12,
+                                                                      ),
                                                                     ),
                                                                     Text(
                                                                       '${invoice.bookId}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
+                                                                      style: context.appTheme.bodyMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        fontSize:
+                                                                            12,
+                                                                      ),
                                                                     ),
                                                                   ],
                                                                 ),
@@ -589,43 +584,41 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                         .max,
                                                                 children: [
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            5,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                        ),
                                                                     child: Icon(
                                                                       Icons
                                                                           .timer_sharp,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
+                                                                      color:
+                                                                          context.appTheme.primary,
                                                                       size: 14,
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            3,
-                                                                            0,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          3,
+                                                                          0,
+                                                                          0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${invoice.pickTime}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Outfit',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Outfit',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -636,43 +629,41 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                         .max,
                                                                 children: [
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            5,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                        ),
                                                                     child: Icon(
                                                                       Icons
                                                                           .date_range,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
+                                                                      color:
+                                                                          context.appTheme.primary,
                                                                       size: 14,
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            3,
-                                                                            0,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          3,
+                                                                          0,
+                                                                          0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${invoice.pickDate}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Outfit',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Outfit',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -686,40 +677,39 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                             children: [
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .arrow_circle_up,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         '${invoice.pickup}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style:
+                                                                            context.appTheme.bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -727,40 +717,39 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .arrow_circle_down,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         '${invoice.destination}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style:
+                                                                            context.appTheme.bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -769,42 +758,43 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
 
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .payment,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         'Total fare : ${invoice.totalPay}',
                                                                         style: TextStyle(
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            fontSize: 20),
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -862,10 +852,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               //                   0,
                                                               //                   0,
                                                               //                   0),
-                                                              //       color: FlutterFlowTheme.of(
+                                                              //       color: AppTheme.of(
                                                               //               context)
                                                               //           .primary,
-                                                              //       textStyle: FlutterFlowTheme.of(
+                                                              //       textStyle: AppTheme.of(
                                                               //               context)
                                                               //           .titleSmall
                                                               //           .override(
@@ -903,7 +893,8 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     );
                                   } else {
                                     return Center(
-                                        child: Text('No data available'));
+                                      child: Text('No data available'),
+                                    );
                                   }
                                 },
                               ),
@@ -913,24 +904,27 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                               padding: const EdgeInsets.all(15.0),
                               child: FutureBuilder<List<Invoice>>(
                                 future: todayJobs(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<Invoice>> snapshot) {
+                                builder: (
+                                  BuildContext context,
+                                  AsyncSnapshot<List<Invoice>> snapshot,
+                                ) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     // Display a loading indicator while waiting for data
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
                                               0.2, // 30% padding from the top
                                         ),
                                         child: CircularProgressIndicator(
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary),
+                                                context.appTheme.primary,
+                                              ),
                                         ),
                                       ),
                                     );
@@ -938,9 +932,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
                                               0.2, // 30% padding from the top
                                         ),
                                         child: Text('No Data Found'),
@@ -950,63 +945,84 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     final invoiceData = snapshot.data;
                                     return Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          0, 15, 0, 0),
+                                        0,
+                                        15,
+                                        0,
+                                        0,
+                                      ),
                                       child: ListView.builder(
                                         controller: controller,
                                         padding: EdgeInsets.zero,
                                         shrinkWrap: true,
                                         scrollDirection: Axis.vertical,
                                         itemCount: invoiceData!.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
+                                        itemBuilder: (
+                                          BuildContext context,
+                                          int index,
+                                        ) {
                                           final invoice = invoiceData[index];
                                           return Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
+                                                  0,
+                                                  10,
+                                                  0,
+                                                  10,
+                                                ),
                                             child: Material(
                                               color: Colors.transparent,
                                               elevation: 3,
                                               child: InkWell(
                                                 onTap: () {
                                                   Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) => AccountStatementDetails(
-                                                              totalFee:
-                                                                  invoice.totalPay ??
-                                                                      '0',
-                                                              jounreryFare: invoice
-                                                                  .journeyFare!,
-                                                              parking: invoice
-                                                                  .carParking!,
-                                                              tolls: invoice
-                                                                  .tolls!,
-                                                              did: invoice.dId!,
-                                                              waiting: invoice
-                                                                  .waiting!,
-                                                              time: invoice
-                                                                  .pickTime!,
-                                                              jobid: invoice
-                                                                  .jobId!,
-                                                              pickupDate: invoice
-                                                                  .pickDate!,
-                                                              pickUplocation:
-                                                                  invoice
-                                                                      .pickup!,
-                                                              dropOflocation:
-                                                                  invoice
-                                                                      .destination!,
-                                                              pickupTime: invoice
-                                                                  .pickTime!,
-                                                              extra: invoice
-                                                                  .extra!)));
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (
+                                                            context,
+                                                          ) => AccountStatementDetails(
+                                                            totalFee:
+                                                                invoice
+                                                                    .totalPay ??
+                                                                '0',
+                                                            jounreryFare:
+                                                                invoice
+                                                                    .journeyFare!,
+                                                            parking:
+                                                                invoice
+                                                                    .carParking!,
+                                                            tolls:
+                                                                invoice.tolls!,
+                                                            did: invoice.dId!,
+                                                            waiting:
+                                                                invoice
+                                                                    .waiting!,
+                                                            time:
+                                                                invoice
+                                                                    .pickTime!,
+                                                            jobid:
+                                                                invoice.jobId!,
+                                                            pickupDate:
+                                                                invoice
+                                                                    .pickDate!,
+                                                            pickUplocation:
+                                                                invoice.pickup!,
+                                                            dropOflocation:
+                                                                invoice
+                                                                    .destination!,
+                                                            pickupTime:
+                                                                invoice
+                                                                    .pickTime!,
+                                                            extra:
+                                                                invoice.extra!,
+                                                          ),
+                                                    ),
+                                                  );
                                                 },
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryBackground,
+                                                    color:
+                                                        context.appTheme.secondaryBackground,
                                                   ),
                                                   child: InkWell(
                                                     splashColor:
@@ -1031,7 +1047,8 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              15.0),
+                                                            15.0,
+                                                          ),
                                                       child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
@@ -1039,12 +1056,12 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                           // Generated code for this Row Widget...
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        7,
-                                                                        10,
-                                                                        7,
-                                                                        5),
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  7,
+                                                                  10,
+                                                                  7,
+                                                                  5,
+                                                                ),
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -1060,29 +1077,23 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                   children: [
                                                                     Text(
                                                                       'Booking ID ',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primary,
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
+                                                                      style: context.appTheme.bodyMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.primary,
+                                                                        fontSize:
+                                                                            12,
+                                                                      ),
                                                                     ),
                                                                     Text(
                                                                       '${invoice.bookId}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
+                                                                      style: context.appTheme.bodyMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        fontSize:
+                                                                            12,
+                                                                      ),
                                                                     ),
                                                                   ],
                                                                 ),
@@ -1104,43 +1115,41 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                         .max,
                                                                 children: [
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            5,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                        ),
                                                                     child: Icon(
                                                                       Icons
                                                                           .timer_sharp,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
+                                                                      color:
+                                                                          context.appTheme.primary,
                                                                       size: 14,
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            3,
-                                                                            0,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          3,
+                                                                          0,
+                                                                          0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${invoice.pickTime}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Outfit',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Outfit',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -1158,38 +1167,42 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                             .max,
                                                                     children: [
                                                                       Padding(
-                                                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            5,
-                                                                            0),
-                                                                        child:
-                                                                            Icon(
+                                                                        padding:
+                                                                            EdgeInsetsDirectional.fromSTEB(
+                                                                              0,
+                                                                              0,
+                                                                              5,
+                                                                              0,
+                                                                            ),
+                                                                        child: Icon(
                                                                           Icons
                                                                               .date_range,
                                                                           color:
-                                                                              FlutterFlowTheme.of(context).primary,
+                                                                              context.appTheme.primary,
                                                                           size:
                                                                               14,
                                                                         ),
                                                                       ),
                                                                       Padding(
-                                                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                                                            0,
-                                                                            3,
-                                                                            0,
-                                                                            0),
-                                                                        child:
-                                                                            Text(
+                                                                        padding:
+                                                                            EdgeInsetsDirectional.fromSTEB(
+                                                                              0,
+                                                                              3,
+                                                                              0,
+                                                                              0,
+                                                                            ),
+                                                                        child: Text(
                                                                           '${invoice.pickDate}',
-                                                                          style: FlutterFlowTheme.of(context)
-                                                                              .labelMedium
-                                                                              .override(
-                                                                                fontFamily: 'Outfit',
-                                                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                                                fontSize: 12,
-                                                                                fontWeight: FontWeight.w500,
-                                                                              ),
+                                                                          style: context.appTheme.labelMedium.override(
+                                                                            fontFamily:
+                                                                                'Outfit',
+                                                                            color:
+                                                                                context.appTheme.secondaryText,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ],
@@ -1205,40 +1218,39 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                             children: [
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .arrow_circle_up,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         '${invoice.pickup}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style:
+                                                                            context.appTheme.bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1246,40 +1258,39 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .arrow_circle_down,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         '${invoice.destination}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style:
+                                                                            context.appTheme.bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1287,42 +1298,43 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .payment,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         'Total fare : ${invoice.totalPay}',
                                                                         style: TextStyle(
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            fontSize: 20),
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1380,10 +1392,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               //                   0,
                                                               //                   0,
                                                               //                   0),
-                                                              //       color: FlutterFlowTheme.of(
+                                                              //       color: AppTheme.of(
                                                               //               context)
                                                               //           .primary,
-                                                              //       textStyle: FlutterFlowTheme.of(
+                                                              //       textStyle: AppTheme.of(
                                                               //               context)
                                                               //           .titleSmall
                                                               //           .override(
@@ -1428,23 +1440,26 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                               padding: const EdgeInsets.all(15.0),
                               child: FutureBuilder<List<Invoice>>(
                                 future: lastWeekJobs(),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<Invoice>> snapshot) {
+                                builder: (
+                                  BuildContext context,
+                                  AsyncSnapshot<List<Invoice>> snapshot,
+                                ) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
                                               0.2, // 30% padding from the top
                                         ),
                                         child: CircularProgressIndicator(
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary),
+                                                context.appTheme.primary,
+                                              ),
                                         ),
                                       ),
                                     );
@@ -1452,9 +1467,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     return Center(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
+                                          top:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
                                               0.2, // 30% padding from the top
                                         ),
                                         child: Text('No Data Found'),
@@ -1470,63 +1486,84 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                     }
                                     return Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          0, 15, 0, 0),
+                                        0,
+                                        15,
+                                        0,
+                                        0,
+                                      ),
                                       child: ListView.builder(
                                         controller: controller,
                                         padding: EdgeInsets.zero,
                                         shrinkWrap: true,
                                         scrollDirection: Axis.vertical,
-                                        itemCount: invoiceData!.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
+                                        itemCount: invoiceData.length,
+                                        itemBuilder: (
+                                          BuildContext context,
+                                          int index,
+                                        ) {
                                           final invoice = invoiceData[index];
                                           return Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    0, 10, 0, 10),
+                                                  0,
+                                                  10,
+                                                  0,
+                                                  10,
+                                                ),
                                             child: Material(
                                               color: Colors.transparent,
                                               elevation: 3,
                                               child: InkWell(
                                                 onTap: () {
                                                   Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) => AccountStatementDetails(
-                                                              totalFee:
-                                                                  invoice.totalPay ??
-                                                                      '0',
-                                                              jounreryFare: invoice
-                                                                  .journeyFare!,
-                                                              parking: invoice
-                                                                  .carParking!,
-                                                              tolls: invoice
-                                                                  .tolls!,
-                                                              did: invoice.dId!,
-                                                              waiting: invoice
-                                                                  .waiting!,
-                                                              time: invoice
-                                                                  .pickTime!,
-                                                              jobid: invoice
-                                                                  .jobId!,
-                                                              pickupDate: invoice
-                                                                  .pickDate!,
-                                                              pickUplocation:
-                                                                  invoice
-                                                                      .pickup!,
-                                                              dropOflocation:
-                                                                  invoice
-                                                                      .destination!,
-                                                              pickupTime: invoice
-                                                                  .pickTime!,
-                                                              extra: invoice
-                                                                  .extra!)));
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (
+                                                            context,
+                                                          ) => AccountStatementDetails(
+                                                            totalFee:
+                                                                invoice
+                                                                    .totalPay ??
+                                                                '0',
+                                                            jounreryFare:
+                                                                invoice
+                                                                    .journeyFare!,
+                                                            parking:
+                                                                invoice
+                                                                    .carParking!,
+                                                            tolls:
+                                                                invoice.tolls!,
+                                                            did: invoice.dId!,
+                                                            waiting:
+                                                                invoice
+                                                                    .waiting!,
+                                                            time:
+                                                                invoice
+                                                                    .pickTime!,
+                                                            jobid:
+                                                                invoice.jobId!,
+                                                            pickupDate:
+                                                                invoice
+                                                                    .pickDate!,
+                                                            pickUplocation:
+                                                                invoice.pickup!,
+                                                            dropOflocation:
+                                                                invoice
+                                                                    .destination!,
+                                                            pickupTime:
+                                                                invoice
+                                                                    .pickTime!,
+                                                            extra:
+                                                                invoice.extra!,
+                                                          ),
+                                                    ),
+                                                  );
                                                 },
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryBackground,
+                                                    color:
+                                                        context.appTheme.secondaryBackground,
                                                   ),
                                                   child: InkWell(
                                                     splashColor:
@@ -1551,7 +1588,8 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              15.0),
+                                                            15.0,
+                                                          ),
                                                       child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
@@ -1559,12 +1597,12 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                           // Generated code for this Row Widget...
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        7,
-                                                                        10,
-                                                                        7,
-                                                                        5),
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  7,
+                                                                  10,
+                                                                  7,
+                                                                  5,
+                                                                ),
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -1580,29 +1618,23 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                   children: [
                                                                     Text(
                                                                       'Booking ID ',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primary,
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
+                                                                      style: context.appTheme.bodyMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.primary,
+                                                                        fontSize:
+                                                                            12,
+                                                                      ),
                                                                     ),
                                                                     Text(
                                                                       '${invoice.bookId}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Readex Pro',
-                                                                            fontSize:
-                                                                                12,
-                                                                          ),
+                                                                      style: context.appTheme.bodyMedium.override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        fontSize:
+                                                                            12,
+                                                                      ),
                                                                     ),
                                                                   ],
                                                                 ),
@@ -1624,43 +1656,41 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                         .max,
                                                                 children: [
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            5,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                        ),
                                                                     child: Icon(
                                                                       Icons
                                                                           .timer_sharp,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
+                                                                      color:
+                                                                          context.appTheme.primary,
                                                                       size: 14,
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            3,
-                                                                            0,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          3,
+                                                                          0,
+                                                                          0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${invoice.pickTime}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Outfit',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Outfit',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -1671,43 +1701,41 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                                         .max,
                                                                 children: [
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            0,
-                                                                            5,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                        ),
                                                                     child: Icon(
                                                                       Icons
                                                                           .date_range,
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
+                                                                      color:
+                                                                          context.appTheme.primary,
                                                                       size: 14,
                                                                     ),
                                                                   ),
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            3,
-                                                                            0,
-                                                                            0),
+                                                                    padding:
+                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                          0,
+                                                                          3,
+                                                                          0,
+                                                                          0,
+                                                                        ),
                                                                     child: Text(
                                                                       '${invoice.pickDate}',
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .labelMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Outfit',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).secondaryText,
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          ),
+                                                                      style: context.appTheme.labelMedium.override(
+                                                                        fontFamily:
+                                                                            'Outfit',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ],
@@ -1721,40 +1749,39 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                             children: [
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .arrow_circle_up,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         '${invoice.pickup}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style:
+                                                                            context.appTheme.bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1762,40 +1789,39 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .arrow_circle_down,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         '${invoice.destination}',
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium,
+                                                                        style:
+                                                                            context.appTheme.bodyMedium,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1803,42 +1829,43 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0,
-                                                                            15,
-                                                                            0,
-                                                                            0),
+                                                                    EdgeInsetsDirectional.fromSTEB(
+                                                                      0,
+                                                                      15,
+                                                                      0,
+                                                                      0,
+                                                                    ),
                                                                 child: Row(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .max,
                                                                   children: [
                                                                     Padding(
-                                                                      padding: EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              0,
-                                                                              20,
-                                                                              0),
-                                                                      child:
-                                                                          Icon(
+                                                                      padding:
+                                                                          EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            20,
+                                                                            0,
+                                                                          ),
+                                                                      child: Icon(
                                                                         Icons
                                                                             .payment,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primary,
+                                                                        color:
+                                                                            context.appTheme.primary,
                                                                         size:
                                                                             24,
                                                                       ),
                                                                     ),
                                                                     Expanded(
-                                                                      child:
-                                                                          Text(
+                                                                      child: Text(
                                                                         'Total fare : ${invoice.totalPay}',
                                                                         style: TextStyle(
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            fontSize: 20),
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              20,
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                   ],
@@ -1896,10 +1923,10 @@ class _AcountStatementsWidgetState extends State<AcountStatementsWidget>
                                                               //                   0,
                                                               //                   0,
                                                               //                   0),
-                                                              //       color: FlutterFlowTheme.of(
+                                                              //       color: AppTheme.of(
                                                               //               context)
                                                               //           .primary,
-                                                              //       textStyle: FlutterFlowTheme.of(
+                                                              //       textStyle: AppTheme.of(
                                                               //               context)
                                                               //           .titleSmall
                                                               //           .override(

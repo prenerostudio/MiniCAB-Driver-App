@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_minicab_driver/time_slot/time_slot_model.dart';
- 
- 
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class TimeSlotView extends StatefulWidget {
   const TimeSlotView({super.key});
@@ -23,8 +23,7 @@ class _TimeSlotViewState extends State<TimeSlotView>
     String? jobId = prefs.getString('jobId');
 
     final response = await http.post(
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/fetch-time-slots.php'),
+      Uri.parse(ApiService.driverFetchTimeSlots),
       // body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
     );
 
@@ -45,8 +44,7 @@ class _TimeSlotViewState extends State<TimeSlotView>
     String? jobId = prefs.getString('jobId');
 
     final response = await http.post(
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/accepted-time-slot.php'),
+      Uri.parse(ApiService.driverAcceptedTimeSlot),
       body: {'d_id': dId.toString()},
     );
 
@@ -68,23 +66,24 @@ class _TimeSlotViewState extends State<TimeSlotView>
       builder: (BuildContext context) {
         return Dialog(
           shape: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.transparent)),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.transparent),
+          ),
           backgroundColor: Colors.white,
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(8)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
             height: 80,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14.0),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 30,
                     width: 30,
-                    child: const CircularProgressIndicator(
-                      color: Colors.green,
-                    ),
+                    child: const CircularProgressIndicator(color: Colors.green),
                   ),
                   const SizedBox(width: 20),
                   const Text(
@@ -106,8 +105,7 @@ class _TimeSlotViewState extends State<TimeSlotView>
     String? jobId = prefs.getString('jobId');
     _showProgressDialog(context);
     final response = await http.post(
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/accept-time-slot.php'),
+      Uri.parse(ApiService.driverAcceptTimeSlot),
       body: {'at_id': atId.toString(), 'd_id': dId.toString()},
     );
     Navigator.pop(context);
@@ -150,167 +148,187 @@ class _TimeSlotViewState extends State<TimeSlotView>
       body: Column(
         children: [
           TabBar(
-              onTap: (value) {
-                print(value);
-                if (value == 1) {
-                  acceptedTimeSlot();
-                } else {
-                  getTimerSlots();
-                }
-              },
-              indicatorSize: TabBarIndicatorSize.tab,
-              controller: tabController,
-              labelColor: const Color.fromARGB(255, 37, 33, 243),
-              tabs: [
-                Tab(
-                  text: 'All timeSlot',
-                ),
-                Tab(
-                  text: 'Accepted timeSlot',
-                )
-              ]),
+            onTap: (value) {
+              print(value);
+              if (value == 1) {
+                acceptedTimeSlot();
+              } else {
+                getTimerSlots();
+              }
+            },
+            indicatorSize: TabBarIndicatorSize.tab,
+            controller: tabController,
+            labelColor: const Color.fromARGB(255, 37, 33, 243),
+            tabs: [Tab(text: 'All timeSlot'), Tab(text: 'Accepted timeSlot')],
+          ),
           Expanded(
-            child: TabBarView(controller: tabController, children: [
-              FutureBuilder<List<TimeSlotModel>>(
-                future: getTimerSlots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No time slots available'));
-                  } else {
-                    final timeSlots = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: timeSlots.length,
-                      itemBuilder: (context, index) {
-                        final slot = timeSlots[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 12),
-                          child: Container(
-                            decoration: BoxDecoration(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                FutureBuilder<List<TimeSlotModel>>(
+                  future: getTimerSlots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No time slots available'));
+                    } else {
+                      final timeSlots = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: timeSlots.length,
+                        itemBuilder: (context, index) {
+                          final slot = timeSlots[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 12,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color: Colors.grey.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: ListTile(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 3),
-                              title: Text(
-                                "Date : ${slot.date}",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              subtitle: Row(
-                                children: [
-                                  Text(
-                                    'Start : ',
-                                    style: TextStyle(fontSize: 14),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                ),
+                                title: Text(
+                                  "Date : ${slot.date}",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  Text(
-                                    '${slot.startTime}',
-                                    style: TextStyle(
-                                        fontSize: 13, color: Colors.grey),
-                                  ),
-                                  Text(
-                                    '    End : ',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  Text(
-                                    "${slot.endTime}",
-                                    style: TextStyle(
-                                        fontSize: 13, color: Colors.grey),
-                                  )
-                                ],
-                              ),
-                              trailing: InkWell(
-                                onTap: () {
-                                  acceptTimeSlot(slot.atId);
-                                },
-                                child: Container(
+                                ),
+                                subtitle: Row(
+                                  children: [
+                                    Text(
+                                      'Start : ',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      slot.startTime,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      '    End : ',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      slot.endTime,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: InkWell(
+                                  onTap: () {
+                                    acceptTimeSlot(slot.atId);
+                                  },
+                                  child: Container(
                                     width: 70,
                                     height: 40,
-                                    decoration:
-                                        BoxDecoration(color: Colors.blue),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                    ),
                                     child: Center(
-                                        child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Accept',
-                                        style: TextStyle(color: Colors.white),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Accept',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                       ),
-                                    ))),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
-              FutureBuilder<List<AcceptedTimeSlotModel>>(
-                future: acceptedTimeSlot(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No time slots available'));
-                  } else {
-                    final timeSlots = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: timeSlots.length,
-                      itemBuilder: (context, index) {
-                        final slot = timeSlots[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 12),
-                          child: Container(
-                            decoration: BoxDecoration(
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+                FutureBuilder<List<AcceptedTimeSlotModel>>(
+                  future: acceptedTimeSlot(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No time slots available'));
+                    } else {
+                      final timeSlots = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: timeSlots.length,
+                        itemBuilder: (context, index) {
+                          final slot = timeSlots[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 12,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color: Colors.grey.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: ListTile(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 3),
-                              title: Text(
-                                "Date : ${slot.date}",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              subtitle: Row(
-                                children: [
-                                  Text(
-                                    'Start : ',
-                                    style: TextStyle(fontSize: 14),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                ),
+                                title: Text(
+                                  "Date : ${slot.date}",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  Text(
-                                    '${slot.startTime}',
-                                    style: TextStyle(
-                                        fontSize: 13, color: Colors.grey),
-                                  ),
-                                  Text(
-                                    '    End : ',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  Text(
-                                    "${slot.endTime}",
-                                    style: TextStyle(
-                                        fontSize: 13, color: Colors.grey),
-                                  )
-                                ],
+                                ),
+                                subtitle: Row(
+                                  children: [
+                                    Text(
+                                      'Start : ',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      slot.startTime,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      '    End : ',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      slot.endTime,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  }
-                },
-              )
-            ]),
-          )
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

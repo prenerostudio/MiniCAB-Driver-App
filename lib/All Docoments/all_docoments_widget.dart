@@ -3,7 +3,7 @@ import 'package:new_minicab_driver/All%20Docoments/widget/bottomSheetForDouble.d
 import 'package:new_minicab_driver/All%20Docoments/widget/bottom_sheet_widget.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'all_docoments_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 export 'all_docoments_model.dart';
 
 class AllDocomentsWidget extends StatefulWidget {
@@ -111,9 +112,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                   : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: context.appTheme.primaryBackground,
         appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -122,7 +123,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
             buttonSize: 60,
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: FlutterFlowTheme.of(context).secondaryText,
+              color: context.appTheme.secondaryText,
               size: 30,
             ),
             onPressed: () async {
@@ -131,9 +132,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
           ),
           title: Text(
             'Documents',
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
+            style: context.appTheme.headlineMedium.override(
               fontFamily: 'Open Sans',
-              color: FlutterFlowTheme.of(context).secondaryText,
+              color: context.appTheme.secondaryText,
               fontSize: 22,
             ),
           ),
@@ -158,11 +159,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                         width: double.infinity,
                         height: MediaQuery.sizeOf(context).height * 1,
                         decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          color: context.appTheme.primaryBackground,
                           borderRadius: BorderRadius.circular(0),
                           border: Border.all(
                             color:
-                                FlutterFlowTheme.of(context).primaryBackground,
+                                context.appTheme.primaryBackground,
                             width: 2,
                           ),
                         ),
@@ -173,9 +174,9 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                               child: TabBar(
                                 // isScrollable: true,
                                 labelColor:
-                                    FlutterFlowTheme.of(context).primaryText,
+                                    context.appTheme.primaryText,
                                 unselectedLabelColor:
-                                    FlutterFlowTheme.of(context).secondaryText,
+                                    context.appTheme.secondaryText,
                                 labelPadding: EdgeInsetsDirectional.fromSTEB(
                                   0,
                                   0,
@@ -187,7 +188,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                 ),
                                 unselectedLabelStyle: TextStyle(),
                                 indicatorColor:
-                                    FlutterFlowTheme.of(context).primary,
+                                    context.appTheme.primary,
                                 indicatorWeight: 3,
                                 tabs: [
                                   Tab(text: 'Driving License Verification'),
@@ -222,9 +223,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                             height: 60,
                                             decoration: BoxDecoration(
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).secondaryText,
+                                                  context.appTheme.secondaryText,
                                             ),
                                             child: Padding(
                                               padding:
@@ -242,9 +241,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                   Text(
                                                     'Document Name',
                                                     style:
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).titleMedium,
+                                                        context.appTheme.titleMedium,
                                                   ),
                                                   Padding(
                                                     padding:
@@ -257,9 +254,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     child: Text(
                                                       'Status',
                                                       style:
-                                                          FlutterFlowTheme.of(
-                                                            context,
-                                                          ).titleMedium,
+                                                          context.appTheme.titleMedium,
                                                     ),
                                                   ),
                                                 ],
@@ -281,18 +276,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Driving Licence Photo\nCard (Front)',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${Fornt == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  Fornt == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -335,13 +328,15 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray2:
                                                                 'dl_back',
                                                             getUrl:
-                                                                "https://www.minicaboffice.com/api/driver/check-driving-license.php",
+                                                                ApiService
+                                                                    .driverCheckDrivingLicense,
                                                             parameter:
                                                                 "dl_front",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-driving-license.php",
+                                                                ApiService
+                                                                    .driverUploadDrivingLicense,
                                                             showImageUrl:
-                                                                "https://www.minicaboffice.com/img/drivers/driving-license/",
+                                                                "https://atiqramzan.online/img/drivers/driving-license/",
                                                           );
                                                         },
                                                       );
@@ -354,26 +349,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'd_license_front',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-d-license-front.php',
+                                                      //                 ApiService.driverCheckDLicenseFront,
                                                       //             parameter:
                                                       //                 "dl_front",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-license-front.php",
+                                                      //                 ApiService.driverUploadLicenseFront,
                                                       //             showImageUrl:
-                                                      //                 "https://www.minicaboffice.com/img/drivers/driving-license/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/driving-license/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -394,7 +385,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     children: [
                                           //       Text(
                                           //         'Driving Licence Photo\nCard (Back)',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -405,7 +396,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //       ),
                                           //       Text(
                                           //         '${Back == "" ? "Awaited\nUpload" : "Uploaded"}',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -430,13 +421,13 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //                       forInsideArray:
                                           //                           "d_license_back",
                                           //                       getUrl:
-                                          //                           'https://minicaboffice.com/api/driver/check-d-license-back.php',
+                                          //                           ApiService.driverCheckDLicenseBack,
                                           //                       parameter:
                                           //                           "dl_back",
                                           //                       postUrl:
-                                          //                           "https://www.minicaboffice.com/api/driver/upload-license-back.php",
+                                          //                           ApiService.driverUploadLicenseBack,
                                           //                       showImageUrl:
-                                          //                           "https://www.minicaboffice.com/img/drivers/driving-license/");
+                                          //                           "https://atiqramzan.online/img/drivers/driving-license/");
                                           //                 });
                                           //             // Navigator.push(
                                           //             //     context,
@@ -447,24 +438,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //             //             forInsideArray:
                                           //             //                 "d_license_back",
                                           //             //             getUrl:
-                                          //             //                 'https://minicaboffice.com/api/driver/check-d-license-back.php',
+                                          //             //                 ApiService.driverCheckDLicenseBack,
                                           //             //             parameter:
                                           //             //                 "dl_back",
                                           //             //             postUrl:
-                                          //             //                 "https://www.minicaboffice.com/api/driver/upload-license-back.php",
+                                          //             //                 ApiService.driverUploadLicenseBack,
                                           //             //             showImageUrl:
-                                          //             //                 "https://www.minicaboffice.com/img/drivers/driving-license/")));
+                                          //             //                 "https://atiqramzan.online/img/drivers/driving-license/")));
                                           //           },
                                           //           child: Text(
                                           //             'View Upload',
-                                          //             style: FlutterFlowTheme
+                                          //             style: AppTheme
                                           //                     .of(context)
                                           //                 .bodyMedium
                                           //                 .override(
                                           //                     fontFamily:
                                           //                         'Readex Pro',
                                           //                     fontSize: 12.0,
-                                          //                     color: FlutterFlowTheme
+                                          //                     color: AppTheme
                                           //                             .of(context)
                                           //                         .primary),
                                           //           ),
@@ -488,18 +479,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Proof of Address         ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${AddressProof == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  AddressProof == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -521,12 +510,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                           forInsideArray:
                                                               'ap_1',
                                                           getUrl:
-                                                              "https://www.minicaboffice.com/api/driver/check-address-proof.php",
+                                                              ApiService
+                                                                  .driverCheckAddressProof,
                                                           parameter: "pa1",
                                                           postUrl:
-                                                              "https://www.minicaboffice.com/api/driver/upload-address-proof.php",
+                                                              ApiService
+                                                                  .driverUploadAddressProof,
                                                           showImageUrl:
-                                                              "https://minicaboffice.com/img/drivers/address-proof/",
+                                                              "https://atiqramzan.online/img/drivers/address-proof/",
                                                         );
                                                       },
                                                     );
@@ -539,25 +530,21 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     //             forInsideArray:
                                                     //                 'address_proof_1',
                                                     //             getUrl:
-                                                    //                 'https://minicaboffice.com/api/driver/check-address-proof-1.php',
+                                                    //                 ApiService.driverCheckAddressProof1,
                                                     //             parameter:
                                                     //                 "pa1",
                                                     //             postUrl:
-                                                    //                 "https://www.minicaboffice.com/api/driver/upload-pa1.php",
+                                                    //                 ApiService.driverUploadPa1,
                                                     //             showImageUrl:
-                                                    //                 "https://minicaboffice.com/img/drivers/address-proof/")));
+                                                    //                 "https://atiqramzan.online/img/drivers/address-proof/")));
                                                   },
                                                   child: Text(
                                                     'View Upload',
-                                                    style: FlutterFlowTheme.of(
-                                                      context,
-                                                    ).bodyMedium.override(
+                                                    style: context.appTheme.bodyMedium.override(
                                                       fontFamily: 'Readex Pro',
                                                       fontSize: 12.0,
                                                       color:
-                                                          FlutterFlowTheme.of(
-                                                            context,
-                                                          ).primary,
+                                                          context.appTheme.primary,
                                                     ),
                                                   ),
                                                 ),
@@ -577,7 +564,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     children: [
                                           //       Text(
                                           //         'Proof of Address Two ',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -588,7 +575,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //       ),
                                           //       Text(
                                           //         '${AddressProofsec == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -613,13 +600,13 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //                       forInsideArray:
                                           //                           'address_proof_2',
                                           //                       getUrl:
-                                          //                           'https://minicaboffice.com/api/driver/check-address-proof-2.php',
+                                          //                           ApiService.driverCheckAddressProof2,
                                           //                       parameter:
                                           //                           "pa2",
                                           //                       postUrl:
-                                          //                           "https://www.minicaboffice.com/api/driver/upload-pa2.php",
+                                          //                           ApiService.driverUploadPa2,
                                           //                       showImageUrl:
-                                          //                           "https://minicaboffice.com/img/drivers/address-proof/");
+                                          //                           "https://atiqramzan.online/img/drivers/address-proof/");
                                           //                 });
                                           //             // Navigator.push(
                                           //             //     context,
@@ -630,24 +617,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //             //             forInsideArray:
                                           //             //                 'address_proof_2',
                                           //             //             getUrl:
-                                          //             //                 'https://minicaboffice.com/api/driver/check-address-proof-2.php',
+                                          //             //                 ApiService.driverCheckAddressProof2,
                                           //             //             parameter:
                                           //             //                 "pa2",
                                           //             //             postUrl:
-                                          //             //                 "https://www.minicaboffice.com/api/driver/upload-pa2.php",
+                                          //             //                 ApiService.driverUploadPa2,
                                           //             //             showImageUrl:
-                                          //             //                 "https://minicaboffice.com/img/drivers/address-proof/")));
+                                          //             //                 "https://atiqramzan.online/img/drivers/address-proof/")));
                                           //           },
                                           //           child: Text(
                                           //             'View Upload',
-                                          //             style: FlutterFlowTheme
+                                          //             style: AppTheme
                                           //                     .of(context)
                                           //                 .bodyMedium
                                           //                 .override(
                                           //                     fontFamily:
                                           //                         'Readex Pro',
                                           //                     fontSize: 12.0,
-                                          //                     color: FlutterFlowTheme
+                                          //                     color: AppTheme
                                           //                             .of(context)
                                           //                         .primary),
                                           //           ),
@@ -672,18 +659,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'PCO Licence               ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${PCO == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  PCO == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -720,12 +705,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'pl_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-pco-license.php',
+                                                                ApiService
+                                                                    .driverCheckPcoLicense,
                                                             parameter: "pl_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-pco.php",
+                                                                ApiService
+                                                                    .driverUploadPco,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/pco-license/",
+                                                                "https://atiqramzan.online/img/drivers/pco-license/",
                                                           );
                                                         },
                                                       );
@@ -738,26 +725,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'pco_license',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-pco-license.php',
+                                                      //                 ApiService.driverCheckPcoLicense,
                                                       //             parameter:
                                                       //                 "pco",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-pco.php",
+                                                      //                 ApiService.driverUploadPco,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/pco-license/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/pco-license/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -781,18 +764,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'DVLA Check Code      ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${DVLA == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  DVLA == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -824,13 +805,15 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'dvla_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-dvla-code.php',
+                                                                ApiService
+                                                                    .driverCheckDvlaCode,
                                                             parameter:
                                                                 "dvla_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-dvla.php",
+                                                                ApiService
+                                                                    .driverUploadDvla,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/dvla/",
+                                                                "https://atiqramzan.online/img/drivers/dvla/",
                                                           );
                                                         },
                                                       );
@@ -843,26 +826,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'dvla_check_code',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-dvla-code.php',
+                                                      //                 ApiService.driverCheckDvlaCode,
                                                       //             parameter:
                                                       //                 "dvla",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-dvla.php",
+                                                      //                 ApiService.driverUploadDvla,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/dvla/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/dvla/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -886,18 +865,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Proof of National        \n Insurance',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${Insurance == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  Insurance == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -929,12 +906,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'ni_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-national-insurance.php',
+                                                                ApiService
+                                                                    .driverCheckNationalInsurance,
                                                             parameter: "ni_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-ni.php",
+                                                                ApiService
+                                                                    .driverUploadNi,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/ni/",
+                                                                "https://atiqramzan.online/img/drivers/ni/",
                                                           );
                                                         },
                                                       );
@@ -947,26 +926,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'national_insurance',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-national-insurance.php',
+                                                      //                 ApiService.driverCheckNationalInsurance,
                                                       //             parameter:
                                                       //                 "ni",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-ni.php",
+                                                      //                 ApiService.driverUploadNi,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/ni/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/ni/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -987,7 +962,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     children: [
                                           //       Text(
                                           //         'Extra                          ',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -998,7 +973,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //       ),
                                           //       Text(
                                           //         '${Extra == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -1022,13 +997,13 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //                       forInsideArray:
                                           //                           'extra',
                                           //                       getUrl:
-                                          //                           'https://minicaboffice.com/api/driver/check-extra-document.php',
+                                          //                           ApiService.driverCheckExtraDocument,
                                           //                       parameter:
                                           //                           "extra",
                                           //                       postUrl:
-                                          //                           "https://www.minicaboffice.com/api/driver/upload-extra.php",
+                                          //                           ApiService.driverUploadExtra,
                                           //                       showImageUrl:
-                                          //                           "https://minicaboffice.com/img/drivers/extra/");
+                                          //                           "https://atiqramzan.online/img/drivers/extra/");
                                           //                 });
                                           //             // Navigator.push(
                                           //             //     context,
@@ -1038,24 +1013,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //             //             forInsideArray:
                                           //             //                 'extra',
                                           //             //             getUrl:
-                                          //             //                 'https://minicaboffice.com/api/driver/check-extra-document.php',
+                                          //             //                 ApiService.driverCheckExtraDocument,
                                           //             //             parameter:
                                           //             //                 "extra",
                                           //             //             postUrl:
-                                          //             //                 "https://www.minicaboffice.com/api/driver/upload-extra.php",
+                                          //             //                 ApiService.driverUploadExtra,
                                           //             //             showImageUrl:
-                                          //             //                 "https://minicaboffice.com/img/drivers/extra/")));
+                                          //             //                 "https://atiqramzan.online/img/drivers/extra/")));
                                           //           },
                                           //           child: Text(
                                           //             'View Upload',
-                                          //             style: FlutterFlowTheme
+                                          //             style: AppTheme
                                           //                     .of(context)
                                           //                 .bodyMedium
                                           //                 .override(
                                           //                     fontFamily:
                                           //                         'Readex Pro',
                                           //                     fontSize: 12.0,
-                                          //                     color: FlutterFlowTheme
+                                          //                     color: AppTheme
                                           //                             .of(context)
                                           //                         .primary),
                                           //           ),
@@ -1089,11 +1064,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //                     .fromSTEB(
                                           //                         0, 0, 0, 0),
                                           //             color:
-                                          //                 FlutterFlowTheme.of(
+                                          //                 AppTheme.of(
                                           //                         context)
                                           //                     .primary,
                                           //             textStyle:
-                                          //                 FlutterFlowTheme.of(
+                                          //                 AppTheme.of(
                                           //                         context)
                                           //                     .titleSmall
                                           //                     .override(
@@ -1141,9 +1116,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                             height: 60,
                                             decoration: BoxDecoration(
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).secondaryText,
+                                                  context.appTheme.secondaryText,
                                             ),
                                             child: Padding(
                                               padding:
@@ -1161,9 +1134,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                   Text(
                                                     'Document Name',
                                                     style:
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).titleMedium,
+                                                        context.appTheme.titleMedium,
                                                   ),
                                                   Padding(
                                                     padding:
@@ -1176,9 +1147,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                     child: Text(
                                                       'Status',
                                                       style:
-                                                          FlutterFlowTheme.of(
-                                                            context,
-                                                          ).titleMedium,
+                                                          context.appTheme.titleMedium,
                                                     ),
                                                   ),
                                                 ],
@@ -1201,9 +1170,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Log Book                ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1217,10 +1184,10 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                         0,
                                                       ),
                                                   child: Text(
-                                                    '${LogBook == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                    style: FlutterFlowTheme.of(
-                                                      context,
-                                                    ).bodyMedium.override(
+                                                    LogBook == ''
+                                                        ? "Awaited\nUpload"
+                                                        : "Uploaded",
+                                                    style: context.appTheme.bodyMedium.override(
                                                       fontFamily: 'Readex Pro',
                                                       fontSize: 12.0,
                                                     ),
@@ -1253,12 +1220,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'lb_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-log-book.php',
+                                                                ApiService
+                                                                    .driverCheckLogBook,
                                                             parameter: "lb_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-log-book.php",
+                                                                ApiService
+                                                                    .driverUploadLogBook,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/log-book/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/log-book/",
                                                           );
                                                         },
                                                       );
@@ -1271,28 +1240,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'log_book',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-log-book.php',
+                                                      //                 ApiService.driverCheckLogBook,
                                                       //             parameter:
                                                       //                 "log_book",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-log-book.php",
+                                                      //                 ApiService.driverUploadLogBook,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/log-book/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/log-book/")));
                                                       // context.pushNamed(
                                                       //     'VehicleLogBook');
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -1316,18 +1281,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Mot Certificate      ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${MotCertificate == "" ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  MotCertificate == ""
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1364,13 +1327,15 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'mot_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-mot-certificate.php',
+                                                                ApiService
+                                                                    .driverCheckMotCertificate,
                                                             parameter:
                                                                 "mot_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-mot.php",
+                                                                ApiService
+                                                                    .driverUploadMot,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/mot-certificate/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/mot-certificate/",
                                                           );
                                                         },
                                                       );
@@ -1383,26 +1348,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'mot_certificate',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-mot-certificate.php',
+                                                      //                 ApiService.driverCheckMotCertificate,
                                                       //             parameter:
                                                       //                 "mot",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-mot.php",
+                                                      //                 ApiService.driverUploadMot,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/mot-certificate/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/mot-certificate/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -1426,18 +1387,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle PCO                       ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${Vpco == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  Vpco == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1473,13 +1432,15 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             numberParamter:
                                                                 "vpco_num",
                                                             getUrl:
-                                                                'https://www.minicaboffice.com/api/driver/check-pco.php',
+                                                                ApiService
+                                                                    .driverCheckPco,
                                                             parameter:
                                                                 "vpco_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-vpco.php",
+                                                                ApiService
+                                                                    .driverUploadVpco,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/pco/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/pco/",
                                                           );
                                                         },
                                                       );
@@ -1492,26 +1453,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'pco_license',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-pco-license.php',
+                                                      //                 ApiService.driverCheckPcoLicense,
                                                       //             parameter:
                                                       //                 "vpco",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-vpco.php",
+                                                      //                 ApiService.driverUploadVpco,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/pco/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/pco/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -1534,18 +1491,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Picture                 ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${vFornt == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  vFornt == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1576,12 +1531,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'vp_front',
                                                             getUrl:
-                                                                'https://www.minicaboffice.com/api/driver/check-pictures.php',
+                                                                ApiService
+                                                                    .driverCheckPictures,
                                                             parameter: "pic1",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-vehicle-pictures.php",
+                                                                ApiService
+                                                                    .driverUploadVehiclePictures,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/picture/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/picture/",
                                                           );
                                                         },
                                                       );
@@ -1594,26 +1551,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'vehicle_picture_front',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-v-pic-front.php',
+                                                      //                 ApiService.driverCheckVPicFront,
                                                       //             parameter:
                                                       //                 "pic1",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-vehicle-picture-front.php",
+                                                      //                 ApiService.driverUploadVehiclePictureFront,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/picture/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/picture/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -1634,7 +1587,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //     children: [
                                           //       Text(
                                           //         'Vehicle Picture Back         ',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -1645,7 +1598,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //       ),
                                           //       Text(
                                           //         '${vBack == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                          //         style: FlutterFlowTheme.of(
+                                          //         style: AppTheme.of(
                                           //                 context)
                                           //             .bodyMedium
                                           //             .override(
@@ -1670,13 +1623,13 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //                       forInsideArray:
                                           //                           'vehicle_picture_back',
                                           //                       getUrl:
-                                          //                           'https://minicaboffice.com/api/driver/check-v-pic-back.php',
+                                          //                           ApiService.driverCheckVPicBack,
                                           //                       parameter:
                                           //                           "pic2",
                                           //                       postUrl:
-                                          //                           "https://www.minicaboffice.com/api/driver/upload-vehicle-picture-back.php",
+                                          //                           ApiService.driverUploadVehiclePictureBack,
                                           //                       showImageUrl:
-                                          //                           "https://minicaboffice.com/img/drivers/vehicle/picture/");
+                                          //                           "https://atiqramzan.online/img/drivers/vehicle/picture/");
                                           //                 });
                                           //             // Navigator.push(
                                           //             //     context,
@@ -1687,24 +1640,24 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //             //             forInsideArray:
                                           //             //                 'vehicle_picture_back',
                                           //             //             getUrl:
-                                          //             //                 'https://minicaboffice.com/api/driver/check-v-pic-back.php',
+                                          //             //                 ApiService.driverCheckVPicBack,
                                           //             //             parameter:
                                           //             //                 "pic2",
                                           //             //             postUrl:
-                                          //             //                 "https://www.minicaboffice.com/api/driver/upload-vehicle-picture-back.php",
+                                          //             //                 ApiService.driverUploadVehiclePictureBack,
                                           //             //             showImageUrl:
-                                          //             //                 "https://minicaboffice.com/img/drivers/vehicle/picture/")));
+                                          //             //                 "https://atiqramzan.online/img/drivers/vehicle/picture/")));
                                           //           },
                                           //           child: Text(
                                           //             'View Upload',
-                                          //             style: FlutterFlowTheme
+                                          //             style: AppTheme
                                           //                     .of(context)
                                           //                 .bodyMedium
                                           //                 .override(
                                           //                     fontFamily:
                                           //                         'Readex Pro',
                                           //                     fontSize: 12.0,
-                                          //                     color: FlutterFlowTheme
+                                          //                     color: AppTheme
                                           //                             .of(context)
                                           //                         .primary),
                                           //           ),
@@ -1729,18 +1682,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Road Tax              ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${roadTax == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  roadTax == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1777,12 +1728,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'rt_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-road-tax.php',
+                                                                ApiService
+                                                                    .driverCheckRoadTax,
                                                             parameter: "rt_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-road-tax.php",
+                                                                ApiService
+                                                                    .driverUploadRoadTax,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/road-tax/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/road-tax/",
                                                           );
                                                         },
                                                       );
@@ -1795,26 +1748,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'road_tax',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-road-tax.php',
+                                                      //                 ApiService.driverCheckRoadTax,
                                                       //             parameter:
                                                       //                 "rt",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-road-tax.php",
+                                                      //                 ApiService.driverUploadRoadTax,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/road-tax/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/road-tax/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -1838,18 +1787,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Rental Agreement',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${VRental == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  VRental == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1886,12 +1833,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'ra_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-rental-agreement.php',
+                                                                ApiService
+                                                                    .driverCheckRentalAgreement,
                                                             parameter: "ra_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-rental-agreement.php",
+                                                                ApiService
+                                                                    .driverUploadRentalAgreement,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/rental-agreement/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/rental-agreement/",
                                                           );
                                                         },
                                                       );
@@ -1904,26 +1853,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'rental_agreement',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-rental-agreement.php',
+                                                      //                 ApiService.driverCheckRentalAgreement,
                                                       //             parameter:
                                                       //                 "ra",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-rental-agreement.php",
+                                                      //                 ApiService.driverUploadRentalAgreement,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/rental-agreement/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/rental-agreement/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -1947,18 +1892,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Insurance Schedule          ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${InsuranceSchedule == null ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  InsuranceSchedule == null
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -1992,12 +1935,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'is_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
+                                                                ApiService
+                                                                    .driverCheckInsuranceSchedule,
                                                             parameter: "is_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-ins-sche.php",
+                                                                ApiService
+                                                                    .driverUploadInsSche,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/insurance-schedule/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/insurance-schedule/",
                                                           );
                                                         },
                                                       );
@@ -2010,26 +1955,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'insurance_schedule',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
+                                                      //                 ApiService.driverCheckInsuranceSchedule,
                                                       //             parameter:
                                                       //                 "sche",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-ins-sche.php",
+                                                      //                 ApiService.driverUploadInsSche,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/insurance-schedule/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/insurance-schedule/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -2052,18 +1993,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Insurance            ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${VInsurance == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  VInsurance == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -2100,28 +2039,26 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'vi_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-insurance.php',
+                                                                ApiService
+                                                                    .driverCheckInsurance,
                                                             parameter: "vi_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-insurance.php",
+                                                                ApiService
+                                                                    .driverUploadInsurance,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/insurance/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/insurance/",
                                                           );
                                                         },
                                                       );
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -2144,18 +2081,16 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                               children: [
                                                 Text(
                                                   'Vehicle Extra            ',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${VInsurance == '' ? "Awaited\nUpload" : "Uploaded"}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).bodyMedium.override(
+                                                  VInsurance == ''
+                                                      ? "Awaited\nUpload"
+                                                      : "Uploaded",
+                                                  style: context.appTheme.bodyMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     fontSize: 12.0,
                                                   ),
@@ -2192,12 +2127,14 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                             forInsideArray:
                                                                 'vi_img',
                                                             getUrl:
-                                                                'https://minicaboffice.com/api/driver/check-insurance.php',
+                                                                ApiService
+                                                                    .driverCheckInsurance,
                                                             parameter: "vi_img",
                                                             postUrl:
-                                                                "https://www.minicaboffice.com/api/driver/upload-insurance.php",
+                                                                ApiService
+                                                                    .driverUploadInsurance,
                                                             showImageUrl:
-                                                                "https://minicaboffice.com/img/drivers/vehicle/insurance/",
+                                                                "https://atiqramzan.online/img/drivers/vehicle/insurance/",
                                                           );
                                                         },
                                                       );
@@ -2210,26 +2147,22 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                                       //             forInsideArray:
                                                       //                 'insurance',
                                                       //             getUrl:
-                                                      //                 'https://minicaboffice.com/api/driver/check-insurance.php',
+                                                      //                 ApiService.driverCheckInsurance,
                                                       //             parameter:
                                                       //                 "ins",
                                                       //             postUrl:
-                                                      //                 "https://www.minicaboffice.com/api/driver/upload-insurance.php",
+                                                      //                 ApiService.driverUploadInsurance,
                                                       //             showImageUrl:
-                                                      //                 "https://minicaboffice.com/img/drivers/vehicle/insurance/")));
+                                                      //                 "https://atiqramzan.online/img/drivers/vehicle/insurance/")));
                                                     },
                                                     child: Text(
                                                       'View Upload',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).bodyMedium.override(
+                                                      style: context.appTheme.bodyMedium.override(
                                                         fontFamily:
                                                             'Readex Pro',
                                                         fontSize: 12.0,
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primary,
+                                                            context.appTheme.primary,
                                                       ),
                                                     ),
                                                   ),
@@ -2261,11 +2194,11 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
                                           //                     .fromSTEB(
                                           //                         0, 0, 0, 0),
                                           //             color:
-                                          //                 FlutterFlowTheme.of(
+                                          //                 AppTheme.of(
                                           //                         context)
                                           //                     .primary,
                                           //             textStyle:
-                                          //                 FlutterFlowTheme.of(
+                                          //                 AppTheme.of(
                                           //                         context)
                                           //                     .titleSmall
                                           //                     .override(
@@ -2318,9 +2251,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-d-license-front.php',
-        ),
+        Uri.parse(ApiService.driverCheckDLicenseFront),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2340,6 +2271,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
+    return null;
   }
 
   String? Back;
@@ -2350,9 +2282,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-d-license-back.php',
-        ),
+        Uri.parse(ApiService.driverCheckDLicenseBack),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2370,6 +2300,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
+    return null;
   }
 
   String? AddressProof;
@@ -2379,9 +2310,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-address-proof-1.php',
-        ),
+        Uri.parse(ApiService.driverCheckAddressProof1),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2414,9 +2343,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-address-proof-2.php',
-        ),
+        Uri.parse(ApiService.driverCheckAddressProof2),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2434,6 +2361,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         return null;
       }
     } catch (e) {}
+    return null;
   }
 
   String? PCO;
@@ -2444,7 +2372,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-pco-license.php'),
+        Uri.parse(ApiService.driverCheckPcoLicense),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2461,6 +2389,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? DVLA;
@@ -2471,7 +2400,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-dvla-code.php'),
+        Uri.parse(ApiService.driverCheckDvlaCode),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2493,6 +2422,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? Insurance;
@@ -2503,9 +2433,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-national-insurance.php',
-        ),
+        Uri.parse(ApiService.driverCheckNationalInsurance),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2522,6 +2450,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? Extra;
@@ -2532,9 +2461,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-extra-document.php',
-        ),
+        Uri.parse(ApiService.driverCheckExtraDocument),
       );
       request.fields.addAll({'d_id': dId});
 
@@ -2551,6 +2478,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   // Vehicle Docments
@@ -2563,7 +2491,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-log-book.php'),
+        Uri.parse(ApiService.driverCheckLogBook),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2578,6 +2506,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? MotCertificate;
@@ -2588,9 +2517,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-mot-certificate.php',
-        ),
+        Uri.parse(ApiService.driverCheckMotCertificate),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2605,6 +2532,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? Vpco;
@@ -2615,7 +2543,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-pco.php'),
+        Uri.parse(ApiService.driverCheckPco),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2630,6 +2558,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? vFornt;
@@ -2640,7 +2569,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-v-pic-front.php'),
+        Uri.parse(ApiService.driverCheckVPicFront),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2656,6 +2585,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? vBack;
@@ -2666,7 +2596,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-v-pic-back.php'),
+        Uri.parse(ApiService.driverCheckVPicBack),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2681,6 +2611,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? roadTax;
@@ -2691,7 +2622,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-road-tax.php'),
+        Uri.parse(ApiService.driverCheckRoadTax),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2706,6 +2637,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? VRental;
@@ -2716,9 +2648,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-rental-agreement.php',
-        ),
+        Uri.parse(ApiService.driverCheckRentalAgreement),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2733,6 +2663,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? InsuranceSchedule;
@@ -2743,9 +2674,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://minicaboffice.com/api/driver/check-insurance-schedule.php',
-        ),
+        Uri.parse(ApiService.driverCheckInsuranceSchedule),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2760,6 +2689,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 
   String? VInsurance;
@@ -2770,7 +2700,7 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
       String dId = prefs.getString('d_id') ?? '';
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/check-insurance.php'),
+        Uri.parse(ApiService.driverCheckInsurance),
       );
       request.fields.addAll({'d_id': dId});
       http.StreamedResponse response = await request.send();
@@ -2785,5 +2715,6 @@ class _AllDocomentsWidgetState extends State<AllDocomentsWidget>
         debugPrint('Failed to load : ${response.statusCode}');
       }
     } catch (e) {}
+    return null;
   }
 }

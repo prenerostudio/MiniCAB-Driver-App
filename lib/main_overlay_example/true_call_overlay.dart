@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 class TrueCallerOverlay extends StatefulWidget {
-  const TrueCallerOverlay({Key? key}) : super(key: key);
+  const TrueCallerOverlay({super.key});
 
   @override
   State<TrueCallerOverlay> createState() => _TrueCallerOverlayState();
@@ -69,14 +69,17 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                           shape: BoxShape.circle,
                           image: const DecorationImage(
                             image: NetworkImage(
-                                "https://api.multiavatar.com/x-slayer.png"),
+                              "https://api.multiavatar.com/x-slayer.png",
+                            ),
                           ),
                         ),
                       ),
                       title: const Text(
                         "X-SLAYER",
                         style: TextStyle(
-                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       subtitle: const Text("Sousse , Tunisia"),
                     ),
@@ -97,11 +100,13 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                           Text(
                             "Flutter Overlay",
                             style: TextStyle(
-                                fontSize: 15.0, fontWeight: FontWeight.bold),
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
                 Positioned(
@@ -111,10 +116,7 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
                     onPressed: () async {
                       await FlutterOverlayWindow.closeOverlay();
                     },
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.black,
-                    ),
+                    icon: const Icon(Icons.close, color: Colors.black),
                   ),
                 ),
               ],

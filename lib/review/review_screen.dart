@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class ReviewScreen extends StatefulWidget {
   const ReviewScreen({super.key});
@@ -17,7 +18,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       String? dId = prefs.getString('d_id');
 
       final response = await http.post(
-        Uri.parse('https://www.minicaboffice.com/api/driver/fetch-reviews.php'),
+        Uri.parse(ApiService.driverFetchReviews),
         body: {'d_id': dId.toString()},
       );
 
@@ -40,9 +41,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         centerTitle: true,
         title: Text(
           "Review Screen",
-          style: TextStyle(
-            fontFamily: 'Plus Jakarta Sans',
-          ),
+          style: TextStyle(fontFamily: 'Plus Jakarta Sans'),
         ),
       ),
       body: Padding(
@@ -70,7 +69,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 8),
+                      horizontal: 8.0,
+                      vertical: 8,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -83,14 +84,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
                               fontFamily: 'Plus Jakarta Sans',
                             ),
                           ),
-                          subtitle: Container(
+                          subtitle: SizedBox(
                             width: 200,
                             child: Row(
                               children: [
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                ),
+                                Icon(Icons.star, color: Colors.amber),
                                 Icon(Icons.star, color: Colors.amber),
                                 Icon(Icons.star, color: Colors.amber),
                                 Icon(Icons.star, color: Colors.amber),

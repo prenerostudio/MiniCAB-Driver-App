@@ -1,7 +1,6 @@
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -9,12 +8,10 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-
 import 'break_time_model.dart';
 export 'break_time_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class BreakTimeWidget extends StatefulWidget {
   const BreakTimeWidget({super.key});
@@ -48,35 +45,38 @@ class _BreakTimeWidgetState extends State<BreakTimeWidget> {
     super.dispose();
   }
 
-void endBreak() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? dId = prefs.getString('d_id');
+  void endBreak() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? dId = prefs.getString('d_id');
 
-  print('The total time is ${_model.timerValue}');
-  String? breakId = prefs.getString('breakId');
-  var request = http.MultipartRequest('POST', Uri.parse('https://www.minicaboffice.com/api/driver/end-break.php'));
-  request.fields.addAll({
-    'bt_id': breakId!,
-    'd_id': dId.toString(),
-    "total_time": _model.timerValue
-  });
-  print(request.fields);
+    print('The total time is ${_model.timerValue}');
+    String? breakId = prefs.getString('breakId');
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiService.driverEndBreak),
+    );
+    request.fields.addAll({
+      'bt_id': breakId!,
+      'd_id': dId.toString(),
+      "total_time": _model.timerValue,
+    });
+    print(request.fields);
 
-  try {
-    http.StreamedResponse response = await request.send();
-    if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
-      if (mounted) {  // Check if the widget is still mounted
-        Navigator.pop(context);
+    try {
+      http.StreamedResponse response = await request.send();
+      if (response.statusCode == 200) {
+        print(await response.stream.bytesToString());
+        if (mounted) {
+          // Check if the widget is still mounted
+          Navigator.pop(context);
+        }
+      } else {
+        print(response.reasonPhrase);
       }
-    } else {
-      print(response.reasonPhrase);
+    } catch (e) {
+      print(e.toString());
     }
-  } catch (e) {
-    print(e.toString());
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ void endBreak() async {
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          backgroundColor: context.appTheme.secondaryBackground,
           body: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -104,18 +104,16 @@ void endBreak() async {
                         children: [
                           Icon(
                             Icons.coffee_outlined,
-                            color: FlutterFlowTheme.of(context).primaryText,
+                            color: context.appTheme.primaryText,
                             size: 30,
                           ),
                           Text(
                             'ON BREAK',
-                            style: FlutterFlowTheme.of(context)
-                                .headlineSmall
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  letterSpacing: 0,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: context.appTheme.headlineSmall.override(
+                              fontFamily: 'Open Sans',
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -128,11 +126,11 @@ void endBreak() async {
                           padding: EdgeInsetsDirectional.fromSTEB(0, 32, 0, 24),
                           child: FlutterFlowTimer(
                             initialTime: _model.timerInitialTimeMs,
-                            getDisplayTime: (value) =>
-                                StopWatchTimer.getDisplayTime(
-                              value,
-                              hours: false,
-                            ),
+                            getDisplayTime:
+                                (value) => StopWatchTimer.getDisplayTime(
+                                  value,
+                                  hours: false,
+                                ),
                             controller: _model.timerController,
                             onChanged: (value, displayTime, shouldUpdate) {
                               _model.timerMilliseconds = value;
@@ -141,14 +139,12 @@ void endBreak() async {
                               if (shouldUpdate) setState(() {});
                             },
                             textAlign: TextAlign.center,
-                            style: FlutterFlowTheme.of(context)
-                                .displaySmall
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  fontSize: 64,
-                                  letterSpacing: 0,
-                                  fontWeight: FontWeight.normal,
-                                ),
+                            style: context.appTheme.displaySmall.override(
+                              fontFamily: 'Open Sans',
+                              fontSize: 64,
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ),
                       ],
@@ -166,8 +162,12 @@ void endBreak() async {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 50, 0, 0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              50,
+                              0,
+                              0,
+                            ),
                             child: FFButtonWidget(
                               onPressed: () async {
                                 _model.timerController.onStopTimer();
@@ -178,17 +178,23 @@ void endBreak() async {
                                 width: MediaQuery.sizeOf(context).width * 0.8,
                                 height: 50,
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    24, 0, 24, 0),
-                                iconPadding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                                color: FlutterFlowTheme.of(context).primary,
-                                textStyle: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      color: Colors.white,
-                                      letterSpacing: 0,
-                                    ),
+                                  24,
+                                  0,
+                                  24,
+                                  0,
+                                ),
+                                iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                ),
+                                color: context.appTheme.primary,
+                                textStyle: context.appTheme.titleSmall.override(
+                                  fontFamily: 'Open Sans',
+                                  color: Colors.white,
+                                  letterSpacing: 0,
+                                ),
                                 elevation: 3,
                                 borderSide: BorderSide(
                                   color: Colors.transparent,

@@ -1,15 +1,12 @@
 import '/components/customer_details_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 // import 'package:styled_divider/styled_divider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 // import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'at_dropoff_model.dart';
 export 'at_dropoff_model.dart';
@@ -68,7 +65,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
       width: MediaQuery.sizeOf(context).width,
       height: MediaQuery.sizeOf(context).height * 1,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
+        color: context.appTheme.secondaryBackground,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -78,9 +75,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
             height: 86,
             decoration: BoxDecoration(
               color: Color(0xFF1C1F28),
-              border: Border.all(
-                color: Color(0xFF1C1F28),
-              ),
+              border: Border.all(color: Color(0xFF1C1F28)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -89,7 +84,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                   width: 30,
                   child: Divider(
                     thickness: 1,
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                   ),
                 ),
                 Padding(
@@ -110,17 +105,19 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                8,
+                                0,
+                                0,
+                                0,
+                              ),
                               child: Text(
                                 'Close',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleMedium
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      color: FlutterFlowTheme.of(context).info,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                style: context.appTheme.titleMedium.override(
+                                  fontFamily: 'Open Sans',
+                                  color: context.appTheme.info,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -143,7 +140,8 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                                     padding: MediaQuery.viewInsetsOf(context),
                                     child: CustomerDetailsWidget(
                                       cNumber: '${widget.cNumber}',
-                                      cemail: '', cname: '',
+                                      cemail: '',
+                                      cname: '',
                                     ),
                                   );
                                 },
@@ -151,7 +149,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                             },
                             child: Icon(
                               Icons.clear,
-                              color: FlutterFlowTheme.of(context).accent4,
+                              color: context.appTheme.accent4,
                               size: 24,
                             ),
                           ),
@@ -174,12 +172,11 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                     ),
                     Text(
                       '${widget.time}',
-                      style: FlutterFlowTheme.of(context).titleLarge.override(
-                            fontFamily: 'Open Sans',
-                            color: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
-                            fontSize: 20,
-                          ),
+                      style: context.appTheme.titleLarge.override(
+                        fontFamily: 'Open Sans',
+                        color: context.appTheme.secondaryBackground,
+                        fontSize: 20,
+                      ),
                     ),
                   ],
                 ),
@@ -191,12 +188,12 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                     children: [
                       Text(
                         'SELECT',
-                        style: FlutterFlowTheme.of(context).titleLarge.override(
-                              fontFamily: 'Open Sans',
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              fontSize: 20,
-                            ),
+                        style: context.appTheme.titleLarge.override(
+                          fontFamily: 'Open Sans',
+                          color:
+                              context.appTheme.secondaryBackground,
+                          fontSize: 20,
+                        ),
                       ),
                       SizedBox(
                         height: 25,
@@ -216,12 +213,12 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                       ),
                       Text(
                         '1',
-                        style: FlutterFlowTheme.of(context).titleLarge.override(
-                              fontFamily: 'Open Sans',
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
-                              fontSize: 20,
-                            ),
+                        style: context.appTheme.titleLarge.override(
+                          fontFamily: 'Open Sans',
+                          color:
+                              context.appTheme.secondaryBackground,
+                          fontSize: 20,
+                        ),
                       ),
                     ],
                   ),
@@ -247,13 +244,11 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                       padding: EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
                       child: Text(
                         'Aukse Kadi',
-                        style: FlutterFlowTheme.of(context)
-                            .titleMedium
-                            .override(
-                              fontFamily: 'Open Sans',
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: context.appTheme.titleMedium.override(
+                          fontFamily: 'Open Sans',
+                          color: context.appTheme.primaryText,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -276,7 +271,8 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                             padding: MediaQuery.viewInsetsOf(context),
                             child: CustomerDetailsWidget(
                               cNumber: '',
-                              cemail: '', cname: '',
+                              cemail: '',
+                              cname: '',
                             ),
                           );
                         },
@@ -284,7 +280,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                     },
                     child: Icon(
                       Icons.keyboard_control_rounded,
-                      color: FlutterFlowTheme.of(context).primaryText,
+                      color: context.appTheme.primaryText,
                       size: 30,
                     ),
                   ),
@@ -299,7 +295,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
               child: Divider(
                 height: 50,
                 thickness: 1,
-                color: FlutterFlowTheme.of(context).secondaryText,
+                color: context.appTheme.secondaryText,
               ),
             ),
           ),
@@ -311,7 +307,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                   width: MediaQuery.sizeOf(context).width,
                   height: 98,
                   decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
@@ -324,25 +320,23 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                             width: 30,
                             height: 30,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
+                              color:
+                                  context.appTheme.secondaryBackground,
                               borderRadius: BorderRadius.circular(50),
                               border: Border.all(
                                 color:
-                                    FlutterFlowTheme.of(context).secondaryText,
+                                    context.appTheme.secondaryText,
                                 width: 2,
                               ),
                             ),
                             alignment: AlignmentDirectional(0, 0),
                             child: Text(
                               'B',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.appTheme.bodyMedium.override(
+                                fontFamily: 'Open Sans',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -353,15 +347,12 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                           child: Text(
                             'City University Of London, 10 Northampton Square, London, \nEC1V OHB',
                             textAlign: TextAlign.start,
-                            style: FlutterFlowTheme.of(context)
-                                .titleMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: context.appTheme.titleMedium.override(
+                              fontFamily: 'Open Sans',
+                              color: context.appTheme.primaryText,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -373,19 +364,13 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                 padding: EdgeInsetsDirectional.fromSTEB(17, 20, 0, 0),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
-                  children: [
-                    SizedBox(
-                      height: 65,
-                    ),
-                  ],
+                  children: [SizedBox(height: 65)],
                 ),
               ),
               Container(
                 width: MediaQuery.sizeOf(context).width,
                 height: 49,
-                decoration: BoxDecoration(
-                  color: Color(0xFF5B68F5),
-                ),
+                decoration: BoxDecoration(color: Color(0xFF5B68F5)),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
@@ -397,25 +382,22 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                           width: 30,
                           height: 30,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).info,
+                            color: context.appTheme.info,
                             borderRadius: BorderRadius.circular(50),
                             border: Border.all(
-                              color: FlutterFlowTheme.of(context).info,
+                              color: context.appTheme.info,
                               width: 2,
                             ),
                           ),
                           alignment: AlignmentDirectional(0, 0),
                           child: Text(
                             'A',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Open Sans',
+                              color: context.appTheme.secondaryText,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
@@ -424,12 +406,11 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                       padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
                       child: Text(
                         '34, Bohun Grove, BARNET EN4 8UA',
-                        style:
-                            FlutterFlowTheme.of(context).titleMedium.override(
-                                  fontFamily: 'Open Sans',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        style: context.appTheme.titleMedium.override(
+                          fontFamily: 'Open Sans',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -452,7 +433,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                         width: 120,
                         child: Divider(
                           thickness: 1,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -462,7 +443,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                   opacity: 0.5,
                   child: Icon(
                     Icons.add_circle_outline,
-                    color: FlutterFlowTheme.of(context).secondaryText,
+                    color: context.appTheme.secondaryText,
                     size: 26,
                   ),
                 ),
@@ -475,7 +456,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                         width: 120,
                         child: Divider(
                           thickness: 1,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -487,9 +468,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
           Container(
             width: MediaQuery.sizeOf(context).width,
             height: 100,
-            decoration: BoxDecoration(
-              color: Color(0xFF1C1F28),
-            ),
+            decoration: BoxDecoration(color: Color(0xFF1C1F28)),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -502,13 +481,12 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                   children: [
                     Text(
                       'PAY BY',
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'Open Sans',
-                            color:
-                                FlutterFlowTheme.of(context).primaryBackground,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      style: context.appTheme.bodyMedium.override(
+                        fontFamily: 'Open Sans',
+                        color: context.appTheme.primaryBackground,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.max,
@@ -523,24 +501,20 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                           padding: EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
                           child: Text(
                             'Cash',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .primaryBackground,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Open Sans',
+                              color:
+                                  context.appTheme.primaryBackground,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 50,
-                ),
+                SizedBox(height: 50),
                 Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -550,13 +524,12 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                       padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 5),
                       child: Text(
                         'CLIENT PAYS',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Open Sans',
-                              color: FlutterFlowTheme.of(context)
-                                  .primaryBackground,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        style: context.appTheme.bodyMedium.override(
+                          fontFamily: 'Open Sans',
+                          color: context.appTheme.primaryBackground,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     Padding(
@@ -566,25 +539,21 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                         children: [
                           Text(
                             '£40.62',
-                            style: FlutterFlowTheme.of(context)
-                                .titleLarge
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .primaryBackground,
-                                ),
+                            style: context.appTheme.titleLarge.override(
+                              fontFamily: 'Open Sans',
+                              color:
+                                  context.appTheme.primaryBackground,
+                            ),
                           ),
                           Text(
                             'Inc, VAT',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .primaryBackground,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Open Sans',
+                              color:
+                                  context.appTheme.primaryBackground,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -609,7 +578,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                         width: 120,
                         child: Divider(
                           thickness: 1,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -619,7 +588,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                   opacity: 0.5,
                   child: Icon(
                     Icons.add_circle_outline,
-                    color: FlutterFlowTheme.of(context).secondaryText,
+                    color: context.appTheme.secondaryText,
                     size: 26,
                   ),
                 ),
@@ -632,7 +601,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                         width: 120,
                         child: Divider(
                           thickness: 1,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -654,7 +623,7 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                   fillColor: Color(0xFF5B68F5),
                   icon: FaIcon(
                     FontAwesomeIcons.ellipsisH,
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                     size: 24,
                   ),
                   onPressed: () {
@@ -672,15 +641,12 @@ class _AtDropoffWidgetState extends State<AtDropoffWidget> {
                     padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                     iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                     color: Color(0xFF1C1F28),
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Open Sans',
-                          color: Colors.white,
-                        ),
-                    elevation: 3,
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                      width: 1,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Open Sans',
+                      color: Colors.white,
                     ),
+                    elevation: 3,
+                    borderSide: BorderSide(color: Colors.transparent, width: 1),
                     borderRadius: BorderRadius.circular(0),
                   ),
                 ),

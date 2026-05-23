@@ -26,7 +26,7 @@ import '../Model/jobDetails.dart';
 import '../components/notes_widget.dart';
 import '../drawer_widget/drawer_view.dart';
 import '../flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -39,17 +39,28 @@ import '../Model/myProfile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:glowy_borders/glowy_borders.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class HomeWidget extends StatefulWidget {
   bool? isFromOnway;
-  HomeWidget({this.isFromOnway, Key? key}) : super(key: key);
+  HomeWidget({this.isFromOnway, super.key});
 
   @override
   _HomeWidgetState createState() => _HomeWidgetState();
 }
 
 class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
+  static const _ink = Color(0xFF101820);
+  static const _green = Color(0xFF0E7C66);
+  static const _surface = Color(0xFFF4F7F5);
+  static const _gold = Color(0xFFE2A84F);
+  static const _pusherAppKey = 'ef80ba163503f394d9c3';
+  static const _pusherCluster = 'ap2';
+  static const _legacyJobsChannel = 'jobs-channel';
+  static const _dispatchBookingChannel = 'dispatch-booking';
+
   late HomeModel _model;
   LatLng? selectedLocation;
   // GoogleMapController? mapController;
@@ -69,113 +80,200 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   bool rootedCheck = false;
   bool jailbreak = false;
   bool devMode = false;
-  bool _isVisible = false;
+  final bool _isVisible = false;
   final animationsMap = <String, AnimationInfo>{};
   final scaffoldKey = GlobalKey<ScaffoldState>();
   bool jobStatus = false;
   bool periodicStatus = false;
+  mapbox.MapboxMap? _mapboxMap;
+  mapbox.PointAnnotationManager? _mapPointManager;
+  mapbox.PolylineAnnotationManager? _mapPolylineManager;
+  Uint8List? _driverMarkerImage;
+  Uint8List? _destinationMarkerImage;
+  bool _mapboxStyleReady = false;
   // bool isPeriodicVisible = false;
   // Timer? _timer;
   // Timer? _timerVisible;
   // bool visiblecontainer = false;
   final controller = MyController(); // Or use a globally provided instance
 
+  Map<String, dynamic> _decodePusherEvent(dynamic event) {
+    final rawData = event?.data;
+    if (rawData == null) {
+      return {};
+    }
+
+    final decoded = json.decode(rawData.toString());
+    if (decoded is Map<String, dynamic>) {
+      return decoded;
+    }
+    if (decoded is Map) {
+      return Map<String, dynamic>.from(decoded);
+    }
+    return {};
+  }
+
+  Map<String, dynamic> _pusherJobData(Map<String, dynamic> eventData) {
+    final details = eventData['details'];
+    if (details is List && details.isNotEmpty && details.first is Map) {
+      return Map<String, dynamic>.from(details.first as Map);
+    }
+
+    final data = eventData['data'];
+    if (data is List && data.isNotEmpty && data.first is Map) {
+      return Map<String, dynamic>.from(data.first as Map);
+    }
+
+    return eventData;
+  }
+
+  String _pusherText(Map<String, dynamic> data, List<String> keys) {
+    for (final key in keys) {
+      final value = data[key];
+      if (value == null) {
+        continue;
+      }
+
+      final text = value.toString();
+      if (text.trim().isNotEmpty && text != 'null') {
+        return text;
+      }
+    }
+    return '';
+  }
+
+  bool _isPusherJobForCurrentDriver(
+    Map<String, dynamic> data,
+    SharedPreferences prefs,
+  ) {
+    final currentDriverId = prefs.getString('d_id') ?? '';
+    final target = _pusherText(data, ['target']).toLowerCase();
+
+    if (target == 'all-drivers') {
+      return true;
+    }
+
+    final pushedDriverId = _pusherText(data, [
+      'd_id',
+      'assigned_driver_id',
+      'target_driver_id',
+      '00000000002',
+    ]);
+
+    return currentDriverId.isNotEmpty && pushedDriverId == currentDriverId;
+  }
+
+  Job _jobFromPusherData(Map<String, dynamic> data) {
+    final bookId = _pusherText(data, ['book_id']);
+    final jobId = _pusherText(data, ['job_id']);
+
+    return Job(
+      jobId: jobId.isNotEmpty ? jobId : bookId,
+      bookId: bookId,
+      cId: _pusherText(data, ['c_id', 'customer_id', '00000003']),
+      dId: _pusherText(data, [
+        'd_id',
+        'assigned_driver_id',
+        'target_driver_id',
+        '00000000002',
+      ]),
+      jobNote: _pusherText(data, ['job_note', 'note']),
+      totalFee: _pusherText(data, ['totalFee', 'total_fee']),
+      journeyFare: _pusherText(data, ['journey_fare']),
+      bookingFee: _pusherText(data, ['booking_fee']),
+      carParking: _pusherText(data, ['car_parking']),
+      waiting: _pusherText(data, ['waiting']),
+      tolls: _pusherText(data, ['tolls']),
+      extra: _pusherText(data, ['extra', 'extras']),
+      jobStatus: _pusherText(data, ['job_status']),
+      dateJobAdd: _pusherText(data, ['date_job_add', 'book_add_date']),
+      cName: _pusherText(data, ['c_name', 'customer_name']),
+      cEmail: _pusherText(data, ['c_email', 'customer_email']),
+      cPhone: _pusherText(data, ['c_phone', 'customer_phone']),
+      cAddress: _pusherText(data, ['c_address', 'customer_address']),
+      dName: _pusherText(data, ['d_name', 'driver_name']),
+      dEmail: _pusherText(data, ['d_email', 'driver_email']),
+      dPhone: _pusherText(data, ['d_phone', 'driver_phone']),
+      bTypeId: _pusherText(data, ['b_type_id', 'booking_type']),
+      pickup: _pusherText(data, ['pickup']),
+      destination: _pusherText(data, ['destination']),
+      address: _pusherText(data, ['address', 'stops']),
+      postalCode: _pusherText(data, ['postal_code']),
+      passenger: _pusherText(data, ['passenger']),
+      pickDate: _pusherText(data, ['pick_date', 'pickup_date']),
+      pickTime: _pusherText(data, ['pick_time', 'pickup_time']),
+      journeyType: _pusherText(data, ['journey_type']),
+      vId: _pusherText(data, ['v_id', 'vehicle_type']),
+      luggage: _pusherText(data, ['luggage']),
+      childSeat: _pusherText(data, ['child_seat']),
+      flightNumber: _pusherText(data, ['flight_number']),
+      delayTime: _pusherText(data, ['delay_time']),
+      note: _pusherText(data, ['note']),
+      journeyDistance: _pusherText(data, ['journey_distance']),
+      bookingStatus: _pusherText(data, ['booking_status']),
+      bidStatus: _pusherText(data, ['bid_status']),
+      bidNote: _pusherText(data, ['bid_note']),
+      bookAddDate: _pusherText(data, ['book_add_date', 'date_job_add']),
+    );
+  }
+
+  void _handleDispatchedPusherJob(
+    Map<String, dynamic> eventData,
+    SharedPreferences prefs,
+  ) {
+    final data = _pusherJobData(eventData);
+    if (!_isPusherJobForCurrentDriver(data, prefs)) {
+      return;
+    }
+
+    startRingtoneAndVibrateLoop();
+    prefs.setBool('jobDispatched', true);
+    listFromPusher.clear();
+    listFromPusher.add(_jobFromPusherData(data));
+    myController.jobPusherContainer.value = true;
+    controller.toggleVariable(
+      myController.jobPusherContainer.value,
+      listFromPusher,
+    );
+  }
+
+  void _handleWithdrawnPusherJob(dynamic event, SharedPreferences prefs) {
+    final eventData = _decodePusherEvent(event);
+    final data = _pusherJobData(eventData);
+
+    if (data.isEmpty || _isPusherJobForCurrentDriver(data, prefs)) {
+      checkJobStatus();
+    }
+  }
+
   pushercallbg() async {
     myController.timer?.cancel();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       var pusher = PusherClient(
-        '28691ac9c0c5ac41b64a',
+        _pusherAppKey,
         PusherOptions(
-          host: 'https://minicaboffice.com/api/driver/upcoming-jobs.php',
-          cluster: 'ap2',
+          host: ApiService.driverJobsUpcomingJobs,
+          cluster: _pusherCluster,
           encrypted: false,
         ),
       );
       pusher.connect();
 
-      var channel = pusher.subscribe('jobs-channel');
-
-      // Listen for new events
-      channel.bind('job-dispatched', (event) {
-        Map<String, dynamic> jsonMap = json.decode(event!.data!);
-
-        myController.currentLoggedInid.value = prefs.getString('d_id') ?? '';
-        if (myController.currentLoggedInid.value ==
-            jsonMap['details'][0]['d_id'].toString()) {
-          // startToon();
-          startRingtoneAndVibrateLoop();
-          prefs.setBool('jobDispatched', true);
-          listFromPusher.clear();
-          listFromPusher.add(
-            Job(
-              jobId: jsonMap['details'][0]['job_id'].toString() ?? "",
-              bookId: jsonMap['details'][0]['book_id'].toString() ?? '',
-              cId: jsonMap['details'][0]['00000003'].toString() ?? "",
-              dId: jsonMap['details'][0]['00000000002'].toString() ?? '',
-              jobNote: jsonMap['details'][0]['job_note'].toString() ?? '',
-              totalFee: jsonMap['details'][0]['totalFee'].toString() ?? '',
-              journeyFare:
-                  jsonMap['details'][0]['journey_fare'].toString() ?? '',
-              bookingFee: jsonMap['details'][0]['booking_fee'].toString() ?? "",
-              carParking: jsonMap['details'][0]['car_parking'].toString() ?? '',
-              waiting: jsonMap['details'][0]['waiting'].toString() ?? '',
-              tolls: jsonMap['details'][0]['tolls'].toString() ?? '',
-              extra: jsonMap['details'][0]['extra'].toString() ?? '',
-              jobStatus: jsonMap['details'][0]['job_status'].toString() ?? '',
-              dateJobAdd:
-                  jsonMap['details'][0]['date_job_add'].toString() ?? '',
-              cName: jsonMap['details'][0]['c_name'].toString() ?? '',
-              cEmail: jsonMap['details'][0]['c_email'].toString() ?? '',
-              cPhone: jsonMap['details'][0]['c_phone'].toString() ?? '',
-              cAddress: jsonMap['details'][0]['c_address'].toString() ?? '',
-              dName: jsonMap['details'][0]['d_name'].toString() ?? '',
-              dEmail: jsonMap['details'][0]['d_email'].toString() ?? '',
-              dPhone: jsonMap['details'][0]['d_phone'].toString() ?? '',
-              bTypeId: jsonMap['details'][0]['b_type_id'].toString() ?? '',
-              pickup: jsonMap['details'][0]['pickup'].toString() ?? '',
-              destination:
-                  jsonMap['details'][0]['destination'].toString() ?? '',
-              address: jsonMap['details'][0]['address'].toString() ?? '',
-              postalCode: jsonMap['details'][0]['postal_code'].toString() ?? '',
-              passenger: jsonMap['details'][0]['passenger'].toString() ?? '',
-              pickDate: jsonMap['details'][0]['pick_date'].toString() ?? '',
-              pickTime: jsonMap['details'][0]['pick_time'].toString() ?? '',
-              journeyType:
-                  jsonMap['details'][0]['journey_type'].toString() ?? '',
-              vId: jsonMap['details'][0]['v_id'].toString() ?? '',
-              luggage: jsonMap['details'][0]['luggage'].toString() ?? '',
-              childSeat: jsonMap['details'][0]['child_seat'].toString() ?? '',
-              flightNumber:
-                  jsonMap['details'][0]['flight_number'].toString() ?? '',
-              delayTime: jsonMap['details'][0]['delay_time'].toString() ?? '',
-              note: jsonMap['details'][0]['note'].toString() ?? '',
-              journeyDistance:
-                  jsonMap['details'][0]['journey_distance'].toString() ?? '',
-              bookingStatus:
-                  jsonMap['details'][0]['booking_status'].toString() ?? '',
-              bidStatus: jsonMap['details'][0]['bid_status'].toString() ?? '',
-              bidNote: jsonMap['details'][0]['bid_note'].toString() ?? '',
-              bookAddDate: jsonMap['details'][0]['bid_status'].toString() ?? '',
-            ),
-          );
-          myController.jobPusherContainer.value = true;
-          controller.toggleVariable(
-            myController.jobPusherContainer.value,
-            listFromPusher,
-          ); // Trigger dialog
-        }
-
-        // showAlert();
-        // listFromPusher=jsonMap
-        // jobDetailsFuture();
-        // });
+      var legacyChannel = pusher.subscribe(_legacyJobsChannel);
+      legacyChannel.bind('job-dispatched', (event) {
+        _handleDispatchedPusherJob(_decodePusherEvent(event), prefs);
       });
-      channel.bind('job-withdrawn', (event) {
-        Map<String, dynamic> jsonMap = json.decode(event!.data!);
-        checkJobStatus();
+      legacyChannel.bind('job-withdrawn', (event) {
+        _handleWithdrawnPusherJob(event, prefs);
+      });
 
-        // });
+      var dispatchChannel = pusher.subscribe(_dispatchBookingChannel);
+      dispatchChannel.bind('booking-dispatch', (event) {
+        _handleDispatchedPusherJob(_decodePusherEvent(event), prefs);
+      });
+      dispatchChannel.bind('booking-withdraw', (event) {
+        _handleWithdrawnPusherJob(event, prefs);
       });
     } catch (e) {}
   }
@@ -186,10 +284,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       // await prefs.remove('ts_id');
 
       var pusher = PusherClient(
-        '28691ac9c0c5ac41b64a',
+        _pusherAppKey,
         PusherOptions(
-          host: 'https://www.minicaboffice.com/api/driver/fetch-time-slots.php',
-          cluster: 'ap2',
+          host: ApiService.driverTimeslotsFetchTimeSlot,
+          cluster: _pusherCluster,
           encrypted: false,
         ),
       );
@@ -245,7 +343,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? token = prefs.getString('loginToken');
     String? did = prefs.getString('d_id');
     final response = await http.post(
-      Uri.parse('https://minicaboffice.com/api/driver/check-user-login.php'),
+      Uri.parse(ApiService.driverAuthenticationCheckLoginToken),
       body: {'d_id': did.toString()},
     );
 
@@ -365,9 +463,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       String? tsid = prefs.getString('ts_id');
 
       var fields = {'d_id': dId.toString(), 'ts_id': tsid.toString()};
-      var uri = Uri.parse(
-        'https://www.minicaboffice.com/api/driver/fetch-time-slots.php',
-      );
+      var uri = Uri.parse(ApiService.driverTimeslotsFetchTimeSlot);
 
       var response = await http.post(uri, body: fields);
 
@@ -429,9 +525,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? dId = prefs.getString('d_id');
     String? jobId = prefs.getString('jobId');
     final response = await http.post(
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/check-job-status.php',
-      ),
+      Uri.parse(ApiService.driverJobsCheckJobStatus),
       body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
     );
     if (response.statusCode == 200) {
@@ -554,6 +648,45 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     setState(() {});
   }
 
+  Future<void> _openDriverDrawer() async {
+    await checkJob();
+    if (isjobAvailable == false) {
+      scaffoldKey.currentState?.openDrawer();
+    } else {
+      Fluttertoast.showToast(msg: 'Complete Job First');
+    }
+  }
+
+  Future<void> _toggleDriverStatus() async {
+    await checkVehicleDocuments();
+    await checkJob();
+
+    if (myController.initialLabelIndex.value == 1 && isjobAvailable == true) {
+      Fluttertoast.showToast(msg: 'Complete Job First');
+      return;
+    }
+
+    final nextStatus = myController.initialLabelIndex.value == 1 ? 0 : 1;
+    final service = FlutterBackgroundService();
+
+    await saveSwitchStatus(nextStatus);
+    myController.initialLabelIndex.value = nextStatus;
+    makeBeep();
+    sendOnlineStatus();
+
+    if (nextStatus == 1) {
+      sendLocationDataPeriodically();
+      service.startService();
+    } else {
+      stopLocationDataPeriodicUpdates();
+      service.invoke("stopService");
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   callAp() async {
     checkJob();
     await jobDetailsFuture().then((_) {
@@ -632,12 +765,32 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: context.appTheme.secondaryBackground,
                     ),
                     child: Stack(
                       children: [
                         // Obx(() => )
                         buildMap(),
+                        Positioned(
+                          top: 0,
+                          left: 16,
+                          right: 16,
+                          child: Obx(
+                            () => _DriverHomeHeader(
+                              isOnline:
+                                  myController.initialLabelIndex.value == 1,
+                              routeDistance: myController.routeDistance.value,
+                              routeDuration: myController.routeDuration.value,
+                              nextInstruction:
+                                  myController.nextInstruction.value,
+                              hasRoute:
+                                  myController.convertedLat.value != 0.0 &&
+                                  myController.convertedLng.value != 0.0,
+                              onMenu: _openDriverDrawer,
+                              onToggleStatus: _toggleDriverStatus,
+                            ),
+                          ),
+                        ),
 
                         // Padding(
                         //   padding: const EdgeInsets.only(top: 150.0),
@@ -663,12 +816,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primary,
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).secondary,
+                                            context.appTheme.primary,
+                                            context.appTheme.secondary,
                                           ],
                                           stops: [0, 1],
                                           begin: const AlignmentDirectional(
@@ -709,15 +858,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         1
                                                     ? 'Offline'
                                                     : 'Online',
-                                                style: FlutterFlowTheme.of(
-                                                  context,
-                                                ).bodyMedium.override(
+                                                style: context.appTheme.bodyMedium.override(
                                                   fontFamily: 'Open Sans',
                                                   fontSize: 18,
                                                   color:
-                                                      FlutterFlowTheme.of(
-                                                        context,
-                                                      ).info,
+                                                      context.appTheme.info,
                                                 ),
                                               ),
                                             ],
@@ -780,18 +925,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                   height: 45,
                                                   decoration: BoxDecoration(
                                                     color:
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).secondaryBackground,
+                                                        context.appTheme.secondaryBackground,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           50,
                                                         ),
                                                     border: Border.all(
                                                       color:
-                                                          FlutterFlowTheme.of(
-                                                            context,
-                                                          ).secondaryBackground,
+                                                          context.appTheme.secondaryBackground,
                                                     ),
                                                   ),
                                                   alignment:
@@ -802,9 +943,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                   child: FaIcon(
                                                     FontAwesomeIcons.listUl,
                                                     color:
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).secondaryText,
+                                                        context.appTheme.secondaryText,
                                                     size: 20,
                                                   ),
                                                 ),
@@ -831,9 +970,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         .initialLabelIndex
                                                         .value ==
                                                     1)
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primary
+                                                  context.appTheme.primary
                                                 else
                                                   Colors.red,
                                               ],
@@ -882,14 +1019,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                     ],
                                                     activeBgColors: [
                                                       [
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).error,
+                                                        context.appTheme.error,
                                                       ],
                                                       [
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).primary,
+                                                        context.appTheme.primary,
                                                       ],
                                                     ],
                                                     onToggle: (index) async {
@@ -909,7 +1042,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         );
                                                       } else {
                                                         debugPrint(
-                                                          'the selection is ${status}',
+                                                          'the selection is $status',
                                                         );
                                                         final service =
                                                             FlutterBackgroundService();
@@ -1177,9 +1310,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 width: 90,
                                                                 decoration: BoxDecoration(
                                                                   color:
-                                                                      FlutterFlowTheme.of(
-                                                                        context,
-                                                                      ).primary,
+                                                                      context.appTheme.primary,
                                                                   borderRadius:
                                                                       BorderRadius.circular(
                                                                         8,
@@ -1280,9 +1411,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                     ? Container(
                                       decoration: BoxDecoration(
                                         color:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primaryBackground,
+                                            context.appTheme.primaryBackground,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       height: 80,
@@ -1292,7 +1421,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                         ),
                                         child: Row(
                                           children: [
-                                            Container(
+                                            SizedBox(
                                               height: 30,
                                               width: 30,
                                               child:
@@ -1305,9 +1434,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                               'Please wait...',
                                               style: TextStyle(
                                                 color:
-                                                    FlutterFlowTheme.of(
-                                                      context,
-                                                    ).primaryText,
+                                                    context.appTheme.primaryText,
                                                 fontFamily: 'Satoshi',
                                                 fontSize: 15,
                                               ),
@@ -1334,7 +1461,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                 .initialLabelIndex
                                                 .value ==
                                             1)
-                                          FlutterFlowTheme.of(context).primary
+                                          context.appTheme.primary
                                         else
                                           Colors.transparent,
                                       ],
@@ -1370,9 +1497,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                 SingleChildScrollView(
                                   child: Container(
                                     color:
-                                        FlutterFlowTheme.of(
-                                          context,
-                                        ).primaryBackground,
+                                        context.appTheme.primaryBackground,
                                     child: Padding(
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
@@ -1404,14 +1529,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                     Text(
                                                       '£${myController.listFromPusher[0].journeyFare}',
                                                       textAlign: TextAlign.end,
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).displaySmall.override(
+                                                      style: context.appTheme.displaySmall.override(
                                                         fontFamily: 'Outfit',
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primaryText,
+                                                            context.appTheme.primaryText,
                                                         fontSize: 32,
                                                         fontWeight:
                                                             FontWeight.w600,
@@ -1419,15 +1540,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                     ),
                                                     Text(
                                                       '(Estimated maximum value)',
-                                                      style: FlutterFlowTheme.of(
-                                                        context,
-                                                      ).labelMedium.override(
+                                                      style: context.appTheme.labelMedium.override(
                                                         fontFamily:
                                                             'Montserrat',
                                                         color:
-                                                            FlutterFlowTheme.of(
-                                                              context,
-                                                            ).primaryText,
+                                                            context.appTheme.primaryText,
                                                         fontSize: 14,
                                                         fontWeight:
                                                             FontWeight.w500,
@@ -1465,9 +1582,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         child: VerticalDivider(
                                                           thickness: 2,
                                                           color:
-                                                              FlutterFlowTheme.of(
-                                                                context,
-                                                              ).secondaryText,
+                                                              context.appTheme.secondaryText,
                                                         ),
                                                       ),
                                                     ),
@@ -1485,9 +1600,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         children: [
                                                           Text(
                                                             'Time',
-                                                            style: FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).bodyMedium
+                                                            style: context.appTheme.bodyMedium
                                                                 .override(
                                                                   fontFamily:
                                                                       'Roboto',
@@ -1504,9 +1617,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 ),
                                                             child: Text(
                                                               'Date',
-                                                              style: FlutterFlowTheme.of(
-                                                                    context,
-                                                                  ).bodyMedium
+                                                              style: context.appTheme.bodyMedium
                                                                   .override(
                                                                     fontFamily:
                                                                         'Roboto',
@@ -1532,11 +1643,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         children: [
                                                           Text(
                                                             myController
-                                                                .listFromPusher[0]!
+                                                                .listFromPusher[0]
                                                                 .pickTime,
-                                                            style: FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).bodyMedium
+                                                            style: context.appTheme.bodyMedium
                                                                 .override(
                                                                   fontFamily:
                                                                       'Roboto',
@@ -1553,11 +1662,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 ),
                                                             child: Text(
                                                               myController
-                                                                  .listFromPusher[0]!
+                                                                  .listFromPusher[0]
                                                                   .pickDate,
-                                                              style: FlutterFlowTheme.of(
-                                                                    context,
-                                                                  ).bodyMedium
+                                                              style: context.appTheme.bodyMedium
                                                                   .override(
                                                                     fontFamily:
                                                                         'Roboto',
@@ -1614,15 +1721,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         child: Center(
                                                           child: Text(
                                                             'A',
-                                                            style: FlutterFlowTheme.of(
-                                                              context,
-                                                            ).bodyMedium.override(
+                                                            style: context.appTheme.bodyMedium.override(
                                                               fontFamily:
                                                                   'Open Sans',
                                                               color:
-                                                                  FlutterFlowTheme.of(
-                                                                    context,
-                                                                  ).secondaryBackground,
+                                                                  context.appTheme.secondaryBackground,
                                                               fontSize: 18,
                                                               fontWeight:
                                                                   FontWeight
@@ -1697,15 +1800,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                       child: Center(
                                                         child: Text(
                                                           'B',
-                                                          style: FlutterFlowTheme.of(
-                                                            context,
-                                                          ).bodyMedium.override(
+                                                          style: context.appTheme.bodyMedium.override(
                                                             fontFamily:
                                                                 'Open Sans',
                                                             color:
-                                                                FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).secondaryBackground,
+                                                                context.appTheme.secondaryBackground,
                                                             fontSize: 18,
                                                             fontWeight:
                                                                 FontWeight.w300,
@@ -1736,17 +1835,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                   ),
                                                               child: Text(
                                                                 myController
-                                                                    .listFromPusher![0]
+                                                                    .listFromPusher[0]
                                                                     .pickup,
-                                                                style: FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).labelMedium.override(
+                                                                style: context.appTheme.labelMedium.override(
                                                                   fontFamily:
                                                                       'Readex Pro',
                                                                   color:
-                                                                      FlutterFlowTheme.of(
-                                                                        context,
-                                                                      ).secondaryText,
+                                                                      context.appTheme.secondaryText,
                                                                   fontSize: 15,
                                                                 ),
                                                                 overflow:
@@ -1779,16 +1874,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                     left: 8,
                                                                   ),
                                                               child: Text(
-                                                                '${(double.parse(myController.listFromPusher[0]!.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${myController.listFromPusher[0]!.journeyType}',
-                                                                style: FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).bodyMedium.override(
+                                                                '${(double.parse(myController.listFromPusher[0].journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${myController.listFromPusher[0].journeyType}',
+                                                                style: context.appTheme.bodyMedium.override(
                                                                   fontFamily:
                                                                       'Open Sans',
                                                                   color:
-                                                                      FlutterFlowTheme.of(
-                                                                        context,
-                                                                      ).secondaryText,
+                                                                      context.appTheme.secondaryText,
                                                                   fontSize: 15,
                                                                 ),
                                                               ),
@@ -1807,17 +1898,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                   ),
                                                               child: Text(
                                                                 myController
-                                                                    .listFromPusher![0]
+                                                                    .listFromPusher[0]
                                                                     .destination,
-                                                                style: FlutterFlowTheme.of(
-                                                                  context,
-                                                                ).labelMedium.override(
+                                                                style: context.appTheme.labelMedium.override(
                                                                   fontFamily:
                                                                       'Readex Pro',
                                                                   color:
-                                                                      FlutterFlowTheme.of(
-                                                                        context,
-                                                                      ).secondaryText,
+                                                                      context.appTheme.secondaryText,
                                                                   fontSize: 15,
                                                                 ),
                                                                 overflow:
@@ -1861,7 +1948,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                     ) {
                                                       return AlertDialog(
                                                         title: Text(
-                                                          'Choose Map Option',
+                                                          'Start navigation',
                                                         ),
                                                         content: Column(
                                                           mainAxisSize:
@@ -1876,7 +1963,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 ), // Replace 'your_image.png' with your image asset path
                                                               ),
                                                               title: Text(
-                                                                'Open in Google Maps',
+                                                                'Open Google Maps',
                                                               ),
                                                               onTap: () async {
                                                                 await getLatLngFromAddress(
@@ -1910,11 +1997,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 width: 25,
                                                                 height: 25,
                                                                 child: Image.asset(
-                                                                  'assets/images/app_launcher_icon.png',
+                                                                  'assets/driver-app-icon.jpg',
                                                                 ), // Replace 'your_image.png' with your image asset path
                                                               ),
                                                               title: Text(
-                                                                'Using App',
+                                                                'Use in-app Mapbox route',
                                                               ),
                                                               onTap: () async {
                                                                 Navigator.pop(
@@ -2030,13 +2117,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         0,
                                                       ),
                                                   color:
-                                                      FlutterFlowTheme.of(
-                                                        context,
-                                                      ).primary,
+                                                      context.appTheme.primary,
                                                   textStyle:
-                                                      FlutterFlowTheme.of(
-                                                        context,
-                                                      ).titleSmall.override(
+                                                      context.appTheme.titleSmall.override(
                                                         fontFamily: 'Open Sans',
                                                         color: Colors.white,
                                                         fontSize: 10,
@@ -2082,57 +2165,147 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   String formattedTime = "";
   Widget buildMap() {
-    return Obx(
-      () => GoogleMap(
-        mapType:
-            MapType.satellite, // Keep this as 'normal' (not satellite etc.)
-        tiltGesturesEnabled: true, // Tilt gesture allow karein
-        buildingsEnabled: true, // 3D buildings dikhayein
-        onMapCreated: (GoogleMapController controller) {
-          myController.setMapController(controller);
-        },
-        initialCameraPosition: CameraPosition(
-          target: LatLng(
-            myController.currentLocation?.latitude ?? 0.0,
-            myController.currentLocation?.longitude ?? 0.0,
-          ),
-          // zoom: 16.0,
-          zoom: 18.0, // Zoom thoda zyada rakho for building details
-          tilt: 60.0,
+    return Obx(() {
+      final latitude = myController.latitude.value;
+      final longitude = myController.longitude.value;
+      final destinationLat = myController.convertedLat.value;
+      final destinationLng = myController.convertedLng.value;
+      final routeCount = myController.decodedPoints.length;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _syncMapboxAnnotations(
+          latitude: latitude,
+          longitude: longitude,
+          destinationLat: destinationLat,
+          destinationLng: destinationLng,
+          routeCount: routeCount,
+        );
+      });
+
+      final centerLat =
+          latitude != 0.0
+              ? latitude
+              : myController.currentLocation?.latitude ?? 51.5074;
+      final centerLng =
+          longitude != 0.0
+              ? longitude
+              : myController.currentLocation?.longitude ?? -0.1278;
+
+      return mapbox.MapWidget(
+        key: const ValueKey('home-mapbox-map'),
+        styleUri: mapbox.MapboxStyles.STANDARD,
+        cameraOptions: mapbox.CameraOptions(
+          center: _mapboxPoint(centerLng, centerLat),
+          zoom: 15.5,
+          pitch: 54,
         ),
-        markers: {
-          // Always show source marker (current location)
-          Marker(
-            markerId: const MarkerId('Source'),
-            position: LatLng(
-              myController.latitude.value,
-              myController.longitude.value,
-            ),
-            icon: myController.sourceicon.value,
-          ),
-          // Only show destination marker if valid coordinates exist
-          if (myController.convertedLat.value != 0.0 &&
-              myController.convertedLng.value != 0.0)
-            Marker(
-              markerId: const MarkerId('destination'),
-              position: LatLng(
-                myController.convertedLat.value,
-                myController.convertedLng.value,
-              ),
-              icon: myController.destinationicon.value,
-            ),
+        onMapCreated: _onMapboxMapCreated,
+        onStyleLoadedListener: (_) async {
+          _mapboxStyleReady = true;
+          await _syncMapboxAnnotations(
+            latitude: latitude,
+            longitude: longitude,
+            destinationLat: destinationLat,
+            destinationLng: destinationLng,
+            routeCount: routeCount,
+          );
         },
-        polylines: myController.polylines.value,
-        myLocationEnabled: false,
-        myLocationButtonEnabled: false,
-        compassEnabled: true,
-        rotateGesturesEnabled: true,
-        // tiltGesturesEnabled: true,
-        scrollGesturesEnabled: true,
-        zoomControlsEnabled: false,
-        zoomGesturesEnabled: true,
+      );
+    });
+  }
+
+  mapbox.Point _mapboxPoint(double longitude, double latitude) {
+    return mapbox.Point(coordinates: mapbox.Position(longitude, latitude));
+  }
+
+  Future<void> _onMapboxMapCreated(mapbox.MapboxMap mapboxMap) async {
+    _mapboxMap = mapboxMap;
+    _mapPointManager =
+        await mapboxMap.annotations.createPointAnnotationManager();
+    _mapPolylineManager =
+        await mapboxMap.annotations.createPolylineAnnotationManager();
+
+    await mapboxMap.location.updateSettings(
+      mapbox.LocationComponentSettings(
+        enabled: true,
+        pulsingEnabled: true,
+        puckBearingEnabled: true,
       ),
     );
+  }
+
+  Future<void> _syncMapboxAnnotations({
+    required double latitude,
+    required double longitude,
+    required double destinationLat,
+    required double destinationLng,
+    required int routeCount,
+  }) async {
+    if (!_mapboxStyleReady ||
+        _mapPointManager == null ||
+        _mapPolylineManager == null) {
+      return;
+    }
+
+    _driverMarkerImage ??= await _loadMarkerBytes('assets/images/car.png');
+    _destinationMarkerImage ??= await _loadMarkerBytes(
+      'assets/images/userg.png',
+    );
+
+    await _mapPointManager!.deleteAll();
+    final pointOptions = <mapbox.PointAnnotationOptions>[];
+    if (latitude != 0.0 && longitude != 0.0 && _driverMarkerImage != null) {
+      pointOptions.add(
+        mapbox.PointAnnotationOptions(
+          geometry: _mapboxPoint(longitude, latitude),
+          image: _driverMarkerImage,
+          iconSize: 0.68,
+          iconAnchor: mapbox.IconAnchor.CENTER,
+          symbolSortKey: 2,
+        ),
+      );
+    }
+
+    if (destinationLat != 0.0 &&
+        destinationLng != 0.0 &&
+        _destinationMarkerImage != null) {
+      pointOptions.add(
+        mapbox.PointAnnotationOptions(
+          geometry: _mapboxPoint(destinationLng, destinationLat),
+          image: _destinationMarkerImage,
+          iconSize: 0.72,
+          iconAnchor: mapbox.IconAnchor.BOTTOM,
+          symbolSortKey: 3,
+        ),
+      );
+    }
+
+    if (pointOptions.isNotEmpty) {
+      await _mapPointManager!.createMulti(pointOptions);
+    }
+
+    await _mapPolylineManager!.deleteAll();
+    if (routeCount > 1) {
+      final coordinates =
+          myController.decodedPoints
+              .map((point) => mapbox.Position(point.longitude, point.latitude))
+              .toList();
+      await _mapPolylineManager!.create(
+        mapbox.PolylineAnnotationOptions(
+          geometry: mapbox.LineString(coordinates: coordinates),
+          lineColor: _green.value,
+          lineOpacity: 0.92,
+          lineWidth: 6,
+          lineBorderColor: Colors.white.value,
+          lineBorderWidth: 1.5,
+        ),
+      );
+    }
+  }
+
+  Future<Uint8List> _loadMarkerBytes(String assetPath) async {
+    final data = await rootBundle.load(assetPath);
+    return data.buffer.asUint8List();
   }
 
   // Widget buildMap() {
@@ -2140,20 +2313,18 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   //     onMapCreated: (GoogleMapController controller) {
   //       // myController.mapController.value = controller;
 
-  LatLng _destination = LatLng(34.0522, -118.2437);
+  final LatLng _destination = LatLng(34.0522, -118.2437);
   void fetchJobStatus() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? d_id = prefs.getString('d_id');
+      String? dId = prefs.getString('d_id');
 
-      if (d_id != null) {
+      if (dId != null) {
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse(
-            'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php',
-          ),
+          Uri.parse(ApiService.driverJobsAcceptedJobsToday),
         );
-        request.fields.addAll({'d_id': d_id});
+        request.fields.addAll({'d_id': dId});
 
         http.StreamedResponse response = await request.send();
 
@@ -2168,17 +2339,30 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   void _animateToCurrentLocation() {
-    if (Position != null) {
-      myController.mapController.value!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(
-              myController.currentLocation!.latitude,
-              myController.currentLocation!.longitude,
-            ),
-            zoom: 12.0,
-          ),
-        ),
+    final latitude =
+        myController.latitude.value != 0.0
+            ? myController.latitude.value
+            : myController.currentLocation?.latitude;
+    final longitude =
+        myController.longitude.value != 0.0
+            ? myController.longitude.value
+            : myController.currentLocation?.longitude;
+
+    if (latitude == null || longitude == null) {
+      return;
+    }
+
+    _mapboxMap?.flyTo(
+      mapbox.CameraOptions(
+        center: _mapboxPoint(longitude, latitude),
+        zoom: 16.5,
+        pitch: 56,
+      ),
+      mapbox.MapAnimationOptions(duration: 900),
+    );
+    if (_mapboxMap == null) {
+      myController.mapController.value?.animateCamera(
+        CameraUpdate.newLatLngZoom(LatLng(latitude, longitude), 14.5),
       );
     }
   }
@@ -2229,7 +2413,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   Timer? _checkTimer;
   int _seconds = 0;
-  bool _isRunning = false;
+  final bool _isRunning = false;
   String? _startTime; // Start time from API in "HH:mm:ss"
   String? _endTime; // End time from API in "HH:mm:ss"
   // bool myController.isTimeSlotAccepted.value = false;
@@ -2239,9 +2423,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? tsid = prefs.getString('ts_id');
 
     final response = await http.post(
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/accept-time-slot.php',
-      ),
+      Uri.parse(ApiService.driverTimeslotsAcceptTimeSlot),
       body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
     );
 
@@ -2255,7 +2437,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         // await prefs.setString('startTime', _startTime!);
         // await prefs.setString('endTime', _endTime!);
 
-        updateEndTime(myController.timeSlotEndTime.value!);
+        updateEndTime(myController.timeSlotEndTime.value);
         setTsId(myController.timeSlotid.value);
         await prefs.setBool('isAccepted', true);
 
@@ -2424,9 +2606,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? tsid = prefs.getString('ts_id');
 
     final response = await http.post(
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/complete-time-slot.php',
-      ),
+      Uri.parse(ApiService.driverTimeslotsCompleteTimeSlot),
       body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
     );
 
@@ -2446,9 +2626,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     String? tsid = prefs.getString('ts_id');
 
     final response = await http.post(
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/reject-time-slot.php',
-      ),
+      Uri.parse(ApiService.driverTimeslotsRejectTimeSlot),
       body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
     );
 
@@ -2467,7 +2645,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
     try {
       final response = await http.post(
-        Uri.parse('https://minicaboffice.com/api/driver/upcoming-jobs.php'),
+        Uri.parse(ApiService.driverJobsUpcomingJobs),
         body: {'d_id': dId.toString()},
       );
 
@@ -2583,12 +2761,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   Future<void> DueBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? dId = await prefs.getString('d_id');
+    String? dId = prefs.getString('d_id');
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/total-due-balance.php',
-      ),
+      Uri.parse(ApiService.driverAccountsTotalDueBalance),
     );
     request.fields.addAll({'d_id': dId.toString()});
     http.StreamedResponse response = await request.send();
@@ -2608,12 +2784,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Future<void> checkVehicleDocuments() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
-    print('the driver id is ${dId}');
+    print('the driver id is $dId');
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/check-vehicle-documents.php',
-      ),
+      Uri.parse(ApiService.driverDocumentsCheckVehicleDocuments),
     );
     request.fields.addAll({'d_id': dId.toString(), 'status': 'online'});
     http.StreamedResponse response = await request.send();
@@ -2657,7 +2831,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/online-status.php'),
+        Uri.parse(ApiService.driverActivityOnlineStatus),
       );
       request.fields.addAll({
         'd_id': dId.toString(),
@@ -2673,10 +2847,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (latitude != null && longitude != null) {
+    if (longitude != null) {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/real-location.php'),
+        Uri.parse(ApiService.driverActivityRealLocation),
       );
       request.fields.addAll({
         'd_id': driverId.toString(),
@@ -2741,5 +2915,192 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         });
       }
     }
+  }
+}
+
+class _DriverHomeHeader extends StatelessWidget {
+  const _DriverHomeHeader({
+    required this.isOnline,
+    required this.routeDistance,
+    required this.routeDuration,
+    required this.nextInstruction,
+    required this.hasRoute,
+    required this.onMenu,
+    required this.onToggleStatus,
+  });
+
+  final bool isOnline;
+  final String routeDistance;
+  final String routeDuration;
+  final String nextInstruction;
+  final bool hasRoute;
+  final VoidCallback onMenu;
+  final VoidCallback onToggleStatus;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE1E7E3)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A101820),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconButton.filledTonal(
+                    tooltip: 'Menu',
+                    onPressed: onMenu,
+                    icon: const Icon(Icons.menu_rounded),
+                    style: IconButton.styleFrom(
+                      backgroundColor: _HomeWidgetState._surface,
+                      foregroundColor: _HomeWidgetState._ink,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Driver cockpit',
+                          style: context.appTheme.titleSmall.copyWith(
+                            color: _HomeWidgetState._ink,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          hasRoute ? 'Mapbox route ready' : 'Waiting for jobs',
+                          overflow: TextOverflow.ellipsis,
+                          style: context.appTheme.bodySmall.copyWith(color: const Color(0xFF65736C)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: onToggleStatus,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            isOnline
+                                ? const Color(0xFFE7F5EF)
+                                : const Color(0xFFFDECEC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color:
+                              isOnline
+                                  ? const Color(0xFFB7DEC9)
+                                  : const Color(0xFFF2C4C4),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.power_settings_new_rounded,
+                            size: 18,
+                            color:
+                                isOnline
+                                    ? _HomeWidgetState._green
+                                    : const Color(0xFFE65454),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            isOnline ? 'Online' : 'Offline',
+                            style: context.appTheme.bodySmall.copyWith(
+                              color:
+                                  isOnline
+                                      ? _HomeWidgetState._green
+                                      : const Color(0xFFE65454),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (hasRoute) const SizedBox(height: 12),
+              if (hasRoute)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _HomeWidgetState._surface,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: _HomeWidgetState._gold,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.navigation_rounded,
+                          color: _HomeWidgetState._ink,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              nextInstruction,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.appTheme.bodyMedium.copyWith(
+                                color: _HomeWidgetState._ink,
+                                fontWeight: FontWeight.w700,
+                                height: 1.25,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '$routeDistance | $routeDuration',
+                              style: context.appTheme.bodySmall
+                                  .copyWith(color: const Color(0xFF65736C)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

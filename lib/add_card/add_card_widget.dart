@@ -2,7 +2,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'add_card_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 export 'add_card_model.dart';
 
 class AddcardWidget extends StatefulWidget {
@@ -56,14 +57,16 @@ class _AddcardWidgetState extends State<AddcardWidget> {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: context.appTheme.primaryBackground,
         appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -72,7 +75,7 @@ class _AddcardWidgetState extends State<AddcardWidget> {
             buttonSize: 60,
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: FlutterFlowTheme.of(context).primary,
+              color: context.appTheme.primary,
               size: 30,
             ),
             onPressed: () async {
@@ -81,11 +84,11 @@ class _AddcardWidgetState extends State<AddcardWidget> {
           ),
           title: Text(
             'ADD NEW CARD',
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  fontFamily: 'Open Sans',
-                  color: FlutterFlowTheme.of(context).primary,
-                  fontSize: 22,
-                ),
+            style: context.appTheme.headlineMedium.override(
+              fontFamily: 'Open Sans',
+              color: context.appTheme.primary,
+              fontSize: 22,
+            ),
           ),
           actions: [],
           centerTitle: true,
@@ -105,7 +108,7 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                     children: [
                       Text(
                         'NO HIDDEN CHARGES. FULLY SECURE',
-                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        style: context.appTheme.bodyMedium,
                       ),
                     ],
                   ),
@@ -116,7 +119,7 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                     width: MediaQuery.sizeOf(context).width,
                     height: MediaQuery.sizeOf(context).height * 1,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
+                      color: context.appTheme.primaryBackground,
                     ),
                     child: Form(
                       key: _model.formKey,
@@ -131,42 +134,46 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                             decoration: InputDecoration(
                               labelText: 'Card Holder Name',
                               labelStyle:
-                                  FlutterFlowTheme.of(context).labelMedium,
+                                  context.appTheme.labelMedium,
                               hintStyle:
-                                  FlutterFlowTheme.of(context).labelMedium,
+                                  context.appTheme.labelMedium,
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
+                                  color:
+                                      context.appTheme.secondaryText,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: context.appTheme.primary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               errorBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
+                                  color: context.appTheme.error,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
+                                  color: context.appTheme.error,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
-                              contentPadding:
-                                  EdgeInsetsDirectional.fromSTEB(15, 0, 15, 0),
+                              contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                15,
+                                0,
+                                15,
+                                0,
+                              ),
                             ),
-                            style: FlutterFlowTheme.of(context).bodyMedium,
+                            style: context.appTheme.bodyMedium,
                             validator: _model.textController1Validator
                                 .asValidator(context),
                           ),
@@ -177,42 +184,46 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                             decoration: InputDecoration(
                               labelText: 'Card Number',
                               labelStyle:
-                                  FlutterFlowTheme.of(context).labelMedium,
+                                  context.appTheme.labelMedium,
                               hintStyle:
-                                  FlutterFlowTheme.of(context).labelMedium,
+                                  context.appTheme.labelMedium,
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
+                                  color:
+                                      context.appTheme.secondaryText,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: context.appTheme.primary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               errorBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
+                                  color: context.appTheme.error,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
                               focusedErrorBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).error,
+                                  color: context.appTheme.error,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.circular(0),
                               ),
-                              contentPadding:
-                                  EdgeInsetsDirectional.fromSTEB(15, 0, 15, 0),
+                              contentPadding: EdgeInsetsDirectional.fromSTEB(
+                                15,
+                                0,
+                                15,
+                                0,
+                              ),
                             ),
-                            style: FlutterFlowTheme.of(context).bodyMedium,
+                            style: context.appTheme.bodyMedium,
                             validator: _model.textController2Validator
                                 .asValidator(context),
                           ),
@@ -226,22 +237,22 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'Expiry mm/yy',
-                                    labelStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium,
-                                    hintStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium,
+                                    labelStyle:
+                                        context.appTheme.labelMedium,
+                                    hintStyle:
+                                        context.appTheme.labelMedium,
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
+                                        color:
+                                            context.appTheme.secondaryText,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
                                     ),
                                     focusedBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
@@ -249,7 +260,7 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                     errorBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
                                         color:
-                                            FlutterFlowTheme.of(context).error,
+                                            context.appTheme.error,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
@@ -257,17 +268,21 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                     focusedErrorBorder: UnderlineInputBorder(
                                       borderSide: BorderSide(
                                         color:
-                                            FlutterFlowTheme.of(context).error,
+                                            context.appTheme.error,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
                                     ),
                                     contentPadding:
                                         EdgeInsetsDirectional.fromSTEB(
-                                            15, 0, 15, 0),
+                                          15,
+                                          0,
+                                          15,
+                                          0,
+                                        ),
                                   ),
                                   style:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                      context.appTheme.bodyMedium,
                                   validator: _model.textController3Validator
                                       .asValidator(context),
                                 ),
@@ -279,22 +294,22 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'CVV',
-                                    labelStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium,
-                                    hintStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium,
+                                    labelStyle:
+                                        context.appTheme.labelMedium,
+                                    hintStyle:
+                                        context.appTheme.labelMedium,
                                     enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
+                                        color:
+                                            context.appTheme.secondaryText,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
@@ -302,7 +317,7 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                     errorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
                                         color:
-                                            FlutterFlowTheme.of(context).error,
+                                            context.appTheme.error,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
@@ -310,17 +325,21 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                     focusedErrorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
                                         color:
-                                            FlutterFlowTheme.of(context).error,
+                                            context.appTheme.error,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(0),
                                     ),
                                     contentPadding:
                                         EdgeInsetsDirectional.fromSTEB(
-                                            15, 0, 15, 0),
+                                          15,
+                                          0,
+                                          15,
+                                          0,
+                                        ),
                                   ),
                                   style:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                                      context.appTheme.bodyMedium,
                                   validator: _model.textController4Validator
                                       .asValidator(context),
                                 ),
@@ -328,33 +347,32 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                             ],
                           ),
                           Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 15, 0, 15),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              15,
+                              0,
+                              15,
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Expanded(
                                   child: FFButtonWidget(
                                     onPressed: () async {
-                                      if(usernameController.text == null){
-                                        Fluttertoast.showToast(
-                                          msg: "Card Holder Name field is empty",
-                                          fontSize: 16.0,
-                                        );
-                                        return;
-                                      } else if(NumberController.text == null){
+                                      if (NumberController.text == null) {
                                         Fluttertoast.showToast(
                                           msg: "Card Number field is empty",
                                           fontSize: 16.0,
                                         );
                                         return;
-                                      } else if(expiryController.text == null){
+                                      } else if (expiryController.text ==
+                                          null) {
                                         Fluttertoast.showToast(
                                           msg: "Expiry field is empty",
                                           fontSize: 16.0,
                                         );
                                         return;
-                                      } else if(cvcController.text == null){
+                                      } else if (cvcController.text == null) {
                                         Fluttertoast.showToast(
                                           msg: "CVC field is empty",
                                           fontSize: 16.0,
@@ -362,28 +380,28 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                         return;
                                       }
                                       try {
-                                        final prefs = await SharedPreferences
-                                            .getInstance();
+                                        final prefs =
+                                            await SharedPreferences.getInstance();
                                         String? cId = prefs.getString('c_id');
                                         var request = http.MultipartRequest(
-                                            'POST',
-                                            Uri.parse(
-                                                'https://www.minicaboffice.com/api/booker/add-card.php'));
+                                          'POST',
+                                          Uri.parse(ApiService.bookerAddCard),
+                                        );
                                         request.fields.addAll({
                                           'c_id': cId.toString(),
-                                          'card_name':
-                                              '${usernameController.text}',
-                                          'card_num':
-                                              '${NumberController.text}',
-                                          'expiry': '${expiryController.text}',
-                                          'cvv': '${cvcController.text}',
+                                          'card_name': usernameController.text,
+                                          'card_num': NumberController.text,
+                                          'expiry': expiryController.text,
+                                          'cvv': cvcController.text,
                                         });
                                         print(request.fields);
                                         http.StreamedResponse response =
                                             await request.send();
                                         if (response.statusCode == 200) {
-                                          print(await response.stream
-                                              .bytesToString());
+                                          print(
+                                            await response.stream
+                                                .bytesToString(),
+                                          );
                                           context.pushNamed('Home');
                                         } else {
                                           print(response.reasonPhrase);
@@ -396,19 +414,25 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                     options: FFButtonOptions(
                                       height: 50,
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          24, 0, 24, 0),
+                                        24,
+                                        0,
+                                        24,
+                                        0,
+                                      ),
                                       iconPadding:
                                           EdgeInsetsDirectional.fromSTEB(
-                                              0, 0, 0, 0),
-                                      color: FlutterFlowTheme.of(context)
-                                          .primary,
-                                      textStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .override(
-                                            fontFamily: 'Open Sans',
-                                            color: FlutterFlowTheme.of(context)
-                                                .info,
+                                            0,
+                                            0,
+                                            0,
+                                            0,
                                           ),
+                                      color:
+                                          context.appTheme.primary,
+                                      textStyle: context.appTheme.titleSmall.override(
+                                        fontFamily: 'Open Sans',
+                                        color:
+                                            context.appTheme.info,
+                                      ),
                                       elevation: 3,
                                       borderSide: BorderSide(
                                         color: Colors.transparent,

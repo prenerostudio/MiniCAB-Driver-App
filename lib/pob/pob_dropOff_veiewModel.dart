@@ -10,6 +10,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -102,9 +103,16 @@ class DropOffViewModel extends GetxController {
     var destination = '${convertedLat.value},${convertedLng.value}';
 
     instructions.clear();
-    final response = await http.post(Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
-    print('the order ${origin} and destination ${destination}');
+    final response = await http.post(
+      Uri.parse(
+        ApiService.googleDirectionsUrl(
+          origin: origin,
+          destination: destination,
+          apiKey: apiKey,
+        ),
+      ),
+    );
+    print('the order $origin and destination $destination');
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       // log('Google Map detail: $data');
@@ -118,25 +126,29 @@ class DropOffViewModel extends GetxController {
             distance.value = leg['distance']['text'];
             time.value = leg['duration']['text'];
             log('Google Map call 3');
-// instructions.addAll(iterable)
+            // instructions.addAll(iterable)
             if (leg.containsKey('steps') && leg['steps'].isNotEmpty) {
               log('Google Map call 4 instructions');
-              instructions.value = leg['steps'].map((step) {
-                return {
-                  'instruction': step['html_instructions'],
-                  'direction': step['maneuver'] ?? 'straight',
-                  'end_location': step['end_location'],
-                };
-              }).toList();
+              instructions.value =
+                  leg['steps'].map((step) {
+                    return {
+                      'instruction': step['html_instructions'],
+                      'direction': step['maneuver'] ?? 'straight',
+                      'end_location': step['end_location'],
+                    };
+                  }).toList();
             }
 
-            log("the first turn is from ${leg['steps'][0]['html_instructions']}");
+            log(
+              "the first turn is from ${leg['steps'][0]['html_instructions']}",
+            );
             final points = route['overview_polyline']['points'];
 
-            decodedPoints.value = PolylinePoints()
-                .decodePolyline(points)
-                .map((point) => LatLng(point.latitude, point.longitude))
-                .toList();
+            decodedPoints.value =
+                PolylinePoints()
+                    .decodePolyline(points)
+                    .map((point) => LatLng(point.latitude, point.longitude))
+                    .toList();
             log('Google Map call 5 polylines');
 
             polylines.add(
@@ -160,12 +172,14 @@ class DropOffViewModel extends GetxController {
 
   Future<Uint8List> getbytesfromimages(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetHeight: width);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetHeight: width,
+    );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    return (await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    ))!.buffer.asUint8List();
   }
 
   void setcustommarkeritem() async {
@@ -200,13 +214,12 @@ class DropOffViewModel extends GetxController {
     );
 
     // Convert resized image back to Uint8List
-    final Uint8List resizedBytes =
-        Uint8List.fromList(img.encodePng(resizedImage));
+    final Uint8List resizedBytes = Uint8List.fromList(
+      img.encodePng(resizedImage),
+    );
 
     // Convert to BitmapDescriptor
-    final ui.Codec codec = await ui.instantiateImageCodec(
-      resizedBytes,
-    );
+    final ui.Codec codec = await ui.instantiateImageCodec(resizedBytes);
     final ui.FrameInfo frameInfo = await codec.getNextFrame();
     final ByteData? byteData = await frameInfo.image.toByteData(
       format: ui.ImageByteFormat.png,
@@ -296,8 +309,15 @@ class DropOffViewModel extends GetxController {
     var destination =
         '${convertedLat.value},${convertedLng.value}'; // Replace with actual destination coordinates
 
-    final response = await http.post(Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+    final response = await http.post(
+      Uri.parse(
+        ApiService.googleDirectionsUrl(
+          origin: origin,
+          destination: destination,
+          apiKey: apiKey,
+        ),
+      ),
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -306,10 +326,11 @@ class DropOffViewModel extends GetxController {
         final points = route['overview_polyline']['points'];
 
         // Decode and update polyline points
-        decodedPoints.value = PolylinePoints()
-            .decodePolyline(points)
-            .map((point) => LatLng(point.latitude, point.longitude))
-            .toList();
+        decodedPoints.value =
+            PolylinePoints()
+                .decodePolyline(points)
+                .map((point) => LatLng(point.latitude, point.longitude))
+                .toList();
 
         polylines.clear();
         polylines.add(
@@ -325,13 +346,14 @@ class DropOffViewModel extends GetxController {
         if (route.containsKey('legs') && route['legs'].isNotEmpty) {
           final leg = route['legs'][0];
           if (leg.containsKey('steps') && leg['steps'].isNotEmpty) {
-            instructions.value = leg['steps'].map((step) {
-              return {
-                'instruction': step['html_instructions'],
-                'direction': step['maneuver'] ?? 'straight',
-                'end_location': step['end_location'],
-              };
-            }).toList();
+            instructions.value =
+                leg['steps'].map((step) {
+                  return {
+                    'instruction': step['html_instructions'],
+                    'direction': step['maneuver'] ?? 'straight',
+                    'end_location': step['end_location'],
+                  };
+                }).toList();
 
             // Reset current step index
             currentStepIndex.value = 0;

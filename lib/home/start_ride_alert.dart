@@ -9,7 +9,7 @@
 // import 'package:glowy_borders/glowy_borders.dart';
 // import 'package:mini_cab/Model/jobDetails.dart';
 // import 'package:mini_cab/components/notes_widget.dart';
-// import 'package:mini_cab/flutter_flow/flutter_flow_theme.dart';
+// import 'package:new_minicab_driver/theme/app_theme.dart';
 // import 'package:mini_cab/flutter_flow/flutter_flow_util.dart';
 // import 'package:mini_cab/flutter_flow/flutter_flow_widgets.dart';
 // import 'package:mini_cab/home/home_view_controller.dart';
@@ -34,7 +34,7 @@
 //         insetPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 10),
 //         child: SingleChildScrollView(
 //           child: Container(
-//             color: FlutterFlowTheme.of(context).primaryBackground,
+//             color: context.appTheme.primaryBackground,
 //             child: Padding(
 //               padding: const EdgeInsets.all(12),
 //               child: Column(
@@ -55,11 +55,11 @@
 //                             Text(
 //                               '£${widget.st[0].journeyFare}',
 //                               textAlign: TextAlign.end,
-//                               style: FlutterFlowTheme.of(context)
+//                               style: context.appTheme
 //                                   .displaySmall
 //                                   .override(
 //                                     fontFamily: 'Outfit',
-//                                     color: FlutterFlowTheme.of(context)
+//                                     color: context.appTheme
 //                                         .primaryText,
 //                                     fontSize: 32,
 //                                     fontWeight: FontWeight.w600,
@@ -67,11 +67,11 @@
 //                             ),
 //                             Text(
 //                               '(Estimated maximum value)',
-//                               style: FlutterFlowTheme.of(context)
+//                               style: context.appTheme
 //                                   .labelMedium
 //                                   .override(
 //                                     fontFamily: 'Montserrat',
-//                                     color: FlutterFlowTheme.of(context)
+//                                     color: context.appTheme
 //                                         .primaryText,
 //                                     fontSize: 14,
 //                                     fontWeight: FontWeight.w500,
@@ -103,7 +103,7 @@
 //                                 height: 50,
 //                                 child: VerticalDivider(
 //                                   thickness: 2,
-//                                   color: FlutterFlowTheme.of(context)
+//                                   color: context.appTheme
 //                                       .secondaryText,
 //                                 ),
 //                               ),
@@ -116,7 +116,7 @@
 //                                 children: [
 //                                   Text(
 //                                     'Time',
-//                                     style: FlutterFlowTheme.of(context)
+//                                     style: context.appTheme
 //                                         .bodyMedium
 //                                         .override(
 //                                           fontFamily: 'Roboto',
@@ -129,7 +129,7 @@
 //                                             0, 15, 0, 0),
 //                                     child: Text(
 //                                       'Date',
-//                                       style: FlutterFlowTheme.of(context)
+//                                       style: context.appTheme
 //                                           .bodyMedium
 //                                           .override(
 //                                             fontFamily: 'Roboto',
@@ -148,7 +148,7 @@
 //                                 children: [
 //                                   Text(
 //                                     '${widget.st[0]!.pickTime}',
-//                                     style: FlutterFlowTheme.of(context)
+//                                     style: context.appTheme
 //                                         .bodyMedium
 //                                         .override(
 //                                           fontFamily: 'Roboto',
@@ -161,7 +161,7 @@
 //                                             0, 15, 0, 0),
 //                                     child: Text(
 //                                       '${widget.st[0]!.pickDate}',
-//                                       style: FlutterFlowTheme.of(context)
+//                                       style: context.appTheme
 //                                           .bodyMedium
 //                                           .override(
 //                                             fontFamily: 'Roboto',
@@ -203,11 +203,11 @@
 //                                 child: Center(
 //                                   child: Text(
 //                                     'A',
-//                                     style: FlutterFlowTheme.of(context)
+//                                     style: context.appTheme
 //                                         .bodyMedium
 //                                         .override(
 //                                           fontFamily: 'Open Sans',
-//                                           color: FlutterFlowTheme.of(context)
+//                                           color: context.appTheme
 //                                               .secondaryBackground,
 //                                           fontSize: 18,
 //                                           fontWeight: FontWeight.w300,
@@ -265,11 +265,11 @@
 //                                 child: Center(
 //                                   child: Text(
 //                                     'B',
-//                                     style: FlutterFlowTheme.of(context)
+//                                     style: context.appTheme
 //                                         .bodyMedium
 //                                         .override(
 //                                           fontFamily: 'Open Sans',
-//                                           color: FlutterFlowTheme.of(context)
+//                                           color: context.appTheme
 //                                               .secondaryBackground,
 //                                           fontSize: 18,
 //                                           fontWeight: FontWeight.w300,
@@ -293,12 +293,12 @@
 //                                           left: 10, top: 10, bottom: 20),
 //                                       child: Text(
 //                                         '${widget.st[0]!.pickup}',
-//                                         style: FlutterFlowTheme.of(context)
+//                                         style: context.appTheme
 //                                             .labelMedium
 //                                             .override(
 //                                               fontFamily: 'Readex Pro',
 //                                               color:
-//                                                   FlutterFlowTheme.of(context)
+//                                                   context.appTheme
 //                                                       .secondaryText,
 //                                               fontSize: 15,
 //                                             ),
@@ -322,12 +322,12 @@
 //                                       padding: const EdgeInsets.only(left: 8),
 //                                       child: Text(
 //                                         '${(double.parse(widget.st[0]!.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${widget.st[0]!.journeyType}',
-//                                         style: FlutterFlowTheme.of(context)
+//                                         style: context.appTheme
 //                                             .bodyMedium
 //                                             .override(
 //                                               fontFamily: 'Open Sans',
 //                                               color:
-//                                                   FlutterFlowTheme.of(context)
+//                                                   context.appTheme
 //                                                       .secondaryText,
 //                                               fontSize: 16,
 //                                             ),
@@ -344,12 +344,12 @@
 //                                           left: 10, top: 10, bottom: 20),
 //                                       child: Text(
 //                                         '${widget.st[0]!.destination}',
-//                                         style: FlutterFlowTheme.of(context)
+//                                         style: context.appTheme
 //                                             .labelMedium
 //                                             .override(
 //                                               fontFamily: 'Readex Pro',
 //                                               color:
-//                                                   FlutterFlowTheme.of(context)
+//                                                   context.appTheme
 //                                                       .secondaryText,
 //                                               fontSize: 15,
 //                                             ),
@@ -426,8 +426,8 @@
 //                               24, 0, 24, 0),
 //                           iconPadding:
 //                               const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-//                           color: FlutterFlowTheme.of(context).primary,
-//                           textStyle: FlutterFlowTheme.of(context)
+//                           color: context.appTheme.primary,
+//                           textStyle: context.appTheme
 //                               .titleSmall
 //                               .override(
 //                                   fontFamily: 'Open Sans',

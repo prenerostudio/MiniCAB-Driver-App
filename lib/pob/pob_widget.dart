@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/clientnotes_widget.dart';
 import '../components/waydetails_widget.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -29,10 +29,11 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class PobWidget extends StatefulWidget {
   const PobWidget({
-    Key? key,
+    super.key,
     // required this.did,
     // required this.jobid,
     // required this.pickup,
@@ -47,7 +48,7 @@ class PobWidget extends StatefulWidget {
     // required this.luggage,
     // required this.cnumber,
     // required this.cemail,
-  }) : super(key: key);
+  });
 
   // final String? did;
   // final String? jobid;
@@ -196,15 +197,15 @@ class _PobWidgetState extends State<PobWidget> {
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           // appBar: AppBar(
-          //   backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          //   backgroundColor: context.appTheme.primaryBackground,
           //   automaticallyImplyLeading: false,
           //   title: Text(
           //     'At DropOff',
-          //     style: FlutterFlowTheme.of(context).headlineMedium.override(
+          //     style: context.appTheme.headlineMedium.override(
           //           fontFamily: 'Outfit',
-          //           color: FlutterFlowTheme.of(context).primary,
+          //           color: context.appTheme.primary,
           //           fontSize: 22,
           //         ),
           //   ),
@@ -222,7 +223,7 @@ class _PobWidgetState extends State<PobWidget> {
                     width: double.infinity,
                     height: MediaQuery.sizeOf(context).height * 0.96,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: context.appTheme.secondaryBackground,
                     ),
                     child: Stack(
                       children: [
@@ -240,9 +241,7 @@ class _PobWidgetState extends State<PobWidget> {
                                     MediaQuery.sizeOf(context).height * 0.30,
                                 decoration: BoxDecoration(
                                   color:
-                                      FlutterFlowTheme.of(
-                                        context,
-                                      ).primaryBackground,
+                                      context.appTheme.primaryBackground,
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -264,7 +263,7 @@ class _PobWidgetState extends State<PobWidget> {
                                         ),
                                         SizedBox(width: 20),
                                         Text(
-                                          '$distanceKm',
+                                          distanceKm,
                                           style: TextStyle(fontSize: 17),
                                         ),
                                         // Container(
@@ -322,9 +321,7 @@ class _PobWidgetState extends State<PobWidget> {
                                               child: Icon(
                                                 Icons.pin_drop_outlined,
                                                 color:
-                                                    FlutterFlowTheme.of(
-                                                      context,
-                                                    ).primary,
+                                                    context.appTheme.primary,
                                                 size: 25,
                                               ),
                                             ),
@@ -338,15 +335,11 @@ class _PobWidgetState extends State<PobWidget> {
                                                       20.0,
                                                     ),
                                                 child: Text(
-                                                  '${dropoff}',
-                                                  style: FlutterFlowTheme.of(
-                                                    context,
-                                                  ).labelMedium.override(
+                                                  dropoff,
+                                                  style: context.appTheme.labelMedium.override(
                                                     fontFamily: 'Readex Pro',
                                                     color:
-                                                        FlutterFlowTheme.of(
-                                                          context,
-                                                        ).secondaryText,
+                                                        context.appTheme.secondaryText,
                                                     fontSize: 20.0,
                                                     letterSpacing: 1.5,
                                                   ),
@@ -382,9 +375,7 @@ class _PobWidgetState extends State<PobWidget> {
                                             icon: FaIcon(
                                               FontAwesomeIcons.ellipsisH,
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).secondaryBackground,
+                                                  context.appTheme.secondaryBackground,
                                               size: 24,
                                             ),
                                             onPressed: () async {
@@ -401,16 +392,16 @@ class _PobWidgetState extends State<PobWidget> {
                                                           context,
                                                         ),
                                                     child: WaydetailsWidget(
-                                                      time: '${pickTime}',
-                                                      date: '${pickDate}',
-                                                      passanger: '${passenger}',
-                                                      cName: '${cName}',
-                                                      cnumber: '${cnumber}',
-                                                      luggage: '${luggage}',
-                                                      pickup: '${pickup}',
-                                                      dropoff: '${dropoff}',
-                                                      cNote: '${note}',
-                                                      cemail: '${cemail}',
+                                                      time: '$pickTime',
+                                                      date: '$pickDate',
+                                                      passanger: '$passenger',
+                                                      cName: '$cName',
+                                                      cnumber: '$cnumber',
+                                                      luggage: '$luggage',
+                                                      pickup: '$pickup',
+                                                      dropoff: dropoff,
+                                                      cNote: '$note',
+                                                      cemail: '$cemail',
                                                     ),
                                                   );
                                                 },
@@ -434,8 +425,8 @@ class _PobWidgetState extends State<PobWidget> {
                                                           context,
                                                         ),
                                                     child: ClientnotesWidget(
-                                                      name: '${cName}',
-                                                      notes: '${note}',
+                                                      name: '$cName',
+                                                      notes: '$note',
                                                     ),
                                                   );
                                                 },
@@ -470,12 +461,8 @@ class _PobWidgetState extends State<PobWidget> {
                                                     0,
                                                   ),
                                               color:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primary,
-                                              textStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).titleSmall.override(
+                                                  context.appTheme.primary,
+                                              textStyle: context.appTheme.titleSmall.override(
                                                 fontFamily: 'Open Sans',
                                                 color: Colors.white,
                                               ),
@@ -503,28 +490,20 @@ class _PobWidgetState extends State<PobWidget> {
                                         thumb: Icon(
                                           Icons.chevron_right,
                                           color:
-                                              FlutterFlowTheme.of(
-                                                context,
-                                              ).primary,
+                                              context.appTheme.primary,
                                         ),
                                         elevationThumb: 2,
                                         elevationTrack: 2,
                                         activeThumbColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primaryBackground,
+                                            context.appTheme.primaryBackground,
                                         activeTrackColor:
-                                            FlutterFlowTheme.of(
-                                              context,
-                                            ).primary,
+                                            context.appTheme.primary,
                                         borderRadius: BorderRadius.circular(8),
                                         child: Text(
                                           'AT DROP OFF'.toUpperCase(),
                                           style: TextStyle(
                                             color:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).primaryBackground,
+                                                context.appTheme.primaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -536,9 +515,7 @@ class _PobWidgetState extends State<PobWidget> {
                                             SnackBar(
                                               content: Text('AT DROP OFF'),
                                               backgroundColor:
-                                                  FlutterFlowTheme.of(
-                                                    context,
-                                                  ).primary,
+                                                  context.appTheme.primary,
                                             ),
                                           );
                                         },
@@ -556,15 +533,15 @@ class _PobWidgetState extends State<PobWidget> {
                                             queryParameters:
                                                 {
                                                   'jobid': serializeParam(
-                                                    '${jobid}',
+                                                    '$jobid',
                                                     ParamType.String,
                                                   ),
                                                   'did': serializeParam(
-                                                    '${did}',
+                                                    '$did',
                                                     ParamType.String,
                                                   ),
                                                   'fare': serializeParam(
-                                                    '${fare}',
+                                                    '$fare',
                                                     ParamType.String,
                                                   ),
                                                 }.withoutNulls,
@@ -597,8 +574,8 @@ class _PobWidgetState extends State<PobWidget> {
                                           context,
                                         ),
                                         child: ClientnotesWidget(
-                                          name: '${cName}',
-                                          notes: '${note}',
+                                          name: '$cName',
+                                          notes: '$note',
                                         ),
                                       );
                                     },
@@ -608,7 +585,7 @@ class _PobWidgetState extends State<PobWidget> {
                                   height: 40,
                                   width: 40,
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context).primary,
+                                    color: context.appTheme.primary,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
@@ -627,7 +604,7 @@ class _PobWidgetState extends State<PobWidget> {
                               //   height: 40,
                               //   width: 40,
                               //   decoration: BoxDecoration(
-                              //       color: FlutterFlowTheme.of(context).primary,
+                              //       color: context.appTheme.primary,
                               //       shape: BoxShape.circle),
                               //   child: Center(
                               //     child: Transform.rotate(
@@ -681,9 +658,9 @@ class _PobWidgetState extends State<PobWidget> {
     polylineCoordinate.clear();
 
     if (result.points.isNotEmpty) {
-      result.points.forEach((PointLatLng point) {
+      for (var point in result.points) {
         polylineCoordinate.add(LatLng(point.latitude, point.longitude));
-      });
+      }
     }
     double distanceinKm = result.totalDistanceValue! / 1600;
     distanceKm = "${distanceinKm.toStringAsFixed(1)} miles";
@@ -706,7 +683,7 @@ class _PobWidgetState extends State<PobWidget> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> routeData =
         route.map((point) => '${point.latitude},${point.longitude}').toList();
-    print("the saved route is ${routeData}");
+    print("the saved route is $routeData");
     await prefs.setStringList('user_route', routeData);
   }
 
@@ -760,7 +737,7 @@ class _PobWidgetState extends State<PobWidget> {
         dropOffViewModel.convertedLat.value, // Destination latitude
         dropOffViewModel.convertedLng.value, // Destination longitude
       );
-      log('the distance in meter is ${distanceInMeters}');
+      log('the distance in meter is $distanceInMeters');
       if (distanceInMeters <= 200) {
         // isReached = true;
         // if (isReached) {
@@ -780,11 +757,10 @@ class _PobWidgetState extends State<PobWidget> {
       markers.add(
         Marker(
           markerId: MarkerId('destination'),
-          position:
-              LatLng(
-                dropOffViewModel.convertedLat.value,
-                dropOffViewModel.convertedLng.value,
-              )!,
+          position: LatLng(
+            dropOffViewModel.convertedLat.value,
+            dropOffViewModel.convertedLng.value,
+          ),
           icon: destination,
         ),
       );
@@ -849,7 +825,7 @@ class _PobWidgetState extends State<PobWidget> {
     //     :
     GoogleMap(
       // circles: geofenceCircles,
-      initialCameraPosition: initialCameraPosition!,
+      initialCameraPosition: initialCameraPosition,
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
       mapType: MapType.satellite, // Keep this as 'normal' (not satellite etc.)
@@ -916,7 +892,7 @@ class _PobWidgetState extends State<PobWidget> {
       String? dId = prefs.getString('d_id');
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/on-ride.php'),
+        Uri.parse(ApiService.driverOnRide),
       );
       request.fields.addAll({'d_id': dId.toString()});
       http.StreamedResponse response = await request.send();
@@ -927,9 +903,9 @@ class _PobWidgetState extends State<PobWidget> {
 
   pushercallbg() async {
     var pusher = PusherClient(
-      '28691ac9c0c5ac41b64a',
+      'ef80ba163503f394d9c3',
       const PusherOptions(
-        host: 'https://www.minicaboffice.com/api/driver/check-job-status.php',
+        host: ApiService.driverCheckJobStatus,
         cluster: 'ap2',
         encrypted: false,
       ),
@@ -945,6 +921,11 @@ class _PobWidgetState extends State<PobWidget> {
 
       // });
     });
+
+    var dispatchChannel = pusher.subscribe('dispatch-booking');
+    dispatchChannel.bind('booking-withdraw', (event) {
+      jobStatus();
+    });
   }
 
   Future<void> jobStatus() async {
@@ -953,9 +934,7 @@ class _PobWidgetState extends State<PobWidget> {
     String? jobId = prefs.getString('jobId');
     try {
       final response = await http.post(
-        Uri.parse(
-          'https://www.minicaboffice.com/api/driver/check-job-status.php',
-        ),
+        Uri.parse(ApiService.driverCheckJobStatus),
         body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
       );
 

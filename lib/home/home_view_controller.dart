@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,25 @@ import 'package:new_minicab_driver/Model/jobDetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
+import 'package:new_minicab_driver/Data/api_service.dart';
+
+const _defaultMapboxAccessToken =
+    'pk.eyJ1IjoicHJlbmVyb3N0dWRpb3MiLCJhIjoiY21vdTAxbDF0MDl5ZzJ0c2h1OWU5cXlvZyJ9.r18j8yamEjiEAmIsBwRnBw';
+const _mapboxAccessToken = String.fromEnvironment(
+  'MAPBOX_ACCESS_TOKEN',
+  defaultValue: '',
+);
+const _legacyMapboxAccessToken = String.fromEnvironment(
+  'ACCESS_TOKEN',
+  defaultValue: '',
+);
+
+String get _resolvedMapboxAccessToken =>
+    _mapboxAccessToken.isNotEmpty
+        ? _mapboxAccessToken
+        : _legacyMapboxAccessToken.isNotEmpty
+        ? _legacyMapboxAccessToken
+        : _defaultMapboxAccessToken;
 
 class JobController extends GetxController {
   var isPeriodicVisible = false.obs;
@@ -38,6 +56,9 @@ class JobController extends GetxController {
   RxList<Job> listFromPusher = <Job>[].obs;
   RxDouble convertedLat = 0.0.obs;
   RxList<LatLng> decodedPoints = <LatLng>[].obs;
+  final routeDuration = '--'.obs;
+  final routeDistance = '--'.obs;
+  final nextInstruction = ''.obs;
   Position? currentLocation;
   RxDouble convertedLng = 0.0.obs;
   RxSet<Polyline> polylines = <Polyline>{}.obs;
@@ -77,9 +98,7 @@ class JobController extends GetxController {
     String? jobid = prefs.getString('jobId');
 
     final response = await http.post(
-      Uri.parse(
-        'https://www.minicaboffice.com/api/driver/accepted-jobs-today.php',
-      ),
+      Uri.parse(ApiService.driverAcceptedJobsToday),
       body: {'d_id': dId.toString()},
     );
     print('before if condition');
@@ -226,9 +245,7 @@ class JobController extends GetxController {
       String? jobId = prefs.getString('jobId');
 
       final response = await http.post(
-        Uri.parse(
-          'https://www.minicaboffice.com/api/driver/accepted-job-details.php',
-        ),
+        Uri.parse(ApiService.driverAcceptedJobDetails),
         body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
       );
 
@@ -287,59 +304,81 @@ class JobController extends GetxController {
     double destinationLat,
     double destinationLng,
   ) async {
-    const apiKey =
-        'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA'; // Replace with your Google Maps API key
-    var origin =
-        '${latitude.value},${longitude.value}'; // Replace with your source coordinates
-    var destination =
-        // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-        '${destinationLat},${destinationLng}'; // Replace with your destination coordinates // Replace with your destination coordinates
-    final response = await http.post(
-      Uri.parse(
-        // can be get and post request
-        // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey',
+    final response = await http.get(
+      ApiService.mapboxDrivingTrafficUri(
+        originLat: latitude.value,
+        originLng: longitude.value,
+        destinationLat: destinationLat,
+        destinationLng: destinationLng,
+        accessToken: _resolvedMapboxAccessToken,
       ),
     );
 
     if (response.statusCode == 200) {
       // Parse the JSON response
       final data = jsonDecode(response.body);
-      // print(data);
       if (data.containsKey('routes') && data['routes'].isNotEmpty) {
         final route = data['routes'][0];
-        if (route.containsKey('legs') && route['legs'].isNotEmpty) {
-          final leg = route['legs'][0];
+        final coordinates =
+            route['geometry']?['coordinates'] is List
+                ? route['geometry']['coordinates'] as List
+                : const [];
+        decodedPoints.value =
+            coordinates
+                .whereType<List>()
+                .where((point) => point.length >= 2)
+                .map(
+                  (point) => LatLng(
+                    (point[1] as num).toDouble(),
+                    (point[0] as num).toDouble(),
+                  ),
+                )
+                .toList();
 
-          if (leg.containsKey('distance')) {
-            // distance.value = leg['distance']['text'];
-            // time.value = leg['duration']['text'];
+        routeDistance.value = _formatMiles(route['distance']);
+        routeDuration.value = _formatDuration(route['duration']);
 
-            final points = route['overview_polyline']['points'];
-
-            // Decode polyline points and add them to the map
-            decodedPoints.value =
-                PolylinePoints()
-                    .decodePolyline(points)
-                    .map((point) => LatLng(point.latitude, point.longitude))
-                    .toList();
-            // polylines.value.clear();
-            polylines.clear(); // Clear previous polyline
-            polylines.add(
-              Polyline(
-                // patterns: [PatternItem.dash(20), PatternItem.gap(10)],
-                // patterns: points,
-                // polylineId: const PolylineId('updated_route'),
-                polylineId: const PolylineId('route'),
-                color: Colors.blue,
-                width: 5,
-                points: decodedPoints,
-              ),
-            );
-          }
+        final legs = route['legs'];
+        final steps =
+            legs is List && legs.isNotEmpty && legs.first['steps'] is List
+                ? legs.first['steps'] as List
+                : const [];
+        if (steps.isNotEmpty) {
+          nextInstruction.value =
+              steps.first['maneuver']?['instruction']?.toString() ??
+              'Continue to route';
+        } else {
+          nextInstruction.value = 'Route ready';
         }
+
+        polylines.clear(); // Clear previous polyline
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('route'),
+            color: Colors.blue,
+            width: 5,
+            points: decodedPoints,
+          ),
+        );
       }
     }
+  }
+
+  String _formatMiles(dynamic meters) {
+    if (meters is! num) {
+      return '--';
+    }
+    return '${(meters / 1609.344).toStringAsFixed(1)} mi';
+  }
+
+  String _formatDuration(dynamic seconds) {
+    if (seconds is! num) {
+      return '--';
+    }
+    if (seconds < 60) {
+      return '${seconds.round()} sec';
+    }
+    return '${(seconds / 60).ceil()} min';
   }
 
   Future<Uint8List> getbytesfromimages(

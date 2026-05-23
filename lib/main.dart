@@ -20,30 +20,42 @@ import 'package:new_minicab_driver/upcomming/upcomming_widget.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'auth/firebase_auth/firebase_user_provider.dart';
-import 'auth/firebase_auth/auth_util.dart';
+import 'auth/base_auth_user_provider.dart';
+import 'auth/simple_auth_user_provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'backend/firebase/firebase_config.dart';
-import 'flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'flutter_flow/nav/nav.dart';
 import 'package:http/http.dart' as http;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
 
 import 'home/home_widget.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
+
+const _defaultMapboxAccessToken =
+    'pk.eyJ1IjoicHJlbmVyb3N0dWRpb3MiLCJhIjoiY21vdTAxbDF0MDl5ZzJ0c2h1OWU5cXlvZyJ9.r18j8yamEjiEAmIsBwRnBw';
+const _mapboxAccessToken = String.fromEnvironment(
+  'MAPBOX_ACCESS_TOKEN',
+  defaultValue: '',
+);
+const _legacyMapboxAccessToken = String.fromEnvironment(
+  'ACCESS_TOKEN',
+  defaultValue: '',
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
-  try {
-    await initFirebase();
-    print('firebase succesffuly');
-  } catch (e) {
-    print('firebase make issue');
-  }
+  mapbox.MapboxOptions.setAccessToken(
+    _mapboxAccessToken.isNotEmpty
+        ? _mapboxAccessToken
+        : _legacyMapboxAccessToken.isNotEmpty
+        ? _legacyMapboxAccessToken
+        : _defaultMapboxAccessToken,
+  );
   notification();
   initializeService();
   runApp(MyApp());
@@ -79,6 +91,136 @@ class _StState extends State<St> {
       ),
     );
   }
+}
+
+class _ElegantDriverNavBar extends StatelessWidget {
+  const _ElegantDriverNavBar({required this.currentIndex, required this.onTap});
+
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  static const _items = [
+    _DriverNavItem(Icons.home_rounded, 'Home'),
+    _DriverNavItem(FontAwesomeIcons.carRear, 'Jobs'),
+    _DriverNavItem(Icons.space_dashboard_rounded, 'Stats'),
+    _DriverNavItem(Icons.local_offer_rounded, 'Bids'),
+    _DriverNavItem(Icons.account_balance_wallet_rounded, 'Pay'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x24101820),
+              blurRadius: 28,
+              offset: Offset(0, 16),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+            child: Container(
+              height: 74,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.94),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE1E7E3)),
+              ),
+              child: Row(
+                children:
+                    _items.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      final selected = index == currentIndex;
+
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: index == _items.length - 1 ? 0 : 4,
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () => onTap(index),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 220),
+                                curve: Curves.easeOutCubic,
+                                height: double.infinity,
+                                decoration: BoxDecoration(
+                                  color:
+                                      selected
+                                          ? const Color(0xFF101820)
+                                          : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    AnimatedScale(
+                                      duration: const Duration(
+                                        milliseconds: 180,
+                                      ),
+                                      curve: Curves.easeOut,
+                                      scale: selected ? 1.05 : 1,
+                                      child: Icon(
+                                        item.icon,
+                                        size: selected ? 22 : 20,
+                                        color:
+                                            selected
+                                                ? const Color(0xFFEACB6C)
+                                                : const Color(0xFF7D8A83),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      item.label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color:
+                                            selected
+                                                ? Colors.white
+                                                : const Color(0xFF7D8A83),
+                                        fontSize: 10,
+                                        fontWeight:
+                                            selected
+                                                ? FontWeight.w800
+                                                : FontWeight.w600,
+                                        letterSpacing: 0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DriverNavItem {
+  const _DriverNavItem(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
 }
 
 Future notification() async {
@@ -207,7 +349,7 @@ void onStart(ServiceInstance service) async {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        await prefs.setString('endTime', newEndTime!);
+        await prefs.setString('endTime', newEndTime);
         timerController.endTime.value = preferences.getString('endTime') ?? '';
       }
     });
@@ -218,7 +360,7 @@ void onStart(ServiceInstance service) async {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        await prefs.setString('ts_id', tsId!);
+        await prefs.setString('ts_id', tsId);
         timerController.tsId.value = preferences.getString('ts_id') ?? '';
       }
     });
@@ -352,7 +494,7 @@ Future startTrackingforpickUp(double pickLat, double pickLng) async {
 Future startTrackingfordropOf(
   double pickLat,
   double pickLng,
-  String _timerDisplayValue,
+  String timerDisplayValue,
 ) async {
   SharedPreferences sp = await SharedPreferences.getInstance();
   String? did = sp.getString('d_id');
@@ -391,14 +533,12 @@ Future startTrackingfordropOf(
       await sp.remove('isWaitingTrue');
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          'https://www.minicaboffice.com/api/driver/calculate-waiting-time.php',
-        ),
+        Uri.parse(ApiService.driverCalculateWaitingTime),
       );
       request.fields.addAll({
-        'd_id': '${did}',
-        'job_id': '${jobid}',
-        'waiting_time': _timerDisplayValue,
+        'd_id': '$did',
+        'job_id': '$jobid',
+        'waiting_time': timerDisplayValue,
         // 'waiting_time': _model.timerValue.toString()
       });
 
@@ -430,9 +570,7 @@ Future<void> completeTimeSlot(String tsid) async {
   String? dId = prefs.getString('d_id');
 
   final response = await http.post(
-    Uri.parse(
-      'https://www.minicaboffice.com/api/driver/complete-time-slot.php',
-    ),
+    Uri.parse(ApiService.driverCompleteTimeSlot),
     body: {'d_id': dId.toString(), 'ts_id': tsid.toString()},
   );
   if (response.statusCode == 200) {
@@ -450,7 +588,7 @@ Future<bool> checkApiStatus() async {
   final prefs = await SharedPreferences.getInstance();
   final dId = prefs.getString('d_id');
   final response = await http.post(
-    Uri.parse('https://minicaboffice.com/api/driver/upcoming-jobs.php'),
+    Uri.parse(ApiService.driverUpcomingJobs),
     body: {'d_id': dId.toString()},
   );
 
@@ -473,7 +611,7 @@ Future<bool> checkLatestTimeslot() async {
     final prefs = await SharedPreferences.getInstance();
     final dId = prefs.getString('d_id');
     final response = await http.post(
-      Uri.parse('https://www.minicaboffice.com/api/driver/fetch-time-slot.php'),
+      Uri.parse(ApiService.driverFetchTimeSlot),
       body: {'d_id': dId.toString()},
     );
 
@@ -575,6 +713,8 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 
@@ -584,7 +724,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale? _locale;
-  ThemeMode _themeMode = FlutterFlowTheme.themeMode;
+  ThemeMode _themeMode = ThemeMode.system;
 
   late Stream<BaseAuthUser> userStream;
 
@@ -598,9 +738,8 @@ class _MyAppState extends State<MyApp> {
     _appStateNotifier = AppStateNotifier.instance;
     _router = createRouter(_appStateNotifier);
     userStream =
-        miniCabFirebaseUserStream()
+        simpleAuthUserStream()
           ..listen((user) => _appStateNotifier.update(user));
-    jwtTokenStream.listen((_) {});
     _appStateNotifier.stopShowingSplashImage();
   }
 
@@ -610,7 +749,6 @@ class _MyAppState extends State<MyApp> {
 
   void setThemeMode(ThemeMode mode) => setState(() {
     _themeMode = mode;
-    FlutterFlowTheme.saveThemeMode(mode);
   });
 
   @override
@@ -627,14 +765,8 @@ class _MyAppState extends State<MyApp> {
       ],
       locale: _locale,
       supportedLocales: const [Locale('en', '')],
-      theme: ThemeData(
-        brightness: Brightness.light,
-        scrollbarTheme: ScrollbarThemeData(),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        scrollbarTheme: ScrollbarThemeData(),
-      ),
+      theme: buildAppTheme(Brightness.light),
+      darkTheme: buildAppTheme(Brightness.dark),
       themeMode: _themeMode,
       routerConfig: _router,
     );
@@ -642,7 +774,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 class NavBarPage extends StatefulWidget {
-  NavBarPage({Key? key, this.initialPage, this.page}) : super(key: key);
+  const NavBarPage({super.key, this.initialPage, this.page});
 
   final String? initialPage;
   final Widget? page;
@@ -766,6 +898,37 @@ class _NavBarPageState extends State<NavBarPage> {
     ).then((value) => safeSetState(() {}));
   }
 
+  Future<void> _handleNavTap(int index, List<String> tabNames) async {
+    bool isjobAvailable = false;
+    debugPrint('the current index is $index');
+    if (index == 0) {
+      myController.isscreenHome.value = true;
+    } else if (index == 1) {
+      myController.isscreenHome.value = false;
+      _showupcomming();
+    } else if (index == 2) {
+      myController.isscreenHome.value = false;
+      _showDashoboard();
+    } else if (index == 3) {
+      myController.isscreenHome.value = false;
+      _showbids();
+    } else if (index == 4) {
+      myController.isscreenHome.value = false;
+      _showAccounts();
+    } else {
+      myController.isscreenHome.value = false;
+    }
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    isjobAvailable = sp.getBool('jobDispatched') ?? false;
+    setState(() {});
+    if (isjobAvailable == false) {
+      _currentPage = null;
+      _currentPageName = tabNames[index];
+    } else {
+      Fluttertoast.showToast(msg: 'Complete Job First');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // checkUserSession();
@@ -789,184 +952,11 @@ class _NavBarPageState extends State<NavBarPage> {
     //         child: _currentPage ?? tabs[_currentPageName]!),
     return Scaffold(
       body: _currentPage ?? tabs[_currentPageName],
-      extendBody: false,
+      extendBody: true,
       backgroundColor: Colors.white,
-      bottomNavigationBar: FloatingNavbar(
+      bottomNavigationBar: _ElegantDriverNavBar(
         currentIndex: currentIndex,
-        onTap: (index) async {
-          bool isjobAvailable = false;
-          debugPrint('the current index is $index');
-          if (index == 0) {
-            myController.isscreenHome.value = true;
-          } else if (index == 1) {
-            myController.isscreenHome.value = false;
-            _showupcomming();
-          } else if (index == 2) {
-            myController.isscreenHome.value = false;
-            _showDashoboard();
-          } else if (index == 3) {
-            myController.isscreenHome.value = false;
-            _showbids();
-          } else if (index == 4) {
-            myController.isscreenHome.value = false;
-            _showAccounts();
-          } else {
-            myController.isscreenHome.value = false;
-          }
-          SharedPreferences sp = await SharedPreferences.getInstance();
-          isjobAvailable = sp.getBool('jobDispatched') ?? false;
-          setState(() {});
-          if (isjobAvailable == false) {
-            _currentPage = null;
-            _currentPageName = tabs.keys.toList()[index];
-          } else {
-            Fluttertoast.showToast(msg: 'Complete Job First');
-          }
-        },
-        backgroundColor: Colors.white,
-        selectedItemColor: FlutterFlowTheme.of(context).primary,
-        unselectedItemColor: Color(0x8A000000),
-        selectedBackgroundColor: Color(0x00000000),
-        borderRadius: 8.0,
-        itemBorderRadius: 0.0,
-        margin: EdgeInsets.zero, // Adjust margin
-        padding: EdgeInsets.zero, //
-        width: double.infinity,
-        elevation: 0.0,
-        items: [
-          FloatingNavbarItem(
-            customWidget: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  currentIndex == 0 ? Icons.home_outlined : Icons.home_outlined,
-                  color:
-                      currentIndex == 0
-                          ? FlutterFlowTheme.of(context).primary
-                          : Color(0x8A000000),
-                  size: currentIndex == 0 ? 24.0 : 24.0,
-                ),
-                Text(
-                  'Home',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color:
-                        currentIndex == 0
-                            ? FlutterFlowTheme.of(context).primary
-                            : Color(0x8A000000),
-                    fontSize: 11.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FloatingNavbarItem(
-            customWidget: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  currentIndex == 1
-                      ? FontAwesomeIcons.carAlt
-                      : FontAwesomeIcons.carAlt,
-                  color:
-                      currentIndex == 1
-                          ? FlutterFlowTheme.of(context).primary
-                          : Color(0x8A000000),
-                  size: currentIndex == 1 ? 24.0 : 24.0,
-                ),
-                Text(
-                  'UpComing',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color:
-                        currentIndex == 1
-                            ? FlutterFlowTheme.of(context).primary
-                            : Color(0x8A000000),
-                    fontSize: 11.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FloatingNavbarItem(
-            customWidget: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.dashboard_sharp,
-                  color:
-                      currentIndex == 2
-                          ? FlutterFlowTheme.of(context).primary
-                          : Color(0x8A000000),
-                  size: 24.0,
-                ),
-                Text(
-                  'Dashboard',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color:
-                        currentIndex == 2
-                            ? FlutterFlowTheme.of(context).primary
-                            : Color(0x8A000000),
-                    fontSize: 11.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FloatingNavbarItem(
-            customWidget: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  FontAwesomeIcons.capsules,
-                  color:
-                      currentIndex == 3
-                          ? FlutterFlowTheme.of(context).primary
-                          : Color(0x8A000000),
-                  size: 24.0,
-                ),
-                Text(
-                  'Bids',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color:
-                        currentIndex == 3
-                            ? FlutterFlowTheme.of(context).primary
-                            : Color(0x8A000000),
-                    fontSize: 11.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FloatingNavbarItem(
-            customWidget: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.payments_rounded,
-                  color:
-                      currentIndex == 4
-                          ? FlutterFlowTheme.of(context).primary
-                          : Color(0x8A000000),
-                  size: 24.0,
-                ),
-                Text(
-                  'AccountStatement',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color:
-                        currentIndex == 4
-                            ? FlutterFlowTheme.of(context).primary
-                            : Color(0x8A000000),
-                    fontSize: 11.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        onTap: (index) => _handleNavTap(index, tabs.keys.toList()),
       ),
     );
   }

@@ -3,7 +3,7 @@ import 'package:new_minicab_driver/JobHistoryDetails/contact_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/components/customer_details_widget.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ import 'job_history_details_model.dart';
 export 'job_history_details_model.dart';
 
 class JobHistoryDetailsWidget extends StatefulWidget {
-  JobHistoryDetailsWidget({
+  const JobHistoryDetailsWidget({
     super.key,
     required this.did,
     required this.pickup,
@@ -96,7 +96,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
 
     // Remove spaces and split by comma
     List<String> routeData = rawData.replaceAll(" ", "").split(",");
-    print('the saved routes minLat ${routeData}');
+    print('the saved routes minLat $routeData');
 
     if (routeData.isEmpty) return;
 
@@ -199,7 +199,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                   : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: context.appTheme.primaryBackground,
         body: SafeArea(
           top: true,
           child: SingleChildScrollView(
@@ -213,7 +213,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                       width: MediaQuery.sizeOf(context).width,
                       // height: 166,
                       decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        color: context.appTheme.primaryBackground,
                         // border: Border.all(color: Color(0xFF1C1F28)),
                       ),
                       child: Column(
@@ -256,7 +256,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                                           child: Icon(
                                             Icons.chevron_left,
                                             // color:
-                                            //     FlutterFlowTheme.of(context)
+                                            //     context.appTheme
                                             //         .accent4,
                                             size: 24,
                                           ),
@@ -271,14 +271,10 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                                         ),
                                         child: Text(
                                           'Back',
-                                          style: FlutterFlowTheme.of(
-                                            context,
-                                          ).titleMedium.override(
+                                          style: context.appTheme.titleMedium.override(
                                             fontFamily: 'Open Sans',
                                             color:
-                                                FlutterFlowTheme.of(
-                                                  context,
-                                                ).primaryText,
+                                                context.appTheme.primaryText,
                                             letterSpacing: 0,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -297,11 +293,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                           //   children: [
                           //     Text(
                           //       '${widget.date}',
-                          //       style: FlutterFlowTheme.of(context)
+                          //       style: context.appTheme
                           //           .titleLarge
                           //           .override(
                           //             fontFamily: 'Open Sans',
-                          //             // color: FlutterFlowTheme.of(context)
+                          //             // color: context.appTheme
                           //             //     .secondaryBackground,
                           //             fontSize: 20,
                           //             letterSpacing: 0,
@@ -318,11 +314,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                           //     ),
                           //     Text(
                           //       '${widget.time}',
-                          //       style: FlutterFlowTheme.of(context)
+                          //       style: context.appTheme
                           //           .titleLarge
                           //           .override(
                           //             fontFamily: 'Open Sans',
-                          //             // color: FlutterFlowTheme.of(context)
+                          //             // color: context.appTheme
                           //             //     .secondaryBackground,
                           //             fontSize: 20,
                           //             letterSpacing: 0,
@@ -338,11 +334,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                           //     children: [
                           //       Text(
                           //         '${widget.cNumber}',
-                          //         style: FlutterFlowTheme.of(context)
+                          //         style: context.appTheme
                           //             .titleLarge
                           //             .override(
                           //               fontFamily: 'Open Sans',
-                          //               // color: FlutterFlowTheme.of(context)
+                          //               // color: context.appTheme
                           //               //     .secondaryBackground,
                           //               fontSize: 20,
                           //               letterSpacing: 0,
@@ -367,11 +363,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                           //       ),
                           //       Text(
                           //         '${widget.passanger}',
-                          //         style: FlutterFlowTheme.of(context)
+                          //         style: context.appTheme
                           //             .titleLarge
                           //             .override(
                           //               fontFamily: 'Open Sans',
-                          //               // color: FlutterFlowTheme.of(context)
+                          //               // color: context.appTheme
                           //               //     .secondaryBackground,
                           //               fontSize: 20,
                           //               letterSpacing: 0,
@@ -412,12 +408,12 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //               highlightColor: Colors.transparent,
                     //               child: Text(
                     //                 '${widget.cName}',
-                    //                 style: FlutterFlowTheme.of(
+                    //                 style: AppTheme.of(
                     //                   context,
                     //                 ).titleMedium.override(
                     //                   fontFamily: 'Open Sans',
                     //                   color:
-                    //                       FlutterFlowTheme.of(
+                    //                       AppTheme.of(
                     //                         context,
                     //                       ).primaryText,
                     //                   letterSpacing: 0,
@@ -470,7 +466,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //           },
                     //           child: Icon(
                     //             Icons.keyboard_control_rounded,
-                    //             color: FlutterFlowTheme.of(context).primaryText,
+                    //             color: context.appTheme.primaryText,
                     //             size: 30,
                     //           ),
                     //         ),
@@ -485,7 +481,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     child: Divider(
                     //       height: 30,
                     //       thickness: 1,
-                    //       color: FlutterFlowTheme.of(context).secondaryText,
+                    //       color: context.appTheme.secondaryText,
                     //     ),
                     //   ),
                     // ),
@@ -498,7 +494,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //         height: 98,
                     //         decoration: BoxDecoration(
                     //           color:
-                    //               FlutterFlowTheme.of(
+                    //               AppTheme.of(
                     //                 context,
                     //               ).secondaryBackground,
                     //         ),
@@ -519,13 +515,13 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //                   height: 30,
                     //                   decoration: BoxDecoration(
                     //                     color:
-                    //                         FlutterFlowTheme.of(
+                    //                         AppTheme.of(
                     //                           context,
                     //                         ).secondaryBackground,
                     //                     borderRadius: BorderRadius.circular(50),
                     //                     border: Border.all(
                     //                       color:
-                    //                           FlutterFlowTheme.of(
+                    //                           AppTheme.of(
                     //                             context,
                     //                           ).secondaryText,
                     //                       width: 2,
@@ -534,7 +530,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //                   alignment: AlignmentDirectional(0, 0),
                     //                   child: Text(
                     //                     'B',
-                    //                     style: FlutterFlowTheme.of(
+                    //                     style: AppTheme.of(
                     //                       context,
                     //                     ).bodyMedium.override(
                     //                       fontFamily: 'Open Sans',
@@ -557,12 +553,12 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //                 child: Text(
                     //                   '${widget.dropoff}',
                     //                   textAlign: TextAlign.start,
-                    //                   style: FlutterFlowTheme.of(
+                    //                   style: AppTheme.of(
                     //                     context,
                     //                   ).titleMedium.override(
                     //                     fontFamily: 'Open Sans',
                     //                     color:
-                    //                         FlutterFlowTheme.of(
+                    //                         AppTheme.of(
                     //                           context,
                     //                         ).primaryText,
                     //                     fontSize: 15,
@@ -599,23 +595,23 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //                 height: 30,
                     //                 decoration: BoxDecoration(
                     //                   // color:
-                    //                   //     FlutterFlowTheme.of(context).info,
+                    //                   //     context.appTheme.info,
                     //                   borderRadius: BorderRadius.circular(50),
                     //                   border: Border.all(
                     //                     // color:
-                    //                     //     FlutterFlowTheme.of(context).info,
+                    //                     //     context.appTheme.info,
                     //                     width: 2,
                     //                   ),
                     //                 ),
                     //                 alignment: AlignmentDirectional(0, 0),
                     //                 child: Text(
                     //                   'A',
-                    //                   style: FlutterFlowTheme.of(
+                    //                   style: AppTheme.of(
                     //                     context,
                     //                   ).bodyMedium.override(
                     //                     fontFamily: 'Open Sans',
                     //                     color:
-                    //                         FlutterFlowTheme.of(
+                    //                         AppTheme.of(
                     //                           context,
                     //                         ).secondaryText,
                     //                     fontSize: 16,
@@ -635,7 +631,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //             ),
                     //             child: Text(
                     //               '${widget.pickup}',
-                    //               style: FlutterFlowTheme.of(
+                    //               style: AppTheme.of(
                     //                 context,
                     //               ).titleMedium.override(
                     //                 fontFamily: 'Open Sans',
@@ -658,7 +654,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     width: 280,
                     //     child: Divider(
                     //       thickness: 1,
-                    //       color: FlutterFlowTheme.of(context).secondaryText,
+                    //       color: context.appTheme.secondaryText,
                     //     ),
                     //   ),
                     // ),
@@ -669,9 +665,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                         children: [
                           Text(
                             'Trip details',
-                            style: FlutterFlowTheme.of(
-                              context,
-                            ).displaySmall.override(
+                            style: context.appTheme.displaySmall.override(
                               fontFamily: 'Montserrat',
                               fontSize: 18,
                               letterSpacing: 0,
@@ -683,7 +677,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     ),
                     SizedBox(height: 10),
                     // Text('the routepoints are ${routePoints.first}'),
-                    Container(
+                    SizedBox(
                       height: 200,
                       child: GoogleMap(
                         mapType:
@@ -755,9 +749,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             title: Text(
                               "Green ride with ${widget.cName}" ?? '',
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 fontFamily: 'Montserrat',
                                 fontSize: 18,
                                 letterSpacing: 0,
@@ -769,9 +761,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             children: [
                               Text(
                                 formattedDate ?? '',
-                                style: FlutterFlowTheme.of(
-                                  context,
-                                ).displaySmall.override(
+                                style: context.appTheme.displaySmall.override(
                                   fontFamily: 'Montserrat',
                                   fontSize: 15,
                                   letterSpacing: 0,
@@ -785,9 +775,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             children: [
                               Text(
                                 "£${widget.fare}" ?? '',
-                                style: FlutterFlowTheme.of(
-                                  context,
-                                ).displaySmall.override(
+                                style: context.appTheme.displaySmall.override(
                                   fontFamily: 'Montserrat',
                                   fontSize: 15,
                                   color: Colors.grey,
@@ -805,9 +793,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             title: Text(
                               "${widget.pickup}" ?? '',
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 fontFamily: 'Montserrat',
                                 fontSize: 15,
                                 letterSpacing: 0,
@@ -823,9 +809,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             title: Text(
                               "${widget.dropoff}" ?? '',
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 fontFamily: 'Montserrat',
                                 fontSize: 15,
                                 letterSpacing: 0,
@@ -838,9 +822,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             children: [
                               Text(
                                 "Help" ?? '',
-                                style: FlutterFlowTheme.of(
-                                  context,
-                                ).displaySmall.override(
+                                style: context.appTheme.displaySmall.override(
                                   fontFamily: 'Montserrat',
                                   fontSize: 15,
                                   letterSpacing: 0,
@@ -868,9 +850,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             title: Text(
                               "Find Lost Items",
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 fontFamily: 'Montserrat',
                                 fontSize: 15,
                                 letterSpacing: 0,
@@ -879,9 +859,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             subtitle: Text(
                               "We can help you to get in touch with your driver",
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 color: Colors.grey,
                                 fontFamily: 'Montserrat',
                                 fontSize: 12,
@@ -910,9 +888,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             title: Text(
                               "Report safety issue",
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 fontFamily: 'Montserrat',
                                 fontSize: 15,
                                 letterSpacing: 0,
@@ -921,9 +897,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                             ),
                             subtitle: Text(
                               "Let us know if you have safety related issue",
-                              style: FlutterFlowTheme.of(
-                                context,
-                              ).displaySmall.override(
+                              style: context.appTheme.displaySmall.override(
                                 color: Colors.grey,
                                 fontFamily: 'Montserrat',
                                 fontSize: 12,
@@ -944,7 +918,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Job Details',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).displaySmall.override(
                     //           fontFamily: 'Montserrat',
@@ -964,7 +938,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Job id',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -975,11 +949,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.bookId}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -996,7 +970,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Pick-up date',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1007,11 +981,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.date}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1028,7 +1002,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Pick-up time',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1039,11 +1013,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.time}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1059,7 +1033,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Fare Details',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).displaySmall.override(
                     //           fontFamily: 'Montserrat',
@@ -1079,7 +1053,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Journey',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1090,11 +1064,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '£${widget.fare}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1111,7 +1085,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Extra',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1122,11 +1096,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '£${widget.extra}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1143,7 +1117,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Toll',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1154,11 +1128,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '£${widget.toll}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1175,7 +1149,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Waiting',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1186,11 +1160,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '£${widget.stopTime}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1207,7 +1181,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Time tracking',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1227,7 +1201,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Job Accepted',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1238,11 +1212,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.jobaccept}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1259,7 +1233,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Job Started',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1270,11 +1244,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.jobstart}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1291,7 +1265,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Way to pickup',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1302,11 +1276,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.waytopickup}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1323,7 +1297,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Arrival at pickup',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1334,11 +1308,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.arrivalNow}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1355,7 +1329,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'POB',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1366,11 +1340,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.pob}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1387,7 +1361,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Dropoff',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1398,11 +1372,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.dropOfftime}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1419,7 +1393,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //     children: [
                     //       Text(
                     //         'Completed At',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
@@ -1430,11 +1404,11 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //       ),
                     //       Text(
                     //         '${widget.completime}',
-                    //         style: FlutterFlowTheme.of(
+                    //         style: AppTheme.of(
                     //           context,
                     //         ).headlineSmall.override(
                     //           fontFamily: 'Open Sans',
-                    //           color: FlutterFlowTheme.of(context).secondaryText,
+                    //           color: context.appTheme.secondaryText,
                     //           fontSize: 18,
                     //           letterSpacing: 0,
                     //           fontWeight: FontWeight.w600,
@@ -1458,7 +1432,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //         children: [
                     //           Text(
                     //             'Client notes',
-                    //             style: FlutterFlowTheme.of(
+                    //             style: AppTheme.of(
                     //               context,
                     //             ).displaySmall.override(
                     //               fontFamily: 'Montserrat',
@@ -1483,12 +1457,12 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //           Expanded(
                     //             child: Text(
                     //               '${widget.cNotes == '' ? '**NO WR OR EXTRA DROPS ARE ALLOWED - ONLY AtoB JOURNEYS **' : widget.cNotes}',
-                    //               style: FlutterFlowTheme.of(
+                    //               style: AppTheme.of(
                     //                 context,
                     //               ).bodyMedium.override(
                     //                 fontFamily: 'Open Sans',
                     //                 color:
-                    //                     FlutterFlowTheme.of(
+                    //                     AppTheme.of(
                     //                       context,
                     //                     ).secondaryText,
                     //                 letterSpacing: 0,
@@ -1510,7 +1484,7 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //         children: [
                     //           Text(
                     //             'Account instractions',
-                    //             style: FlutterFlowTheme.of(
+                    //             style: AppTheme.of(
                     //               context,
                     //             ).displaySmall.override(
                     //               fontFamily: 'Montserrat',
@@ -1536,12 +1510,12 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     //             child: Text(
                     //               '**DO NOT MAKE ANY EXTRA STOP\nOFFS** ADDITIONAL PASSENGER NOT AUTHORISED YOU WILL NOT BE PAID FOR THEM**\nAtoB journeys ONLY *NO MULTISTOPS* or Wait & Returns',
                     //               textAlign: TextAlign.justify,
-                    //               style: FlutterFlowTheme.of(
+                    //               style: AppTheme.of(
                     //                 context,
                     //               ).bodyMedium.override(
                     //                 fontFamily: 'Open Sans',
                     //                 color:
-                    //                     FlutterFlowTheme.of(
+                    //                     AppTheme.of(
                     //                       context,
                     //                     ).secondaryText,
                     //                 letterSpacing: 0,

@@ -5,7 +5,7 @@ import '../Model/jobDetails.dart';
 import '../home/home_widget.dart';
 import '/components/upcommingjob_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +24,10 @@ import 'package:latlong2/latlong.dart' as latlong;
 import '../Model/myProfile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class UpcommingWidget extends StatefulWidget {
-  const UpcommingWidget({Key? key}) : super(key: key);
+  const UpcommingWidget({super.key});
 
   @override
   _UpcommingWidgetState createState() => _UpcommingWidgetState();
@@ -39,7 +40,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   Position? currentLocation;
   bool isLoading = false;
   // late Timer _timer;
-  List<LatLng> _polylineCoordinates = [];
+  final List<LatLng> _polylineCoordinates = [];
   List<Marker> markers = [];
   double currentLatitude = 0.0;
   double currentLongitude = 0.0;
@@ -136,7 +137,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     String? dId = prefs.getString('d_id');
     print(dId);
     final response = await http.post(
-      Uri.parse('https://minicaboffice.com/api/driver/upcoming-jobs.php'),
+      Uri.parse(ApiService.driverUpcomingJobs),
       body: {'d_id': dId.toString()},
     );
 
@@ -192,10 +193,10 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         },
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          backgroundColor: context.appTheme.secondaryBackground,
 
           // appBar: AppBar(
-          //   backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          //   backgroundColor: context.appTheme.primaryBackground,
           //   automaticallyImplyLeading: false,
           //   leading: FlutterFlowIconButton(
           //     borderColor: Colors.transparent,
@@ -204,7 +205,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
           //     buttonSize: 60,
           //     icon: Icon(
           //       Icons.arrow_back_rounded,
-          //       color: FlutterFlowTheme.of(context).primary,
+          //       color: context.appTheme.primary,
           //       size: 30,
           //     ),
           //     onPressed: () async {
@@ -218,9 +219,9 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
           //   ),
           //   title: Text(
           //     'Upcoming Booking',
-          //     style: FlutterFlowTheme.of(context).headlineMedium.override(
+          //     style: context.appTheme.headlineMedium.override(
           //           fontFamily: 'Outfit',
-          //           color: FlutterFlowTheme.of(context).primary,
+          //           color: context.appTheme.primary,
           //           fontSize: 22,
           //         ),
           //   ),
@@ -237,14 +238,14 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: context.appTheme.secondaryBackground,
                     ),
                     child:
                         isLoading
                             ? Center(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  FlutterFlowTheme.of(context).primary,
+                                  context.appTheme.primary,
                                 ),
                               ),
                             )
@@ -253,7 +254,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
                             : Center(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  FlutterFlowTheme.of(context).primary,
+                                  context.appTheme.primary,
                                 ),
                               ),
                             ),
@@ -273,8 +274,8 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       tiltGesturesEnabled: true,
       initialCameraPosition: CameraPosition(
         target: LatLng(
-          _currentPosition?.latitude ?? 0.0,
-          _currentPosition?.longitude ?? 0.0,
+          _currentPosition.latitude ?? 0.0,
+          _currentPosition.longitude ?? 0.0,
         ),
         zoom: 12,
       ),
@@ -290,14 +291,14 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       zoomGesturesEnabled: true,
       onMapCreated: _onMapCreated,
       markers: Set<Marker>.of(markers),
-      polylines: Set<Polyline>.of([
+      polylines: <Polyline>{
         Polyline(
           polylineId: PolylineId('route'),
           color: Colors.blue,
           width: 5,
           points: _polylineCoordinates,
         ),
-      ]),
+      },
     );
   }
 
@@ -379,7 +380,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       double latitude = lat / 1E5;
       double longitude = lng / 1E5;
       points.add(LatLng(latitude, longitude));
-      print('lati ${latitude}');
+      print('lati $latitude');
     }
     return points;
   }
@@ -395,7 +396,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       }
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/passenger-waiting.php'),
+        Uri.parse(ApiService.driverPassengerWaiting),
       );
       request.fields.addAll({'d_id': dId.toString()});
 
@@ -424,7 +425,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       }
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://minicaboffice.com/api/driver/way-to-pickup.php'),
+        Uri.parse(ApiService.driverWayToPickup),
       );
       request.fields.addAll({'d_id': dId.toString()});
 
@@ -451,7 +452,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         _currentPosition = position;
         currentLatitude = position.latitude;
         currentLongitude = position.longitude;
-        print('locat  ${_currentPosition}');
+        print('locat  $_currentPosition');
       });
     } catch (e) {
       print("Error getting current location: $e");
@@ -465,7 +466,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
 
     await _getCurrentLocation();
 
-    if (currentLatitude != null && currentLongitude != null) {
+    if (currentLongitude != null) {
       _kGoogle = CameraPosition(
         target: LatLng(currentLatitude, currentLongitude),
         zoom: 14,
@@ -496,7 +497,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       Polyline(
         polylineId: PolylineId('1'),
         points: latLen,
-        color: FlutterFlowTheme.of(context).primary,
+        color: context.appTheme.primary,
         // Colors.deepOrange,
       ),
     );
@@ -508,10 +509,9 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
 
   Future<void> getLocationFromAddress() async {
     final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
-    final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
-    final address = pickup;
+    final address = pickup ?? '';
     final response = await http.post(
-      Uri.parse('$apiUrl?address=$address&key=$apiKey'),
+      ApiService.googleGeocodeUri(address: address, apiKey: apiKey),
     );
 
     if (response.statusCode == 200) {

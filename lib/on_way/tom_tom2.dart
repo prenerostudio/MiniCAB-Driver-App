@@ -5,12 +5,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -19,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   GoogleMapController? mapController;
   Location location = Location();
   LatLng _currentPosition = LatLng(52.50931, 13.42936); // Start Location
-  LatLng _destination = LatLng(52.50274, 13.43872); // Destination
+  final LatLng _destination = LatLng(52.50274, 13.43872); // Destination
   Set<Polyline> _polylines = {};
   List<LatLng> _routePoints = [];
   BitmapDescriptor? carIcon;
@@ -48,8 +51,14 @@ class _MyAppState extends State<MyApp> {
 
   // Fetch route from TomTom API with traffic data
   Future<void> getRoute() async {
-    final String url =
-        "https://api.tomtom.com/routing/1/calculateRoute/${_currentPosition.latitude},${_currentPosition.longitude}:${_destination.latitude},${_destination.longitude}/json?key=$tomtomApiKey&traffic=true";
+    final String url = ApiService.tomTomRouteUrl(
+      originLat: _currentPosition.latitude,
+      originLng: _currentPosition.longitude,
+      destinationLat: _destination.latitude,
+      destinationLng: _destination.longitude,
+      apiKey: tomtomApiKey,
+      traffic: true,
+    );
 
     final response = await http.get(Uri.parse(url));
 

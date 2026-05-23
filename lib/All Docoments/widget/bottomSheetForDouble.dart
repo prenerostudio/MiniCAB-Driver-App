@@ -11,7 +11,7 @@ import 'package:new_minicab_driver/flutter_flow/flutter_flow_widgets.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 
 class DoubleDocumentBottomSheet extends StatefulWidget {
   String parameter;
@@ -87,9 +87,10 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
     return Container(
       width: double.infinity,
       color: Colors.white,
-      height: widget.isfieldAvailable == null && widget.isDateAvaiabl == null
-          ? MediaQuery.of(context).size.height * 0.6
-          : MediaQuery.of(context).size.height * 0.9,
+      height:
+          widget.isfieldAvailable == null && widget.isDateAvaiabl == null
+              ? MediaQuery.of(context).size.height * 0.6
+              : MediaQuery.of(context).size.height * 0.9,
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
         child: SingleChildScrollView(
@@ -97,122 +98,28 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
               Text(
                 widget.name,
-                style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Open Sans',
-                      letterSpacing: 0,
-                    ),
+                style: context.appTheme.headlineMedium.override(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Open Sans',
+                  letterSpacing: 0,
+                ),
               ),
               // Text("${widget.showImageUrl}$uploadedImage"),
               _imageFile == null && uploadedImage.isNotEmpty
                   ? Stack(
-                      children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 0, 0),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                _pickImage(ImageSource.gallery);
-                                // context.pushNamed('DriverPCOLicense');
-                              },
-                              child: SizedBox(
-                                  height: 200,
-                                  width: 200,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CachedNetworkImage(
-                                        imageUrl:
-                                            "${widget.showImageUrl}$uploadedImage",
-                                        fit: BoxFit.contain,
-                                        placeholder: (context, url) =>
-                                            Center(child: Text('Loading..')),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                        fadeInDuration: Duration(
-                                            milliseconds:
-                                                500), // Optional fade-in effect
-                                      ),
-                                    ],
-                                  )),
-                            ),
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            0,
+                            0,
+                            0,
                           ),
-                        ),
-                        // Positioned(
-                        //     right: 0,
-                        //     top: 0,
-                        //     child: Container(
-                        //       decoration: const BoxDecoration(
-                        //           color: Colors.blue, shape: BoxShape.circle),
-                        //       child: const Center(
-                        //         child: Icon(
-                        //           color: Colors.white,
-                        //           Icons.add,
-                        //           size: 30,
-                        //         ),
-                        //       ),
-                        //     ))
-                      ],
-                    )
-                  : _imageFile != null
-                      ? Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 0, 0),
-                              child: InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  _pickImage(ImageSource.gallery);
-                                  // context.pushNamed('DriverPCOLicense');
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: SizedBox(
-                                      height: 200,
-                                      width: 200,
-                                      child: Image.file(
-                                        File(
-                                          _imageFile!.path,
-                                        ),
-                                        fit: BoxFit.contain,
-                                      )),
-                                ),
-                              ),
-                            ),
-                            // Positioned(
-                            //     right: 0,
-                            //     top: 0,
-                            //     child: Container(
-                            //       decoration: const BoxDecoration(
-                            //           color: Colors.blue, shape: BoxShape.circle),
-                            //       child: const Center(
-                            //         child: Icon(
-                            //           color: Colors.white,
-                            //           Icons.add,
-                            //           size: 30,
-                            //         ),
-                            //       ),
-                            //     ))
-                          ],
-                        )
-                      : Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -222,181 +129,289 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
                               _pickImage(ImageSource.gallery);
                               // context.pushNamed('DriverPCOLicense');
                             },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                'assets/images/pngwing.com.png',
-                                width: MediaQuery.sizeOf(context).width,
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.25,
+                            child: SizedBox(
+                              height: 200,
+                              width: 200,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl:
+                                        "${widget.showImageUrl}$uploadedImage",
+                                    fit: BoxFit.contain,
+                                    placeholder:
+                                        (context, url) =>
+                                            Center(child: Text('Loading..')),
+                                    errorWidget:
+                                        (context, url, error) =>
+                                            Icon(Icons.error),
+                                    fadeInDuration: Duration(
+                                      milliseconds: 500,
+                                    ), // Optional fade-in effect
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Positioned(
+                      //     right: 0,
+                      //     top: 0,
+                      //     child: Container(
+                      //       decoration: const BoxDecoration(
+                      //           color: Colors.blue, shape: BoxShape.circle),
+                      //       child: const Center(
+                      //         child: Icon(
+                      //           color: Colors.white,
+                      //           Icons.add,
+                      //           size: 30,
+                      //         ),
+                      //       ),
+                      //     ))
+                    ],
+                  )
+                  : _imageFile != null
+                  ? Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                          0,
+                          0,
+                          0,
+                          0,
+                        ),
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            _pickImage(ImageSource.gallery);
+                            // context.pushNamed('DriverPCOLicense');
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SizedBox(
+                              height: 200,
+                              width: 200,
+                              child: Image.file(
+                                File(_imageFile!.path),
                                 fit: BoxFit.contain,
                               ),
                             ),
                           ),
                         ),
-              SizedBox(
-                height: 10,
-              ),
+                      ),
+                      // Positioned(
+                      //     right: 0,
+                      //     top: 0,
+                      //     child: Container(
+                      //       decoration: const BoxDecoration(
+                      //           color: Colors.blue, shape: BoxShape.circle),
+                      //       child: const Center(
+                      //         child: Icon(
+                      //           color: Colors.white,
+                      //           Icons.add,
+                      //           size: 30,
+                      //         ),
+                      //       ),
+                      //     ))
+                    ],
+                  )
+                  : Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        _pickImage(ImageSource.gallery);
+                        // context.pushNamed('DriverPCOLicense');
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/pngwing.com.png',
+                          width: MediaQuery.sizeOf(context).width,
+                          height: MediaQuery.sizeOf(context).height * 0.25,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+              SizedBox(height: 10),
 
               Text(
                 widget.name2,
-                style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Open Sans',
-                      letterSpacing: 0,
-                    ),
+                style: context.appTheme.headlineMedium.override(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Open Sans',
+                  letterSpacing: 0,
+                ),
               ),
 
               _imageFile2 == null && uploadedImage2.isNotEmpty
                   ? Stack(
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          child: InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              _pickImage2(ImageSource.gallery);
-                              // context.pushNamed('DriverPCOLicense');
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                    height: 200,
-                                    width: 200,
-                                    child: CachedNetworkImage(
-                                      imageUrl:
-                                          "${widget.showImageUrl}$uploadedImage2",
-                                      fit: BoxFit.contain,
-                                      placeholder: (context, url) =>
-                                          Center(child: Text('Loading..')),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
-                                      fadeInDuration: Duration(
-                                          milliseconds:
-                                              500), // Optional fade-in effect
-                                    )),
-                              ],
-                            ),
-                          ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                          0,
+                          0,
+                          0,
+                          0,
                         ),
-                        // Positioned(
-                        //     right: 0,
-                        //     top: 0,
-                        //     child: Container(
-                        //       decoration: const BoxDecoration(
-                        //           color: Colors.blue, shape: BoxShape.circle),
-                        //       child: const Center(
-                        //         child: Icon(
-                        //           color: Colors.white,
-                        //           Icons.add,
-                        //           size: 30,
-                        //         ),
-                        //       ),
-                        //     ))
-                      ],
-                    )
-                  : _imageFile2 != null
-                      ? Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 0, 0),
-                              child: InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  _pickImage2(ImageSource.gallery);
-                                  // context.pushNamed('DriverPCOLicense');
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: SizedBox(
-                                      height: 200,
-                                      width: 200,
-                                      child: Image.file(
-                                        File(
-                                          _imageFile2!.path,
-                                        ),
-                                        fit: BoxFit.contain,
-                                      )),
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            _pickImage2(ImageSource.gallery);
+                            // context.pushNamed('DriverPCOLicense');
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 200,
+                                width: 200,
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                      "${widget.showImageUrl}$uploadedImage2",
+                                  fit: BoxFit.contain,
+                                  placeholder:
+                                      (context, url) =>
+                                          Center(child: Text('Loading..')),
+                                  errorWidget:
+                                      (context, url, error) =>
+                                          Icon(Icons.error),
+                                  fadeInDuration: Duration(
+                                    milliseconds: 500,
+                                  ), // Optional fade-in effect
                                 ),
                               ),
-                            ),
-                          ],
-                        )
-                      : Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                          child: InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              _pickImage2(ImageSource.gallery);
-                              // context.pushNamed('DriverPCOLicense');
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                'assets/images/pngwing.com.png',
-                                width: MediaQuery.sizeOf(context).width,
-                                height:
-                                    MediaQuery.sizeOf(context).height * 0.25,
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Positioned(
+                      //     right: 0,
+                      //     top: 0,
+                      //     child: Container(
+                      //       decoration: const BoxDecoration(
+                      //           color: Colors.blue, shape: BoxShape.circle),
+                      //       child: const Center(
+                      //         child: Icon(
+                      //           color: Colors.white,
+                      //           Icons.add,
+                      //           size: 30,
+                      //         ),
+                      //       ),
+                      //     ))
+                    ],
+                  )
+                  : _imageFile2 != null
+                  ? Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                          0,
+                          0,
+                          0,
+                          0,
+                        ),
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            _pickImage2(ImageSource.gallery);
+                            // context.pushNamed('DriverPCOLicense');
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SizedBox(
+                              height: 200,
+                              width: 200,
+                              child: Image.file(
+                                File(_imageFile2!.path),
                                 fit: BoxFit.contain,
                               ),
                             ),
                           ),
                         ),
+                      ),
+                    ],
+                  )
+                  : Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        _pickImage2(ImageSource.gallery);
+                        // context.pushNamed('DriverPCOLicense');
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/pngwing.com.png',
+                          width: MediaQuery.sizeOf(context).width,
+                          height: MediaQuery.sizeOf(context).height * 0.25,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
 
               widget.isfieldAvailable == null
                   ? SizedBox.shrink()
                   : Column(
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              widget.fieldTitle ?? 'dymmy',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
+                    children: [
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text(
+                            widget.fieldTitle ?? 'dymmy',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: numberController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'License Number',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.withOpacity(0.3),
+                            fontSize: 15,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.2),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        TextFormField(
-                          controller: numberController,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'License Number',
-                              hintStyle: TextStyle(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  fontSize: 15),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: Colors.grey.withOpacity(0.2))),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(color: Colors.grey))),
-                        ),
-                      ],
-                    ),
-              const SizedBox(
-                height: 10,
-              ),
+                      ),
+                    ],
+                  ),
+              const SizedBox(height: 10),
+
               // Text(
               //   '${widget.fieldTitle}',
               //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -404,56 +419,54 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
               // SizedBox(
               //   height: 10,
               // ),
-
               widget.isDateAvaiabl == null
                   ? SizedBox.shrink()
                   : Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              widget.dateTitle ?? 'date dymmy',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            widget.dateTitle ?? 'date dymmy',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            _pickDate(context);
-                          },
-                          child: Container(
-                            height: 55,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Colors.grey.withOpacity(0.8)),
-                                borderRadius: BorderRadius.circular(9)),
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            child: Center(
-                                child: Row(
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          _pickDate(context);
+                        },
+                        child: Container(
+                          height: 55,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.8),
+                            ),
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          child: Center(
+                            child: Row(
                               children: [
-                                SizedBox(
-                                  width: 20,
-                                ),
+                                SizedBox(width: 20),
                                 Text(
                                   _selectedDate != null
-                                      ? "${_formatDate(_selectedDate!)}"
+                                      ? _formatDate(_selectedDate!)
                                       : "mm/dd/yyyy",
                                   style: TextStyle(fontSize: 16),
                                 ),
                               ],
-                            )),
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
 
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 24, 0, 12),
                 child: FFButtonWidget(
@@ -465,25 +478,27 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
 
                     print('Button pressed ..$isloading.');
                   },
-                  text: uploadedImage.isNotEmpty || uploadedImage2.isNotEmpty
-                      ? "Update"
-                      : 'Upload Now',
-                  icon: const Icon(
-                    Icons.cloud_upload_outlined,
-                    size: 15,
-                  ),
+                  text:
+                      uploadedImage.isNotEmpty || uploadedImage2.isNotEmpty
+                          ? "Update"
+                          : 'Upload Now',
+                  icon: const Icon(Icons.cloud_upload_outlined, size: 15),
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 54,
                     padding: const EdgeInsets.all(0),
-                    iconPadding:
-                        const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                    color: FlutterFlowTheme.of(context).primary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Open Sans',
-                          color: Colors.white,
-                          letterSpacing: 0,
-                        ),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                      0,
+                      0,
+                      0,
+                      0,
+                    ),
+                    color: context.appTheme.primary,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Open Sans',
+                      color: Colors.white,
+                      letterSpacing: 0,
+                    ),
                     elevation: 4,
                     borderSide: const BorderSide(
                       color: Colors.transparent,
@@ -568,7 +583,8 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
       request.fields[widget.dateParamter ?? ''] =
           _formatDate(_selectedDate!).toString(); // Replace with your actual ID
       print(
-          'the date for ${widget.dateParamter} is for ${_formatDate(_selectedDate!)}');
+        'the date for ${widget.dateParamter} is for ${_formatDate(_selectedDate!)}',
+      );
     }
 
     // request.fields['d_id'] = did; // Replace with your actual ID
@@ -616,7 +632,7 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
       if (response.statusCode == 200) {
         String responseString = await response.stream.bytesToString();
         Map<String, dynamic> jsonResponse = json.decode(responseString);
-        print('Now the condition is true ${jsonResponse}');
+        print('Now the condition is true $jsonResponse');
         setState(() {
           _imageFile == null;
           uploadedImage = jsonResponse['data'][0][widget.forInsideArray] ?? '';
@@ -633,9 +649,6 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
   String uploadedImage2 = '';
 
   void _showToastMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
 }

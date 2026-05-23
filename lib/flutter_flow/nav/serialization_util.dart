@@ -38,11 +38,12 @@ String? serializeParam(
       return null;
     }
     if (isList) {
-      final serializedValues = (param as Iterable)
-          .map((p) => serializeParam(p, paramType, false))
-          .where((p) => p != null)
-          .map((p) => p!)
-          .toList();
+      final serializedValues =
+          (param as Iterable)
+              .map((p) => serializeParam(p, paramType, false))
+              .where((p) => p != null)
+              .map((p) => p!)
+              .toList();
       return json.encode(serializedValues);
     }
     switch (paramType) {
@@ -145,11 +146,7 @@ enum ParamType {
   JSON,
 }
 
-dynamic deserializeParam<T>(
-  String? param,
-  ParamType paramType,
-  bool isList,
-) {
+dynamic deserializeParam<T>(String? param, ParamType paramType, bool isList) {
   try {
     if (param == null) {
       return null;
@@ -160,7 +157,7 @@ dynamic deserializeParam<T>(
         return null;
       }
       return paramValues
-          .where((p) => p is String)
+          .whereType<String>()
           .map((p) => p as String)
           .map((p) => deserializeParam<T>(p, paramType, false))
           .where((p) => p != null)

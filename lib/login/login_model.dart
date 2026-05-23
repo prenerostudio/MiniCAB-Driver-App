@@ -18,10 +18,12 @@ class LoginModel extends FlutterFlowModel<LoginWidget> {
 
   /// Initialization and disposal methods.
 
+  @override
   void initState(BuildContext context) {
     passwordVisibility = false;
   }
 
+  @override
   void dispose() {
     unfocusNode.dispose();
     phoneNumberFocusNode?.dispose();
@@ -31,7 +33,7 @@ class LoginModel extends FlutterFlowModel<LoginWidget> {
     passwordController?.dispose();
   }
 
-/// Action blocks are added here.
+  /// Action blocks are added here.
 
-/// Additional helper methods are added here.
+  /// Additional helper methods are added here.
 }

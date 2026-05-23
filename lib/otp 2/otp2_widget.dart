@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -18,15 +18,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'otp2_model.dart';
 export 'otp2_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class Otp2Widget extends StatefulWidget {
   const Otp2Widget({
-    Key? key,
+    super.key,
     required this.phoneNumber,
     required this.varifyId,
-  }) : super(key: key);
+  });
 
   final String? phoneNumber;
   final String? varifyId;
@@ -40,10 +40,7 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   void _showToastMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
 
   bool? isLogin;
@@ -106,7 +103,6 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
   }
 
   var code = "";
-  final FirebaseAuth auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     if (isiOS) {
@@ -119,16 +115,18 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          backgroundColor: context.appTheme.secondaryBackground,
           appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+            backgroundColor: context.appTheme.secondaryBackground,
             automaticallyImplyLeading: false,
             leading: FlutterFlowIconButton(
               borderColor: Colors.transparent,
@@ -137,7 +135,7 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
               buttonSize: 60.0,
               icon: Icon(
                 Icons.arrow_back_rounded,
-                color: FlutterFlowTheme.of(context).primary,
+                color: context.appTheme.primary,
                 size: 30.0,
               ),
               onPressed: () async {
@@ -155,11 +153,9 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                 alignment: AlignmentDirectional(0.00, 0.00),
                 child: Container(
                   width: double.infinity,
-                  constraints: BoxConstraints(
-                    maxWidth: 670.0,
-                  ),
+                  constraints: BoxConstraints(maxWidth: 670.0),
                   decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
@@ -167,7 +163,11 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            24.0, 0.0, 24.0, 0.0),
+                          24.0,
+                          0.0,
+                          24.0,
+                          0.0,
+                        ),
                         child: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -175,21 +175,27 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                             children: [
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 32.0, 0.0, 8.0),
+                                  0.0,
+                                  32.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Text(
                                   'Verify Code',
                                   textAlign: TextAlign.start,
-                                  style: FlutterFlowTheme.of(context)
-                                      .displayMedium,
+                                  style: context.appTheme.displayMedium,
                                 ).animateOnPageLoad(
-                                    animationsMap['textOnPageLoadAnimation']!),
+                                  animationsMap['textOnPageLoadAnimation']!,
+                                ),
                               ),
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 4.0, 0.0, 8.0),
+                                  0.0,
+                                  4.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: RichText(
-                                  textScaleFactor:
-                                      MediaQuery.of(context).textScaleFactor,
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
@@ -203,30 +209,33 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                                           '--',
                                         ),
                                         style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
+                                          color: context.appTheme.primary,
                                           fontWeight: FontWeight.bold,
                                         ),
-                                      )
+                                      ),
                                     ],
-                                    style: FlutterFlowTheme.of(context)
-                                        .labelLarge
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          lineHeight: 1.2,
-                                        ),
+                                    style: context.appTheme.labelLarge.override(
+                                      fontFamily: 'Readex Pro',
+                                      lineHeight: 1.2,
+                                    ),
+                                  ),
+                                  textScaler: TextScaler.linear(
+                                    MediaQuery.of(context).textScaleFactor,
                                   ),
                                 ),
                               ),
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 16.0, 0.0, 0.0),
+                                  0.0,
+                                  16.0,
+                                  0.0,
+                                  0.0,
+                                ),
                                 child: PinCodeTextField(
                                   autoDisposeControllers: false,
                                   appContext: context,
                                   length: 6,
-                                  textStyle:
-                                      FlutterFlowTheme.of(context).bodyLarge,
+                                  textStyle: context.appTheme.bodyLarge,
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   enableActiveFill: false,
@@ -234,30 +243,28 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                                   enablePinAutofill: true,
                                   errorTextSpace: 16.0,
                                   showCursor: true,
-                                  cursorColor:
-                                      FlutterFlowTheme.of(context).primary,
+                                  cursorColor: context.appTheme.primary,
                                   obscureText: false,
                                   hintCharacter: '-',
                                   keyboardType: TextInputType.number,
                                   pinTheme: PinTheme(
-                                    fieldHeight: MediaQuery.of(context).size.width * 0.118,
-                                    fieldWidth:  MediaQuery.of(context).size.width * 0.119,
+                                    fieldHeight:
+                                        MediaQuery.of(context).size.width *
+                                        0.118,
+                                    fieldWidth:
+                                        MediaQuery.of(context).size.width *
+                                        0.119,
                                     borderWidth: 1.0,
                                     borderRadius: BorderRadius.circular(7.0),
                                     shape: PinCodeFieldShape.box,
-                                    activeColor: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    inactiveColor:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    selectedColor:
-                                        FlutterFlowTheme.of(context).primary,
+                                    activeColor: context.appTheme.primaryText,
+                                    inactiveColor: context.appTheme.alternate,
+                                    selectedColor: context.appTheme.primary,
                                     activeFillColor:
-                                        FlutterFlowTheme.of(context)
-                                            .primaryText,
+                                        context.appTheme.primaryText,
                                     inactiveFillColor:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    selectedFillColor:
-                                        FlutterFlowTheme.of(context).primary,
+                                        context.appTheme.alternate,
+                                    selectedFillColor: context.appTheme.primary,
                                   ),
                                   controller: _model.pinCodeController,
                                   onChanged: (value) {
@@ -275,25 +282,32 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                       ),
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            24.0, 12.0, 24.0, 16.0),
+                          24.0,
+                          12.0,
+                          24.0,
+                          16.0,
+                        ),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             FFButtonWidget(
                               onPressed: () async {
-                                try {
-                                  // Verify the phone number using OTP
-                                  PhoneAuthCredential credential =
-                                      PhoneAuthProvider.credential(
-                                    verificationId: '${widget.varifyId}',
-                                    smsCode: code,
+                                if (code.trim().length != 6) {
+                                  _showToastMessage(
+                                    "Enter a valid 6 digit code.",
                                   );
-                                  await auth.signInWithCredential(credential);
+                                  return;
+                                }
+
+                                try {
                                   final url = Uri.parse(
-                                      'https://www.minicaboffice.com/api/driver/signin.php');
-                                  final request =
-                                      http.MultipartRequest('POST', url);
+                                    ApiService.driverSignin,
+                                  );
+                                  final request = http.MultipartRequest(
+                                    'POST',
+                                    url,
+                                  );
                                   request.fields.addAll({
                                     'd_phone': '${widget.phoneNumber}',
                                   });
@@ -302,9 +316,11 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                                     final response = await request.send();
 
                                     if (response.statusCode == 200) {
+                                      final responseBody =
+                                          await response.stream.bytesToString();
                                       final jsonResponse = json.decode(
-                                          await response.stream
-                                              .bytesToString());
+                                        responseBody,
+                                      );
 
                                       if (jsonResponse['status'] == true) {
                                         context.pushNamed(
@@ -320,10 +336,10 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                                         _showToastMessage("Login successful!");
                                       } else {
                                         _showToastMessage(
-                                            "Please wait for admin approval of your documents. You will receive a message and email.");
+                                          "Please wait for admin approval of your documents. You will receive a message and email.",
+                                        );
                                       }
-                                      print(
-                                          'Response: ${await response.stream.bytesToString()}');
+                                      print('Response: $responseBody');
                                     } else {
                                       print(response.reasonPhrase);
                                     }
@@ -332,35 +348,41 @@ class _Otp2WidgetState extends State<Otp2Widget> with TickerProviderStateMixin {
                                     print('Error: $error');
                                   }
                                 } catch (e) {
-                                  print('Wrong OTP');
+                                  print('OTP login failed: $e');
                                   _showToastMessage(
-                                      "Wrong OTP. Please try again.");
+                                    "Unable to verify. Please try again.",
+                                  );
                                 }
                               },
                               text: 'Verify Code',
                               options: FFButtonOptions(
                                 height: 52.0,
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    44.0, 0.0, 44.0, 0.0),
+                                  44.0,
+                                  0.0,
+                                  44.0,
+                                  0.0,
+                                ),
                                 iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 0.0),
-                                color: FlutterFlowTheme.of(context).primary,
-                                textStyle:
-                                    FlutterFlowTheme.of(context).titleMedium,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                ),
+                                color: context.appTheme.primary,
+                                textStyle: context.appTheme.titleMedium,
                                 elevation: 3.0,
                                 borderSide: BorderSide(
                                   color: Colors.transparent,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
-                                hoverColor:
-                                    FlutterFlowTheme.of(context).accent1,
+                                hoverColor: context.appTheme.accent1,
                                 hoverBorderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: context.appTheme.primary,
                                   width: 1.0,
                                 ),
-                                hoverTextColor:
-                                    FlutterFlowTheme.of(context).primaryText,
+                                hoverTextColor: context.appTheme.primaryText,
                                 hoverElevation: 0.0,
                               ),
                             ),

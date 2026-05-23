@@ -1,14 +1,11 @@
 import 'package:url_launcher/url_launcher.dart';
 
 import '../flutter_flow/flutter_flow_widgets.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 // import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'customer_details_model.dart';
 export 'customer_details_model.dart';
@@ -57,7 +54,7 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
       width: MediaQuery.sizeOf(context).width,
       height: MediaQuery.sizeOf(context).height * 0.5,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
+        color: context.appTheme.secondaryBackground,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -66,11 +63,11 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
             padding: EdgeInsetsDirectional.fromSTEB(10.0, 10.0, 0.0, 0.0),
             child: Text(
               'Customer Detail',
-              style: FlutterFlowTheme.of(context).labelLarge.override(
-                    fontFamily: 'Readex Pro',
-                    color: FlutterFlowTheme.of(context).primary,
-                    fontSize: 20.0,
-                  ),
+              style: context.appTheme.labelLarge.override(
+                fontFamily: 'Readex Pro',
+                color: context.appTheme.primary,
+                fontSize: 20.0,
+              ),
             ),
           ),
           Padding(
@@ -83,12 +80,13 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
               onTap: () async {
                 context.pushNamed(
                   'NameFullScreen',
-                  queryParameters: {
-                    'name': serializeParam(
-                      '${widget.cname}',
-                      ParamType.String,
-                    ),
-                  }.withoutNulls,
+                  queryParameters:
+                      {
+                        'name': serializeParam(
+                          '${widget.cname}',
+                          ParamType.String,
+                        ),
+                      }.withoutNulls,
                 );
               },
               child: Row(
@@ -103,11 +101,11 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
                     padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
                     child: Text(
                       '${widget.cname}',
-                      style: FlutterFlowTheme.of(context).titleMedium.override(
-                            fontFamily: 'Open Sans',
-                            color: FlutterFlowTheme.of(context).primaryText,
-                            fontWeight: FontWeight.w400,
-                          ),
+                      style: context.appTheme.titleMedium.override(
+                        fontFamily: 'Open Sans',
+                        color: context.appTheme.primaryText,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ],
@@ -117,7 +115,7 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
           Divider(
             height: 50,
             thickness: 1,
-            color: FlutterFlowTheme.of(context).secondaryText,
+            color: context.appTheme.secondaryText,
           ),
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
@@ -128,20 +126,16 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Icon(
-                    Icons.call,
-                    color: Color(0xFF5B68F5),
-                    size: 28,
-                  ),
+                  Icon(Icons.call, color: Color(0xFF5B68F5), size: 28),
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
                     child: Text(
                       '${widget.cNumber}',
-                      style: FlutterFlowTheme.of(context).titleMedium.override(
-                            fontFamily: 'Open Sans',
-                            color: FlutterFlowTheme.of(context).primaryText,
-                            fontWeight: FontWeight.w400,
-                          ),
+                      style: context.appTheme.titleMedium.override(
+                        fontFamily: 'Open Sans',
+                        color: context.appTheme.primaryText,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ],
@@ -151,27 +145,23 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
           Divider(
             height: 50,
             thickness: 1,
-            color: FlutterFlowTheme.of(context).secondaryText,
+            color: context.appTheme.secondaryText,
           ),
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Icon(
-                  Icons.mail,
-                  color: Color(0xFF5B68F5),
-                  size: 28,
-                ),
+                Icon(Icons.mail, color: Color(0xFF5B68F5), size: 28),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
                   child: Text(
                     '${widget.cemail}',
-                    style: FlutterFlowTheme.of(context).titleMedium.override(
-                          fontFamily: 'Open Sans',
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          fontWeight: FontWeight.w400,
-                        ),
+                    style: context.appTheme.titleMedium.override(
+                      fontFamily: 'Open Sans',
+                      color: context.appTheme.primaryText,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ],
@@ -180,7 +170,7 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
           Divider(
             height: 50,
             thickness: 1,
-            color: FlutterFlowTheme.of(context).secondaryText,
+            color: context.appTheme.secondaryText,
           ),
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(10, 10, 10, 0),
@@ -193,25 +183,19 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
                     Navigator.pop(context);
                   },
                   text: 'Move Back',
-                  icon: FaIcon(
-                    FontAwesomeIcons.backward,
-                    size: 21,
-                  ),
+                  icon: FaIcon(FontAwesomeIcons.backward, size: 21),
                   options: FFButtonOptions(
                     width: MediaQuery.sizeOf(context).width * 0.5,
                     height: 45,
                     padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                     iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                    color: FlutterFlowTheme.of(context).primary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Open Sans',
-                          color: Colors.white,
-                        ),
-                    elevation: 3,
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                      width: 1,
+                    color: context.appTheme.primary,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Open Sans',
+                      color: Colors.white,
                     ),
+                    elevation: 3,
+                    borderSide: BorderSide(color: Colors.transparent, width: 1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -222,11 +206,9 @@ class _CustomerDetailsWidgetState extends State<CustomerDetailsWidget> {
       ),
     );
   }
+
   void _launchDialer(String phoneNumber) async {
-    final Uri telUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
+    final Uri telUri = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(telUri)) {
       await launchUrl(telUri);
     } else {

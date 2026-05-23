@@ -9,8 +9,10 @@ class DashboardModel extends FlutterFlowModel<DashboardWidget> {
 
   bool? switchValue2;
 
+  @override
   void initState(BuildContext context) {}
 
+  @override
   void dispose() {
     unfocusNode.dispose();
   }

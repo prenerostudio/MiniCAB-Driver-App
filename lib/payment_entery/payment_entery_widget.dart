@@ -6,7 +6,7 @@ import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/jobDetails.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,14 +18,15 @@ import 'payment_entery_model.dart';
 export 'payment_entery_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class PaymentEnteryWidget extends StatefulWidget {
   const PaymentEnteryWidget({
-    Key? key,
+    super.key,
     required this.jobid,
     required this.did,
     required this.fare,
-  }) : super(key: key);
+  });
 
   final String? jobid;
   final String? fare;
@@ -59,39 +60,39 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
     pushercallbg();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _model = createModel(context, () => PaymentEnteryModel());
-    extraWaitingController = TextEditingController(text: '${Extra ?? '0'}');
-    parkingController = TextEditingController(text: '${CarParking ?? '0'}');
-    tollsController = TextEditingController(text: '${Tolls ?? '0'}');
-    watingController = TextEditingController(text: '${Waiting ?? '0'}');
+    extraWaitingController = TextEditingController(text: Extra ?? '0');
+    parkingController = TextEditingController(text: CarParking ?? '0');
+    tollsController = TextEditingController(text: Tolls ?? '0');
+    watingController = TextEditingController(text: Waiting ?? '0');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 4), () {
         setState(() {
-          watingController?.text =
-              '${Waiting ?? '0'}'; // Replace 'Waiting' with your actual value
+          watingController.text =
+              Waiting ?? '0'; // Replace 'Waiting' with your actual value
         });
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 4), () {
         setState(() {
-          tollsController?.text =
-              '${Tolls ?? '0'}'; // Replace 'Waiting' with your actual value
+          tollsController.text =
+              Tolls ?? '0'; // Replace 'Waiting' with your actual value
         });
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 4), () {
         setState(() {
-          parkingController?.text =
-              '${CarParking ?? '0'}'; // Replace 'Waiting' with your actual value
+          parkingController.text =
+              CarParking ?? '0'; // Replace 'Waiting' with your actual value
         });
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(seconds: 4), () {
         setState(() {
-          extraWaitingController?.text =
-              '${Extra ?? '0'}'; // Replace 'Waiting' with your actual value
+          extraWaitingController.text =
+              Extra ?? '0'; // Replace 'Waiting' with your actual value
         });
       });
     });
@@ -114,10 +115,8 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
     print(dId);
 
     final response = await http.post(
-      Uri.parse('https://minicaboffice.com/api/driver/upcoming-jobs.php'),
-      body: {
-        'd_id': dId.toString(),
-      },
+      Uri.parse(ApiService.driverUpcomingJobs),
+      body: {'d_id': dId.toString()},
     );
 
     if (response.statusCode == 200) {
@@ -150,10 +149,9 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
   pushercallbg() async {
     try {
       var pusher = PusherClient(
-        '28691ac9c0c5ac41b64a',
+        'ef80ba163503f394d9c3',
         PusherOptions(
-          host:
-              'https://www.minicaboffice.com/api/driver/check-fare-status.php',
+          host: ApiService.driverCheckFareStatus,
           cluster: 'ap2',
           encrypted: false,
         ),
@@ -175,12 +173,13 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
 
           print('the message is ${jsonMap['total_fee']}');
           saveData(
-              jsonMap['details']['journey_fare'].toString(),
-              jsonMap['details']['car_parking'].toString(),
-              jsonMap['details']['extras'].toString(),
-              jsonMap['details']['waiting'].toString(),
-              jsonMap['details']['tolls'].toString(),
-              jsonMap['total_fee'].toString());
+            jsonMap['details']['journey_fare'].toString(),
+            jsonMap['details']['car_parking'].toString(),
+            jsonMap['details']['extras'].toString(),
+            jsonMap['details']['waiting'].toString(),
+            jsonMap['details']['tolls'].toString(),
+            jsonMap['total_fee'].toString(),
+          );
           setState(() {});
         }
       });
@@ -189,8 +188,14 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
     }
   }
 
-  saveData(String jfare, String carparking, String extra, String waiting,
-      String tolls, String totalFee) async {
+  saveData(
+    String jfare,
+    String carparking,
+    String extra,
+    String waiting,
+    String tolls,
+    String totalFee,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('journey_fare', jfare);
     await prefs.setString('car_parking', carparking);
@@ -203,7 +208,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
   // Future fetchFareData() async {
   //   try {
   //     final uri = Uri.parse(
-  //         'https://www.minicaboffice.com/api/driver/check-fare-status.php');
+  //         ApiService.driverCheckFareStatus);
   //     final response = await http.post(uri, body: {'fare_id': ' '});
 
   //     if (response.statusCode == 200) {
@@ -247,14 +252,16 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
       String? dId = prefs.getString('d_id');
       print(dId);
       print('d_id not found in shared preferences.${widget.jobid}');
-      print('d_id not found in shared preferences.${dId}');
+      print('d_id not found in shared preferences.$dId');
       print('d_id not found in shared preferences.${parkingController.text}');
       print('d_id not found in shared preferences.${tollsController.text}');
       print('d_id not found in shared preferences.${watingController.text}');
 
       if (dId == null) {}
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://www.minicaboffice.com/api/driver/add-fares.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiService.driverAddFares),
+      );
       request.fields.addAll({
         'job_id': '${widget.jobid}',
         'd_id': dId.toString(),
@@ -290,14 +297,16 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
     }
     getFares();
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async => true,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          backgroundColor: context.appTheme.secondaryBackground,
           body: SafeArea(
             top: true,
             child: Row(
@@ -314,7 +323,7 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                     width: 100.0,
                     height: double.infinity,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: context.appTheme.secondaryBackground,
                     ),
                     alignment: AlignmentDirectional(0.00, -1.00),
                     child: SingleChildScrollView(
@@ -326,8 +335,8 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                             width: double.infinity,
                             height: 140.0,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
+                              color:
+                                  context.appTheme.secondaryBackground,
                               borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(16.0),
                                 bottomRight: Radius.circular(16.0),
@@ -341,29 +350,41 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                             alignment: AlignmentDirectional(0.00, 0.00),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  32.0, 32.0, 32.0, 32.0),
+                                32.0,
+                                32.0,
+                                32.0,
+                                32.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Enter Charges',
-                                    style: FlutterFlowTheme.of(context)
-                                        .displaySmall,
+                                    style:
+                                        context.appTheme.displaySmall,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 12.0, 0.0, 24.0),
+                                      0.0,
+                                      12.0,
+                                      0.0,
+                                      24.0,
+                                    ),
                                     child: Text(
                                       'Let\'s get filling out the form below.',
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelMedium,
+                                      style:
+                                          context.appTheme.labelMedium,
                                     ),
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 16.0),
-                                    child: Container(
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      16.0,
+                                    ),
+                                    child: SizedBox(
                                       width: 370.0,
                                       child: TextFormField(
                                         controller: extraWaitingController,
@@ -373,61 +394,56 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Extra',
-                                          labelStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .override(
-                                                    fontFamily: 'Open Sans',
-                                                    fontSize: 18,
-                                                  ),
+                                          labelStyle: context.appTheme.labelMedium.override(
+                                            fontFamily: 'Open Sans',
+                                            fontSize: 18,
+                                          ),
                                           // hintText: 'Extra',
                                           hintStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium,
+                                              context.appTheme.labelMedium,
                                           enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
+                                                  context.appTheme.alternate,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                                  context.appTheme.primary,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           errorBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
+                                                  context.appTheme.error,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedErrorBorder:
                                               OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
+                                                borderSide: BorderSide(
+                                                  color:
+                                                      context.appTheme.error,
+                                                  width: 2,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
                                         ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium,
+                                        style:
+                                            context.appTheme.bodyMedium,
                                         keyboardType: TextInputType.phone,
                                         validator: _model
                                             .extraWaitingControllerValidator
@@ -437,8 +453,12 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 16.0),
-                                    child: Container(
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      16.0,
+                                    ),
+                                    child: SizedBox(
                                       width: 370.0,
                                       child: TextFormField(
                                         controller: parkingController,
@@ -447,61 +467,56 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Parking',
-                                          labelStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .override(
-                                                    fontFamily: 'Open Sans',
-                                                    fontSize: 18,
-                                                  ),
+                                          labelStyle: context.appTheme.labelMedium.override(
+                                            fontFamily: 'Open Sans',
+                                            fontSize: 18,
+                                          ),
                                           // hintText: 'Parking',
                                           hintStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium,
+                                              context.appTheme.labelMedium,
                                           enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
+                                                  context.appTheme.alternate,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                                  context.appTheme.primary,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           errorBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
+                                                  context.appTheme.error,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedErrorBorder:
                                               OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
+                                                borderSide: BorderSide(
+                                                  color:
+                                                      context.appTheme.error,
+                                                  width: 2,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
                                         ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium,
+                                        style:
+                                            context.appTheme.bodyMedium,
                                         keyboardType: TextInputType.phone,
                                         validator: _model
                                             .parkingControllerValidator
@@ -511,8 +526,12 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 16.0),
-                                    child: Container(
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      16.0,
+                                    ),
+                                    child: SizedBox(
                                       width: 370.0,
                                       child: TextFormField(
                                         controller: watingController,
@@ -521,61 +540,56 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Waiting',
-                                          labelStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .override(
-                                                    fontFamily: 'Open Sans',
-                                                    fontSize: 18,
-                                                  ),
+                                          labelStyle: context.appTheme.labelMedium.override(
+                                            fontFamily: 'Open Sans',
+                                            fontSize: 18,
+                                          ),
                                           // hintText: 'Waiting',
                                           hintStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium,
+                                              context.appTheme.labelMedium,
                                           enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
+                                                  context.appTheme.alternate,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                                  context.appTheme.primary,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           errorBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
+                                                  context.appTheme.error,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedErrorBorder:
                                               OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
+                                                borderSide: BorderSide(
+                                                  color:
+                                                      context.appTheme.error,
+                                                  width: 2,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
                                         ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium,
+                                        style:
+                                            context.appTheme.bodyMedium,
                                         keyboardType: TextInputType.phone,
                                         validator: _model
                                             .parkingControllerValidator
@@ -585,8 +599,12 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 16.0),
-                                    child: Container(
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      16.0,
+                                    ),
+                                    child: SizedBox(
                                       width: 370.0,
                                       child: TextFormField(
                                         controller: tollsController,
@@ -596,61 +614,56 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           labelText: 'Tolls',
-                                          labelStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .override(
-                                                    fontFamily: 'Open Sans',
-                                                    fontSize: 18,
-                                                  ),
+                                          labelStyle: context.appTheme.labelMedium.override(
+                                            fontFamily: 'Open Sans',
+                                            fontSize: 18,
+                                          ),
                                           // hintText: 'Tolls',
                                           hintStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium,
+                                              context.appTheme.labelMedium,
                                           enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
+                                                  context.appTheme.alternate,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                                  context.appTheme.primary,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           errorBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
+                                                  context.appTheme.error,
                                               width: 2,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           focusedErrorBorder:
                                               OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .error,
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
+                                                borderSide: BorderSide(
+                                                  color:
+                                                      context.appTheme.error,
+                                                  width: 2,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
                                         ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium,
+                                        style:
+                                            context.appTheme.bodyMedium,
                                         keyboardType: TextInputType.phone,
                                         validator: _model
                                             .emailAddressControllerValidator
@@ -660,12 +673,15 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 16.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      16.0,
+                                    ),
                                     child: FFButtonWidget(
                                       onPressed: () async {
                                         SharedPreferences prefs =
-                                            await SharedPreferences
-                                                .getInstance();
+                                            await SharedPreferences.getInstance();
                                         // prefs.setInt('isRideStart', 4);
                                         if (extra ==
                                                 extraWaitingController.text &&
@@ -674,20 +690,23 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                             waiting == watingController.text) {
                                           print('process with same');
                                           Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CompleteWidget(
-                                                        isfromfare: true,
-                                                      )));
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => CompleteWidget(
+                                                    isfromfare: true,
+                                                  ),
+                                            ),
+                                          );
                                         } else {
                                           showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return DailogForFare(
-                                                  addFares: addFares(),
-                                                );
-                                              });
+                                            context: context,
+                                            builder: (context) {
+                                              return DailogForFare(
+                                                addFares: addFares(),
+                                              );
+                                            },
+                                          );
                                           print('dialog');
                                         }
 
@@ -708,25 +727,32 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                         width: 370.0,
                                         height: 44.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         iconPadding:
                                             EdgeInsetsDirectional.fromSTEB(
-                                                0.0, 0.0, 0.0, 0.0),
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                        textStyle: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              color: Colors.white,
+                                              0.0,
+                                              0.0,
+                                              0.0,
+                                              0.0,
                                             ),
+                                        color:
+                                            context.appTheme.primary,
+                                        textStyle: context.appTheme.titleSmall.override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
+                                        ),
                                         elevation: 3.0,
                                         borderSide: BorderSide(
                                           color: Colors.transparent,
                                           width: 1.0,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
+                                        borderRadius: BorderRadius.circular(
+                                          12.0,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -781,15 +807,15 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                                   //           EdgeInsetsDirectional.fromSTEB(
                                   //               0.0, 0.0, 0.0, 0.0),
                                   //       color: isExcapted == 0
-                                  //           ? FlutterFlowTheme.of(context)
+                                  //           ? context.appTheme
                                   //               .primary
                                   //           : isExcapted == 1
-                                  //               ? FlutterFlowTheme.of(context)
+                                  //               ? context.appTheme
                                   //                   .primary
                                   //                   .withOpacity(0.3)
-                                  //               : FlutterFlowTheme.of(context)
+                                  //               : context.appTheme
                                   //                   .primary,
-                                  //       textStyle: FlutterFlowTheme.of(context)
+                                  //       textStyle: context.appTheme
                                   //           .titleSmall
                                   //           .override(
                                   //             fontFamily: 'Readex Pro',
@@ -823,13 +849,17 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
                     flex: 6,
                     child: Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(
-                          16.0, 16.0, 16.0, 16.0),
+                        16.0,
+                        16.0,
+                        16.0,
+                        16.0,
+                      ),
                       child: Container(
                         width: 100.0,
                         height: double.infinity,
                         decoration: BoxDecoration(
                           color:
-                              FlutterFlowTheme.of(context).secondaryBackground,
+                              context.appTheme.secondaryBackground,
                           image: DecorationImage(
                             fit: BoxFit.cover,
                             image: CachedNetworkImageProvider(
@@ -867,7 +897,9 @@ class _DailogForFareState extends State<DailogForFare> {
         height: 200,
         width: double.infinity,
         decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(10)),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -876,14 +908,10 @@ class _DailogForFareState extends State<DailogForFare> {
                 'Confirmation',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: 20),
               Text(
                 'Your fares need approval from controller.',
-                style: TextStyle(
-                  fontSize: 17,
-                ),
+                style: TextStyle(fontSize: 17),
                 textAlign: TextAlign.center,
               ),
               Spacer(),
@@ -893,11 +921,11 @@ class _DailogForFareState extends State<DailogForFare> {
                   onPressed: () async {
                     widget.addFares;
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CompleteWidget(
-                                  isfromfare: true,
-                                )));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CompleteWidget(isfromfare: true),
+                      ),
+                    );
                     setState(() {});
                     // if (isExcapted == 2) {
                     //   Navigator.push(
@@ -915,13 +943,17 @@ class _DailogForFareState extends State<DailogForFare> {
                     width: 370.0,
                     height: 44.0,
                     padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FlutterFlowTheme.of(context).primary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Readex Pro',
-                          color: Colors.white,
-                        ),
+                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                    ),
+                    color: context.appTheme.primary,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Readex Pro',
+                      color: Colors.white,
+                    ),
                     elevation: 3.0,
                     borderSide: BorderSide(
                       color: Colors.transparent,

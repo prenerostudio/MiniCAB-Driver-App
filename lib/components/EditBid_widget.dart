@@ -1,7 +1,7 @@
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +11,11 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'EditBid_model.dart';
 import 'edit_bid_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 export 'edit_bid_model.dart';
 
 class EditBidWidget extends StatefulWidget {
-  const EditBidWidget({
-    super.key,
-    required this.dId,
-    required this.bidId,
-  });
+  const EditBidWidget({super.key, required this.dId, required this.bidId});
 
   final String? dId;
   final String? bidId;
@@ -35,6 +32,7 @@ class _EditBidWidgetState extends State<EditBidWidget> {
     super.setState(callback);
     _model.onUpdate();
   }
+
   TextEditingController bidingController = TextEditingController();
   @override
   void initState() {
@@ -60,13 +58,13 @@ class _EditBidWidgetState extends State<EditBidWidget> {
         width: double.infinity,
         height: 400,
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).secondaryBackground,
+          color: context.appTheme.secondaryBackground,
           boxShadow: [
             BoxShadow(
               blurRadius: 4,
               color: Color(0x25090F13),
               offset: Offset(0, 2),
-            )
+            ),
           ],
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(0),
@@ -91,7 +89,7 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                       width: 60,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        color: context.appTheme.primaryBackground,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -110,18 +108,16 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                         children: [
                           Text(
                             'Edit Bid',
-                            style: FlutterFlowTheme.of(context)
-                                .headlineSmall
-                                .override(
+                            style: context.appTheme.headlineSmall.override(
                               fontFamily: 'Outfit',
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: context.appTheme.primary,
                             ),
                           ),
                           Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                             child: Text(
                               'Please enter a bid amount.',
-                              style: FlutterFlowTheme.of(context).labelMedium,
+                              style: context.appTheme.labelMedium,
                             ),
                           ),
                         ],
@@ -136,7 +132,7 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                         buttonSize: 44,
                         icon: Icon(
                           Icons.close,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                           size: 24,
                         ),
                         onPressed: () async {
@@ -150,7 +146,7 @@ class _EditBidWidgetState extends State<EditBidWidget> {
               Divider(
                 height: 24,
                 thickness: 2,
-                color: FlutterFlowTheme.of(context).primaryBackground,
+                color: context.appTheme.primaryBackground,
               ),
               Padding(
                 padding: EdgeInsets.all(20),
@@ -159,7 +155,7 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         child: TextFormField(
                           controller: bidingController,
@@ -170,42 +166,42 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                           decoration: InputDecoration(
                             labelText: '£00.00',
                             labelStyle:
-                            FlutterFlowTheme.of(context).labelMedium,
+                                context.appTheme.labelMedium,
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color:
-                                FlutterFlowTheme.of(context).secondaryText,
+                                    context.appTheme.secondaryText,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).primary,
+                                color: context.appTheme.primary,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             errorBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
+                                color: context.appTheme.error,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: FlutterFlowTheme.of(context).error,
+                                color: context.appTheme.error,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             filled: true,
-                            fillColor: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
+                            fillColor:
+                                context.appTheme.secondaryBackground,
                             contentPadding: EdgeInsets.all(24),
                           ),
-                          style: FlutterFlowTheme.of(context).bodyMedium,
+                          style: context.appTheme.bodyMedium,
                           textAlign: TextAlign.start,
                           keyboardType: TextInputType.number,
                           validator: _model.bidingControllerValidator
@@ -219,7 +215,7 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                         onPressed: () async {
                           try {
                             print(widget.bidId);
-                            if(bidingController.text.isEmpty){
+                            if (bidingController.text.isEmpty) {
                               Fluttertoast.showToast(
                                 msg: "Please enter a bid amount.",
                                 textColor: Colors.white,
@@ -227,13 +223,17 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                               );
                               return;
                             }
-                            var request = http.MultipartRequest('POST', Uri.parse('https://www.minicaboffice.com/api/driver/edit-bid.php'));
+                            var request = http.MultipartRequest(
+                              'POST',
+                              Uri.parse(ApiService.driverEditBid),
+                            );
                             request.fields.addAll({
                               'bid_id': '${widget.bidId}',
                               'bid_amount': bidingController.text,
                             });
                             print(request.fields);
-                            http.StreamedResponse response = await request.send();
+                            http.StreamedResponse response =
+                                await request.send();
                             if (response.statusCode == 200) {
                               print(await response.stream.bytesToString());
                               Navigator.pop(context);
@@ -249,11 +249,14 @@ class _EditBidWidgetState extends State<EditBidWidget> {
                         options: FFButtonOptions(
                           height: 40,
                           padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                          iconPadding:
-                          EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
+                          iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            0,
+                            0,
+                            0,
+                          ),
+                          color: context.appTheme.primary,
+                          textStyle: context.appTheme.titleSmall.override(
                             fontFamily: 'Readex Pro',
                             color: Colors.white,
                           ),

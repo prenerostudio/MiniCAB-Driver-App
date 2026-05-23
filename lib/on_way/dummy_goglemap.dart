@@ -9,8 +9,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class DummyViewMap extends StatefulWidget {
+  const DummyViewMap({super.key});
+
   @override
   _DummyViewMapState createState() => _DummyViewMapState();
 }
@@ -79,8 +82,12 @@ class _DummyViewMapState extends State<DummyViewMap> {
   // }
 
   Future<void> getDirections() async {
-    final url =
-        'https://maps.googleapis.com/maps/api/directions/json?origin=${startPoint.latitude},${startPoint.longitude}&destination=${endPoint.latitude},${endPoint.longitude}&alternatives=true&key=AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
+    final url = ApiService.googleDirectionsUrl(
+      origin: '${startPoint.latitude},${startPoint.longitude}',
+      destination: '${endPoint.latitude},${endPoint.longitude}',
+      alternatives: true,
+      apiKey: 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA',
+    );
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {

@@ -9,7 +9,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:new_minicab_driver/Model/jobDetails.dart';
-import 'package:new_minicab_driver/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import 'package:new_minicab_driver/flutter_flow/flutter_flow_util.dart';
 import 'package:new_minicab_driver/flutter_flow/flutter_flow_widgets.dart';
 import 'package:new_minicab_driver/home/home_view_controller.dart';
@@ -28,6 +28,7 @@ import 'package:flutter/services.dart';
 export 'home_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:convert';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class HomeScreenAlert extends StatefulWidget {
   List<Job> st;
@@ -40,23 +41,18 @@ class HomeScreenAlert extends StatefulWidget {
 }
 
 class _HomeScreenAlertState extends State<HomeScreenAlert> {
-  Future acceptJob(
-    String jobId,
-  ) async {
+  Future acceptJob(String jobId, String bookId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       String? dId = prefs.getString('d_id');
       var fields = {
         'job_id': jobId.toString(),
+        'book_id': bookId.toString(),
         'd_id': dId.toString(),
       };
-      var uri =
-          Uri.parse('https://www.minicaboffice.com/api/driver/accept-job.php');
+      var uri = Uri.parse(ApiService.driverAcceptJob);
 
-      var response = await http.post(
-        uri,
-        body: fields,
-      );
+      var response = await http.post(uri, body: fields);
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -89,14 +85,20 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
         '${myController.currentLocation?.latitude},${myController.currentLocation?.longitude}'; // Replace with your source coordinates
     var destination =
         // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-        '${destinationLat},${desLng}';
+        '$destinationLat,$desLng';
     // var destination =
     // // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
     // '${31.3637197},${73.0553336}';
     try {
-      final response = await http.post(Uri.parse(// can be get and post request
-          // 'https://maps.googleapis.com/maps/api/directions/json?origin=31.4064054,73.0413076&destination=31.6404050,73.2413070&key=AIzaSyBBSmpcyEaIojvZznYVNpCU0Htvdabe__Y'));
-          'https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$apiKey'));
+      final response = await http.post(
+        Uri.parse(
+          ApiService.googleDirectionsUrl(
+            origin: origin,
+            destination: destination,
+            apiKey: apiKey,
+          ),
+        ),
+      );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
@@ -116,10 +118,11 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
               // final String encodedPolyline =
               //     json['routes'][0]['overview_polyline']['points'];
               // final List<LatLng> points = decodePolyline(encodedPolyline);
-              decodedPoints = PolylinePoints()
-                  .decodePolyline(points)
-                  .map((point) => LatLng(point.latitude, point.longitude))
-                  .toList();
+              decodedPoints =
+                  PolylinePoints()
+                      .decodePolyline(points)
+                      .map((point) => LatLng(point.latitude, point.longitude))
+                      .toList();
 
               if (mounted) {
                 setState(() {
@@ -187,7 +190,8 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
         myController.convertedLat.value = locations.first.latitude;
         myController.convertedLng.value = locations.first.longitude;
         print(
-            'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}');
+          'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}',
+        );
         _getPolyline(locations.first.latitude, locations.first.longitude);
       }
     } catch (e) {
@@ -195,20 +199,13 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
     }
   }
 
-  Future<void> rejectJob(
-    String jobId,
-    String bookId,
-  ) async {
+  Future<void> rejectJob(String jobId, String bookId) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     try {
-      var url =
-          Uri.parse('https://minicaboffice.com/api/driver/cancel-booking.php');
+      var url = Uri.parse(ApiService.driverCancelBooking);
       var response = await http.post(
         url,
-        body: {
-          'book_id': bookId.toString(),
-          'job_id': jobId.toString(),
-        },
+        body: {'book_id': bookId.toString(), 'job_id': jobId.toString()},
       );
       if (response.statusCode == 200) {
         myController.jobPusherContainer.value = false;
@@ -227,30 +224,32 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.all(8),
-        width: double.infinity,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).secondaryBackground,
-          boxShadow: [
-            const BoxShadow(
-              blurRadius: 4.0,
-              color: Color(0x33000000),
-              offset: Offset(0.0, 2.0),
-            )
-          ],
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: widget.st!.length,
-              itemBuilder: (context, index) {
-                final jobItem = widget.st[index];
-                return Column(mainAxisSize: MainAxisSize.max, children: [
+      margin: EdgeInsets.all(8),
+      width: double.infinity,
+      height: widget.height,
+      decoration: BoxDecoration(
+        color: context.appTheme.secondaryBackground,
+        boxShadow: [
+          const BoxShadow(
+            blurRadius: 4.0,
+            color: Color(0x33000000),
+            offset: Offset(0.0, 2.0),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: widget.st.length,
+            itemBuilder: (context, index) {
+              final jobItem = widget.st[index];
+              return Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
                     child: Row(
@@ -265,27 +264,21 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                             Text(
                               '£${jobItem.journeyFare}',
                               textAlign: TextAlign.end,
-                              style: FlutterFlowTheme.of(context)
-                                  .displaySmall
-                                  .override(
-                                    fontFamily: 'Outfit',
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.appTheme.displaySmall.override(
+                                fontFamily: 'Outfit',
+                                color: context.appTheme.primaryText,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             Text(
                               '(Estimated maximum value)',
-                              style: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'Montserrat',
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              style: context.appTheme.labelMedium.override(
+                                fontFamily: 'Montserrat',
+                                color: context.appTheme.primaryText,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ].divide(const SizedBox(height: 4)),
                         ),
@@ -313,38 +306,42 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                 height: 50,
                                 child: VerticalDivider(
                                   thickness: 2,
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
+                                  color:
+                                      context.appTheme.secondaryText,
                                 ),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 0, 0),
+                                0,
+                                0,
+                                0,
+                                0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Text(
                                     'Time',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Roboto',
-                                          fontSize: 16,
-                                        ),
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            0, 0, 0, 0),
+                                          0,
+                                          0,
+                                          0,
+                                          0,
+                                        ),
                                     child: Text(
                                       'Date',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Roboto',
-                                            fontSize: 16,
-                                          ),
+                                      style: context.appTheme.bodyMedium.override(
+                                        fontFamily: 'Roboto',
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -352,30 +349,34 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  70, 0, 0, 0),
+                                70,
+                                0,
+                                0,
+                                0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Text(
-                                    '${jobItem.pickTime}',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Roboto',
-                                          fontSize: 16,
-                                        ),
+                                    jobItem.pickTime,
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0, 5, 0, 0),
+                                      0,
+                                      5,
+                                      0,
+                                      0,
+                                    ),
                                     child: Text(
-                                      '${jobItem.pickDate}',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Roboto',
-                                            fontSize: 16,
-                                          ),
+                                      jobItem.pickDate,
+                                      style: context.appTheme.bodyMedium.override(
+                                        fontFamily: 'Roboto',
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -387,8 +388,10 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -413,23 +416,19 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                 child: Center(
                                   child: Text(
                                     'A',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w300,
-                                        ),
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Open Sans',
+                                      color:
+                                          context.appTheme.secondaryBackground,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w300,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                top: 5,
-                              ),
+                              padding: const EdgeInsets.only(top: 5),
                               child: Stack(
                                 children: [
                                   Align(
@@ -443,9 +442,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 5,
-                                    ),
+                                    padding: const EdgeInsets.only(top: 5),
                                     child: Container(
                                       width: 30,
                                       height: 30,
@@ -474,15 +471,13 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                 child: Center(
                                   child: Text(
                                     'B',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w300,
-                                        ),
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Open Sans',
+                                      color:
+                                          context.appTheme.secondaryBackground,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w300,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -500,18 +495,18 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                   Flexible(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 0, top: 10, bottom: 10),
+                                        left: 0,
+                                        top: 10,
+                                        bottom: 10,
+                                      ),
                                       child: Text(
-                                        '${jobItem.pickup}',
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelMedium
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
-                                              fontSize: 14,
-                                            ),
+                                        jobItem.pickup,
+                                        style: context.appTheme.labelMedium.override(
+                                          fontFamily: 'Readex Pro',
+                                          color:
+                                              context.appTheme.secondaryText,
+                                          fontSize: 14,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                       ),
@@ -528,21 +523,17 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                       color: Color(0xFF5B68F5),
                                       size: 18,
                                     ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
+                                    SizedBox(width: 10),
                                     Text(
                                       '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${jobItem.journeyType}',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Open Sans',
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            fontSize: 15,
-                                          ),
+                                      style: context.appTheme.bodyMedium.override(
+                                        fontFamily: 'Open Sans',
+                                        color:
+                                            context.appTheme.secondaryText,
+                                        fontSize: 15,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -552,18 +543,17 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                   Flexible(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 10, bottom: 0),
+                                        top: 10,
+                                        bottom: 0,
+                                      ),
                                       child: Text(
-                                        '${jobItem.destination}',
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelMedium
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
-                                              fontSize: 15,
-                                            ),
+                                        jobItem.destination,
+                                        style: context.appTheme.labelMedium.override(
+                                          fontFamily: 'Readex Pro',
+                                          color:
+                                              context.appTheme.secondaryText,
+                                          fontSize: 15,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                       ),
@@ -587,29 +577,30 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                           Vibration.cancel();
                           myController.visiblecontainer.value = false;
 
-                          rejectJob(
-                            '${jobItem.jobId}',
-                            '${jobItem.bookId}',
-                          );
+                          rejectJob(jobItem.jobId, jobItem.bookId);
                         },
                         text: 'cancel',
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          size: 15,
-                        ),
+                        icon: const Icon(Icons.delete_outline, size: 15),
                         options: FFButtonOptions(
                           height: 50,
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              24, 0, 24, 0),
-                          iconPadding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                            24,
+                            0,
+                            24,
+                            0,
+                          ),
+                          iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            0,
+                            0,
+                            0,
+                          ),
                           color: Colors.red,
-                          textStyle: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .override(
-                                  fontFamily: 'Open Sans',
-                                  color: Colors.white,
-                                  fontSize: 10),
+                          textStyle: context.appTheme.titleSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
                           elevation: 3,
                           borderSide: const BorderSide(
                             color: Colors.transparent,
@@ -629,7 +620,10 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                           await sp.setString('jobAcceptedTime', formattedTime);
                           // myController.visiblecontainer.value = true;
                           myController.isJobDetailDone.value = true;
-                          await acceptJob(jobItem.jobId).then((s) {});
+                          await acceptJob(
+                            jobItem.jobId,
+                            jobItem.bookId,
+                          ).then((s) {});
                           // isOverlayClosed = true;
                           FlutterRingtonePlayer().stop();
                           Vibration.cancel();
@@ -645,12 +639,15 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                           } else {
                             // Navigator.pop(context);
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => NavBarPage(
-                                          initialPage: 'Home',
-                                          page: HomeWidget(),
-                                        )));
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => NavBarPage(
+                                      initialPage: 'Home',
+                                      page: HomeWidget(),
+                                    ),
+                              ),
+                            );
                           }
                           // if (myController.isscreenHome.value == false) {
                           //   Navigator.push(
@@ -666,23 +663,27 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                           // );
                         },
                         text: 'Accept',
-                        icon: const Icon(
-                          Icons.east,
-                          size: 15,
-                        ),
+                        icon: const Icon(Icons.east, size: 15),
                         options: FFButtonOptions(
                           height: 50,
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              24, 0, 24, 0),
-                          iconPadding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: FlutterFlowTheme.of(context).primary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    fontFamily: 'Open Sans',
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                  ),
+                            24,
+                            0,
+                            24,
+                            0,
+                          ),
+                          iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            0,
+                            0,
+                            0,
+                          ),
+                          color: context.appTheme.primary,
+                          textStyle: context.appTheme.titleSmall.override(
+                            fontFamily: 'Open Sans',
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
                           elevation: 3,
                           borderSide: const BorderSide(
                             color: Colors.transparent,
@@ -693,14 +694,15 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                       ),
                     ],
                   ),
-                ]
-                    // .divide(SizedBox(height: 4))
-                    // .addToEnd(SizedBox(height: 12)),
-                    );
-              },
-            ),
+                ],
+                // .divide(SizedBox(height: 4))
+                // .addToEnd(SizedBox(height: 12)),
+              );
+            },
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   void _getCurrentTime() {

@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '/flutter_flow/flutter_flow_drop_down.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
@@ -16,13 +16,10 @@ export 'add_vehicle_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../Model/vehicle.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class AddVehicleWidget extends StatefulWidget {
-  const AddVehicleWidget({
-    Key? key,
-  }) : super(key: key);
-
-
+  const AddVehicleWidget({super.key});
 
   @override
   _AddVehicleWidgetState createState() => _AddVehicleWidgetState();
@@ -81,21 +78,15 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
   }
 
   void _showToastMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
-
-
-
 
   Future<vehicie?> fetchVehicleData() async {
     try {
       var request = http.Request(
-          'GET',
-          Uri.parse(
-              'https://www.minicaboffice.com/api/driver/fetch-vehicles.php'));
+        'GET',
+        Uri.parse(ApiService.driverFetchVehicles),
+      );
 
       http.StreamedResponse response = await request.send();
 
@@ -116,7 +107,8 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
   void fetchData() async {
     vehicie? vehicleData = await fetchVehicleData();
     if (vehicleData != null) {
-      dropdownOptions = vehicleData.data
+      dropdownOptions =
+          vehicleData.data
               ?.map((data) => Data(vId: data.vId, vName: data.vName))
               .toList() ??
           [];
@@ -140,14 +132,16 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           body: SafeArea(
             top: true,
             child: SingleChildScrollView(
@@ -174,7 +168,6 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                   },
                                   style: TextButton.styleFrom(
                                     foregroundColor: Colors.blue,
-
                                   ),
                                   child: Text('Skip'),
                                 ),
@@ -182,45 +175,55 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 10.0, 20.0, 20.0),
+                                20.0,
+                                10.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: FlutterFlowDropDown<String>(
-                                controller: _model.dropDownValueController ??=
-                                    FormFieldController<String>(null),
-                                options: dropDownOptions ??
-                                    [],
+                                controller:
+                                    _model.dropDownValueController ??=
+                                        FormFieldController<String>(null),
+                                options: dropDownOptions ?? [],
                                 onChanged: (val) {
                                   setState(() {
-                                    Data selectedData =
-                                        dropdownOptions.firstWhere(
-                                            (data) => data.vName == val);
-                                    dropDownValue = selectedData
-                                        .vId; // Store vId when an item is selected
+                                    Data selectedData = dropdownOptions
+                                        .firstWhere(
+                                          (data) => data.vName == val,
+                                        );
+                                    dropDownValue =
+                                        selectedData
+                                            .vId; // Store vId when an item is selected
                                   });
-                                  print('Selected Value: ${dropDownValue}');
+                                  print('Selected Value: $dropDownValue');
                                 },
                                 width: 398.0,
                                 height: 50.0,
                                 searchHintTextStyle:
-                                    FlutterFlowTheme.of(context).labelMedium,
+                                    context.appTheme.labelMedium,
                                 textStyle:
-                                    FlutterFlowTheme.of(context).bodyMedium,
+                                    context.appTheme.bodyMedium,
                                 hintText: 'Select Vehicle...',
                                 searchHintText: 'Search for an item...',
                                 icon: Icon(
                                   Icons.keyboard_arrow_down_rounded,
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
+                                  color:
+                                      context.appTheme.secondaryText,
                                   size: 24.0,
                                 ),
-                                fillColor: FlutterFlowTheme.of(context)
-                                    .primaryBackground,
+                                fillColor:
+                                    context.appTheme.primaryBackground,
                                 elevation: 2.0,
                                 borderColor:
-                                    FlutterFlowTheme.of(context).accent4,
+                                    context.appTheme.accent4,
                                 borderWidth: 2.0,
                                 borderRadius: 8.0,
                                 margin: EdgeInsetsDirectional.fromSTEB(
-                                    16.0, 4.0, 16.0, 4.0),
+                                  16.0,
+                                  4.0,
+                                  16.0,
+                                  4.0,
+                                ),
                                 hidesUnderline: true,
                                 isSearchable: true,
                                 isMultiSelect: false,
@@ -228,32 +231,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: MakeController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Vehicle Make',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'Vehicle Make',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -283,13 +286,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -297,32 +304,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: ModelController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Vehicle  Model',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'Vehicle Model',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -352,13 +359,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -366,32 +377,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: ColorController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Vehicle Color',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'Vehicle Color',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -421,13 +432,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -435,32 +450,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: RegisterNumberController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Registration Number',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'Registration Number',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -490,13 +505,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -504,32 +523,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: PHVlicenceController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'PHV Licence Number',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'PHV Licence Number',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -559,13 +578,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -574,118 +597,124 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
 
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
-                             child: TextFormField(
-                                  controller: PHVEController,
-                                  textCapitalization: TextCapitalization.words,
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'PHV Expiry',
-                                    labelStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .override(
-                                          fontFamily: 'Plus Jakarta Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                    hintText: 'MM-YYYY',
-                                    hintStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .override(
-                                          fontFamily: 'Plus Jakarta Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFE0E3E7),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xFF4B39EF),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFFF5963),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Color(0xFFFF5963),
-                                        width: 2.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    prefixIcon: GestureDetector(
-                                      onTap: () async {
-                                        DateTime? selectedDate = await showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.now(),
-                                          firstDate: DateTime(2024),
-                                          lastDate: DateTime(2040),
-                                        );
-                                        if (selectedDate != null) {
-                                          String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
-                                          PHVEController.text = formattedDate;
-                                        }
-                                      },
-                                      child: Icon(Icons.calendar_today),
-                                    ),
-                                    filled: true,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    contentPadding:
-                                        EdgeInsetsDirectional.fromSTEB(
-                                            20.0, 24.0, 0.0, 24.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
+                              child: TextFormField(
+                                controller: PHVEController,
+                                textCapitalization: TextCapitalization.words,
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  labelText: 'PHV Expiry',
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
                                   ),
-
-                                  style: FlutterFlowTheme.of(context).labelMedium,
-                                  validator: _model
-                                      .vdescriptionControllerValidator
-                                      .asValidator(context),
+                                  hintText: 'MM-YYYY',
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFE0E3E7),
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF4B39EF),
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFF5963),
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFFF5963),
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  prefixIcon: GestureDetector(
+                                    onTap: () async {
+                                      DateTime? selectedDate =
+                                          await showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2024),
+                                            lastDate: DateTime(2040),
+                                          );
+                                      if (selectedDate != null) {
+                                        String formattedDate =
+                                            "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
+                                        PHVEController.text = formattedDate;
+                                      }
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  filled: true,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
+                                  contentPadding:
+                                      EdgeInsetsDirectional.fromSTEB(
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
+
+                                style: context.appTheme.labelMedium,
+                                validator: _model
+                                    .vdescriptionControllerValidator
+                                    .asValidator(context),
+                              ),
                             ),
 
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: TexiInsuranceController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Taxi Insurance Number',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'Taxi Insurance Number',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -715,13 +744,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -729,32 +762,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: TIEController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Taxi Insurance Expiry',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'MM-YYYY',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -785,27 +818,33 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                   ),
                                   prefixIcon: GestureDetector(
                                     onTap: () async {
-                                      DateTime? selectedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(2024),
-                                        lastDate: DateTime(2040),
-                                      );
+                                      DateTime? selectedDate =
+                                          await showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2024),
+                                            lastDate: DateTime(2040),
+                                          );
                                       if (selectedDate != null) {
-                                        String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
+                                        String formattedDate =
+                                            "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
                                         TIEController.text = formattedDate;
                                       }
                                     },
                                     child: Icon(Icons.calendar_today),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -813,32 +852,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: MOTnumberController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'MOT Number',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'MOT Number',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -868,13 +907,17 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -882,32 +925,32 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  20.0, 20.0, 20.0, 20.0),
+                                20.0,
+                                20.0,
+                                20.0,
+                                20.0,
+                              ),
                               child: TextFormField(
                                 controller: MOTEController,
                                 textCapitalization: TextCapitalization.words,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'MOT Expiry',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   hintText: 'MM-YYYY',
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  hintStyle: context.appTheme.labelMedium.override(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -938,27 +981,33 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                   ),
                                   prefixIcon: GestureDetector(
                                     onTap: () async {
-                                      DateTime? selectedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(2024),
-                                        lastDate: DateTime(2040),
-                                      );
+                                      DateTime? selectedDate =
+                                          await showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2024),
+                                            lastDate: DateTime(2040),
+                                          );
                                       if (selectedDate != null) {
-                                        String formattedDate = "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
+                                        String formattedDate =
+                                            "${selectedDate.month}-${selectedDate.year.toString().padLeft(2, '0')}";
                                         MOTEController.text = formattedDate;
                                       }
                                     },
                                     child: Icon(Icons.calendar_today),
                                   ),
                                   filled: true,
-                                  fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                  fillColor:
+                                      context.appTheme.secondaryBackground,
                                   contentPadding:
                                       EdgeInsetsDirectional.fromSTEB(
-                                          20.0, 24.0, 0.0, 24.0),
+                                        20.0,
+                                        24.0,
+                                        0.0,
+                                        24.0,
+                                      ),
                                 ),
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                style: context.appTheme.labelMedium,
                                 validator: _model
                                     .vdescriptionControllerValidator
                                     .asValidator(context),
@@ -968,111 +1017,160 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                               alignment: AlignmentDirectional(0.00, 0.05),
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 24.0, 0.0, 45.0),
+                                  0.0,
+                                  24.0,
+                                  0.0,
+                                  45.0,
+                                ),
                                 child: FFButtonWidget(
                                   onPressed: () async {
                                     try {
-
                                       SharedPreferences prefs =
                                           await SharedPreferences.getInstance();
                                       String? dId = prefs.getString('d_id');
                                       if (dropDownValue == null) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                                'Please select a vehicle.'),
+                                              'Please select a vehicle.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      } if (MakeController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (MakeController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the Make of the vehicle.'),
+                                            content: Text(
+                                              'Please enter the Make of the vehicle.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (ModelController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (ModelController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the Model of the vehicle.'),
+                                            content: Text(
+                                              'Please enter the Model of the vehicle.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (ColorController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (ColorController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the Color of the vehicle.'),
+                                            content: Text(
+                                              'Please enter the Color of the vehicle.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (RegisterNumberController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (RegisterNumberController
+                                          .text
+                                          .isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the Registration number of the vehicle.'),
+                                            content: Text(
+                                              'Please enter the Registration number of the vehicle.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (PHVlicenceController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (PHVlicenceController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the PHV Licence.'),
+                                            content: Text(
+                                              'Please enter the PHV Licence.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (PHVEController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (PHVEController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the PHV Licence Expiry.'),
+                                            content: Text(
+                                              'Please enter the PHV Licence Expiry.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (TexiInsuranceController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (TexiInsuranceController
+                                          .text
+                                          .isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the vehicle Insurance.'),
+                                            content: Text(
+                                              'Please enter the vehicle Insurance.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (TIEController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (TIEController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the vehicle Insurance Expiry.'),
+                                            content: Text(
+                                              'Please enter the vehicle Insurance Expiry.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (MOTnumberController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (MOTnumberController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the MOT Number.'),
+                                            content: Text(
+                                              'Please enter the MOT Number.',
+                                            ),
                                           ),
                                         );
                                         return;
-                                      }if (MOTEController.text.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                      }
+                                      if (MOTEController.text.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
-                                            content: Text('Please enter the MOT Expiry.'),
+                                            content: Text(
+                                              'Please enter the MOT Expiry.',
+                                            ),
                                           ),
                                         );
                                         return;
                                       }
                                       var request = http.MultipartRequest(
-                                          'POST',
-                                          Uri.parse(
-                                              'https://minicaboffice.com/api/driver/add-vehicle.php'));
+                                        'POST',
+                                        Uri.parse(ApiService.driverAddVehicle),
+                                      );
                                       request.fields.addAll({
                                         'd_id': dId.toString(),
-                                        'v_id': '${dropDownValue}',
+                                        'v_id': '$dropDownValue',
                                         'v_make': MakeController.text,
                                         'v_model': ModelController.text,
                                         'v_color': ColorController.text,
@@ -1083,13 +1181,14 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                         'v_ti': TexiInsuranceController.text,
                                         'v_ti_expiry': TIEController.text,
                                         'v_mot': MOTnumberController.text,
-                                        'v_mot_expiry': MOTEController.text
+                                        'v_mot_expiry': MOTEController.text,
                                       });
                                       http.StreamedResponse response =
                                           await request.send();
                                       if (response.statusCode == 200) {
-                                        print(await response.stream
-                                            .bytesToString());
+                                        print(
+                                          await response.stream.bytesToString(),
+                                        );
                                         await setIsLoginTrue();
                                         context.pushNamed('Documents');
                                       } else {
@@ -1104,18 +1203,24 @@ class _AddVehicleWidgetState extends State<AddVehicleWidget> {
                                     width: 270.0,
                                     height: 50.0,
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .override(
-                                          fontFamily: 'Plus Jakarta Sans',
-                                          color: Colors.white,
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.normal,
-                                        ),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
+                                    color: context.appTheme.primary,
+                                    textStyle: context.appTheme.titleMedium.override(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Colors.white,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.normal,
+                                    ),
                                     elevation: 2.0,
                                     borderSide: BorderSide(
                                       color: Colors.transparent,

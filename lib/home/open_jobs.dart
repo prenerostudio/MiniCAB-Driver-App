@@ -4,22 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_minicab_driver/Model/open_job_details.dart';
-import 'package:new_minicab_driver/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class OpenJobsSection extends StatefulWidget {
-  const OpenJobsSection({Key? key}) : super(key: key);
+  const OpenJobsSection({super.key});
 
   @override
   State<OpenJobsSection> createState() => _OpenJobsSectionState();
 }
 
 class _OpenJobsSectionState extends State<OpenJobsSection> {
-  String baseUrl = 'https://minicaboffice.com/api/driver/open-bookings.php';
+  String baseUrl = ApiService.driverOpenBookings;
 
   Future<List<OpenJob>> fetchJobs() async {
-    final response = await http.get(Uri.parse('$baseUrl'));
+    final response = await http.get(Uri.parse(baseUrl));
     final Map<String, dynamic> jsonResponse = json.decode(response.body);
     // debugPrint('the response is ${jsonResponse['data']}');
     if (response.statusCode == 200) {
@@ -36,23 +37,14 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
     super.initState();
   }
 
-  Future selectJob(
-    String openId,
-  ) async {
+  Future selectJob(String openId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       String? dId = prefs.getString('d_id');
-      var fields = {
-        'd_id': dId.toString(),
-        'ob_id': openId.toString(),
-      };
-      var uri =
-          Uri.parse('https://minicaboffice.com/api/driver/select-booking.php');
+      var fields = {'d_id': dId.toString(), 'ob_id': openId.toString()};
+      var uri = Uri.parse(ApiService.driverSelectBooking);
 
-      var response = await http.post(
-        uri,
-        body: fields,
-      );
+      var response = await http.post(uri, body: fields);
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -78,12 +70,7 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Open Jobs"),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: "Open"),
-              Tab(text: "My Jobs"),
-            ],
-          ),
+          bottom: const TabBar(tabs: [Tab(text: "Open"), Tab(text: "My Jobs")]),
         ),
         body: TabBarView(
           children: [
@@ -121,35 +108,40 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
                           ),
                           trailing: Container(
                             decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).primary),
+                              color: context.appTheme.primary,
+                            ),
                             child: TextButton(
-                                onPressed: () {
-                                  if (job.obStatus == 'Open') {
-                                    selectJob(job.obId);
-                                  } else {
-                                    Fluttertoast.showToast(
-                                      msg: 'Job has been taken already',
-                                      textColor: Colors.white,
-                                      fontSize: 16.0,
-                                    );
-                                  }
-                                  print('open id is ${job.obId}');
-                                },
-                                child: job.obStatus == 'Open'
-                                    ? Text(
+                              onPressed: () {
+                                if (job.obStatus == 'Open') {
+                                  selectJob(job.obId);
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: 'Job has been taken already',
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                }
+                                print('open id is ${job.obId}');
+                              },
+                              child:
+                                  job.obStatus == 'Open'
+                                      ? Text(
                                         'Select',
-                                        style: TextStyle(color: Colors.white
-                                            // color: FlutterFlowTheme.of(context)
-                                            //     .primaryBackground,
-                                            ),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          // color: context.appTheme
+                                          //     .primaryBackground,
+                                        ),
                                       )
-                                    : Text(
+                                      : Text(
                                         'Selected',
-                                        style: TextStyle(color: Colors.white
-                                            // color: FlutterFlowTheme.of(context)
-                                            //     .primaryBackground,
-                                            ),
-                                      )),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          // color: context.appTheme
+                                          //     .primaryBackground,
+                                        ),
+                                      ),
+                            ),
                           ),
                           onTap: () {
                             // Handle item tap
@@ -201,61 +193,66 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary),
+                                      color:
+                                          context.appTheme.primary,
+                                    ),
                                     child: TextButton(
-                                        onPressed: () {
-                                          selectJob(job.obId);
-                                          // if (job.dId.isEmpty) {
+                                      onPressed: () {
+                                        selectJob(job.obId);
+                                        // if (job.dId.isEmpty) {
 
-                                          // } else {
-                                          //   Fluttertoast.showToast(
-                                          //     msg: 'Job has been taken already',
-                                          //     textColor: Colors.white,
-                                          //     fontSize: 16.0,
-                                          //   );
-                                          // }
-                                          print('open id is ${job.obId}');
-                                        },
-                                        child: Text(
-                                          'DESELECT',
-                                          style: TextStyle(color: Colors.white
-                                              // color: FlutterFlowTheme.of(context)
-                                              //     .primaryBackground,
-                                              ),
-                                        )),
+                                        // } else {
+                                        //   Fluttertoast.showToast(
+                                        //     msg: 'Job has been taken already',
+                                        //     textColor: Colors.white,
+                                        //     fontSize: 16.0,
+                                        //   );
+                                        // }
+                                        print('open id is ${job.obId}');
+                                      },
+                                      child: Text(
+                                        'DESELECT',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          // color: context.appTheme
+                                          //     .primaryBackground,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
+                                  SizedBox(width: 8),
                                   Container(
                                     decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary),
+                                      color:
+                                          context.appTheme.primary,
+                                    ),
                                     child: TextButton(
-                                        onPressed: () {
-                                          // selectJob(job.obId);
-                                          assignJob(job.bookId, job.cId,
-                                              job.dId, job.journeyFare);
-                                          print('open id is ${job.bookId}');
-                                          print('open id is ${job.cId}');
-                                          print('open id is ${job.dId}');
-                                          print(
-                                              'open id is ${job.journeyFare}');
-                                        },
-                                        child: Text(
-                                          'Assign Me',
-                                          style: TextStyle(color: Colors.white
-                                              // color: FlutterFlowTheme.of(context)
-                                              //     .primaryBackground,
-                                              ),
-                                        )),
+                                      onPressed: () {
+                                        // selectJob(job.obId);
+                                        assignJob(
+                                          job.bookId,
+                                          job.cId,
+                                          job.dId,
+                                          job.journeyFare,
+                                        );
+                                        print('open id is ${job.bookId}');
+                                        print('open id is ${job.cId}');
+                                        print('open id is ${job.dId}');
+                                        print('open id is ${job.journeyFare}');
+                                      },
+                                      child: Text(
+                                        'Assign Me',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          // color: context.appTheme
+                                          //     .primaryBackground,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                height: 6,
-                              )
+                              SizedBox(height: 6),
                             ],
                           ),
                         ),
@@ -273,7 +270,7 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
     );
   }
 
-  String assignMe = 'https://minicaboffice.com/api/driver/assign-job.php';
+  String assignMe = ApiService.driverAssignJob;
 
   Future assignJob(
     String bookId,
@@ -292,10 +289,7 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
       };
       var uri = Uri.parse(assignMe);
 
-      var response = await http.post(
-        uri,
-        body: fields,
-      );
+      var response = await http.post(uri, body: fields);
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -313,5 +307,4 @@ class _OpenJobsSectionState extends State<OpenJobsSection> {
       print('Error during HTTP request: $e');
     }
   }
-
 }

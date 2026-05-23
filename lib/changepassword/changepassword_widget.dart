@@ -1,5 +1,5 @@
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +18,7 @@ import 'package:open_file/open_file.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'changepassword_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 export 'changepassword_model.dart';
 
 class ChangepasswordWidget extends StatefulWidget {
@@ -55,12 +56,14 @@ class _ChangepasswordWidgetState extends State<ChangepasswordWidget> {
     String? dId = prefs.getString('d_id');
 
     try {
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://www.minicaboffice.com/api/driver/report.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiService.driverReport),
+      );
       request.fields.addAll({
-        'd_id':dId.toString(),
-        'start_date': '${formattedDate}',
-        'end_date': '${formattedDate1}',
+        'd_id': dId.toString(),
+        'start_date': '$formattedDate',
+        'end_date': '$formattedDate1',
       });
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -79,10 +82,11 @@ class _ChangepasswordWidgetState extends State<ChangepasswordWidget> {
                   pw.Table.fromTextArray(
                     cellAlignment: pw.Alignment.center,
                     cellPadding: pw.EdgeInsets.symmetric(
-                        vertical: 3.0, horizontal: 3.0), // Adjust as needed
+                      vertical: 3.0,
+                      horizontal: 3.0,
+                    ), // Adjust as needed
                     headerDecoration: pw.BoxDecoration(
                       color: PdfColors.grey200,
-
                     ),
                     headers: [
                       'Job ID',
@@ -96,24 +100,25 @@ class _ChangepasswordWidgetState extends State<ChangepasswordWidget> {
                       'Passenger',
                       'Pick Time',
                       'Pick Date',
-                      'Total Pay Amount'
+                      'Total Pay Amount',
                     ],
-                    data: data.map<List<String>>((item) {
-                      return [
-                        item['job_id'],
-                        item['journey_fare'],
-                        item['car_parking'],
-                        item['waiting'],
-                        item['tolls'],
-                        item['extra'],
-                        item['total_pay'],
-                        item['driver_commission'],
-                        item['passenger'],
-                        item['pick_time'],
-                        item['pick_date'],
-                        item['total_pay_amount']
-                      ].map<String>((value) => value.toString()).toList();
-                    }).toList(),
+                    data:
+                        data.map<List<String>>((item) {
+                          return [
+                            item['job_id'],
+                            item['journey_fare'],
+                            item['car_parking'],
+                            item['waiting'],
+                            item['tolls'],
+                            item['extra'],
+                            item['total_pay'],
+                            item['driver_commission'],
+                            item['passenger'],
+                            item['pick_time'],
+                            item['pick_date'],
+                            item['total_pay_amount'],
+                          ].map<String>((value) => value.toString()).toList();
+                        }).toList(),
                     tableWidth: pw.TableWidth.max,
                     cellHeight: 40.0,
                   ),
@@ -143,14 +148,15 @@ class _ChangepasswordWidgetState extends State<ChangepasswordWidget> {
   Future<String> getTotalPayAmount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
-    final uri =
-        Uri.parse('https://www.minicaboffice.com/api/driver/report.php');
-    final response = await http.post(uri, body: {
-      'd_id': dId.toString(),
-      'start_date': '$formattedDate',
-      'end_date': '$formattedDate1'
-
-    });
+    final uri = Uri.parse(ApiService.driverReport);
+    final response = await http.post(
+      uri,
+      body: {
+        'd_id': dId.toString(),
+        'start_date': '$formattedDate',
+        'end_date': '$formattedDate1',
+      },
+    );
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       String totalPayAmount =
@@ -227,367 +233,82 @@ class _ChangepasswordWidgetState extends State<ChangepasswordWidget> {
     }
 
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
 
-        child: Scaffold(
-          key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          appBar: AppBar(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            automaticallyImplyLeading: false,
-            leading: FlutterFlowIconButton(
-              borderColor: Colors.transparent,
-              borderRadius: 30,
-              borderWidth: 1,
-              buttonSize: 60,
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: FlutterFlowTheme.of(context).primary,
-                size: 30,
-              ),
-              onPressed: () async {
-                context.pop();
-              },
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: context.appTheme.primaryBackground,
+        appBar: AppBar(
+          backgroundColor: context.appTheme.primaryBackground,
+          automaticallyImplyLeading: false,
+          leading: FlutterFlowIconButton(
+            borderColor: Colors.transparent,
+            borderRadius: 30,
+            borderWidth: 1,
+            buttonSize: 60,
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: context.appTheme.primary,
+              size: 30,
             ),
-            title: Text(
-              'Reports',
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Outfit',
-                    color: FlutterFlowTheme.of(context).primary,
-                    fontSize: 22,
-                  ),
-            ),
-            actions: [],
-            centerTitle: true,
-            elevation: 2,
+            onPressed: () async {
+              context.pop();
+            },
           ),
-          body: SafeArea(
-            top: true,
-            child: Align(
-              alignment: AlignmentDirectional(1, -1),
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 50, 0, 20),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          FFButtonWidget(
-                            onPressed: () => selectDate(context),
-                            text: 'Start Date',
-                            options: FFButtonOptions(
-                              height: 40,
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                              iconPadding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                              color: FlutterFlowTheme.of(context).primary,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    color: Colors.white,
-                                  ),
-                              elevation: 3,
-                              borderSide: BorderSide(
-                                color: Colors.transparent,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          FFButtonWidget(
-                            onPressed: () => _selectDate(context),
-                            text: 'End Date',
-                            options: FFButtonOptions(
-                              height: 40,
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                              iconPadding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                              color: FlutterFlowTheme.of(context).secondaryText,
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                  ),
-                              elevation: 3,
-                              borderSide: BorderSide(
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          Icon(
-                            Icons.calendar_month,
-                            color: FlutterFlowTheme.of(context).primary,
-                            size: 24,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            '${formattedDate ?? 'YYYY/MM/DD'}',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  fontSize: 18,
-                                ),
-                          ),
-                          Text(
-                            '${formattedDate1 ?? 'YYYY/MM/DD'}',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  color:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  fontSize: 18,
-                                ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              fetchTotalPayAmount();
-                            },
-                            child: Icon(
-                              Icons.send_rounded,
-                              color: FlutterFlowTheme.of(context).primary,
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: FlutterFlowTheme.of(context).alternate,
-                    ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).primary,
-                            ),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 20, 0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0, 5, 0, 5),
-                                        child: Text(
-                                          'Your Payment Summary',
-                                          textAlign: TextAlign.start,
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryBackground,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            10, 5, 0, 5),
-                                        child: Text(
-                                          'Week  ${formattedDate ?? 'YYYY/MM/DD'} - ${formattedDate1 ?? 'YYYY/MM/DD'}',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryBackground,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    '£',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Text(
-                                      'Gross Earnings',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Readex Pro',
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                    Text(
-                                      'see Breakdown Blow',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium,
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 10, 0),
-                                  child: Text(
-                                    '${totalPayAmount ?? '0'}',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).primary,
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    10, 10, 10, 10),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Net Payment',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryBackground,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 10.0),
-                                      child: Text(
-                                        '${totalPayAmount ?? '0'}',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primaryBackground,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(1, 0),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
-                        child: FFButtonWidget(
-                          onPressed: () async {
-                            await generateAndSavePdf();
-                          },
-                          text: 'Download PDF',
-                          icon: Icon(
-                            Icons.picture_as_pdf_rounded,
-                            size: 15,
-                          ),
+          title: Text(
+            'Reports',
+            style: context.appTheme.headlineMedium.override(
+              fontFamily: 'Outfit',
+              color: context.appTheme.primary,
+              fontSize: 22,
+            ),
+          ),
+          actions: [],
+          centerTitle: true,
+          elevation: 2,
+        ),
+        body: SafeArea(
+          top: true,
+          child: Align(
+            alignment: AlignmentDirectional(1, -1),
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 50, 0, 20),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        FFButtonWidget(
+                          onPressed: () => selectDate(context),
+                          text: 'Start Date',
                           options: FFButtonOptions(
                             height: 40,
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                            iconPadding:
-                                EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                            color: FlutterFlowTheme.of(context).primary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  color: Colors.white,
-                                ),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              24,
+                              0,
+                              24,
+                              0,
+                            ),
+                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              0,
+                              0,
+                              0,
+                            ),
+                            color: context.appTheme.primary,
+                            textStyle: context.appTheme.titleSmall.override(
+                              fontFamily: 'Readex Pro',
+                              color: Colors.white,
+                            ),
                             elevation: 3,
                             borderSide: BorderSide(
                               color: Colors.transparent,
@@ -596,15 +317,302 @@ class _ChangepasswordWidgetState extends State<ChangepasswordWidget> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        FFButtonWidget(
+                          onPressed: () => _selectDate(context),
+                          text: 'End Date',
+                          options: FFButtonOptions(
+                            height: 40,
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              24,
+                              0,
+                              24,
+                              0,
+                            ),
+                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              0,
+                              0,
+                              0,
+                            ),
+                            color: context.appTheme.secondaryText,
+                            textStyle: context.appTheme.titleSmall.override(
+                              fontFamily: 'Readex Pro',
+                              color:
+                                  context.appTheme.primaryBackground,
+                            ),
+                            elevation: 3,
+                            borderSide: BorderSide(
+                              color: context.appTheme.secondaryText,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        Icon(
+                          Icons.calendar_month,
+                          color: context.appTheme.primary,
+                          size: 24,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          formattedDate ?? 'YYYY/MM/DD',
+                          style: context.appTheme.bodyMedium.override(
+                            fontFamily: 'Readex Pro',
+                            color: context.appTheme.primaryText,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          formattedDate1 ?? 'YYYY/MM/DD',
+                          style: context.appTheme.bodyMedium.override(
+                            fontFamily: 'Readex Pro',
+                            color: context.appTheme.primaryText,
+                            fontSize: 18,
+                          ),
+                        ),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            fetchTotalPayAmount();
+                          },
+                          child: Icon(
+                            Icons.send_rounded,
+                            color: context.appTheme.primary,
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: context.appTheme.alternate,
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: context.appTheme.primary,
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              0,
+                              20,
+                              0,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                        0,
+                                        5,
+                                        0,
+                                        5,
+                                      ),
+                                      child: Text(
+                                        'Your Payment Summary',
+                                        textAlign: TextAlign.start,
+                                        style: context.appTheme.bodyMedium.override(
+                                          fontFamily: 'Readex Pro',
+                                          color:
+                                              context.appTheme.primaryBackground,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                        10,
+                                        5,
+                                        0,
+                                        5,
+                                      ),
+                                      child: Text(
+                                        'Week  ${formattedDate ?? 'YYYY/MM/DD'} - ${formattedDate1 ?? 'YYYY/MM/DD'}',
+                                        style: context.appTheme.bodyMedium.override(
+                                          fontFamily: 'Readex Pro',
+                                          color:
+                                              context.appTheme.primaryBackground,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  '£',
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Readex Pro',
+                                    color:
+                                        context.appTheme.primaryBackground,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    'Gross Earnings',
+                                    style: context.appTheme.bodyMedium.override(
+                                      fontFamily: 'Readex Pro',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    'see Breakdown Blow',
+                                    style:
+                                        context.appTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  0,
+                                  0,
+                                  10,
+                                  0,
+                                ),
+                                child: Text(
+                                  totalPayAmount ?? '0',
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: context.appTheme.primary,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                10,
+                                10,
+                                10,
+                                10,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Text(
+                                        'Net Payment',
+                                        style: context.appTheme.bodyMedium.override(
+                                          fontFamily: 'Readex Pro',
+                                          color:
+                                              context.appTheme.primaryBackground,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Text(
+                                      totalPayAmount ?? '0',
+                                      style: context.appTheme.bodyMedium.override(
+                                        fontFamily: 'Readex Pro',
+                                        color:
+                                            context.appTheme.primaryBackground,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: AlignmentDirectional(1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
+                      child: FFButtonWidget(
+                        onPressed: () async {
+                          await generateAndSavePdf();
+                        },
+                        text: 'Download PDF',
+                        icon: Icon(Icons.picture_as_pdf_rounded, size: 15),
+                        options: FFButtonOptions(
+                          height: 40,
+                          padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
+                          iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            0,
+                            0,
+                            0,
+                          ),
+                          color: context.appTheme.primary,
+                          textStyle: context.appTheme.titleSmall.override(
+                            fontFamily: 'Readex Pro',
+                            color: Colors.white,
+                          ),
+                          elevation: 3,
+                          borderSide: BorderSide(
+                            color: Colors.transparent,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-
+      ),
     );
   }
 }

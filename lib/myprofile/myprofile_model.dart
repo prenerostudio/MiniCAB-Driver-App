@@ -1,4 +1,4 @@
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'myprofile_widget.dart' show MyprofileWidget;
@@ -15,8 +15,10 @@ class MyprofileModel extends FlutterFlowModel<MyprofileWidget> {
 
   /// Initialization and disposal methods.
 
+  @override
   void initState(BuildContext context) {}
 
+  @override
   void dispose() {
     unfocusNode.dispose();
   }

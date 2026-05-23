@@ -1,4 +1,4 @@
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -11,7 +11,7 @@ export 'notes_model.dart';
 
 class NotesWidget extends StatefulWidget {
   const NotesWidget({
-    Key? key,
+    super.key,
     required this.dId,
     required this.jobId,
     required this.pickup,
@@ -26,7 +26,7 @@ class NotesWidget extends StatefulWidget {
     required this.luggage,
     required this.cemail,
     required this.passenger,
-  }) : super(key: key);
+  });
 
   final String? dId;
   final String? note;
@@ -78,13 +78,13 @@ class _NotesWidgetState extends State<NotesWidget> {
         height: MediaQuery.sizeOf(context).height * 0.65,
         width: MediaQuery.sizeOf(context).width * 1.0,
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).secondaryBackground,
+          color: context.appTheme.secondaryBackground,
           boxShadow: [
             BoxShadow(
               blurRadius: 3.0,
               color: Color(0x33000000),
               offset: Offset(0.0, 1.0),
-            )
+            ),
           ],
           borderRadius: BorderRadius.circular(8.0),
         ),
@@ -101,11 +101,11 @@ class _NotesWidgetState extends State<NotesWidget> {
                     children: [
                       Text(
                         'Client notes',
-                        style: FlutterFlowTheme.of(context).displaySmall.override(
-                              fontFamily: 'Montserrat',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: context.appTheme.displaySmall.override(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -118,10 +118,10 @@ class _NotesWidgetState extends State<NotesWidget> {
                       Expanded(
                         child: Text(
                           widget.note!,
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'Open Sans',
-                                color: FlutterFlowTheme.of(context).secondaryText,
-                              ),
+                          style: context.appTheme.bodyMedium.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                          ),
                         ),
                       ),
                     ],
@@ -134,11 +134,11 @@ class _NotesWidgetState extends State<NotesWidget> {
                     children: [
                       Text(
                         'Account insttractions',
-                        style: FlutterFlowTheme.of(context).displaySmall.override(
-                              fontFamily: 'Montserrat',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: context.appTheme.displaySmall.override(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -152,11 +152,11 @@ class _NotesWidgetState extends State<NotesWidget> {
                         child: Text(
                           '**DO NOT MAKE ANY EXTRA STOP\nOFFS** ADDITIONAL PASSENGER NOT AUTHORISED YOU WILL NOT BE PAID FOR THEM**\nAtoB journeys ONLY *NO MULTISTOPS* or Wait & Returns',
                           textAlign: TextAlign.justify,
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'Open Sans',
-                                color: FlutterFlowTheme.of(context).secondaryText,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          style: context.appTheme.bodyMedium.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -169,11 +169,11 @@ class _NotesWidgetState extends State<NotesWidget> {
                     children: [
                       Text(
                         'Passenger',
-                        style: FlutterFlowTheme.of(context).displaySmall.override(
-                              fontFamily: 'Montserrat',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: context.appTheme.displaySmall.override(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -186,11 +186,11 @@ class _NotesWidgetState extends State<NotesWidget> {
                       Expanded(
                         child: Text(
                           widget.cName!,
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'Open Sans',
-                                color: FlutterFlowTheme.of(context).secondaryText,
-                                fontSize: 16,
-                              ),
+                          style: context.appTheme.bodyMedium.override(
+                            fontFamily: 'Open Sans',
+                            color: context.appTheme.secondaryText,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -202,65 +202,66 @@ class _NotesWidgetState extends State<NotesWidget> {
                     onPressed: () async {
                       context.pushNamed(
                         'onWay',
-                        queryParameters: {
-                          'did': serializeParam(
-                            '${widget.dId}',
-                            ParamType.String,
-                          ),
-                          'jobid': serializeParam(
-                            '${widget.jobId}',
-                            ParamType.String,
-                          ),
-                          'pickup': serializeParam(
-                            '${widget.pickup}',
-                            ParamType.String,
-                          ),
-                          'dropoff': serializeParam(
-                            '${widget.dropoff}',
-                            ParamType.String,
-                          ),
-                          'cName': serializeParam(
-                            '${widget.cName}',
-                            ParamType.String,
-                          ),
-                          'cnumber': serializeParam(
-                            '${widget.cnumber}',
-                            ParamType.String,
-                          ),
-                          'cemail': serializeParam(
-                            '${widget.cemail}',
-                            ParamType.String,
-                          ),
-                          'luggage': serializeParam(
-                            '${widget.luggage}',
-                            ParamType.String,
-                          ),
-                          'note': serializeParam(
-                            '${widget.note}',
-                            ParamType.String,
-                          ),
-                          'fare': serializeParam(
-                            '${widget.fare}',
-                            ParamType.String,
-                          ),
-                          'distance': serializeParam(
-                            '${widget.distance}',
-                            ParamType.String,
-                          ),
-            
-                          'pickTime': serializeParam(
-                            '${widget.pickTime}',
-                            ParamType.String,
-                          ),
-                          'pickDate': serializeParam(
-                            '${widget.pickDate}',
-                            ParamType.String,
-                          ),
-                          'passenger': serializeParam(
-                            '${widget.passenger}',
-                            ParamType.String,
-                          ),
-                        }.withoutNulls,
+                        queryParameters:
+                            {
+                              'did': serializeParam(
+                                '${widget.dId}',
+                                ParamType.String,
+                              ),
+                              'jobid': serializeParam(
+                                '${widget.jobId}',
+                                ParamType.String,
+                              ),
+                              'pickup': serializeParam(
+                                '${widget.pickup}',
+                                ParamType.String,
+                              ),
+                              'dropoff': serializeParam(
+                                '${widget.dropoff}',
+                                ParamType.String,
+                              ),
+                              'cName': serializeParam(
+                                '${widget.cName}',
+                                ParamType.String,
+                              ),
+                              'cnumber': serializeParam(
+                                '${widget.cnumber}',
+                                ParamType.String,
+                              ),
+                              'cemail': serializeParam(
+                                '${widget.cemail}',
+                                ParamType.String,
+                              ),
+                              'luggage': serializeParam(
+                                '${widget.luggage}',
+                                ParamType.String,
+                              ),
+                              'note': serializeParam(
+                                '${widget.note}',
+                                ParamType.String,
+                              ),
+                              'fare': serializeParam(
+                                '${widget.fare}',
+                                ParamType.String,
+                              ),
+                              'distance': serializeParam(
+                                '${widget.distance}',
+                                ParamType.String,
+                              ),
+
+                              'pickTime': serializeParam(
+                                '${widget.pickTime}',
+                                ParamType.String,
+                              ),
+                              'pickDate': serializeParam(
+                                '${widget.pickDate}',
+                                ParamType.String,
+                              ),
+                              'passenger': serializeParam(
+                                '${widget.passenger}',
+                                ParamType.String,
+                              ),
+                            }.withoutNulls,
                       );
                     },
                     text: 'ACKNOWLEDGE',
@@ -269,12 +270,12 @@ class _NotesWidgetState extends State<NotesWidget> {
                       height: 50,
                       padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                       iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      color: FlutterFlowTheme.of(context).primary,
-                      textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                            fontFamily: 'Open Sans',
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
+                      color: context.appTheme.primary,
+                      textStyle: context.appTheme.titleSmall.override(
+                        fontFamily: 'Open Sans',
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
                       elevation: 3,
                       borderSide: BorderSide(
                         color: Colors.transparent,

@@ -1,20 +1,13 @@
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'name_full_screen_model.dart';
 export 'name_full_screen_model.dart';
 
 class NameFullScreenWidget extends StatefulWidget {
-  const NameFullScreenWidget({
-    super.key,
-    required this.name,
-  });
+  const NameFullScreenWidget({super.key, required this.name});
 
   final String? name;
 
@@ -43,14 +36,16 @@ class _NameFullScreenWidgetState extends State<NameFullScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: context.appTheme.primaryBackground,
         appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+          backgroundColor: context.appTheme.primaryBackground,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -59,7 +54,7 @@ class _NameFullScreenWidgetState extends State<NameFullScreenWidget> {
             buttonSize: 60,
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: FlutterFlowTheme.of(context).primary,
+              color: context.appTheme.primary,
               size: 30,
             ),
             onPressed: () async {
@@ -77,27 +72,27 @@ class _NameFullScreenWidgetState extends State<NameFullScreenWidget> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Expanded(
-                    child: Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(50.0),
-                           child: Image.asset(
-                            'assets/images/app_launcher_icon.png',
-                            width: 200.0,
-                            height: 200.0,
-                            fit: BoxFit.cover,
-                          ),
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(50.0),
+                        child: Image.asset(
+                          'assets/driver-app-icon.jpg',
+                          width: 200.0,
+                          height: 200.0,
+                          fit: BoxFit.cover,
                         ),
-                        Text(
-                          '${widget.name}',
-                          style: FlutterFlowTheme.of(context).headlineMedium.override(
-                            fontFamily: 'Outfit',
-                            color: FlutterFlowTheme.of(context).primary,
-                            fontSize: 50,
-                          ),
+                      ),
+                      Text(
+                        '${widget.name}',
+                        style: context.appTheme.headlineMedium.override(
+                          fontFamily: 'Outfit',
+                          color: context.appTheme.primary,
+                          fontSize: 50,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

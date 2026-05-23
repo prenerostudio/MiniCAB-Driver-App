@@ -24,8 +24,8 @@ class _JobDetialsInfoSheetState extends State<JobDetialsInfoSheet> {
           return Container(
             // height: 300,
             width: double.infinity,
-            child: Text('data'),
             color: Colors.white,
+            child: Text('data'),
           );
         },
       ),

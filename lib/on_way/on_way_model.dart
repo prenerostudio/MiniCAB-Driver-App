@@ -1,7 +1,7 @@
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../flutter_flow/flutter_flow_timer.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'on_way_widget.dart' show OnWayWidget;
@@ -16,12 +16,16 @@ class OnWayModel extends FlutterFlowModel<OnWayWidget> {
   final unfocusNode = FocusNode();
   int timerMilliseconds = 0;
   String timerValue = StopWatchTimer.getDisplayTime(0, milliSecond: false);
-  FlutterFlowTimerController timerController =
-  FlutterFlowTimerController(StopWatchTimer(mode: StopWatchMode.countUp));
+  FlutterFlowTimerController timerController = FlutterFlowTimerController(
+    StopWatchTimer(mode: StopWatchMode.countUp),
+  );
+
   /// Initialization and disposal methods.
 
+  @override
   void initState(BuildContext context) {}
 
+  @override
   void dispose() {
     unfocusNode.dispose();
   }

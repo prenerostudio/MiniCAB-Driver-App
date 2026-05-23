@@ -1,5 +1,5 @@
 import '/flutter_flow/flutter_flow_drop_down.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
@@ -36,12 +36,13 @@ class SignupModel extends FlutterFlowModel<SignupWidget> {
   String? dropDownValue2;
   FormFieldController<String>? dropDownValueController2;
 
-
   /// Initialization and disposal methods.
+  @override
   void initState(BuildContext context) {
     passwordVisibility = false;
   }
 
+  @override
   void dispose() {
     unfocusNode.dispose();
     textFieldFocusNode?.dispose();

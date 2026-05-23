@@ -22,8 +22,7 @@ class FlutterFlowTimerController with ChangeNotifier {
   void onResetTimer() {
     timer.onResetTimer();
     late final StreamSubscription subscription;
-   
-   
+
     subscription = timer.rawTime.listen((_) {
       notifyListeners();
       subscription.cancel();
@@ -39,7 +38,7 @@ class FlutterFlowTimerController with ChangeNotifier {
 
 class FlutterFlowTimer extends StatefulWidget {
   const FlutterFlowTimer({
-    Key? key,
+    super.key,
     required this.initialTime,
     required this.controller,
     required this.getDisplayTime,
@@ -48,7 +47,7 @@ class FlutterFlowTimer extends StatefulWidget {
     this.onEnded,
     required this.textAlign,
     required this.style,
-  }) : super(key: key);
+  });
 
   final int initialTime;
   final FlutterFlowTimerController controller;
@@ -118,9 +117,6 @@ class _FlutterFlowTimerState extends State<FlutterFlowTimer> {
   }
 
   @override
-  Widget build(BuildContext context) => Text(
-        _displayTime,
-        textAlign: widget.textAlign,
-        style: widget.style,
-      );
+  Widget build(BuildContext context) =>
+      Text(_displayTime, textAlign: widget.textAlign, style: widget.style);
 }

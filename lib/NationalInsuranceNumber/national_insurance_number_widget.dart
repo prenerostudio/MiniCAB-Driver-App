@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'national_insurance_number_model.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 export 'national_insurance_number_model.dart';
 
 class NationalInsuranceNumberWidget extends StatefulWidget {
@@ -60,19 +61,16 @@ class _NationalInsuranceNumberWidgetState
   }
 
   void _showToastMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: message, textColor: Colors.white);
   }
 
   Future<String?> fetchDLicense() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String dId = prefs.getString('d_id') ?? '';
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://minicaboffice.com/api/driver/check-national-insurance.php'));
+      'POST',
+      Uri.parse(ApiService.driverCheckNationalInsurance),
+    );
     request.fields.addAll({'d_id': dId});
 
     http.StreamedResponse response = await request.send();
@@ -93,14 +91,16 @@ class _NationalInsuranceNumberWidgetState
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+        backgroundColor: context.appTheme.secondaryBackground,
         appBar: AppBar(
-          backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+          backgroundColor: context.appTheme.secondaryBackground,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -109,7 +109,7 @@ class _NationalInsuranceNumberWidgetState
             buttonSize: 60,
             icon: Icon(
               Icons.chevron_left_outlined,
-              color: FlutterFlowTheme.of(context).secondaryText,
+              color: context.appTheme.secondaryText,
               size: 30,
             ),
             onPressed: () async {
@@ -131,7 +131,7 @@ class _NationalInsuranceNumberWidgetState
                 children: [
                   Text(
                     'National Insurance Number',
-                    style: FlutterFlowTheme.of(context).headlineMedium,
+                    style: context.appTheme.headlineMedium,
                   ),
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
@@ -178,60 +178,60 @@ class _NationalInsuranceNumberWidgetState
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: selectedImage != null
-                            ? Image.file(
-                                selectedImage!,
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.25,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/pngwing.com.png',
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.25,
-                                    fit: BoxFit.contain,
-                                  );
-                                },
-                              )
-                            : License != null
+                        child:
+                            selectedImage != null
+                                ? Image.file(
+                                  selectedImage!,
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.25,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/pngwing.com.png',
+                                      width: MediaQuery.of(context).size.width,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                          0.25,
+                                      fit: BoxFit.contain,
+                                    );
+                                  },
+                                )
+                                : License != null
                                 ? Image.network(
-                                    'https://minicaboffice.com/img/drivers/driving-license/$License',
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.25,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/pngwing.com.png',
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.25,
-                                        fit: BoxFit.contain,
-                                      );
-                                    },
-                                  )
+                                  'https://atiqramzan.online/img/drivers/driving-license/$License',
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.25,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/pngwing.com.png',
+                                      width: MediaQuery.of(context).size.width,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                          0.25,
+                                      fit: BoxFit.contain,
+                                    );
+                                  },
+                                )
                                 : Image.asset(
-                                    'assets/images/pngwing.com.png',
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.25,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/pngwing.com.png',
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.25,
-                                        fit: BoxFit.contain,
-                                      );
-                                    },
-                                  ),
+                                  'assets/images/pngwing.com.png',
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.25,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/pngwing.com.png',
+                                      width: MediaQuery.of(context).size.width,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                          0.25,
+                                      fit: BoxFit.contain,
+                                    );
+                                  },
+                                ),
                       ),
                     ),
                   ),
@@ -252,15 +252,16 @@ class _NationalInsuranceNumberWidgetState
                             String? dId = prefs.getString('d_id');
                             try {
                               var request = http.MultipartRequest(
-                                  'POST',
-                                  Uri.parse(
-                                      'https://www.minicaboffice.com/api/driver/upload-ni.php'));
-                              request.fields.addAll({
-                                'd_id': dId.toString(),
-                              });
+                                'POST',
+                                Uri.parse(ApiService.driverUploadNi),
+                              );
+                              request.fields.addAll({'d_id': dId.toString()});
                               request.files.add(
-                                  await http.MultipartFile.fromPath(
-                                      'ni', selectedImage!.path));
+                                await http.MultipartFile.fromPath(
+                                  'ni',
+                                  selectedImage!.path,
+                                ),
+                              );
                               http.StreamedResponse response =
                                   await request.send();
 
@@ -281,24 +282,25 @@ class _NationalInsuranceNumberWidgetState
                             }
                           },
                           text:
-                              '${selectedImage != null ? 'Uploaded' : 'Awaiting Upload'}',
-                          icon: Icon(
-                            Icons.cloud_upload_outlined,
-                            size: 12,
-                          ),
+                              selectedImage != null
+                                  ? 'Uploaded'
+                                  : 'Awaiting Upload',
+                          icon: Icon(Icons.cloud_upload_outlined, size: 12),
                           options: FFButtonOptions(
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: 50,
                             padding: EdgeInsets.all(0),
-                            iconPadding:
-                                EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                            color: FlutterFlowTheme.of(context).primary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: Colors.white,
-                                ),
+                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              0,
+                              0,
+                              0,
+                            ),
+                            color: context.appTheme.primary,
+                            textStyle: context.appTheme.titleSmall.override(
+                              fontFamily: 'Open Sans',
+                              color: Colors.white,
+                            ),
                             elevation: 4,
                             borderSide: BorderSide(
                               color: Colors.transparent,
@@ -326,16 +328,18 @@ class _NationalInsuranceNumberWidgetState
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: 50,
                             padding: EdgeInsets.all(0),
-                            iconPadding:
-                                EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                            color: FlutterFlowTheme.of(context).secondary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .primaryBackground,
-                                ),
+                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                              0,
+                              0,
+                              0,
+                              0,
+                            ),
+                            color: context.appTheme.secondary,
+                            textStyle: context.appTheme.titleSmall.override(
+                              fontFamily: 'Open Sans',
+                              color:
+                                  context.appTheme.primaryBackground,
+                            ),
                             elevation: 4,
                             borderSide: BorderSide(
                               color: Colors.transparent,

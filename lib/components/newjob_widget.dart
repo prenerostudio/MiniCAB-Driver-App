@@ -1,23 +1,17 @@
 import '/components/customer_details_widget.dart';
 import '/components/onway_widget.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 // import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'newjob_model.dart';
 export 'newjob_model.dart';
 
 class NewjobWidget extends StatefulWidget {
-  const NewjobWidget({
-    super.key,
-    required this.polyline,
-  });
+  const NewjobWidget({super.key, required this.polyline});
 
   final Future Function()? polyline;
 
@@ -51,16 +45,11 @@ class _NewjobWidgetState extends State<NewjobWidget> {
   Widget build(BuildContext context) {
     return Container(
       width: 500,
-      constraints: BoxConstraints(
-        maxWidth: 570,
-      ),
+      constraints: BoxConstraints(maxWidth: 570),
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
+        color: context.appTheme.secondaryBackground,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Color(0xFFE5E7EB),
-          width: 1,
-        ),
+        border: Border.all(color: Color(0xFFE5E7EB), width: 1),
       ),
       child: Padding(
         padding: EdgeInsets.all(12),
@@ -89,7 +78,8 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                             padding: MediaQuery.viewInsetsOf(context),
                             child: CustomerDetailsWidget(
                               cNumber: '',
-                            cemail: '', cname: '',
+                              cemail: '',
+                              cname: '',
                             ),
                           );
                         },
@@ -97,7 +87,7 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                     },
                     child: Icon(
                       Icons.clear,
-                      color: FlutterFlowTheme.of(context).primaryText,
+                      color: context.appTheme.primaryText,
                       size: 24,
                     ),
                   ),
@@ -106,11 +96,11 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                   padding: EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
                   child: Text(
                     'Close',
-                    style: FlutterFlowTheme.of(context).titleMedium.override(
-                          fontFamily: 'Open Sans',
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: context.appTheme.titleMedium.override(
+                      fontFamily: 'Open Sans',
+                      color: context.appTheme.primaryText,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -128,37 +118,31 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                     children: [
                       Text(
                         '9 jobs/£367 away from 5% bonus on each job thereafter!',
-                        style: FlutterFlowTheme.of(context)
-                            .labelMedium
-                            .override(
-                              fontFamily: 'Plus Jakarta Sans',
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        style: context.appTheme.labelMedium.override(
+                          fontFamily: 'Plus Jakarta Sans',
+                          color: context.appTheme.primaryText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Text(
                         '\$4,400',
                         textAlign: TextAlign.end,
-                        style: FlutterFlowTheme.of(context)
-                            .displaySmall
-                            .override(
-                              fontFamily: 'Outfit',
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: context.appTheme.displaySmall.override(
+                          fontFamily: 'Outfit',
+                          color: context.appTheme.primaryText,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       Text(
                         '(Estimated maximum value)',
-                        style: FlutterFlowTheme.of(context)
-                            .labelMedium
-                            .override(
-                              fontFamily: 'Montserrat',
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        style: context.appTheme.labelMedium.override(
+                          fontFamily: 'Montserrat',
+                          color: context.appTheme.primaryText,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ].divide(SizedBox(height: 4)),
                   ),
@@ -172,11 +156,7 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.business,
-                    color: Color(0xFF5B68F5),
-                    size: 45,
-                  ),
+                  Icon(Icons.business, color: Color(0xFF5B68F5), size: 45),
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -186,7 +166,7 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                           height: 50,
                           child: VerticalDivider(
                             thickness: 2,
-                            color: FlutterFlowTheme.of(context).secondaryText,
+                            color: context.appTheme.secondaryText,
                           ),
                         ),
                       ),
@@ -197,24 +177,22 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                           children: [
                             Text(
                               'Jobs Price',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Roboto',
-                                    fontSize: 16,
-                                  ),
+                              style: context.appTheme.bodyMedium
+                                  .override(fontFamily: 'Roboto', fontSize: 16),
                             ),
                             Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                0,
+                                15,
+                                0,
+                                0,
+                              ),
                               child: Text(
                                 'Holiday Pay',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Roboto',
-                                      fontSize: 16,
-                                    ),
+                                style: context.appTheme.bodyMedium.override(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ],
@@ -227,24 +205,22 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                           children: [
                             Text(
                               '£ 21.78',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Roboto',
-                                    fontSize: 16,
-                                  ),
+                              style: context.appTheme.bodyMedium
+                                  .override(fontFamily: 'Roboto', fontSize: 16),
                             ),
                             Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                0,
+                                15,
+                                0,
+                                0,
+                              ),
                               child: Text(
                                 '£ 1.94',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Roboto',
-                                      fontSize: 16,
-                                    ),
+                                style: context.appTheme.bodyMedium.override(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ],
@@ -281,15 +257,13 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                           alignment: AlignmentDirectional(0, 0),
                           child: Text(
                             'A',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w300,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Open Sans',
+                              color:
+                                  context.appTheme.secondaryBackground,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
                         ),
                       ),
@@ -300,8 +274,12 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                             Align(
                               alignment: AlignmentDirectional(0.51, 0.14),
                               child: Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(13, 0, 0, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  13,
+                                  0,
+                                  0,
+                                  0,
+                                ),
                                 child: Container(
                                   width: 4,
                                   height: 80,
@@ -312,8 +290,12 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 25, 0, 0),
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                0,
+                                25,
+                                0,
+                                0,
+                              ),
                               child: Container(
                                 width: 30,
                                 height: 30,
@@ -348,15 +330,13 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                           alignment: AlignmentDirectional(0, 0),
                           child: Text(
                             'B',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Open Sans',
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w300,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Open Sans',
+                              color:
+                                  context.appTheme.secondaryBackground,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
                         ),
                       ),
@@ -370,11 +350,8 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                       children: [
                         Text(
                           'EN4 8UA',
-                          style:
-                              FlutterFlowTheme.of(context).titleLarge.override(
-                                    fontFamily: 'Open Sans',
-                                    fontSize: 20,
-                                  ),
+                          style: context.appTheme.titleLarge
+                              .override(fontFamily: 'Open Sans', fontSize: 20),
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(0, 40, 0, 40),
@@ -387,18 +364,20 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                                 size: 18,
                               ),
                               Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  8,
+                                  0,
+                                  0,
+                                  0,
+                                ),
                                 child: Text(
                                   '1 h 8 min, 10.23 mi',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontSize: 16,
-                                      ),
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Open Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ],
@@ -406,11 +385,8 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                         ),
                         Text(
                           'EN4 8UA',
-                          style:
-                              FlutterFlowTheme.of(context).titleLarge.override(
-                                    fontFamily: 'Open Sans',
-                                    fontSize: 20,
-                                  ),
+                          style: context.appTheme.titleLarge
+                              .override(fontFamily: 'Open Sans', fontSize: 20),
                         ),
                       ],
                     ),
@@ -449,24 +425,18 @@ class _NewjobWidgetState extends State<NewjobWidget> {
                   ).then((value) => safeSetState(() {}));
                 },
                 text: 'Start Now',
-                icon: Icon(
-                  Icons.east,
-                  size: 15,
-                ),
+                icon: Icon(Icons.east, size: 15),
                 options: FFButtonOptions(
                   height: 50,
                   padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
                   iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                  color: FlutterFlowTheme.of(context).primary,
-                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                        fontFamily: 'Open Sans',
-                        color: Colors.white,
-                      ),
-                  elevation: 3,
-                  borderSide: BorderSide(
-                    color: Colors.transparent,
-                    width: 1,
+                  color: context.appTheme.primary,
+                  textStyle: context.appTheme.titleSmall.override(
+                    fontFamily: 'Open Sans',
+                    color: Colors.white,
                   ),
+                  elevation: 3,
+                  borderSide: BorderSide(color: Colors.transparent, width: 1),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),

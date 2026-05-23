@@ -1,15 +1,11 @@
 import '/components/customer_details_widget.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 // import 'package:styled_divider/styled_divider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 // import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'waydetails_model.dart';
 export 'waydetails_model.dart';
@@ -85,7 +81,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height * 1,
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).secondaryBackground,
+                color: context.appTheme.secondaryBackground,
               ),
               child: SingleChildScrollView(
                 controller: scrollController,
@@ -97,9 +93,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                       height: 166,
                       decoration: BoxDecoration(
                         color: Color(0xFF1C1F28),
-                        border: Border.all(
-                          color: Color(0xFF1C1F28),
-                        ),
+                        border: Border.all(color: Color(0xFF1C1F28)),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
@@ -108,8 +102,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                             width: 30,
                             child: Divider(
                               thickness: 1,
-                              color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
+                              color:
+                                  context.appTheme.secondaryBackground,
                             ),
                           ),
                           Row(
@@ -118,18 +112,20 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                             children: [
                               Text(
                                 'PREBOOK',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      // color: FlutterFlowTheme.of(context)
-                                      //     .secondaryBackground,
-                                      fontSize: 20,
-                                    ),
+                                style: context.appTheme.titleLarge.override(
+                                  fontFamily: 'Open Sans',
+                                  // color: context.appTheme
+                                  //     .secondaryBackground,
+                                  fontSize: 20,
+                                ),
                               ),
                               Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(10, 0, 5, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  10,
+                                  0,
+                                  5,
+                                  0,
+                                ),
                                 child: Icon(
                                   Icons.access_time_filled_rounded,
                                   color: Color(0xFF5B68F5),
@@ -138,14 +134,12 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                               ),
                               Text(
                                 '${widget.time}',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      // color: FlutterFlowTheme.of(context)
-                                      //     .secondaryBackground,
-                                      fontSize: 20,
-                                    ),
+                                style: context.appTheme.titleLarge.override(
+                                  fontFamily: 'Open Sans',
+                                  // color: context.appTheme
+                                  //     .secondaryBackground,
+                                  fontSize: 20,
+                                ),
                               ),
                             ],
                           ),
@@ -155,18 +149,20 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                             children: [
                               Text(
                                 'Date',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      // color: FlutterFlowTheme.of(context)
-                                      //     .secondaryBackground,
-                                      fontSize: 20,
-                                    ),
+                                style: context.appTheme.titleLarge.override(
+                                  fontFamily: 'Open Sans',
+                                  // color: context.appTheme
+                                  //     .secondaryBackground,
+                                  fontSize: 20,
+                                ),
                               ),
                               Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(10, 0, 5, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  10,
+                                  0,
+                                  5,
+                                  0,
+                                ),
                                 child: FaIcon(
                                   FontAwesomeIcons.calendar,
                                   size: 21,
@@ -175,14 +171,12 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                               ),
                               Text(
                                 '${widget.date}',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      fontFamily: 'Open Sans',
-                                      // color: FlutterFlowTheme.of(context)
-                                      //     .secondaryBackground,
-                                      fontSize: 20,
-                                    ),
+                                style: context.appTheme.titleLarge.override(
+                                  fontFamily: 'Open Sans',
+                                  // color: context.appTheme
+                                  //     .secondaryBackground,
+                                  fontSize: 20,
+                                ),
                               ),
                             ],
                           ),
@@ -194,7 +188,11 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                               children: [
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      10, 0, 5, 0),
+                                    10,
+                                    0,
+                                    5,
+                                    0,
+                                  ),
                                   child: Icon(
                                     Icons.luggage_outlined,
                                     color: Color(0xFF5B68F5),
@@ -203,14 +201,12 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                 ),
                                 Text(
                                   '${widget.luggage}',
-                                  style: FlutterFlowTheme.of(context)
-                                      .titleLarge
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        // color: FlutterFlowTheme.of(context)
-                                        //     .secondaryBackground,
-                                        fontSize: 20,
-                                      ),
+                                  style: context.appTheme.titleLarge.override(
+                                    fontFamily: 'Open Sans',
+                                    // color: context.appTheme
+                                    //     .secondaryBackground,
+                                    fontSize: 20,
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 25,
@@ -222,7 +218,11 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                 ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      20, 0, 5, 0),
+                                    20,
+                                    0,
+                                    5,
+                                    0,
+                                  ),
                                   child: FaIcon(
                                     FontAwesomeIcons.userFriends,
                                     color: Color(0xFF5B68F5),
@@ -231,14 +231,12 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                 ),
                                 Text(
                                   '${widget.passanger}',
-                                  style: FlutterFlowTheme.of(context)
-                                      .titleLarge
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        // color: FlutterFlowTheme.of(context)
-                                        //     .secondaryBackground,
-                                        fontSize: 20,
-                                      ),
+                                  style: context.appTheme.titleLarge.override(
+                                    fontFamily: 'Open Sans',
+                                    // color: context.appTheme
+                                    //     .secondaryBackground,
+                                    fontSize: 20,
+                                  ),
                                 ),
                               ],
                             ),
@@ -262,8 +260,12 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                               ),
                               // Generated code for this Text Widget...
                               Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  8,
+                                  0,
+                                  0,
+                                  0,
+                                ),
                                 child: InkWell(
                                   splashColor: Colors.transparent,
                                   focusColor: Colors.transparent,
@@ -272,25 +274,24 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                   onTap: () async {
                                     context.pushNamed(
                                       'NameFullScreen',
-                                      queryParameters: {
-                                        'name': serializeParam(
-                                          '${widget.cName}',
-                                          ParamType.String,
-                                        ),
-                                      }.withoutNulls,
+                                      queryParameters:
+                                          {
+                                            'name': serializeParam(
+                                              '${widget.cName}',
+                                              ParamType.String,
+                                            ),
+                                          }.withoutNulls,
                                     );
                                   },
                                   child: Text(
                                     '${widget.cName}',
-                                    style: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .override(
-                                          fontFamily: 'Open Sans',
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                          letterSpacing: 0,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    style: context.appTheme.titleMedium.override(
+                                      fontFamily: 'Open Sans',
+                                      color:
+                                          context.appTheme.primaryText,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -323,7 +324,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                               },
                               child: Icon(
                                 Icons.keyboard_control_rounded,
-                                color: FlutterFlowTheme.of(context).primaryText,
+                                color: context.appTheme.primaryText,
                                 size: 30,
                               ),
                             ),
@@ -338,7 +339,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                         child: Divider(
                           height: 30,
                           thickness: 1,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -368,24 +369,19 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                   child: Center(
                                     child: Text(
                                       'A',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Open Sans',
-                                            // color: FlutterFlowTheme.of(context)
-                                            //     .secondaryBackground,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w300,
-                                          ),
+                                      style: context.appTheme.bodyMedium.override(
+                                        fontFamily: 'Open Sans',
+                                        // color: context.appTheme
+                                        //     .secondaryBackground,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w300,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(
-                                  top: 5,
-                                  left: 25,
-                                ),
+                                padding: EdgeInsets.only(top: 5, left: 25),
                                 child: Stack(
                                   children: [
                                     Align(
@@ -399,9 +395,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(
-                                        top: 25,
-                                      ),
+                                      padding: EdgeInsets.only(top: 25),
                                       child: Container(
                                         width: 30,
                                         height: 30,
@@ -430,15 +424,13 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                   child: Center(
                                     child: Text(
                                       'B',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Open Sans',
-                                            // color: FlutterFlowTheme.of(context)
-                                            //     .secondaryBackground,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w300,
-                                          ),
+                                      style: context.appTheme.bodyMedium.override(
+                                        fontFamily: 'Open Sans',
+                                        // color: context.appTheme
+                                        //     .secondaryBackground,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w300,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -453,26 +445,27 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                 Wrap(
                                   children: [
                                     Row(
-                                      mainAxisSize: MainAxisSize
-                                          .min, // Set this to MainAxisSize.min
+                                      mainAxisSize:
+                                          MainAxisSize
+                                              .min, // Set this to MainAxisSize.min
                                       children: [
                                         Flexible(
                                           child: Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    10.0, 10.0, 0.0, 20.0),
+                                                  10.0,
+                                                  10.0,
+                                                  0.0,
+                                                  20.0,
+                                                ),
                                             child: Text(
                                               '${widget.pickup}',
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  .labelMedium
-                                                  .override(
-                                                    fontFamily: 'Readex Pro',
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryText,
-                                                    fontSize: 15.0,
-                                                  ),
+                                              style: context.appTheme.labelMedium.override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
+                                                    context.appTheme.secondaryText,
+                                                fontSize: 15.0,
+                                              ),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 3,
                                             ),
@@ -487,18 +480,18 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                     Flexible(
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                            left: 10, top: 10, bottom: 20),
+                                          left: 10,
+                                          top: 10,
+                                          bottom: 20,
+                                        ),
                                         child: Text(
                                           '${widget.dropoff}',
-                                          style: FlutterFlowTheme.of(context)
-                                              .labelMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
-                                                fontSize: 15,
-                                              ),
+                                          style: context.appTheme.labelMedium.override(
+                                            fontFamily: 'Readex Pro',
+                                            color:
+                                                context.appTheme.secondaryText,
+                                            fontSize: 15,
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 3,
                                         ),
@@ -518,7 +511,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                         width: 280,
                         child: Divider(
                           thickness: 1,
-                          color: FlutterFlowTheme.of(context).secondaryText,
+                          color: context.appTheme.secondaryText,
                         ),
                       ),
                     ),
@@ -526,67 +519,77 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Padding(
-                          padding:
-                              EdgeInsetsDirectional.fromSTEB(15, 20, 15, 0),
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            15,
+                            20,
+                            15,
+                            0,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
                                 'Client notes',
-                                style: FlutterFlowTheme.of(context)
-                                    .displaySmall
-                                    .override(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                              EdgeInsetsDirectional.fromSTEB(15, 15, 15, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${widget.cNote}',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                      ),
+                                style: context.appTheme.displaySmall.override(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
                         ),
                         Padding(
-                          padding:
-                              EdgeInsetsDirectional.fromSTEB(15, 20, 15, 0),
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            15,
+                            15,
+                            15,
+                            0,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text(
-                                'Account instractions',
-                                style: FlutterFlowTheme.of(context)
-                                    .displaySmall
-                                    .override(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                              Expanded(
+                                child: Text(
+                                  '${widget.cNote}',
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Open Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
                         Padding(
-                          padding:
-                              EdgeInsetsDirectional.fromSTEB(15, 15, 15, 0),
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            15,
+                            20,
+                            15,
+                            0,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Text(
+                                'Account instractions',
+                                style: context.appTheme.displaySmall.override(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            15,
+                            15,
+                            15,
+                            0,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
@@ -594,14 +597,12 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                 child: Text(
                                   '**DO NOT MAKE ANY EXTRA STOP\nOFFS** ADDITIONAL PASSENGER NOT AUTHORISED YOU WILL NOT BE PAID FOR THEM**\nAtoB journeys ONLY *NO MULTISTOPS* or Wait & Returns',
                                   textAlign: TextAlign.justify,
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Open Sans',
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Open Sans',
+                                    color:
+                                        context.appTheme.secondaryText,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ],
@@ -624,8 +625,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                   width: 120,
                                   child: Divider(
                                     thickness: 1,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color:
+                                        context.appTheme.secondaryText,
                                   ),
                                 ),
                               ),
@@ -635,7 +636,7 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                             opacity: 0.5,
                             child: Icon(
                               Icons.add_circle_outline,
-                              color: FlutterFlowTheme.of(context).secondaryText,
+                              color: context.appTheme.secondaryText,
                               size: 26,
                             ),
                           ),
@@ -648,8 +649,8 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                                   width: 120,
                                   child: Divider(
                                     thickness: 1,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
+                                    color:
+                                        context.appTheme.secondaryText,
                                   ),
                                 ),
                               ),
@@ -672,17 +673,23 @@ class _WaydetailsWidgetState extends State<WaydetailsWidget> {
                             options: FFButtonOptions(
                               width: MediaQuery.sizeOf(context).width * 0.90,
                               height: 50,
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                              iconPadding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                24,
+                                0,
+                                24,
+                                0,
+                              ),
+                              iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                0,
+                                0,
+                                0,
+                                0,
+                              ),
                               color: Color(0xFF1C1F28),
-                              textStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .override(
-                                    fontFamily: 'Open Sans',
-                                    color: Colors.white,
-                                  ),
+                              textStyle: context.appTheme.titleSmall.override(
+                                fontFamily: 'Open Sans',
+                                color: Colors.white,
+                              ),
                               elevation: 3,
                               borderSide: BorderSide(
                                 color: Colors.transparent,

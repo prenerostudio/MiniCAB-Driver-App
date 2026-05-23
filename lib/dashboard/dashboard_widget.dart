@@ -12,7 +12,7 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,10 +26,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import '../Model/myProfile.dart';
+import 'package:new_minicab_driver/Data/api_service.dart';
 // library flutter_overlay_window;
 
 class DashboardWidget extends StatefulWidget {
-  const DashboardWidget({Key? key}) : super(key: key);
+  const DashboardWidget({super.key});
 
   @override
   _DashboardWidgetState createState() => _DashboardWidgetState();
@@ -216,8 +217,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
 
   bool? isLogin;
   String _platformVersion = 'Unknown';
-  bool _isShowingWindow = false;
-  bool _isUpdatedWindow = false;
+  final bool _isShowingWindow = false;
+  final bool _isUpdatedWindow = false;
   // SystemWindowPrefMode prefMode = SystemWindowPrefMode.OVERLAY;
   static const String _mainAppPort = 'MainApp';
   final _receivePort = ReceivePort();
@@ -235,10 +236,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
       platformVersion = 'Failed to get platform version.';
     }
     if (!mounted) return;
-    if (platformVersion != null)
+    if (platformVersion != null) {
       setState(() {
         _platformVersion = platformVersion!;
       });
+    }
   }
 
   @override
@@ -253,18 +255,20 @@ class _DashboardWidgetState extends State<DashboardWidget>
     }
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
               DateTime.now().difference(lastBackPressed!) >
                   Duration(seconds: 2)) {
             context.pushNamed('Home');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Press again to exit')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Press again to exit')));
             lastBackPressed = DateTime.now();
             return false;
           } else {
@@ -274,8 +278,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
         },
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          drawer: Container(
+          backgroundColor: context.appTheme.primaryBackground,
+          drawer: SizedBox(
             width: MediaQuery.sizeOf(context).width * 0.8,
             height: MediaQuery.sizeOf(context).height * 1.0,
             child: Drawer(
@@ -286,15 +290,16 @@ class _DashboardWidgetState extends State<DashboardWidget>
                   width: MediaQuery.sizeOf(context).width,
                   height: MediaQuery.sizeOf(context).height * 1.0,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? FlutterFlowTheme.of(context).primaryBackground
-                        : FlutterFlowTheme.of(context).primaryBackground,
+                    color:
+                        Theme.of(context).brightness == Brightness.light
+                            ? context.appTheme.primaryBackground
+                            : context.appTheme.primaryBackground,
                     boxShadow: [
                       BoxShadow(
                         blurRadius: 4.0,
                         color: Color(0x33000000),
                         offset: Offset(0.0, 2.0),
-                      )
+                      ),
                     ],
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -305,8 +310,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 8.0),
+                          padding: const EdgeInsets.fromLTRB(
+                            0.0,
+                            15.0,
+                            0.0,
+                            8.0,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
@@ -322,78 +331,87 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     children: [
                                       FutureBuilder<List<Driver>>(
                                         future: myProfile(),
-                                        builder: (BuildContext context,
-                                            AsyncSnapshot<List<Driver>>
-                                                snapshot) {
+                                        builder: (
+                                          BuildContext context,
+                                          AsyncSnapshot<List<Driver>> snapshot,
+                                        ) {
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
                                             return CircularProgressIndicator(
                                               valueColor:
                                                   AlwaysStoppedAnimation<Color>(
-                                                      Colors.blueAccent),
+                                                    Colors.blueAccent,
+                                                  ),
                                             );
                                           } else if (snapshot.hasError) {
                                             return Text(
-                                                'Error: ${snapshot.error}');
+                                              'Error: ${snapshot.error}',
+                                            );
                                           } else {
                                             final driverData = snapshot.data;
                                             return Column(
                                               children: [
                                                 Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 15.0, 0.0, 8.0),
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0.0,
+                                                        15.0,
+                                                        0.0,
+                                                        8.0,
+                                                      ),
                                                   child: Row(
                                                     mainAxisSize:
                                                         MainAxisSize.max,
                                                     children: [
                                                       Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    10.0,
-                                                                    0.0,
-                                                                    10.0,
-                                                                    0.0),
-                                                        child: Container(
-                                                            width: 70.0,
-                                                            height: 70.0,
-                                                            clipBehavior:
-                                                                Clip.antiAlias,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .circle,
+                                                            EdgeInsetsDirectional.fromSTEB(
+                                                              10.0,
+                                                              0.0,
+                                                              10.0,
+                                                              0.0,
                                                             ),
-                                                            child:
-                                                                Image.network(
-                                                              'https://minicaboffice.com/img/drivers/${driverData![0].dPic}',
-                                                              width: 100.0,
-                                                              height: 100.0,
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder:
-                                                                  (context,
-                                                                      error,
-                                                                      stackTrace) {
-                                                                return Image
-                                                                    .asset(
-                                                                  'assets/images/user.png',
-                                                                  width: 100.0,
-                                                                  height: 100.0,
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                );
-                                                              },
-                                                            )),
+                                                        child: Container(
+                                                          width: 70.0,
+                                                          height: 70.0,
+                                                          clipBehavior:
+                                                              Clip.antiAlias,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                shape:
+                                                                    BoxShape
+                                                                        .circle,
+                                                              ),
+                                                          child: Image.network(
+                                                            'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
+                                                            width: 100.0,
+                                                            height: 100.0,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
+                                                              return Image.asset(
+                                                                'assets/images/user.png',
+                                                                width: 100.0,
+                                                                height: 100.0,
+                                                                fit:
+                                                                    BoxFit
+                                                                        .cover,
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
                                                       ),
                                                       Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    4.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
+                                                            EdgeInsetsDirectional.fromSTEB(
+                                                              4.0,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                            ),
                                                         child: Column(
                                                           mainAxisSize:
                                                               MainAxisSize.max,
@@ -405,45 +423,40 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                                                   .start,
                                                           children: [
                                                             Text(
-                                                              '${driverData[0].dName ?? ""}',
-                                                              style: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .bodyMedium
-                                                                  .override(
-                                                                    fontFamily:
-                                                                        'Plus Jakarta Sans',
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primary,
-                                                                    fontSize:
-                                                                        14.0,
-                                                                  ),
+                                                              driverData[0]
+                                                                      .dName ??
+                                                                  "",
+                                                              style: context.appTheme.bodyMedium.override(
+                                                                fontFamily:
+                                                                    'Plus Jakarta Sans',
+                                                                color:
+                                                                    context.appTheme.primary,
+                                                                fontSize: 14.0,
+                                                              ),
                                                             ),
                                                             Padding(
                                                               padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0.0,
-                                                                          10.0,
-                                                                          0.0,
-                                                                          0.0),
+                                                                  EdgeInsetsDirectional.fromSTEB(
+                                                                    0.0,
+                                                                    10.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                  ),
                                                               child: Text(
-                                                                '${driverData[0].dPhone ?? ""}',
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodySmall
-                                                                    .override(
-                                                                      fontFamily:
-                                                                          'Plus Jakarta Sans',
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primary,
-                                                                      fontSize:
-                                                                          12.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                    ),
+                                                                driverData[0]
+                                                                        .dPhone ??
+                                                                    "",
+                                                                style: context.appTheme.bodySmall.override(
+                                                                  fontFamily:
+                                                                      'Plus Jakarta Sans',
+                                                                  color:
+                                                                      context.appTheme.primary,
+                                                                  fontSize:
+                                                                      12.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -466,52 +479,64 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 10.0, 10.0, 0.0),
+                            0.0,
+                            10.0,
+                            10.0,
+                            0.0,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 0.0),
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                ),
                                 child: Text(
                                   'Light & Dark Mode',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                      ),
+                                  style: context.appTheme.bodyMedium.override(
+                                    fontFamily: 'Readex Pro',
+                                    color: context.appTheme.primary,
+                                  ),
                                 ),
                               ),
                               Switch.adaptive(
                                 value: _model.switchValue2 ??= false,
                                 onChanged: (newValue) async {
                                   setState(
-                                      () => _model.switchValue2 = newValue!);
-                                  if (newValue!) {
+                                    () => _model.switchValue2 = newValue,
+                                  );
+                                  if (newValue) {
                                     setDarkModeSetting(context, ThemeMode.dark);
                                   } else {
                                     setDarkModeSetting(
-                                        context, ThemeMode.light);
+                                      context,
+                                      ThemeMode.light,
+                                    );
                                   }
                                 },
                                 activeColor:
-                                    FlutterFlowTheme.of(context).primary,
+                                    context.appTheme.primary,
                                 activeTrackColor:
-                                    FlutterFlowTheme.of(context).accent1,
+                                    context.appTheme.accent1,
                                 inactiveTrackColor:
-                                    FlutterFlowTheme.of(context).alternate,
+                                    context.appTheme.alternate,
                                 inactiveThumbColor:
-                                    FlutterFlowTheme.of(context).secondaryText,
+                                    context.appTheme.secondaryText,
                               ),
                             ],
                           ),
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -526,36 +551,45 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: FaIcon(
                                         FontAwesomeIcons.poundSign,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Earning  £${dueBalance ?? '00.00'}',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -565,14 +599,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ),
-                        Divider(
-                          thickness: 1.0,
-                          color: Color(0xFFE0E3E7),
-                        ),
+                        Divider(thickness: 1.0, color: Color(0xFFE0E3E7)),
 
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -587,43 +622,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: FaIcon(
                                         FontAwesomeIcons.home,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Home',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -634,7 +678,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -649,43 +697,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: FaIcon(
                                         FontAwesomeIcons.capsules,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Bid',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -696,7 +753,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -711,43 +772,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.checklist_sharp,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Job History',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -758,7 +828,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -773,43 +847,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.directions_car,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'UpComming Jobs',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -818,13 +901,14 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ),
-                        Divider(
-                          thickness: 1.0,
-                          color: Color(0xFFE0E3E7),
-                        ),
+                        Divider(thickness: 1.0, color: Color(0xFFE0E3E7)),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -839,43 +923,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.edit_document,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Edit Documents',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -886,7 +979,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -901,43 +998,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.share_arrival_time,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Time Slots',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -990,7 +1096,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         //                   12.0, 0.0, 0.0, 0.0),
                         //               child: Icon(
                         //                 Icons.payment,
-                        //                 color: FlutterFlowTheme.of(context)
+                        //                 color: context.appTheme
                         //                     .primary,
                         //                 size: 20.0,
                         //               ),
@@ -1001,12 +1107,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         //                     12.0, 0.0, 0.0, 0.0),
                         //                 child: Text(
                         //                   'Change Payment Method',
-                        //                   style: FlutterFlowTheme.of(context)
+                        //                   style: context.appTheme
                         //                       .bodyMedium
                         //                       .override(
                         //                         fontFamily: 'Plus Jakarta Sans',
                         //                         color:
-                        //                             FlutterFlowTheme.of(context)
+                        //                             context.appTheme
                         //                                 .primary,
                         //                         fontSize: 14.0,
                         //                         fontWeight: FontWeight.w500,
@@ -1017,7 +1123,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         //             Icon(
                         //               Icons.chevron_right_outlined,
                         //               color:
-                        //                   FlutterFlowTheme.of(context).primary,
+                        //                   context.appTheme.primary,
                         //               size: 24.0,
                         //             ),
                         //           ],
@@ -1026,13 +1132,14 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         //     ),
                         //   ),
                         // ),
-                        Divider(
-                          thickness: 1.0,
-                          color: Color(0xFFE0E3E7),
-                        ),
+                        Divider(thickness: 1.0, color: Color(0xFFE0E3E7)),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -1047,43 +1154,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.account_circle_outlined,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'My Account',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1094,7 +1210,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -1109,43 +1229,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.payments,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Account Statement',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1156,7 +1285,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 5.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -1171,43 +1304,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.feedback_outlined,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Reviews',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1231,44 +1373,53 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               curve: Curves.easeInOut,
                               width: double.infinity,
                               child: Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  0,
+                                  8,
+                                  0,
+                                  8,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12, 0, 0, 0),
+                                        12,
+                                        0,
+                                        0,
+                                        0,
+                                      ),
                                       child: Icon(
                                         Icons.chat_outlined,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12, 0, 0, 0),
+                                          12,
+                                          0,
+                                          0,
+                                          0,
+                                        ),
                                         child: Text(
                                           'Massages',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24,
                                     ),
                                   ],
@@ -1299,44 +1450,53 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               curve: Curves.easeInOut,
                               width: double.infinity,
                               child: Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  0,
+                                  8,
+                                  0,
+                                  8,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12, 0, 0, 0),
+                                        12,
+                                        0,
+                                        0,
+                                        0,
+                                      ),
                                       child: Icon(
                                         Icons.call_outlined,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12, 0, 0, 0),
+                                          12,
+                                          0,
+                                          0,
+                                          0,
+                                        ),
                                         child: Text(
                                           'Support',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24,
                                     ),
                                   ],
@@ -1345,13 +1505,14 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ),
-                        Divider(
-                          thickness: 1.0,
-                          color: Color(0xFFE0E3E7),
-                        ),
+                        Divider(thickness: 1.0, color: Color(0xFFE0E3E7)),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              5.0, 5.0, 5.0, 80.0),
+                            5.0,
+                            5.0,
+                            5.0,
+                            80.0,
+                          ),
                           child: InkWell(
                             splashColor: Colors.transparent,
                             focusColor: Colors.transparent,
@@ -1371,43 +1532,52 @@ class _DashboardWidgetState extends State<DashboardWidget>
                               width: double.infinity,
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 8.0),
+                                  0.0,
+                                  8.0,
+                                  0.0,
+                                  8.0,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          12.0, 0.0, 0.0, 0.0),
+                                        12.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                      ),
                                       child: Icon(
                                         Icons.login_rounded,
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
+                                        color:
+                                            context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 0.0, 0.0),
+                                          12.0,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                        ),
                                         child: Text(
                                           'Log out',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                          style: context.appTheme.bodyMedium.override(
+                                            fontFamily: 'Plus Jakarta Sans',
+                                            color:
+                                                context.appTheme.primary,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1431,25 +1601,33 @@ class _DashboardWidgetState extends State<DashboardWidget>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(30.0, 5.0, 50.0, 5.0),
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                      30.0,
+                      5.0,
+                      50.0,
+                      5.0,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              10.0, 10.0, 10.0, 10.0),
+                            10.0,
+                            10.0,
+                            10.0,
+                            10.0,
+                          ),
                           child: FlutterFlowIconButton(
-                            borderColor: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
+                            borderColor:
+                                context.appTheme.secondaryBackground,
                             borderWidth: 1.0,
                             buttonSize: 40.0,
-                            fillColor: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
+                            fillColor:
+                                context.appTheme.secondaryBackground,
                             icon: Icon(
                               Icons.menu,
-                              color: FlutterFlowTheme.of(context).primaryText,
+                              color: context.appTheme.primaryText,
                               size: 30,
                             ),
                             onPressed: () async {
@@ -1465,13 +1643,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           },
                           child: Text(
                             'Dashboard',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.05,
-                                ),
+                            style: context.appTheme.bodyMedium.override(
+                              fontFamily: 'Readex Pro',
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.05,
+                            ),
                           ),
                         ),
                       ],
@@ -1492,31 +1668,25 @@ class _DashboardWidgetState extends State<DashboardWidget>
                           inactiveBgColor: Colors.grey,
                           inactiveFgColor: Colors.white,
                           totalSwitches: 2,
-                          labels: [
-                            'Back To Online',
-                            'Break time',
-                          ],
+                          labels: ['Back To Online', 'Break time'],
                           icons: [
                             FontAwesomeIcons.dotCircle,
                             FontAwesomeIcons.powerOff,
                           ],
                           activeBgColors: [
-                            [
-                              FlutterFlowTheme.of(context).primary,
-                            ],
-                            [
-                              Colors.yellow,
-                            ]
+                            [context.appTheme.primary],
+                            [Colors.yellow],
                           ],
                           onToggle: (index) async {
                             if (SwitchStatus == 1) {
                               if (index == 1) {
                                 startBreak();
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            BreakTimeWidget()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BreakTimeWidget(),
+                                  ),
+                                );
                                 // context.pushNamed('BreakTime');
                               } else {
                                 print('the break press');
@@ -1526,7 +1696,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                 // var request = http.MultipartRequest(
                                 //     'POST',
                                 //     Uri.parse(
-                                //         'https://www.minicaboffice.com/api/driver/end-break.php'));
+                                //         ApiService.driverEndBreak));
                                 // request.fields.addAll({
                                 //   'bt_id': '${breakId}',
                                 //   'd_id': dId.toString()
@@ -1555,8 +1725,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                     ),
                   ),
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 16.0, 12.0),
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                      16.0,
+                      12.0,
+                      16.0,
+                      12.0,
+                    ),
                     child: GridView(
                       padding: EdgeInsets.zero,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -1581,39 +1755,44 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: context.appTheme.primary,
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
+                                12.0,
+                                0.0,
+                                12.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.home,
-                                    color: FlutterFlowTheme.of(context).info,
+                                    color: context.appTheme.info,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     child: Text(
                                       'Home',
                                       textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            color: FlutterFlowTheme.of(context)
-                                                .info,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.05,
-                                          ),
+                                      style: context.appTheme.displaySmall.override(
+                                        fontFamily: 'Outfit',
+                                        color:
+                                            context.appTheme.info,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            0.05,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1644,16 +1823,18 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                          ? FocusScope.of(context)
-                                              .requestFocus(_model.unfocusNode)
-                                          : FocusScope.of(context).unfocus(),
+                                  onTap:
+                                      () =>
+                                          _model.unfocusNode.canRequestFocus
+                                              ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                              : FocusScope.of(
+                                                context,
+                                              ).unfocus(),
                                   child: Padding(
                                     padding: MediaQuery.viewInsetsOf(context),
-                                    child: UpcommingjobWidget(
-                                      dId: '',
-                                    ),
+                                    child: UpcommingjobWidget(dId: ''),
                                   ),
                                 );
                               },
@@ -1665,40 +1846,45 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
+                              color: context.appTheme.alternate,
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
+                                12.0,
+                                0.0,
+                                12.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.directions_car_outlined,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     child: Text(
                                       'Upcoming Jobs',
                                       textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            color: FlutterFlowTheme.of(context)
-                                                .primaryText,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.05,
-                                          ),
+                                      style: context.appTheme.displaySmall.override(
+                                        fontFamily: 'Outfit',
+                                        color:
+                                            context.appTheme.primaryText,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            0.05,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1729,16 +1915,21 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                          ? FocusScope.of(context)
-                                              .requestFocus(_model.unfocusNode)
-                                          : FocusScope.of(context).unfocus(),
+                                  onTap:
+                                      () =>
+                                          _model.unfocusNode.canRequestFocus
+                                              ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                              : FocusScope.of(
+                                                context,
+                                              ).unfocus(),
                                   child: Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: JobHistorySheet(
-                                          // did: '',
-                                          )),
+                                    padding: MediaQuery.viewInsetsOf(context),
+                                    child: JobHistorySheet(
+                                      // did: '',
+                                    ),
+                                  ),
                                 );
                               },
                             ).then((value) => safeSetState(() {}));
@@ -1749,38 +1940,43 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
+                              color: context.appTheme.alternate,
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
+                                12.0,
+                                0.0,
+                                12.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.checklist_rtl,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     child: Text(
                                       'Job History',
                                       textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.05,
-                                          ),
+                                      style: context.appTheme.displaySmall.override(
+                                        fontFamily: 'Outfit',
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            0.05,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1788,7 +1984,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ).animateOnPageLoad(
-                            animationsMap['containerOnPageLoadAnimation2']!),
+                          animationsMap['containerOnPageLoadAnimation2']!,
+                        ),
                         InkWell(
                           splashColor: Colors.transparent,
                           focusColor: Colors.transparent,
@@ -1812,14 +2009,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                          ? FocusScope.of(context)
-                                              .requestFocus(_model.unfocusNode)
-                                          : FocusScope.of(context).unfocus(),
+                                  onTap:
+                                      () =>
+                                          _model.unfocusNode.canRequestFocus
+                                              ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                              : FocusScope.of(
+                                                context,
+                                              ).unfocus(),
                                   child: Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: BidsBottomSheet()),
+                                    padding: MediaQuery.viewInsetsOf(context),
+                                    child: BidsBottomSheet(),
+                                  ),
                                 );
                               },
                             ).then((value) => safeSetState(() {}));
@@ -1830,38 +2032,43 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
+                              color: context.appTheme.alternate,
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
+                                12.0,
+                                0.0,
+                                12.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   FaIcon(
                                     FontAwesomeIcons.clipboardList,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     child: Text(
                                       'Bids ',
                                       textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.05,
-                                          ),
+                                      style: context.appTheme.displaySmall.override(
+                                        fontFamily: 'Outfit',
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            0.05,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1869,7 +2076,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ).animateOnPageLoad(
-                            animationsMap['containerOnPageLoadAnimation4']!),
+                          animationsMap['containerOnPageLoadAnimation4']!,
+                        ),
                         InkWell(
                           splashColor: Colors.transparent,
                           focusColor: Colors.transparent,
@@ -1893,14 +2101,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                          ? FocusScope.of(context)
-                                              .requestFocus(_model.unfocusNode)
-                                          : FocusScope.of(context).unfocus(),
+                                  onTap:
+                                      () =>
+                                          _model.unfocusNode.canRequestFocus
+                                              ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                              : FocusScope.of(
+                                                context,
+                                              ).unfocus(),
                                   child: Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: ZoneBottomsheet()),
+                                    padding: MediaQuery.viewInsetsOf(context),
+                                    child: ZoneBottomsheet(),
+                                  ),
                                 );
                               },
                             ).then((value) => safeSetState(() {}));
@@ -1911,38 +2124,43 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
+                              color: context.appTheme.alternate,
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
+                                12.0,
+                                0.0,
+                                12.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.location_on,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     child: Text(
                                       'Zones',
                                       textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.05,
-                                          ),
+                                      style: context.appTheme.displaySmall.override(
+                                        fontFamily: 'Outfit',
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            0.05,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1950,7 +2168,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ).animateOnPageLoad(
-                            animationsMap['containerOnPageLoadAnimation5']!),
+                          animationsMap['containerOnPageLoadAnimation5']!,
+                        ),
                         InkWell(
                           splashColor: Colors.transparent,
                           focusColor: Colors.transparent,
@@ -1974,14 +2193,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                          ? FocusScope.of(context)
-                                              .requestFocus(_model.unfocusNode)
-                                          : FocusScope.of(context).unfocus(),
+                                  onTap:
+                                      () =>
+                                          _model.unfocusNode.canRequestFocus
+                                              ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                              : FocusScope.of(
+                                                context,
+                                              ).unfocus(),
                                   child: Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: AccountsBottomsheet()),
+                                    padding: MediaQuery.viewInsetsOf(context),
+                                    child: AccountsBottomsheet(),
+                                  ),
                                 );
                               },
                             ).then((value) => safeSetState(() {}));
@@ -1997,38 +2221,43 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             width: MediaQuery.sizeOf(context).width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             decoration: BoxDecoration(
-                              color: FlutterFlowTheme.of(context).alternate,
+                              color: context.appTheme.alternate,
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
+                                12.0,
+                                0.0,
+                                12.0,
+                                0.0,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.payments,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                    ),
                                     child: Text(
                                       'Payment',
                                       textAlign: TextAlign.center,
-                                      style: FlutterFlowTheme.of(context)
-                                          .displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.05,
-                                          ),
+                                      style: context.appTheme.displaySmall.override(
+                                        fontFamily: 'Outfit',
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            0.05,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -2036,7 +2265,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             ),
                           ),
                         ).animateOnPageLoad(
-                            animationsMap['containerOnPageLoadAnimation6']!),
+                          animationsMap['containerOnPageLoadAnimation6']!,
+                        ),
                       ],
                     ),
                   ),
@@ -2054,17 +2284,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              'https://www.minicaboffice.com/api/driver/start-break.php'));
+        'POST',
+        Uri.parse(ApiService.driverStartBreak),
+      );
       request.fields.addAll({'d_id': dId.toString()});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         String responseBody = await response.stream.bytesToString();
         var jsonResponse = json.decode(responseBody);
-        Fluttertoast.showToast(
-          msg: "Switched to Break time",
-        );
+        Fluttertoast.showToast(msg: "Switched to Break time");
         if (jsonResponse['status']) {
           String data = jsonResponse['data'].toString();
           // breakId = data;
@@ -2112,12 +2340,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
     String? dId = prefs.getString('d_id');
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(
-          'https://www.minicaboffice.com/api/driver/total-due-balance.php'),
+      Uri.parse(ApiService.driverTotalDueBalance),
     );
-    request.fields.addAll({
-      'd_id': dId.toString(),
-    });
+    request.fields.addAll({'d_id': dId.toString()});
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
@@ -2150,22 +2375,16 @@ class _DashboardWidgetState extends State<DashboardWidget>
       return [];
     }
 
-    final uri =
-        Uri.parse('https://minicaboffice.com/api/driver/view-profile.php');
+    final uri = Uri.parse(ApiService.driverViewProfile);
     final response = await http.post(uri, body: {'d_id': dId.toString()});
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
 
-      if (data is List) {
-        List<Driver> profileData =
-            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-        return profileData;
-      } else {
-        print('Invalid data format received.');
-        return [];
-      }
+      List<Driver> profileData =
+          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
       return [];
@@ -2177,13 +2396,16 @@ class _DashboardWidgetState extends State<DashboardWidget>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
 
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/online-status.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiService.driverOnlineStatus),
+      );
       request.fields.addAll({
         'd_id': dId.toString(),
-        'status': switchValue1 == false
-            ? 'Offline'
-            : 'Online', // Adjusted status based on the switch value
+        'status':
+            switchValue1 == false
+                ? 'Offline'
+                : 'Online', // Adjusted status based on the switch value
       });
       print(request.fields);
 
@@ -2202,13 +2424,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (latitude != null && longitude != null) {
-      var request = http.MultipartRequest('POST',
-          Uri.parse('https://minicaboffice.com/api/driver/real-location.php'));
+    if (longitude != null) {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiService.driverRealLocation),
+      );
       request.fields.addAll({
         'd_id': driverId.toString(),
         'latitude': latitude.toString(),
-        'longitude': longitude.toString()
+        'longitude': longitude.toString(),
       });
 
       request.fields.forEach((key, value) {
@@ -2254,20 +2478,18 @@ class _DashboardWidgetState extends State<DashboardWidget>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? savedPhone = prefs.getString('d_phone');
     String? savedPassword = prefs.getString('d_password');
-    final url =
-        Uri.parse('https://www.minicaboffice.com/api/driver/signin.php');
+    final url = Uri.parse(ApiService.driverSignin);
     final request = http.MultipartRequest('POST', url);
     request.fields.addAll({
-      'd_phone': '${savedPhone}',
-      'd_password': '${savedPassword}',
+      'd_phone': '$savedPhone',
+      'd_password': '$savedPassword',
     });
     try {
-      final url =
-          Uri.parse('https://www.minicaboffice.com/api/driver/signin.php');
+      final url = Uri.parse(ApiService.driverSignin);
       final request = http.MultipartRequest('POST', url);
       request.fields.addAll({
-        'd_phone': '${savedPhone ?? ''}',
-        'd_password': '${savedPassword ?? ''}',
+        'd_phone': savedPhone ?? '',
+        'd_password': savedPassword ?? '',
       });
       print(request.fields);
       final response = await request.send();
@@ -2278,7 +2500,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
         if (jsonResponse['status'] == true) {
           if (jsonResponse.containsKey('data')) {
             final Map<String, dynamic> userData = jsonResponse[''];
-            if (userData != null && userData.isNotEmpty) {
+            if (userData.isNotEmpty) {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setBool('isLogin', true);
               userData.forEach((key, value) async {
@@ -2304,22 +2526,16 @@ class _DashboardWidgetState extends State<DashboardWidget>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
-    final uri =
-        Uri.parse('https://minicaboffice.com/api/driver/view-profile.php');
+    final uri = Uri.parse(ApiService.driverViewProfile);
     final response = await http.post(uri, body: {'d_id': dId.toString()});
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''];
 
-      if (data is List) {
-        List<Driver> profileData =
-            data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
-        return profileData;
-      } else {
-        print('Invalid data format received.');
-        return []; // Return an empty list in case of invalid data format.
-      }
+      List<Driver> profileData =
+          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
       return []; // Return an empty list in case of an error.

@@ -1,14 +1,10 @@
 import '/flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'changepaymentmethod_model.dart';
 export 'changepaymentmethod_model.dart';
@@ -66,9 +62,11 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
     _model = createModel(context, () => ChangepaymentmethodModel());
 
     setupAnimations(
-      animationsMap.values.where((anim) =>
-      anim.trigger == AnimationTrigger.onActionTrigger ||
-          !anim.applyInitialState),
+      animationsMap.values.where(
+        (anim) =>
+            anim.trigger == AnimationTrigger.onActionTrigger ||
+            !anim.applyInitialState,
+      ),
       this,
     );
   }
@@ -85,18 +83,15 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(4, 30, 4, 15),
       child: Container(
-        constraints: BoxConstraints(
-          minWidth: 350,
-          maxWidth: double.infinity,
-        ),
+        constraints: BoxConstraints(minWidth: 350, maxWidth: double.infinity),
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).secondaryBackground,
+          color: context.appTheme.secondaryBackground,
           boxShadow: [
             BoxShadow(
               blurRadius: 4,
               color: Color(0x33000000),
               offset: Offset(0, 2),
-            )
+            ),
           ],
           borderRadius: BorderRadius.circular(12),
         ),
@@ -112,7 +107,7 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                 child: Container(
                   width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    color: context.appTheme.secondaryBackground,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
@@ -124,8 +119,12 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
-                              padding:
-                              EdgeInsetsDirectional.fromSTEB(0, 0, 40, 0),
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                0,
+                                0,
+                                40,
+                                0,
+                              ),
                               child: InkWell(
                                 splashColor: Colors.transparent,
                                 focusColor: Colors.transparent,
@@ -136,7 +135,7 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                                 },
                                 child: Icon(
                                   Icons.arrow_back,
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: context.appTheme.primary,
                                   size: 30,
                                 ),
                               ),
@@ -144,9 +143,7 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                             Expanded(
                               child: Text(
                                 'CHANGE PAYMENT METHOD',
-                                style: FlutterFlowTheme.of(context)
-                                    .headlineSmall
-                                    .override(
+                                style: context.appTheme.headlineSmall.override(
                                   fontFamily: 'Open Sans',
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
@@ -164,21 +161,23 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                           children: [
                             FaIcon(
                               FontAwesomeIcons.wallet,
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: context.appTheme.primary,
                               size: 24,
                             ),
                             Expanded(
                               child: Padding(
-                                padding:
-                                EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  20,
+                                  0,
+                                  0,
+                                  0,
+                                ),
                                 child: Text(
                                   'Cash',
-                                  style: FlutterFlowTheme.of(context)
-                                      .labelLarge
-                                      .override(
+                                  style: context.appTheme.labelLarge.override(
                                     fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                   ),
                                 ),
                               ),
@@ -188,7 +187,7 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                       ),
                       Divider(
                         thickness: 1,
-                        color: FlutterFlowTheme.of(context).secondaryText,
+                        color: context.appTheme.secondaryText,
                       ),
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(20, 15, 20, 15),
@@ -198,21 +197,23 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                           children: [
                             Icon(
                               Icons.paypal_outlined,
-                              color: FlutterFlowTheme.of(context).primary,
+                              color: context.appTheme.primary,
                               size: 24,
                             ),
                             Expanded(
                               child: Padding(
-                                padding:
-                                EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                  20,
+                                  0,
+                                  0,
+                                  0,
+                                ),
                                 child: Text(
                                   'Paypal',
-                                  style: FlutterFlowTheme.of(context)
-                                      .labelLarge
-                                      .override(
+                                  style: context.appTheme.labelLarge.override(
                                     fontFamily: 'Open Sans',
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
+                                    color:
+                                        context.appTheme.primaryText,
                                   ),
                                 ),
                               ),
@@ -222,7 +223,7 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                       ),
                       Divider(
                         thickness: 1,
-                        color: FlutterFlowTheme.of(context).secondaryText,
+                        color: context.appTheme.secondaryText,
                       ),
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 5),
@@ -233,9 +234,7 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                             Expanded(
                               child: Text(
                                 'Some payment methods may not be available in this location.',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
+                                style: context.appTheme.bodyMedium.override(
                                   fontFamily: 'Open Sans',
                                   fontSize: 12,
                                 ),
@@ -259,13 +258,19 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                                 options: FFButtonOptions(
                                   height: 50,
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      24, 0, 24, 0),
+                                    24,
+                                    0,
+                                    24,
+                                    0,
+                                  ),
                                   iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                  ),
+                                  color: context.appTheme.primary,
+                                  textStyle: context.appTheme.titleSmall.override(
                                     fontFamily: 'Open Sans',
                                     color: Colors.white,
                                   ),
@@ -299,11 +304,14 @@ class _ChangepaymentmethodWidgetState extends State<ChangepaymentmethodWidget>
                         options: FFButtonOptions(
                           height: 50,
                           padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                          iconPadding:
-                          EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
+                          iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            0,
+                            0,
+                            0,
+                            0,
+                          ),
+                          color: context.appTheme.primaryText,
+                          textStyle: context.appTheme.titleSmall.override(
                             fontFamily: 'Open Sans',
                             color: Colors.white,
                           ),

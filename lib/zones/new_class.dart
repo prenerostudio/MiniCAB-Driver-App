@@ -4,6 +4,8 @@ import 'package:intl/intl.dart'; // For date formatting
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerApp extends StatefulWidget {
+  const TimerApp({super.key});
+
   @override
   _TimerAppState createState() => _TimerAppState();
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'zones_model.dart';
 export 'zones_model.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:new_minicab_driver/Data/api_service.dart';
 
 class ZoneBottomsheet extends StatefulWidget {
   const ZoneBottomsheet({super.key});
@@ -34,8 +34,7 @@ class _ZoneBottomsheetState extends State<ZoneBottomsheet> {
 
   Future<void> getZonesData() async {
     try {
-      final Uri url =
-          Uri.parse('https://minicaboffice.com/api/driver/zones.php');
+      final Uri url = Uri.parse(ApiService.driverZones);
       final response = await http.get(url);
 
       print('Response status: ${response.statusCode}');
@@ -46,8 +45,9 @@ class _ZoneBottomsheetState extends State<ZoneBottomsheet> {
 
         // Ensure to map the dynamic list to a list of strings
         setState(() {
-          zones = List<String>.from(data
-              .map((zone) => zone['zone_name'] as String)); // Corrected line
+          zones = List<String>.from(
+            data.map((zone) => zone['zone_name'] as String),
+          ); // Corrected line
           print('Successfully fetched zones: $zones');
         });
       } else {
@@ -68,42 +68,42 @@ class _ZoneBottomsheetState extends State<ZoneBottomsheet> {
           Navigator.pop(context);
         }
       },
-      child: DraggableScrollableSheet(builder: (context, scrollController) {
-        return Container(
+      child: DraggableScrollableSheet(
+        builder: (context, scrollController) {
+          return Container(
             color: Colors.white,
             child: Column(
               children: [
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 Text(
                   'Zone List',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 zones.isEmpty
                     ? Center(
-                        child:
-                            CircularProgressIndicator()) // Show loading indicator
+                      child: CircularProgressIndicator(),
+                    ) // Show loading indicator
                     : Expanded(
-                        child: ListView.builder(
-                          controller: scrollController,
-                          itemCount: zones.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              child: ListTile(
-                                title:
-                                    Text(zones[index]), // Display the zone name
-                              ),
-                            );
-                          },
-                        ),
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: zones.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            child: ListTile(
+                              title: Text(
+                                zones[index],
+                              ), // Display the zone name
+                            ),
+                          );
+                        },
                       ),
+                    ),
               ],
-            ));
-      }),
+            ),
+          );
+        },
+      ),
     );
   }
 }
