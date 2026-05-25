@@ -181,6 +181,50 @@ class ApiService {
       '$driverBaseUrl/jobs/calculate-waiting-time.php';
   static const String driverCancelBooking =
       '$driverBaseUrl/jobs/cancel-booking.php';
+  static const String driverCheckAddressProof =
+      '$driverBaseUrl/documents/driver/check-address-proof.php';
+  static const String driverCheckAddressProof1 =
+      '$driverBaseUrl/documents/driver/check-address-proof-1.php';
+  static const String driverCheckAddressProof2 =
+      '$driverBaseUrl/documents/driver/check-address-proof-2.php';
+  static const String driverCheckDLicenseBack =
+      '$driverBaseUrl/documents/driver/check-d-license-back.php';
+  static const String driverCheckDLicenseFront =
+      '$driverBaseUrl/documents/driver/check-d-license-front.php';
+  static const String driverCheckDrivingLicense =
+      '$driverBaseUrl/documents/driver/check-driving-license.php';
+  static const String driverCheckDvlaCode =
+      '$driverBaseUrl/documents/driver/check-dvla-code.php';
+  static const String driverCheckExtraDocument =
+      '$driverBaseUrl/documents/driver/check-extra-document.php';
+  static const String driverCheckFareStatus =
+      '$driverBaseUrl/jobs/check-fare-status.php';
+  static const String driverCheckInsurance =
+      '$driverBaseUrl/documents/vehicle/check-insurance.php';
+  static const String driverCheckInsuranceSchedule =
+      '$driverBaseUrl/documents/vehicle/check-insurance-schedule.php';
+  static const String driverCheckJobStatus =
+      '$driverBaseUrl/jobs/check-job-status.php';
+  static const String driverCheckLogBook =
+      '$driverBaseUrl/documents/vehicle/check-log-book.php';
+  static const String driverCheckMotCertificate =
+      '$driverBaseUrl/documents/vehicle/check-mot-certificate.php';
+  static const String driverCheckNationalInsurance =
+      '$driverBaseUrl/documents/driver/check-national-insurance.php';
+  static const String driverCheckPco =
+      '$driverBaseUrl/documents/vehicle/check-pco.php';
+  static const String driverCheckPcoLicense =
+      '$driverBaseUrl/documents/driver/check-pco-license.php';
+  static const String driverCheckPictures =
+      '$driverBaseUrl/documents/vehicle/check-pictures.php';
+  static const String driverCheckRentalAgreement =
+      '$driverBaseUrl/documents/vehicle/check-rental-agreement.php';
+  static const String driverCheckRoadTax =
+      '$driverBaseUrl/documents/vehicle/check-road-tax.php';
+  static const String driverCheckVPicBack =
+      '$driverBaseUrl/documents/vehicle/check-v-pic-back.php';
+  static const String driverCheckVPicFront =
+      '$driverBaseUrl/documents/vehicle/check-v-pic-front.php';
 
   static const String driverCompleteJob =
       '$driverBaseUrl/jobs/complete-job.php';
@@ -201,6 +245,7 @@ class ApiService {
       '$driverBaseUrl/activity/fetch-reviews.php';
   static const String driverFetchTimeSlot =
       '$driverBaseUrl/timeslots/fetch-time-slots.php';
+  static const String driverFetchTimeSlots = driverFetchTimeSlot;
 
   static const String driverFetchVehicles =
       '$driverBaseUrl/activity/fetch-vehicles.php';
@@ -265,6 +310,10 @@ class ApiService {
       '$driverBaseUrl/documents/vehicle/upload-mot.php';
   static const String driverUploadNi =
       '$driverBaseUrl/documents/driver/upload-ni.php';
+  static const String driverUploadPa1 =
+      '$driverBaseUrl/documents/driver/upload-pa1.php';
+  static const String driverUploadPa2 =
+      '$driverBaseUrl/documents/driver/upload-pa2.php';
 
   static const String driverUploadPco =
       '$driverBaseUrl/documents/driver/upload-pco.php';

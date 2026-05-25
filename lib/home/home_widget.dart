@@ -309,20 +309,20 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
             'ts_id',
             jsonMap['details'][0]['ts_id'].toString(),
           );
-          myController.timeSlotid.value =
-              jsonMap['details'][0]['ts_id'].toString();
-          myController.timeSlotDate.value =
-              jsonMap['details'][0]['ts_date'].toString();
+          myController.timeSlotid.value = jsonMap['details'][0]['ts_id']
+              .toString();
+          myController.timeSlotDate.value = jsonMap['details'][0]['ts_date']
+              .toString();
           myController.timeSlotStarttime.value =
               jsonMap['details'][0]['start_time'].toString();
           _startTime = jsonMap['details'][0]['start_time'].toString();
           await prefs.remove('accepted');
           myController.isTimeSlotAccepted.value =
               prefs.getBool('accepted') ?? false;
-          _endTime =
-              jsonMap['details'][0]['end_time'].toString(); // e.g., "15:00:00"
-          myController.timeSlotEndTime.value =
-              jsonMap['details'][0]['end_time'].toString();
+          _endTime = jsonMap['details'][0]['end_time']
+              .toString(); // e.g., "15:00:00"
+          myController.timeSlotEndTime.value = jsonMap['details'][0]['end_time']
+              .toString();
           myController.timeSloPricePerhour.value =
               jsonMap['details'][0]['price_hour'].toString();
           myController.timeSlottotalPay.value =
@@ -728,11 +728,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     //     : '');
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap:
-          () =>
-              _model.unfocusNode.canRequestFocus
-                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-                  : FocusScope.of(context).unfocus(),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
@@ -858,12 +856,15 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         1
                                                     ? 'Offline'
                                                     : 'Online',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily: 'Open Sans',
-                                                  fontSize: 18,
-                                                  color:
-                                                      context.appTheme.info,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily: 'Open Sans',
+                                                      fontSize: 18,
+                                                      color:
+                                                          context.appTheme.info,
+                                                    ),
                                               ),
                                             ],
                                           ),
@@ -924,15 +925,17 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                   width: 45,
                                                   height: 45,
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        context.appTheme.secondaryBackground,
+                                                    color: context
+                                                        .appTheme
+                                                        .secondaryBackground,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           50,
                                                         ),
                                                     border: Border.all(
-                                                      color:
-                                                          context.appTheme.secondaryBackground,
+                                                      color: context
+                                                          .appTheme
+                                                          .secondaryBackground,
                                                     ),
                                                   ),
                                                   alignment:
@@ -942,8 +945,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                       ),
                                                   child: FaIcon(
                                                     FontAwesomeIcons.listUl,
-                                                    color:
-                                                        context.appTheme.secondaryText,
+                                                    color: context
+                                                        .appTheme
+                                                        .secondaryText,
                                                     size: 20,
                                                   ),
                                                 ),
@@ -985,10 +989,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         const BorderRadius.all(
                                                           Radius.circular(999),
                                                         ),
-                                                    color:
-                                                        Theme.of(context)
-                                                            .colorScheme
-                                                            .secondaryContainer,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .secondaryContainer,
                                                   ),
                                                   child: ToggleSwitch(
                                                     minWidth:
@@ -1018,11 +1021,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                           .dotCircle,
                                                     ],
                                                     activeBgColors: [
+                                                      [context.appTheme.error],
                                                       [
-                                                        context.appTheme.error,
-                                                      ],
-                                                      [
-                                                        context.appTheme.primary,
+                                                        context
+                                                            .appTheme
+                                                            .primary,
                                                       ],
                                                     ],
                                                     onToggle: (index) async {
@@ -1063,8 +1066,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                               index!,
                                                             );
                                                             myController
-                                                                .initialLabelIndex
-                                                                .value = index;
+                                                                    .initialLabelIndex
+                                                                    .value =
+                                                                index;
                                                             if (!jobStatus) {
                                                               if (index == 1) {
                                                                 print(
@@ -1111,47 +1115,46 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                           } else {
                                                             showDialog(
                                                               context: context,
-                                                              builder: (
-                                                                BuildContext
-                                                                context,
-                                                              ) {
-                                                                return AlertDialog(
-                                                                  title: const Text(
-                                                                    'Upload Vehicle Documents Required',
-                                                                  ),
-                                                                  content:
-                                                                      const Text(
-                                                                        'You are not Online. Uploading vehicle documents is required before switching to the Online state.',
+                                                              builder:
+                                                                  (
+                                                                    BuildContext
+                                                                    context,
+                                                                  ) {
+                                                                    return AlertDialog(
+                                                                      title: const Text(
+                                                                        'Upload Vehicle Documents Required',
                                                                       ),
-                                                                  actions: <
-                                                                    Widget
-                                                                  >[
-                                                                    TextButton(
-                                                                      child: const Text(
-                                                                        'Cancel',
-                                                                      ),
-                                                                      onPressed: () {
-                                                                        Navigator.of(
-                                                                          context,
-                                                                        ).pop();
-                                                                      },
-                                                                    ),
-                                                                    TextButton(
-                                                                      child: const Text(
-                                                                        'Upload',
-                                                                      ),
-                                                                      onPressed: () {
-                                                                        Navigator.of(
-                                                                          context,
-                                                                        ).pop();
-                                                                        context.pushNamed(
-                                                                          'AllDocoments',
-                                                                        );
-                                                                      },
-                                                                    ),
-                                                                  ],
-                                                                );
-                                                              },
+                                                                      content:
+                                                                          const Text(
+                                                                            'You are not Online. Uploading vehicle documents is required before switching to the Online state.',
+                                                                          ),
+                                                                      actions: <Widget>[
+                                                                        TextButton(
+                                                                          child: const Text(
+                                                                            'Cancel',
+                                                                          ),
+                                                                          onPressed: () {
+                                                                            Navigator.of(
+                                                                              context,
+                                                                            ).pop();
+                                                                          },
+                                                                        ),
+                                                                        TextButton(
+                                                                          child: const Text(
+                                                                            'Upload',
+                                                                          ),
+                                                                          onPressed: () {
+                                                                            Navigator.of(
+                                                                              context,
+                                                                            ).pop();
+                                                                            context.pushNamed(
+                                                                              'AllDocoments',
+                                                                            );
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  },
                                                             );
                                                           }
                                                         }
@@ -1181,120 +1184,120 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                     Obx(
                                       () =>
                                           myController
-                                                  .isTimeSlotDispatched
-                                                  .value
-                                              ? Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                ),
-                                                width: double.infinity,
-                                                child: Column(
-                                                  children: [
-                                                    SizedBox(height: 10),
-                                                    Text(
-                                                      _formatTime(_seconds),
-                                                      style: TextStyle(
-                                                        fontSize: 22,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                              .isTimeSlotDispatched
+                                              .value
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                              ),
+                                              width: double.infinity,
+                                              child: Column(
+                                                children: [
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                    _formatTime(_seconds),
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Text(
+                                                        'TimeSlot-Date :',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: [
-                                                        Text(
-                                                          'TimeSlot-Date :',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          myController
-                                                              .timeSlotDate
-                                                              .value,
-                                                          style: TextStyle(),
-                                                        ),
-                                                        Container(
-                                                          height: 15,
-                                                          width: 1,
-                                                          color: Colors.grey,
-                                                        ),
-                                                        Text(
-                                                          'Start time :',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          myController
-                                                              .timeSlotStarttime
-                                                              .value,
-                                                          style: TextStyle(),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: [
-                                                        Text(
-                                                          'End time :',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          myController
-                                                              .timeSlotEndTime
-                                                              .value,
-                                                          style: TextStyle(),
-                                                        ),
-                                                        Container(
-                                                          height: 15,
-                                                          width: 1,
-                                                          color: Colors.grey,
-                                                        ),
-                                                        Text(
-                                                          'Price per hour :',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          '£${myController.timeSloPricePerhour.value}',
-                                                          style: TextStyle(),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              '  Total pay : £${myController.timeSlottotalPay.value}',
-                                                              style: TextStyle(
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                      Text(
                                                         myController
-                                                                    .isTimeSlotAccepted
-                                                                    .value ==
-                                                                false
-                                                            ? InkWell(
+                                                            .timeSlotDate
+                                                            .value,
+                                                        style: TextStyle(),
+                                                      ),
+                                                      Container(
+                                                        height: 15,
+                                                        width: 1,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                        'Start time :',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        myController
+                                                            .timeSlotStarttime
+                                                            .value,
+                                                        style: TextStyle(),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Text(
+                                                        'End time :',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        myController
+                                                            .timeSlotEndTime
+                                                            .value,
+                                                        style: TextStyle(),
+                                                      ),
+                                                      Container(
+                                                        height: 15,
+                                                        width: 1,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                        'Price per hour :',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        '£${myController.timeSloPricePerhour.value}',
+                                                        style: TextStyle(),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            '  Total pay : £${myController.timeSlottotalPay.value}',
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      myController
+                                                                  .isTimeSlotAccepted
+                                                                  .value ==
+                                                              false
+                                                          ? InkWell(
                                                               onTap: () async {
                                                                 await FlutterRingtonePlayer()
                                                                     .stop();
@@ -1309,8 +1312,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 height: 40,
                                                                 width: 90,
                                                                 decoration: BoxDecoration(
-                                                                  color:
-                                                                      context.appTheme.primary,
+                                                                  color: context
+                                                                      .appTheme
+                                                                      .primary,
                                                                   borderRadius:
                                                                       BorderRadius.circular(
                                                                         8,
@@ -1320,20 +1324,19 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                   child: Text(
                                                                     'Accept',
                                                                     style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
+                                                                      color: Colors
+                                                                          .white,
                                                                     ),
                                                                   ),
                                                                 ),
                                                               ),
                                                             )
-                                                            : Container(),
-                                                        myController
-                                                                    .isTimeSlotAccepted
-                                                                    .value ==
-                                                                false
-                                                            ? GestureDetector(
+                                                          : Container(),
+                                                      myController
+                                                                  .isTimeSlotAccepted
+                                                                  .value ==
+                                                              false
+                                                          ? GestureDetector(
                                                               onTap: () async {
                                                                 await FlutterRingtonePlayer()
                                                                     .stop();
@@ -1345,9 +1348,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 height: 40,
                                                                 width: 90,
                                                                 decoration: BoxDecoration(
-                                                                  color:
-                                                                      Colors
-                                                                          .red,
+                                                                  color: Colors
+                                                                      .red,
                                                                   borderRadius:
                                                                       BorderRadius.circular(
                                                                         8,
@@ -1357,22 +1359,21 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                   child: Text(
                                                                     'Reject',
                                                                     style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
+                                                                      color: Colors
+                                                                          .white,
                                                                     ),
                                                                   ),
                                                                 ),
                                                               ),
                                                             )
-                                                            : Container(),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5),
-                                                  ],
-                                                ),
-                                              )
-                                              : Container(),
+                                                          : Container(),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 5),
+                                                ],
+                                              ),
+                                            )
+                                          : Container(),
                                     ),
                                   ],
                                 ),
@@ -1406,77 +1407,74 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                             left: 20,
                           ),
                           child: Obx(
-                            () =>
-                                myController.isJobDetailDone.value
-                                    ? Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            context.appTheme.primaryBackground,
-                                        borderRadius: BorderRadius.circular(8),
+                            () => myController.isJobDetailDone.value
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      color: context.appTheme.primaryBackground,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    height: 80,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14.0,
                                       ),
-                                      height: 80,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 14.0,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              height: 30,
-                                              width: 30,
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                    color: Colors.green,
-                                                  ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 30,
+                                            width: 30,
+                                            child:
+                                                const CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                ),
+                                          ),
+                                          const SizedBox(width: 20),
+                                          Text(
+                                            'Please wait...',
+                                            style: TextStyle(
+                                              color:
+                                                  context.appTheme.primaryText,
+                                              fontFamily: 'Satoshi',
+                                              fontSize: 15,
                                             ),
-                                            const SizedBox(width: 20),
-                                            Text(
-                                              'Please wait...',
-                                              style: TextStyle(
-                                                color:
-                                                    context.appTheme.primaryText,
-                                                fontFamily: 'Satoshi',
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    )
-                                    : Container(),
+                                    ),
+                                  )
+                                : Container(),
                           ),
                         ),
                         Align(
                           alignment: Alignment.center,
                           child: Obx(
-                            () =>
-                                myController.jobPusherContainer.value == true
-                                    ? AnimatedGradientBorder(
-                                      glowSize: 0,
-                                      gradientColors: [
+                            () => myController.jobPusherContainer.value == true
+                                ? AnimatedGradientBorder(
+                                    glowSize: 0,
+                                    gradientColors: [
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      if (myController
+                                              .initialLabelIndex
+                                              .value ==
+                                          1)
+                                        context.appTheme.primary
+                                      else
                                         Colors.transparent,
-                                        Colors.transparent,
-                                        Colors.transparent,
-                                        if (myController
-                                                .initialLabelIndex
-                                                .value ==
-                                            1)
-                                          context.appTheme.primary
-                                        else
-                                          Colors.transparent,
-                                      ],
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(8),
-                                      ),
-                                      child: HomeScreenAlert(
-                                        isfromUi: true,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                            0.44,
-                                        st: listFromPusher,
-                                      ),
-                                    )
-                                    : SizedBox.shrink(),
+                                    ],
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(8),
+                                    ),
+                                    child: HomeScreenAlert(
+                                      isfromUi: true,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                          0.44,
+                                      st: listFromPusher,
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
                           ),
                         ),
                       ],
@@ -1488,136 +1486,134 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                     children: [
                       myController.visiblecontainer.value == true
                           ? Container(
-                            // height: 580,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SingleChildScrollView(
-                                  child: Container(
-                                    color:
-                                        context.appTheme.primaryBackground,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                  0,
-                                                  0,
-                                                  0,
-                                                  8,
-                                                ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      '£${myController.listFromPusher[0].journeyFare}',
-                                                      textAlign: TextAlign.end,
-                                                      style: context.appTheme.displaySmall.override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            context.appTheme.primaryText,
-                                                        fontSize: 32,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      '(Estimated maximum value)',
-                                                      style: context.appTheme.labelMedium.override(
-                                                        fontFamily:
-                                                            'Montserrat',
-                                                        color:
-                                                            context.appTheme.primaryText,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ].divide(
-                                                    const SizedBox(height: 1),
+                              // height: 580,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SingleChildScrollView(
+                                    child: Container(
+                                      color: context.appTheme.primaryBackground,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional.fromSTEB(
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    8,
                                                   ),
-                                                ),
-                                              ],
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        '£${myController.listFromPusher[0].journeyFare}',
+                                                        textAlign:
+                                                            TextAlign.end,
+                                                        style: context
+                                                            .appTheme
+                                                            .displaySmall
+                                                            .override(
+                                                              fontFamily:
+                                                                  'Outfit',
+                                                              color: context
+                                                                  .appTheme
+                                                                  .primaryText,
+                                                              fontSize: 32,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                      ),
+                                                      Text(
+                                                        '(Estimated maximum value)',
+                                                        style: context
+                                                            .appTheme
+                                                            .labelMedium
+                                                            .override(
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              color: context
+                                                                  .appTheme
+                                                                  .primaryText,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                    ].divide(const SizedBox(height: 1)),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(0),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.car,
-                                                  color: Color(0xFF5B68F5),
-                                                  size: 35,
-                                                ),
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    Opacity(
-                                                      opacity: 0.5,
-                                                      child: SizedBox(
-                                                        height: 30,
-                                                        child: VerticalDivider(
-                                                          thickness: 2,
-                                                          color:
-                                                              context.appTheme.secondaryText,
+                                            Padding(
+                                              padding: const EdgeInsets.all(0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    FontAwesomeIcons.car,
+                                                    color: Color(0xFF5B68F5),
+                                                    size: 35,
+                                                  ),
+                                                  Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Opacity(
+                                                        opacity: 0.5,
+                                                        child: SizedBox(
+                                                          height: 30,
+                                                          child: VerticalDivider(
+                                                            thickness: 2,
+                                                            color: context
+                                                                .appTheme
+                                                                .secondaryText,
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsetsDirectional.fromSTEB(
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                          ),
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          Text(
-                                                            'Time',
-                                                            style: context.appTheme.bodyMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Roboto',
-                                                                  fontSize: 14,
-                                                                ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsetsDirectional.fromSTEB(
-                                                                  0,
-                                                                  5,
-                                                                  0,
-                                                                  0,
-                                                                ),
-                                                            child: Text(
-                                                              'Date',
-                                                              style: context.appTheme.bodyMedium
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsetsDirectional.fromSTEB(
+                                                              0,
+                                                              0,
+                                                              0,
+                                                              0,
+                                                            ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          children: [
+                                                            Text(
+                                                              'Time',
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
                                                                   .override(
                                                                     fontFamily:
                                                                         'Roboto',
@@ -1625,46 +1621,49 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                         14,
                                                                   ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsetsDirectional.fromSTEB(
+                                                                    0,
+                                                                    5,
+                                                                    0,
+                                                                    0,
+                                                                  ),
+                                                              child: Text(
+                                                                'Date',
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Roboto',
+                                                                      fontSize:
+                                                                          14,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsetsDirectional.fromSTEB(
-                                                            80,
-                                                            0,
-                                                            0,
-                                                            0,
-                                                          ),
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          Text(
-                                                            myController
-                                                                .listFromPusher[0]
-                                                                .pickTime,
-                                                            style: context.appTheme.bodyMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Roboto',
-                                                                  fontSize: 15,
-                                                                ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsetsDirectional.fromSTEB(
-                                                                  0,
-                                                                  5,
-                                                                  0,
-                                                                  0,
-                                                                ),
-                                                            child: Text(
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsetsDirectional.fromSTEB(
+                                                              80,
+                                                              0,
+                                                              0,
+                                                              0,
+                                                            ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          children: [
+                                                            Text(
                                                               myController
                                                                   .listFromPusher[0]
-                                                                  .pickDate,
-                                                              style: context.appTheme.bodyMedium
+                                                                  .pickTime,
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
                                                                   .override(
                                                                     fontFamily:
                                                                         'Roboto',
@@ -1672,45 +1671,149 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                         15,
                                                                   ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsetsDirectional.fromSTEB(
+                                                                    0,
+                                                                    5,
+                                                                    0,
+                                                                    0,
+                                                                  ),
+                                                              child: Text(
+                                                                myController
+                                                                    .listFromPusher[0]
+                                                                    .pickDate,
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Roboto',
+                                                                      fontSize:
+                                                                          15,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ].divide(
-                                                const SizedBox(width: 16),
+                                                    ],
+                                                  ),
+                                                ].divide(const SizedBox(width: 16)),
                                               ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Container(
+                                            Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Container(
+                                                          width: 30,
+                                                          height: 30,
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(
+                                                              0xFF5B68F5,
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  50,
+                                                                ),
+                                                            shape: BoxShape
+                                                                .rectangle,
+                                                            border: Border.all(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF5B68F5,
+                                                                  ),
+                                                              width: 2,
+                                                            ),
+                                                          ),
+                                                          child: Center(
+                                                            child: Text(
+                                                              'A',
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Open Sans',
+                                                                    color: context
+                                                                        .appTheme
+                                                                        .secondaryBackground,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.only(
+                                                              left: 25,
+                                                            ),
+                                                        child: Stack(
+                                                          children: [
+                                                            Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: Container(
+                                                                width: 4,
+                                                                height: 40,
+                                                                decoration:
+                                                                    const BoxDecoration(
+                                                                      color: Color(
+                                                                        0xFFE5E7EB,
+                                                                      ),
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets.only(
+                                                                    top: 5,
+                                                                  ),
+                                                              child: Container(
+                                                                width: 30,
+                                                                height: 30,
+                                                                decoration: const BoxDecoration(
+                                                                  color:
+                                                                      Color.fromRGBO(
+                                                                        0,
+                                                                        0,
+                                                                        0,
+                                                                        0.0,
+                                                                      ),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Container(
                                                         width: 30,
                                                         height: 30,
                                                         decoration: BoxDecoration(
                                                           color: const Color(
                                                             0xFF5B68F5,
                                                           ),
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                50,
-                                                              ),
                                                           shape:
-                                                              BoxShape
-                                                                  .rectangle,
+                                                              BoxShape.circle,
                                                           border: Border.all(
                                                             color: const Color(
                                                               0xFF5B68F5,
@@ -1720,429 +1823,376 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                         ),
                                                         child: Center(
                                                           child: Text(
-                                                            'A',
-                                                            style: context.appTheme.bodyMedium.override(
-                                                              fontFamily:
-                                                                  'Open Sans',
-                                                              color:
-                                                                  context.appTheme.secondaryBackground,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w300,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                            left: 25,
-                                                          ),
-                                                      child: Stack(
-                                                        children: [
-                                                          Align(
-                                                            alignment:
-                                                                Alignment
-                                                                    .center,
-                                                            child: Container(
-                                                              width: 4,
-                                                              height: 40,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                    color: Color(
-                                                                      0xFFE5E7EB,
-                                                                    ),
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets.only(
-                                                                  top: 5,
-                                                                ),
-                                                            child: Container(
-                                                              width: 30,
-                                                              height: 30,
-                                                              decoration: const BoxDecoration(
-                                                                color:
-                                                                    Color.fromRGBO(
-                                                                      0,
-                                                                      0,
-                                                                      0,
-                                                                      0.0,
-                                                                    ),
-                                                                shape:
-                                                                    BoxShape
-                                                                        .circle,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      width: 30,
-                                                      height: 30,
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(
-                                                          0xFF5B68F5,
-                                                        ),
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                            0xFF5B68F5,
-                                                          ),
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          'B',
-                                                          style: context.appTheme.bodyMedium.override(
-                                                            fontFamily:
-                                                                'Open Sans',
-                                                            color:
-                                                                context.appTheme.secondaryBackground,
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w300,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  width: 20,
-                                                ), // Added SizedBox for spacing
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Flexible(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets.only(
-                                                                    left: 10,
-                                                                    // top: 10,
-                                                                    bottom: 10,
-                                                                  ),
-                                                              child: Text(
-                                                                myController
-                                                                    .listFromPusher[0]
-                                                                    .pickup,
-                                                                style: context.appTheme.labelMedium.override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  color:
-                                                                      context.appTheme.secondaryText,
-                                                                  fontSize: 15,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                maxLines: 3,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                              bottom: 10,
-                                                            ),
-                                                        child: Row(
-                                                          children: [
-                                                            const FaIcon(
-                                                              FontAwesomeIcons
-                                                                  .bong,
-                                                              color: Color(
-                                                                0xFF5B68F5,
-                                                              ),
-                                                              size: 18,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets.only(
-                                                                    left: 8,
-                                                                  ),
-                                                              child: Text(
-                                                                '${(double.parse(myController.listFromPusher[0].journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${myController.listFromPusher[0].journeyType}',
-                                                                style: context.appTheme.bodyMedium.override(
+                                                            'B',
+                                                            style: context
+                                                                .appTheme
+                                                                .bodyMedium
+                                                                .override(
                                                                   fontFamily:
                                                                       'Open Sans',
-                                                                  color:
-                                                                      context.appTheme.secondaryText,
-                                                                  fontSize: 15,
+                                                                  color: context
+                                                                      .appTheme
+                                                                      .secondaryBackground,
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w300,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 20,
+                                                  ), // Added SizedBox for spacing
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Flexible(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets.only(
+                                                                      left: 10,
+                                                                      // top: 10,
+                                                                      bottom:
+                                                                          10,
+                                                                    ),
+                                                                child: Text(
+                                                                  myController
+                                                                      .listFromPusher[0]
+                                                                      .pickup,
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .labelMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color: context
+                                                                            .appTheme
+                                                                            .secondaryText,
+                                                                        fontSize:
+                                                                            15,
+                                                                      ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  maxLines: 3,
                                                                 ),
                                                               ),
                                                             ),
                                                           ],
                                                         ),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Flexible(
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets.only(
-                                                                    left: 10,
-                                                                    bottom: 5,
-                                                                  ),
-                                                              child: Text(
-                                                                myController
-                                                                    .listFromPusher[0]
-                                                                    .destination,
-                                                                style: context.appTheme.labelMedium.override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  color:
-                                                                      context.appTheme.secondaryText,
-                                                                  fontSize: 15,
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                bottom: 10,
+                                                              ),
+                                                          child: Row(
+                                                            children: [
+                                                              const FaIcon(
+                                                                FontAwesomeIcons
+                                                                    .bong,
+                                                                color: Color(
+                                                                  0xFF5B68F5,
                                                                 ),
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                maxLines: 3,
+                                                                size: 18,
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets.only(
+                                                                      left: 8,
+                                                                    ),
+                                                                child: Text(
+                                                                  '${(double.parse(myController.listFromPusher[0].journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${myController.listFromPusher[0].journeyType}',
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Open Sans',
+                                                                        color: context
+                                                                            .appTheme
+                                                                            .secondaryText,
+                                                                        fontSize:
+                                                                            15,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Flexible(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets.only(
+                                                                      left: 10,
+                                                                      bottom: 5,
+                                                                    ),
+                                                                child: Text(
+                                                                  myController
+                                                                      .listFromPusher[0]
+                                                                      .destination,
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .labelMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color: context
+                                                                            .appTheme
+                                                                            .secondaryText,
+                                                                        fontSize:
+                                                                            15,
+                                                                      ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  maxLines: 3,
+                                                                ),
                                                               ),
                                                             ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                FFButtonWidget(
+                                                  onPressed: () async {
+                                                    print(
+                                                      'the value is ${myController.initialLabelIndex.value}',
+                                                    );
+                                                    SharedPreferences sp =
+                                                        await SharedPreferences.getInstance();
+
+                                                    _getCurrentTime();
+                                                    await sp.setString(
+                                                      'jobStartTime',
+                                                      formattedTime,
+                                                    );
+
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                            'Start navigation',
                                                           ),
-                                                        ],
-                                                      ),
-                                                    ],
+                                                          content: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              ListTile(
+                                                                leading: SizedBox(
+                                                                  width: 25,
+                                                                  height: 25,
+                                                                  child: Image.asset(
+                                                                    'assets/images/google.png',
+                                                                  ), // Replace 'your_image.png' with your image asset path
+                                                                ),
+                                                                title: Text(
+                                                                  'Open Google Maps',
+                                                                ),
+                                                                onTap: () async {
+                                                                  await getLatLngFromAddress(
+                                                                    myController
+                                                                        .listFromPusher[0]
+                                                                        .pickup,
+                                                                  );
+                                                                  // first background
+                                                                  startRideTracking(
+                                                                    latitudeforGooglmap
+                                                                        .toString(),
+                                                                    lngforGooglmap
+                                                                        .toString(),
+                                                                  );
+                                                                  await startTracking(
+                                                                    latitudeforGooglmap,
+                                                                    lngforGooglmap,
+                                                                  );
+                                                                  Navigator.pop(
+                                                                    context,
+                                                                  );
+                                                                  await MapUtils.navigateTo(
+                                                                    latitudeforGooglmap,
+                                                                    lngforGooglmap,
+                                                                  );
+                                                                  // start from here
+                                                                },
+                                                              ),
+                                                              ListTile(
+                                                                leading: SizedBox(
+                                                                  width: 25,
+                                                                  height: 25,
+                                                                  child: Image.asset(
+                                                                    'assets/driver-app-icon.jpg',
+                                                                  ), // Replace 'your_image.png' with your image asset path
+                                                                ),
+                                                                title: Text(
+                                                                  'Use in-app Mapbox route',
+                                                                ),
+                                                                onTap: () async {
+                                                                  Navigator.pop(
+                                                                    context,
+                                                                  );
+                                                                  if (myController
+                                                                          .initialLabelIndex
+                                                                          .value ==
+                                                                      1) {
+                                                                    await sp
+                                                                        .setBool(
+                                                                          'show',
+                                                                          false,
+                                                                        );
+                                                                    await sp.setInt(
+                                                                      'isRideStart',
+                                                                      1,
+                                                                    );
+                                                                    await showModalBottomSheet(
+                                                                      isScrollControlled:
+                                                                          true,
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .transparent,
+                                                                      enableDrag:
+                                                                          false,
+                                                                      context:
+                                                                          context,
+                                                                      builder: (context) {
+                                                                        return Padding(
+                                                                          padding: MediaQuery.viewInsetsOf(
+                                                                            context,
+                                                                          ),
+                                                                          child: NotesWidget(
+                                                                            dId:
+                                                                                myController.listFromPusher[0].dId,
+                                                                            jobId:
+                                                                                myController.listFromPusher[0].jobId,
+                                                                            pickTime:
+                                                                                myController.listFromPusher[0].pickTime,
+                                                                            pickDate:
+                                                                                myController.listFromPusher[0].pickDate,
+                                                                            passenger:
+                                                                                myController.listFromPusher[0].passenger,
+                                                                            pickup:
+                                                                                myController.listFromPusher[0].pickup,
+                                                                            dropoff:
+                                                                                myController.listFromPusher[0].destination,
+                                                                            luggage:
+                                                                                myController.listFromPusher[0].luggage,
+                                                                            cName:
+                                                                                myController.listFromPusher[0].cName,
+                                                                            cnumber:
+                                                                                myController.listFromPusher[0].cPhone,
+                                                                            cemail:
+                                                                                myController.listFromPusher[0].cEmail,
+                                                                            note:
+                                                                                myController.listFromPusher[0].note,
+                                                                            fare:
+                                                                                myController.listFromPusher[0].journeyFare,
+                                                                            distance:
+                                                                                myController.listFromPusher[0].journeyDistance,
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    ).then(
+                                                                      (
+                                                                        value,
+                                                                      ) => safeSetState(
+                                                                        () {},
+                                                                      ),
+                                                                    );
+                                                                  } else {
+                                                                    Fluttertoast.showToast(
+                                                                      msg:
+                                                                          "Please be online before starting the ride.",
+                                                                      textColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      fontSize:
+                                                                          16.0,
+                                                                    );
+                                                                  }
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  text: 'Start Now',
+                                                  icon: const Icon(
+                                                    Icons.east,
+                                                    size: 15,
+                                                  ),
+                                                  options: FFButtonOptions(
+                                                    height: 40,
+                                                    padding:
+                                                        const EdgeInsetsDirectional.fromSTEB(
+                                                          24,
+                                                          0,
+                                                          24,
+                                                          0,
+                                                        ),
+                                                    iconPadding:
+                                                        const EdgeInsetsDirectional.fromSTEB(
+                                                          0,
+                                                          0,
+                                                          0,
+                                                          0,
+                                                        ),
+                                                    color: context
+                                                        .appTheme
+                                                        .primary,
+                                                    textStyle: context
+                                                        .appTheme
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Open Sans',
+                                                          color: Colors.white,
+                                                          fontSize: 10,
+                                                        ),
+                                                    elevation: 3,
+                                                    borderSide:
+                                                        const BorderSide(
+                                                          color: Colors
+                                                              .transparent,
+                                                          width: 1,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              FFButtonWidget(
-                                                onPressed: () async {
-                                                  print(
-                                                    'the value is ${myController.initialLabelIndex.value}',
-                                                  );
-                                                  SharedPreferences sp =
-                                                      await SharedPreferences.getInstance();
-
-                                                  _getCurrentTime();
-                                                  await sp.setString(
-                                                    'jobStartTime',
-                                                    formattedTime,
-                                                  );
-
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (
-                                                      BuildContext context,
-                                                    ) {
-                                                      return AlertDialog(
-                                                        title: Text(
-                                                          'Start navigation',
-                                                        ),
-                                                        content: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            ListTile(
-                                                              leading: SizedBox(
-                                                                width: 25,
-                                                                height: 25,
-                                                                child: Image.asset(
-                                                                  'assets/images/google.png',
-                                                                ), // Replace 'your_image.png' with your image asset path
-                                                              ),
-                                                              title: Text(
-                                                                'Open Google Maps',
-                                                              ),
-                                                              onTap: () async {
-                                                                await getLatLngFromAddress(
-                                                                  myController
-                                                                      .listFromPusher[0]
-                                                                      .pickup,
-                                                                );
-                                                                // first background
-                                                                startRideTracking(
-                                                                  latitudeforGooglmap
-                                                                      .toString(),
-                                                                  lngforGooglmap
-                                                                      .toString(),
-                                                                );
-                                                                await startTracking(
-                                                                  latitudeforGooglmap,
-                                                                  lngforGooglmap,
-                                                                );
-                                                                Navigator.pop(
-                                                                  context,
-                                                                );
-                                                                await MapUtils.navigateTo(
-                                                                  latitudeforGooglmap,
-                                                                  lngforGooglmap,
-                                                                );
-                                                                // start from here
-                                                              },
-                                                            ),
-                                                            ListTile(
-                                                              leading: SizedBox(
-                                                                width: 25,
-                                                                height: 25,
-                                                                child: Image.asset(
-                                                                  'assets/driver-app-icon.jpg',
-                                                                ), // Replace 'your_image.png' with your image asset path
-                                                              ),
-                                                              title: Text(
-                                                                'Use in-app Mapbox route',
-                                                              ),
-                                                              onTap: () async {
-                                                                Navigator.pop(
-                                                                  context,
-                                                                );
-                                                                if (myController
-                                                                        .initialLabelIndex
-                                                                        .value ==
-                                                                    1) {
-                                                                  await sp
-                                                                      .setBool(
-                                                                        'show',
-                                                                        false,
-                                                                      );
-                                                                  await sp.setInt(
-                                                                    'isRideStart',
-                                                                    1,
-                                                                  );
-                                                                  await showModalBottomSheet(
-                                                                    isScrollControlled:
-                                                                        true,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .transparent,
-                                                                    enableDrag:
-                                                                        false,
-                                                                    context:
-                                                                        context,
-                                                                    builder: (
-                                                                      context,
-                                                                    ) {
-                                                                      return Padding(
-                                                                        padding:
-                                                                            MediaQuery.viewInsetsOf(
-                                                                              context,
-                                                                            ),
-                                                                        child: NotesWidget(
-                                                                          dId:
-                                                                              myController.listFromPusher[0].dId,
-                                                                          jobId:
-                                                                              myController.listFromPusher[0].jobId,
-                                                                          pickTime:
-                                                                              myController.listFromPusher[0].pickTime,
-                                                                          pickDate:
-                                                                              myController.listFromPusher[0].pickDate,
-                                                                          passenger:
-                                                                              myController.listFromPusher[0].passenger,
-                                                                          pickup:
-                                                                              myController.listFromPusher[0].pickup,
-                                                                          dropoff:
-                                                                              myController.listFromPusher[0].destination,
-                                                                          luggage:
-                                                                              myController.listFromPusher[0].luggage,
-                                                                          cName:
-                                                                              myController.listFromPusher[0].cName,
-                                                                          cnumber:
-                                                                              myController.listFromPusher[0].cPhone,
-                                                                          cemail:
-                                                                              myController.listFromPusher[0].cEmail,
-                                                                          note:
-                                                                              myController.listFromPusher[0].note,
-                                                                          fare:
-                                                                              myController.listFromPusher[0].journeyFare,
-                                                                          distance:
-                                                                              myController.listFromPusher[0].journeyDistance,
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ).then(
-                                                                    (value) =>
-                                                                        safeSetState(
-                                                                          () {},
-                                                                        ),
-                                                                  );
-                                                                } else {
-                                                                  Fluttertoast.showToast(
-                                                                    msg:
-                                                                        "Please be online before starting the ride.",
-                                                                    textColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    fontSize:
-                                                                        16.0,
-                                                                  );
-                                                                }
-                                                              },
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                text: 'Start Now',
-                                                icon: const Icon(
-                                                  Icons.east,
-                                                  size: 15,
-                                                ),
-                                                options: FFButtonOptions(
-                                                  height: 40,
-                                                  padding:
-                                                      const EdgeInsetsDirectional.fromSTEB(
-                                                        24,
-                                                        0,
-                                                        24,
-                                                        0,
-                                                      ),
-                                                  iconPadding:
-                                                      const EdgeInsetsDirectional.fromSTEB(
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        0,
-                                                      ),
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  textStyle:
-                                                      context.appTheme.titleSmall.override(
-                                                        fontFamily: 'Open Sans',
-                                                        color: Colors.white,
-                                                        fontSize: 10,
-                                                      ),
-                                                  elevation: 3,
-                                                  borderSide: const BorderSide(
-                                                    color: Colors.transparent,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ].divide(const SizedBox(height: 4)),
+                                          ].divide(const SizedBox(height: 4)),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
+                                ],
+                              ),
+                            )
                           : SizedBox.shrink(),
                     ],
                   ),
@@ -2182,14 +2232,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         );
       });
 
-      final centerLat =
-          latitude != 0.0
-              ? latitude
-              : myController.currentLocation?.latitude ?? 51.5074;
-      final centerLng =
-          longitude != 0.0
-              ? longitude
-              : myController.currentLocation?.longitude ?? -0.1278;
+      final centerLat = latitude != 0.0
+          ? latitude
+          : myController.currentLocation?.latitude ?? 51.5074;
+      final centerLng = longitude != 0.0
+          ? longitude
+          : myController.currentLocation?.longitude ?? -0.1278;
 
       return mapbox.MapWidget(
         key: const ValueKey('home-mapbox-map'),
@@ -2220,10 +2268,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   Future<void> _onMapboxMapCreated(mapbox.MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
-    _mapPointManager =
-        await mapboxMap.annotations.createPointAnnotationManager();
-    _mapPolylineManager =
-        await mapboxMap.annotations.createPolylineAnnotationManager();
+    _mapPointManager = await mapboxMap.annotations
+        .createPointAnnotationManager();
+    _mapPolylineManager = await mapboxMap.annotations
+        .createPolylineAnnotationManager();
 
     await mapboxMap.location.updateSettings(
       mapbox.LocationComponentSettings(
@@ -2286,10 +2334,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
     await _mapPolylineManager!.deleteAll();
     if (routeCount > 1) {
-      final coordinates =
-          myController.decodedPoints
-              .map((point) => mapbox.Position(point.longitude, point.latitude))
-              .toList();
+      final coordinates = myController.decodedPoints
+          .map((point) => mapbox.Position(point.longitude, point.latitude))
+          .toList();
       await _mapPolylineManager!.create(
         mapbox.PolylineAnnotationOptions(
           geometry: mapbox.LineString(coordinates: coordinates),
@@ -2339,14 +2386,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   void _animateToCurrentLocation() {
-    final latitude =
-        myController.latitude.value != 0.0
-            ? myController.latitude.value
-            : myController.currentLocation?.latitude;
-    final longitude =
-        myController.longitude.value != 0.0
-            ? myController.longitude.value
-            : myController.currentLocation?.longitude;
+    final latitude = myController.latitude.value != 0.0
+        ? myController.latitude.value
+        : myController.currentLocation?.latitude;
+    final longitude = myController.longitude.value != 0.0
+        ? myController.longitude.value
+        : myController.currentLocation?.longitude;
 
     if (latitude == null || longitude == null) {
       return;
@@ -2847,23 +2892,21 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (longitude != null) {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(ApiService.driverActivityRealLocation),
-      );
-      request.fields.addAll({
-        'd_id': driverId.toString(),
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-      });
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiService.driverActivityRealLocation),
+    );
+    request.fields.addAll({
+      'd_id': driverId.toString(),
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+    });
 
-      request.fields.forEach((key, value) {});
+    request.fields.forEach((key, value) {});
 
-      http.StreamedResponse response = await request.send();
+    http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
-      } else {}
+    if (response.statusCode == 200) {
     } else {}
   }
 
@@ -2990,7 +3033,9 @@ class _DriverHomeHeader extends StatelessWidget {
                         Text(
                           hasRoute ? 'Mapbox route ready' : 'Waiting for jobs',
                           overflow: TextOverflow.ellipsis,
-                          style: context.appTheme.bodySmall.copyWith(color: const Color(0xFF65736C)),
+                          style: context.appTheme.bodySmall.copyWith(
+                            color: const Color(0xFF65736C),
+                          ),
                         ),
                       ],
                     ),
@@ -3006,16 +3051,14 @@ class _DriverHomeHeader extends StatelessWidget {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isOnline
-                                ? const Color(0xFFE7F5EF)
-                                : const Color(0xFFFDECEC),
+                        color: isOnline
+                            ? const Color(0xFFE7F5EF)
+                            : const Color(0xFFFDECEC),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color:
-                              isOnline
-                                  ? const Color(0xFFB7DEC9)
-                                  : const Color(0xFFF2C4C4),
+                          color: isOnline
+                              ? const Color(0xFFB7DEC9)
+                              : const Color(0xFFF2C4C4),
                         ),
                       ),
                       child: Row(
@@ -3024,19 +3067,17 @@ class _DriverHomeHeader extends StatelessWidget {
                           Icon(
                             Icons.power_settings_new_rounded,
                             size: 18,
-                            color:
-                                isOnline
-                                    ? _HomeWidgetState._green
-                                    : const Color(0xFFE65454),
+                            color: isOnline
+                                ? _HomeWidgetState._green
+                                : const Color(0xFFE65454),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             isOnline ? 'Online' : 'Offline',
                             style: context.appTheme.bodySmall.copyWith(
-                              color:
-                                  isOnline
-                                      ? _HomeWidgetState._green
-                                      : const Color(0xFFE65454),
+                              color: isOnline
+                                  ? _HomeWidgetState._green
+                                  : const Color(0xFFE65454),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -3088,8 +3129,9 @@ class _DriverHomeHeader extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               '$routeDistance | $routeDuration',
-                              style: context.appTheme.bodySmall
-                                  .copyWith(color: const Color(0xFF65736C)),
+                              style: context.appTheme.bodySmall.copyWith(
+                                color: const Color(0xFF65736C),
+                              ),
                             ),
                           ],
                         ),

@@ -255,11 +255,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
     }
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap:
-          () =>
-              _model.unfocusNode.canRequestFocus
-                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-                  : FocusScope.of(context).unfocus(),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
@@ -290,10 +288,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
                   width: MediaQuery.sizeOf(context).width,
                   height: MediaQuery.sizeOf(context).height * 1.0,
                   decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).brightness == Brightness.light
-                            ? context.appTheme.primaryBackground
-                            : context.appTheme.primaryBackground,
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? context.appTheme.primaryBackground
+                        : context.appTheme.primaryBackground,
                     boxShadow: [
                       BoxShadow(
                         blurRadius: 4.0,
@@ -331,144 +328,156 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     children: [
                                       FutureBuilder<List<Driver>>(
                                         future: myProfile(),
-                                        builder: (
-                                          BuildContext context,
-                                          AsyncSnapshot<List<Driver>> snapshot,
-                                        ) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                    Colors.blueAccent,
-                                                  ),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return Text(
-                                              'Error: ${snapshot.error}',
-                                            );
-                                          } else {
-                                            final driverData = snapshot.data;
-                                            return Column(
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      EdgeInsetsDirectional.fromSTEB(
-                                                        0.0,
-                                                        15.0,
-                                                        0.0,
-                                                        8.0,
-                                                      ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional.fromSTEB(
-                                                              10.0,
-                                                              0.0,
-                                                              10.0,
-                                                              0.0,
-                                                            ),
-                                                        child: Container(
-                                                          width: 70.0,
-                                                          height: 70.0,
-                                                          clipBehavior:
-                                                              Clip.antiAlias,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                                shape:
-                                                                    BoxShape
+                                        builder:
+                                            (
+                                              BuildContext context,
+                                              AsyncSnapshot<List<Driver>>
+                                              snapshot,
+                                            ) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                        Color
+                                                      >(Colors.blueAccent),
+                                                );
+                                              } else if (snapshot.hasError) {
+                                                return Text(
+                                                  'Error: ${snapshot.error}',
+                                                );
+                                              } else {
+                                                final driverData =
+                                                    snapshot.data;
+                                                return Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional.fromSTEB(
+                                                            0.0,
+                                                            15.0,
+                                                            0.0,
+                                                            8.0,
+                                                          ),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  10.0,
+                                                                  0.0,
+                                                                  10.0,
+                                                                  0.0,
+                                                                ),
+                                                            child: Container(
+                                                              width: 70.0,
+                                                              height: 70.0,
+                                                              clipBehavior: Clip
+                                                                  .antiAlias,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                    shape: BoxShape
                                                                         .circle,
-                                                              ),
-                                                          child: Image.network(
-                                                            'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
-                                                            width: 100.0,
-                                                            height: 100.0,
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder: (
-                                                              context,
-                                                              error,
-                                                              stackTrace,
-                                                            ) {
-                                                              return Image.asset(
-                                                                'assets/images/user.png',
+                                                                  ),
+                                                              child: Image.network(
+                                                                'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
                                                                 width: 100.0,
                                                                 height: 100.0,
-                                                                fit:
-                                                                    BoxFit
-                                                                        .cover,
-                                                              );
-                                                            },
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                errorBuilder:
+                                                                    (
+                                                                      context,
+                                                                      error,
+                                                                      stackTrace,
+                                                                    ) {
+                                                                      return Image.asset(
+                                                                        'assets/images/user.png',
+                                                                        width:
+                                                                            100.0,
+                                                                        height:
+                                                                            100.0,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      );
+                                                                    },
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional.fromSTEB(
-                                                              4.0,
-                                                              0.0,
-                                                              0.0,
-                                                              0.0,
-                                                            ),
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              driverData[0]
-                                                                      .dName ??
-                                                                  "",
-                                                              style: context.appTheme.bodyMedium.override(
-                                                                fontFamily:
-                                                                    'Plus Jakarta Sans',
-                                                                color:
-                                                                    context.appTheme.primary,
-                                                                fontSize: 14.0,
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional.fromSTEB(
-                                                                    0.0,
-                                                                    10.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                  ),
-                                                              child: Text(
-                                                                driverData[0]
-                                                                        .dPhone ??
-                                                                    "",
-                                                                style: context.appTheme.bodySmall.override(
-                                                                  fontFamily:
-                                                                      'Plus Jakarta Sans',
-                                                                  color:
-                                                                      context.appTheme.primary,
-                                                                  fontSize:
-                                                                      12.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  4.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
                                                                 ),
-                                                              ),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  driverData[0]
+                                                                          .dName ??
+                                                                      "",
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Plus Jakarta Sans',
+                                                                        color: context
+                                                                            .appTheme
+                                                                            .primary,
+                                                                        fontSize:
+                                                                            14.0,
+                                                                      ),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      EdgeInsetsDirectional.fromSTEB(
+                                                                        0.0,
+                                                                        10.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                      ),
+                                                                  child: Text(
+                                                                    driverData[0]
+                                                                            .dPhone ??
+                                                                        "",
+                                                                    style: context.appTheme.bodySmall.override(
+                                                                      fontFamily:
+                                                                          'Plus Jakarta Sans',
+                                                                      color: context
+                                                                          .appTheme
+                                                                          .primary,
+                                                                      fontSize:
+                                                                          12.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                        },
+                                                    ),
+                                                  ],
+                                                );
+                                              }
+                                            },
                                       ),
                                     ],
                                   ),
@@ -518,12 +527,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     );
                                   }
                                 },
-                                activeColor:
-                                    context.appTheme.primary,
-                                activeTrackColor:
-                                    context.appTheme.accent1,
-                                inactiveTrackColor:
-                                    context.appTheme.alternate,
+                                activeColor: context.appTheme.primary,
+                                activeTrackColor: context.appTheme.accent1,
+                                inactiveTrackColor: context.appTheme.alternate,
                                 inactiveThumbColor:
                                     context.appTheme.secondaryText,
                               ),
@@ -568,8 +574,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: FaIcon(
                                         FontAwesomeIcons.poundSign,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -583,13 +588,13 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Earning  £${dueBalance ?? '00.00'}',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
@@ -639,8 +644,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: FaIcon(
                                         FontAwesomeIcons.home,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -654,20 +658,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Home',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -714,8 +717,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: FaIcon(
                                         FontAwesomeIcons.capsules,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -729,20 +731,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Bid',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -789,8 +790,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.checklist_sharp,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -804,20 +804,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Job History',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -864,8 +863,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.directions_car,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -879,20 +877,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'UpComming Jobs',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -940,8 +937,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.edit_document,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -955,20 +951,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Edit Documents',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1015,8 +1010,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.share_arrival_time,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -1030,20 +1024,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Time Slots',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1171,8 +1164,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.account_circle_outlined,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -1186,20 +1178,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'My Account',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1246,8 +1237,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.payments,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -1261,20 +1251,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Account Statement',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1321,8 +1310,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.feedback_outlined,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -1336,20 +1324,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Reviews',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1391,8 +1378,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.chat_outlined,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20,
                                       ),
                                     ),
@@ -1406,20 +1392,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Massages',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24,
                                     ),
                                   ],
@@ -1468,8 +1453,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.call_outlined,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20,
                                       ),
                                     ),
@@ -1483,20 +1467,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Support',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24,
                                     ),
                                   ],
@@ -1549,8 +1532,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                       ),
                                       child: Icon(
                                         Icons.login_rounded,
-                                        color:
-                                            context.appTheme.primary,
+                                        color: context.appTheme.primary,
                                         size: 20.0,
                                       ),
                                     ),
@@ -1564,20 +1546,19 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                         ),
                                         child: Text(
                                           'Log out',
-                                          style: context.appTheme.bodyMedium.override(
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            color:
-                                                context.appTheme.primary,
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: context.appTheme.bodyMedium
+                                              .override(
+                                                fontFamily: 'Plus Jakarta Sans',
+                                                color: context.appTheme.primary,
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.chevron_right_outlined,
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       size: 24.0,
                                     ),
                                   ],
@@ -1619,12 +1600,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
                             10.0,
                           ),
                           child: FlutterFlowIconButton(
-                            borderColor:
-                                context.appTheme.secondaryBackground,
+                            borderColor: context.appTheme.secondaryBackground,
                             borderWidth: 1.0,
                             buttonSize: 40.0,
-                            fillColor:
-                                context.appTheme.secondaryBackground,
+                            fillColor: context.appTheme.secondaryBackground,
                             icon: Icon(
                               Icons.menu,
                               color: context.appTheme.primaryText,
@@ -1785,14 +1764,16 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     child: Text(
                                       'Home',
                                       textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall.override(
-                                        fontFamily: 'Outfit',
-                                        color:
-                                            context.appTheme.info,
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            0.05,
-                                      ),
+                                      style: context.appTheme.displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            color: context.appTheme.info,
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.05,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -1823,15 +1804,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap:
-                                      () =>
-                                          _model.unfocusNode.canRequestFocus
-                                              ? FocusScope.of(
-                                                context,
-                                              ).requestFocus(_model.unfocusNode)
-                                              : FocusScope.of(
-                                                context,
-                                              ).unfocus(),
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                      ? FocusScope.of(
+                                          context,
+                                        ).requestFocus(_model.unfocusNode)
+                                      : FocusScope.of(context).unfocus(),
                                   child: Padding(
                                     padding: MediaQuery.viewInsetsOf(context),
                                     child: UpcommingjobWidget(dId: ''),
@@ -1862,8 +1840,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                 children: [
                                   Icon(
                                     Icons.directions_car_outlined,
-                                    color:
-                                        context.appTheme.primaryText,
+                                    color: context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
@@ -1877,14 +1854,16 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     child: Text(
                                       'Upcoming Jobs',
                                       textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall.override(
-                                        fontFamily: 'Outfit',
-                                        color:
-                                            context.appTheme.primaryText,
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            0.05,
-                                      ),
+                                      style: context.appTheme.displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            color: context.appTheme.primaryText,
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.05,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -1915,15 +1894,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap:
-                                      () =>
-                                          _model.unfocusNode.canRequestFocus
-                                              ? FocusScope.of(
-                                                context,
-                                              ).requestFocus(_model.unfocusNode)
-                                              : FocusScope.of(
-                                                context,
-                                              ).unfocus(),
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                      ? FocusScope.of(
+                                          context,
+                                        ).requestFocus(_model.unfocusNode)
+                                      : FocusScope.of(context).unfocus(),
                                   child: Padding(
                                     padding: MediaQuery.viewInsetsOf(context),
                                     child: JobHistorySheet(
@@ -1956,8 +1932,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                 children: [
                                   Icon(
                                     Icons.checklist_rtl,
-                                    color:
-                                        context.appTheme.primaryText,
+                                    color: context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
@@ -1971,12 +1946,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     child: Text(
                                       'Job History',
                                       textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall.override(
-                                        fontFamily: 'Outfit',
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            0.05,
-                                      ),
+                                      style: context.appTheme.displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.05,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -2009,15 +1987,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap:
-                                      () =>
-                                          _model.unfocusNode.canRequestFocus
-                                              ? FocusScope.of(
-                                                context,
-                                              ).requestFocus(_model.unfocusNode)
-                                              : FocusScope.of(
-                                                context,
-                                              ).unfocus(),
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                      ? FocusScope.of(
+                                          context,
+                                        ).requestFocus(_model.unfocusNode)
+                                      : FocusScope.of(context).unfocus(),
                                   child: Padding(
                                     padding: MediaQuery.viewInsetsOf(context),
                                     child: BidsBottomSheet(),
@@ -2048,8 +2023,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                 children: [
                                   FaIcon(
                                     FontAwesomeIcons.clipboardList,
-                                    color:
-                                        context.appTheme.primaryText,
+                                    color: context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
@@ -2063,12 +2037,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     child: Text(
                                       'Bids ',
                                       textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall.override(
-                                        fontFamily: 'Outfit',
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            0.05,
-                                      ),
+                                      style: context.appTheme.displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.05,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -2101,15 +2078,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap:
-                                      () =>
-                                          _model.unfocusNode.canRequestFocus
-                                              ? FocusScope.of(
-                                                context,
-                                              ).requestFocus(_model.unfocusNode)
-                                              : FocusScope.of(
-                                                context,
-                                              ).unfocus(),
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                      ? FocusScope.of(
+                                          context,
+                                        ).requestFocus(_model.unfocusNode)
+                                      : FocusScope.of(context).unfocus(),
                                   child: Padding(
                                     padding: MediaQuery.viewInsetsOf(context),
                                     child: ZoneBottomsheet(),
@@ -2140,8 +2114,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                 children: [
                                   Icon(
                                     Icons.location_on,
-                                    color:
-                                        context.appTheme.primaryText,
+                                    color: context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
@@ -2155,12 +2128,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     child: Text(
                                       'Zones',
                                       textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall.override(
-                                        fontFamily: 'Outfit',
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            0.05,
-                                      ),
+                                      style: context.appTheme.displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.05,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -2193,15 +2169,12 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                   //   Navigator.pop(context);
                                   //   debugPrint('downSwipped');
                                   // },
-                                  onTap:
-                                      () =>
-                                          _model.unfocusNode.canRequestFocus
-                                              ? FocusScope.of(
-                                                context,
-                                              ).requestFocus(_model.unfocusNode)
-                                              : FocusScope.of(
-                                                context,
-                                              ).unfocus(),
+                                  onTap: () =>
+                                      _model.unfocusNode.canRequestFocus
+                                      ? FocusScope.of(
+                                          context,
+                                        ).requestFocus(_model.unfocusNode)
+                                      : FocusScope.of(context).unfocus(),
                                   child: Padding(
                                     padding: MediaQuery.viewInsetsOf(context),
                                     child: AccountsBottomsheet(),
@@ -2237,8 +2210,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                 children: [
                                   Icon(
                                     Icons.payments,
-                                    color:
-                                        context.appTheme.primaryText,
+                                    color: context.appTheme.primaryText,
                                     size:
                                         MediaQuery.of(context).size.width * 0.1,
                                   ),
@@ -2252,12 +2224,15 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     child: Text(
                                       'Payment',
                                       textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall.override(
-                                        fontFamily: 'Outfit',
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            0.05,
-                                      ),
+                                      style: context.appTheme.displaySmall
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.05,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -2382,8 +2357,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
 
-      List<Driver> profileData =
-          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      List<Driver> profileData = data
+          .map((item) => Driver.fromJson(item))
+          .cast<Driver>()
+          .toList();
       return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
@@ -2402,10 +2379,9 @@ class _DashboardWidgetState extends State<DashboardWidget>
       );
       request.fields.addAll({
         'd_id': dId.toString(),
-        'status':
-            switchValue1 == false
-                ? 'Offline'
-                : 'Online', // Adjusted status based on the switch value
+        'status': switchValue1 == false
+            ? 'Offline'
+            : 'Online', // Adjusted status based on the switch value
       });
       print(request.fields);
 
@@ -2424,30 +2400,26 @@ class _DashboardWidgetState extends State<DashboardWidget>
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (longitude != null) {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(ApiService.driverRealLocation),
-      );
-      request.fields.addAll({
-        'd_id': driverId.toString(),
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-      });
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiService.driverRealLocation),
+    );
+    request.fields.addAll({
+      'd_id': driverId.toString(),
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+    });
 
-      request.fields.forEach((key, value) {
-        print('$key: $value');
-      });
+    request.fields.forEach((key, value) {
+      print('$key: $value');
+    });
 
-      http.StreamedResponse response = await request.send();
+    http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-      }
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
     } else {
-      print("Some fields are empty or invalid.");
+      print(response.reasonPhrase);
     }
   }
 
@@ -2533,8 +2505,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''];
 
-      List<Driver> profileData =
-          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      List<Driver> profileData = data
+          .map((item) => Driver.fromJson(item))
+          .cast<Driver>()
+          .toList();
       return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');

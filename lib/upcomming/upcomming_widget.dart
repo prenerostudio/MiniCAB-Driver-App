@@ -170,11 +170,9 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     }
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap:
-          () =>
-              _model.unfocusNode.canRequestFocus
-                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-                  : FocusScope.of(context).unfocus(),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
@@ -240,24 +238,23 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
                     decoration: BoxDecoration(
                       color: context.appTheme.secondaryBackground,
                     ),
-                    child:
-                        isLoading
-                            ? Center(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  context.appTheme.primary,
-                                ),
-                              ),
-                            )
-                            : currentLocation != null
-                            ? buildMap()
-                            : Center(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  context.appTheme.primary,
-                                ),
+                    child: isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                context.appTheme.primary,
                               ),
                             ),
+                          )
+                        : currentLocation != null
+                        ? buildMap()
+                        : Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                context.appTheme.primary,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -466,12 +463,10 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
 
     await _getCurrentLocation();
 
-    if (currentLongitude != null) {
-      _kGoogle = CameraPosition(
-        target: LatLng(currentLatitude, currentLongitude),
-        zoom: 14,
-      );
-    }
+    _kGoogle = CameraPosition(
+      target: LatLng(currentLatitude, currentLongitude),
+      zoom: 14,
+    );
 
     await getLocationFromAddress();
 

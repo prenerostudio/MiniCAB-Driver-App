@@ -253,13 +253,9 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
         builder: (context, scrollController) {
           DateTime? lastBackPressed;
           return GestureDetector(
-            onTap:
-                () =>
-                    _model.unfocusNode.canRequestFocus
-                        ? FocusScope.of(
-                          context,
-                        ).requestFocus(_model.unfocusNode)
-                        : FocusScope.of(context).unfocus(),
+            onTap: () => _model.unfocusNode.canRequestFocus
+                ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                : FocusScope.of(context).unfocus(),
             child: WillPopScope(
               onWillPop: () async {
                 if (lastBackPressed == null ||
@@ -297,8 +293,8 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                         decoration: BoxDecoration(
                           color:
                               Theme.of(context).brightness == Brightness.light
-                                  ? context.appTheme.primaryBackground
-                                  : context.appTheme.primaryBackground,
+                              ? context.appTheme.primaryBackground
+                              : context.appTheme.primaryBackground,
                           boxShadow: [
                             BoxShadow(
                               blurRadius: 4.0,
@@ -339,151 +335,154 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           children: [
                                             FutureBuilder<List<Driver>>(
                                               future: myProfile(),
-                                              builder: (
-                                                BuildContext context,
-                                                AsyncSnapshot<List<Driver>>
-                                                snapshot,
-                                              ) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return CircularProgressIndicator(
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                          Color
-                                                        >(Colors.blueAccent),
-                                                  );
-                                                } else if (snapshot.hasError) {
-                                                  return Text(
-                                                    'Error: ${snapshot.error}',
-                                                  );
-                                                } else {
-                                                  final driverData =
-                                                      snapshot.data;
-                                                  return Column(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional.fromSTEB(
-                                                              0.0,
-                                                              15.0,
-                                                              0.0,
-                                                              8.0,
+                                              builder:
+                                                  (
+                                                    BuildContext context,
+                                                    AsyncSnapshot<List<Driver>>
+                                                    snapshot,
+                                                  ) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return CircularProgressIndicator(
+                                                        valueColor:
+                                                            AlwaysStoppedAnimation<
+                                                              Color
+                                                            >(
+                                                              Colors.blueAccent,
                                                             ),
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional.fromSTEB(
-                                                                    10.0,
-                                                                    0.0,
-                                                                    10.0,
-                                                                    0.0,
-                                                                  ),
-                                                              child: Container(
-                                                                width: 70.0,
-                                                                height: 70.0,
-                                                                clipBehavior:
-                                                                    Clip.antiAlias,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                      shape:
-                                                                          BoxShape
-                                                                              .circle,
-                                                                    ),
-                                                                child: Image.network(
-                                                                  'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
-                                                                  width: 100.0,
-                                                                  height: 100.0,
-                                                                  fit:
-                                                                      BoxFit
-                                                                          .cover,
-                                                                  errorBuilder: (
-                                                                    context,
-                                                                    error,
-                                                                    stackTrace,
-                                                                  ) {
-                                                                    return Image.asset(
-                                                                      'assets/images/user.png',
+                                                      );
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return Text(
+                                                        'Error: ${snapshot.error}',
+                                                      );
+                                                    } else {
+                                                      final driverData =
+                                                          snapshot.data;
+                                                      return Column(
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional.fromSTEB(
+                                                                  0.0,
+                                                                  15.0,
+                                                                  0.0,
+                                                                  8.0,
+                                                                ),
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              children: [
+                                                                Padding(
+                                                                  padding:
+                                                                      EdgeInsetsDirectional.fromSTEB(
+                                                                        10.0,
+                                                                        0.0,
+                                                                        10.0,
+                                                                        0.0,
+                                                                      ),
+                                                                  child: Container(
+                                                                    width: 70.0,
+                                                                    height:
+                                                                        70.0,
+                                                                    clipBehavior:
+                                                                        Clip.antiAlias,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                          shape:
+                                                                              BoxShape.circle,
+                                                                        ),
+                                                                    child: Image.network(
+                                                                      'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
                                                                       width:
                                                                           100.0,
                                                                       height:
                                                                           100.0,
-                                                                      fit:
-                                                                          BoxFit
-                                                                              .cover,
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional.fromSTEB(
-                                                                    4.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                  ),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    driverData[0]
-                                                                            .dName ??
-                                                                        "",
-                                                                    style: context.appTheme.bodyMedium.override(
-                                                                      fontFamily:
-                                                                          'Plus Jakarta Sans',
-                                                                      color:
-                                                                          context.appTheme.primary,
-                                                                      fontSize:
-                                                                          14.0,
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      errorBuilder:
+                                                                          (
+                                                                            context,
+                                                                            error,
+                                                                            stackTrace,
+                                                                          ) {
+                                                                            return Image.asset(
+                                                                              'assets/images/user.png',
+                                                                              width: 100.0,
+                                                                              height: 100.0,
+                                                                              fit: BoxFit.cover,
+                                                                            );
+                                                                          },
                                                                     ),
                                                                   ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        EdgeInsetsDirectional.fromSTEB(
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      EdgeInsetsDirectional.fromSTEB(
+                                                                        4.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                      ),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .max,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        driverData[0].dName ??
+                                                                            "",
+                                                                        style: context.appTheme.bodyMedium.override(
+                                                                          fontFamily:
+                                                                              'Plus Jakarta Sans',
+                                                                          color: context
+                                                                              .appTheme
+                                                                              .primary,
+                                                                          fontSize:
+                                                                              14.0,
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
                                                                           0.0,
                                                                           10.0,
                                                                           0.0,
                                                                           0.0,
                                                                         ),
-                                                                    child: Text(
-                                                                      driverData[0]
-                                                                              .dPhone ??
-                                                                          "",
-                                                                      style: context.appTheme.bodySmall.override(
-                                                                        fontFamily:
-                                                                            'Plus Jakarta Sans',
-                                                                        color:
-                                                                            context.appTheme.primary,
-                                                                        fontSize:
-                                                                            12.0,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
+                                                                        child: Text(
+                                                                          driverData[0].dPhone ??
+                                                                              "",
+                                                                          style: context.appTheme.bodySmall.override(
+                                                                            fontFamily:
+                                                                                'Plus Jakarta Sans',
+                                                                            color:
+                                                                                context.appTheme.primary,
+                                                                            fontSize:
+                                                                                12.0,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                        ),
                                                                       ),
-                                                                    ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                }
-                                              },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }
+                                                  },
                                             ),
                                           ],
                                         ),
@@ -513,11 +512,11 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       ),
                                       child: Text(
                                         'Light & Dark Mode',
-                                        style: context.appTheme.bodyMedium.override(
-                                          fontFamily: 'Readex Pro',
-                                          color:
-                                              context.appTheme.primary,
-                                        ),
+                                        style: context.appTheme.bodyMedium
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: context.appTheme.primary,
+                                            ),
                                       ),
                                     ),
                                     Switch.adaptive(
@@ -538,8 +537,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           );
                                         }
                                       },
-                                      activeColor:
-                                          context.appTheme.primary,
+                                      activeColor: context.appTheme.primary,
                                       activeTrackColor:
                                           context.appTheme.accent1,
                                       inactiveTrackColor:
@@ -589,8 +587,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: FaIcon(
                                               FontAwesomeIcons.poundSign,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -605,14 +602,19 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Earning  £${dueBalance ?? '00.00'}',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -663,8 +665,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: FaIcon(
                                               FontAwesomeIcons.home,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -679,21 +680,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Home',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -741,8 +746,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: FaIcon(
                                               FontAwesomeIcons.capsules,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -757,21 +761,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Bid',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -819,8 +827,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.checklist_sharp,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -835,21 +842,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Job History',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -897,8 +908,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.directions_car,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -913,21 +923,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'UpComming Jobs',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -976,8 +990,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.edit_document,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -992,21 +1005,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Edit Documents',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -1054,8 +1071,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.share_arrival_time,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -1070,21 +1086,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Time Slots',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -1213,8 +1233,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.account_circle_outlined,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -1229,21 +1248,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'My Account',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -1291,8 +1314,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.payments,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -1307,21 +1329,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Account Statement',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -1369,8 +1395,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.feedback_outlined,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -1385,21 +1410,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Reviews',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -1442,8 +1471,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.chat_outlined,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20,
                                             ),
                                           ),
@@ -1458,21 +1486,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Massages',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24,
                                           ),
                                         ],
@@ -1522,8 +1554,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.call_outlined,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20,
                                             ),
                                           ),
@@ -1538,21 +1569,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Support',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24,
                                           ),
                                         ],
@@ -1606,8 +1641,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                 ),
                                             child: Icon(
                                               Icons.login_rounded,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 20.0,
                                             ),
                                           ),
@@ -1622,21 +1656,25 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                                   ),
                                               child: Text(
                                                 'Log out',
-                                                style: context.appTheme.bodyMedium.override(
-                                                  fontFamily:
-                                                      'Plus Jakarta Sans',
-                                                  color:
-                                                      context.appTheme.primary,
-                                                  fontSize: 14.0,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                                style: context
+                                                    .appTheme
+                                                    .bodyMedium
+                                                    .override(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: context
+                                                          .appTheme
+                                                          .primary,
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_outlined,
-                                            color:
-                                                context.appTheme.primary,
+                                            color: context.appTheme.primary,
                                             size: 24.0,
                                           ),
                                         ],
@@ -1701,8 +1739,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       context.appTheme.secondaryBackground,
                                   icon: Icon(
                                     Icons.menu,
-                                    color:
-                                        context.appTheme.primaryText,
+                                    color: context.appTheme.primaryText,
                                     size: 30,
                                   ),
                                   onPressed: () async {
@@ -1765,8 +1802,8 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder:
-                                              (context) => BreakTimeWidget(),
+                                          builder: (context) =>
+                                              BreakTimeWidget(),
                                         ),
                                       );
                                       // context.pushNamed('BreakTime');
@@ -1856,8 +1893,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       children: [
                                         Icon(
                                           Icons.home,
-                                          color:
-                                              context.appTheme.info,
+                                          color: context.appTheme.info,
                                           size:
                                               MediaQuery.of(
                                                 context,
@@ -1875,16 +1911,16 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           child: Text(
                                             'Home',
                                             textAlign: TextAlign.center,
-                                            style: context.appTheme.displaySmall.override(
-                                              fontFamily: 'Outfit',
-                                              color:
-                                                  context.appTheme.info,
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  0.05,
-                                            ),
+                                            style: context.appTheme.displaySmall
+                                                .override(
+                                                  fontFamily: 'Outfit',
+                                                  color: context.appTheme.info,
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      0.05,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -1915,19 +1951,12 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                         //   Navigator.pop(context);
                                         //   debugPrint('downSwipped');
                                         // },
-                                        onTap:
-                                            () =>
-                                                _model
-                                                        .unfocusNode
-                                                        .canRequestFocus
-                                                    ? FocusScope.of(
-                                                      context,
-                                                    ).requestFocus(
-                                                      _model.unfocusNode,
-                                                    )
-                                                    : FocusScope.of(
-                                                      context,
-                                                    ).unfocus(),
+                                        onTap: () =>
+                                            _model.unfocusNode.canRequestFocus
+                                            ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                            : FocusScope.of(context).unfocus(),
                                         child: Padding(
                                           padding: MediaQuery.viewInsetsOf(
                                             context,
@@ -1945,8 +1974,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                   height:
                                       MediaQuery.of(context).size.height * 0.4,
                                   decoration: BoxDecoration(
-                                    color:
-                                        context.appTheme.alternate,
+                                    color: context.appTheme.alternate,
                                     borderRadius: BorderRadius.circular(24.0),
                                   ),
                                   child: Padding(
@@ -1963,8 +1991,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       children: [
                                         Icon(
                                           Icons.directions_car_outlined,
-                                          color:
-                                              context.appTheme.primaryText,
+                                          color: context.appTheme.primaryText,
                                           size:
                                               MediaQuery.of(
                                                 context,
@@ -1982,16 +2009,18 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           child: Text(
                                             'Upcoming Jobs',
                                             textAlign: TextAlign.center,
-                                            style: context.appTheme.displaySmall.override(
-                                              fontFamily: 'Outfit',
-                                              color:
-                                                  context.appTheme.primaryText,
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  0.05,
-                                            ),
+                                            style: context.appTheme.displaySmall
+                                                .override(
+                                                  fontFamily: 'Outfit',
+                                                  color: context
+                                                      .appTheme
+                                                      .primaryText,
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      0.05,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -2022,19 +2051,12 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                         //   Navigator.pop(context);
                                         //   debugPrint('downSwipped');
                                         // },
-                                        onTap:
-                                            () =>
-                                                _model
-                                                        .unfocusNode
-                                                        .canRequestFocus
-                                                    ? FocusScope.of(
-                                                      context,
-                                                    ).requestFocus(
-                                                      _model.unfocusNode,
-                                                    )
-                                                    : FocusScope.of(
-                                                      context,
-                                                    ).unfocus(),
+                                        onTap: () =>
+                                            _model.unfocusNode.canRequestFocus
+                                            ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                            : FocusScope.of(context).unfocus(),
                                         child: Padding(
                                           padding: MediaQuery.viewInsetsOf(
                                             context,
@@ -2054,8 +2076,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                   height:
                                       MediaQuery.of(context).size.height * 0.4,
                                   decoration: BoxDecoration(
-                                    color:
-                                        context.appTheme.alternate,
+                                    color: context.appTheme.alternate,
                                     borderRadius: BorderRadius.circular(24.0),
                                   ),
                                   child: Padding(
@@ -2072,8 +2093,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       children: [
                                         Icon(
                                           Icons.checklist_rtl,
-                                          color:
-                                              context.appTheme.primaryText,
+                                          color: context.appTheme.primaryText,
                                           size:
                                               MediaQuery.of(
                                                 context,
@@ -2091,14 +2111,15 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           child: Text(
                                             'Job History',
                                             textAlign: TextAlign.center,
-                                            style: context.appTheme.displaySmall.override(
-                                              fontFamily: 'Outfit',
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  0.05,
-                                            ),
+                                            style: context.appTheme.displaySmall
+                                                .override(
+                                                  fontFamily: 'Outfit',
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      0.05,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -2131,19 +2152,12 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                         //   Navigator.pop(context);
                                         //   debugPrint('downSwipped');
                                         // },
-                                        onTap:
-                                            () =>
-                                                _model
-                                                        .unfocusNode
-                                                        .canRequestFocus
-                                                    ? FocusScope.of(
-                                                      context,
-                                                    ).requestFocus(
-                                                      _model.unfocusNode,
-                                                    )
-                                                    : FocusScope.of(
-                                                      context,
-                                                    ).unfocus(),
+                                        onTap: () =>
+                                            _model.unfocusNode.canRequestFocus
+                                            ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                            : FocusScope.of(context).unfocus(),
                                         child: Padding(
                                           padding: MediaQuery.viewInsetsOf(
                                             context,
@@ -2161,8 +2175,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                   height:
                                       MediaQuery.of(context).size.height * 0.4,
                                   decoration: BoxDecoration(
-                                    color:
-                                        context.appTheme.alternate,
+                                    color: context.appTheme.alternate,
                                     borderRadius: BorderRadius.circular(24.0),
                                   ),
                                   child: Padding(
@@ -2179,8 +2192,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       children: [
                                         FaIcon(
                                           FontAwesomeIcons.clipboardList,
-                                          color:
-                                              context.appTheme.primaryText,
+                                          color: context.appTheme.primaryText,
                                           size:
                                               MediaQuery.of(
                                                 context,
@@ -2198,14 +2210,15 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           child: Text(
                                             'Bids ',
                                             textAlign: TextAlign.center,
-                                            style: context.appTheme.displaySmall.override(
-                                              fontFamily: 'Outfit',
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  0.05,
-                                            ),
+                                            style: context.appTheme.displaySmall
+                                                .override(
+                                                  fontFamily: 'Outfit',
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      0.05,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -2238,19 +2251,12 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                         //   Navigator.pop(context);
                                         //   debugPrint('downSwipped');
                                         // },
-                                        onTap:
-                                            () =>
-                                                _model
-                                                        .unfocusNode
-                                                        .canRequestFocus
-                                                    ? FocusScope.of(
-                                                      context,
-                                                    ).requestFocus(
-                                                      _model.unfocusNode,
-                                                    )
-                                                    : FocusScope.of(
-                                                      context,
-                                                    ).unfocus(),
+                                        onTap: () =>
+                                            _model.unfocusNode.canRequestFocus
+                                            ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                            : FocusScope.of(context).unfocus(),
                                         child: Padding(
                                           padding: MediaQuery.viewInsetsOf(
                                             context,
@@ -2268,8 +2274,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                   height:
                                       MediaQuery.of(context).size.height * 0.4,
                                   decoration: BoxDecoration(
-                                    color:
-                                        context.appTheme.alternate,
+                                    color: context.appTheme.alternate,
                                     borderRadius: BorderRadius.circular(24.0),
                                   ),
                                   child: Padding(
@@ -2286,8 +2291,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       children: [
                                         Icon(
                                           Icons.location_on,
-                                          color:
-                                              context.appTheme.primaryText,
+                                          color: context.appTheme.primaryText,
                                           size:
                                               MediaQuery.of(
                                                 context,
@@ -2305,14 +2309,15 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           child: Text(
                                             'Zones',
                                             textAlign: TextAlign.center,
-                                            style: context.appTheme.displaySmall.override(
-                                              fontFamily: 'Outfit',
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  0.05,
-                                            ),
+                                            style: context.appTheme.displaySmall
+                                                .override(
+                                                  fontFamily: 'Outfit',
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      0.05,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -2345,19 +2350,12 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                         //   Navigator.pop(context);
                                         //   debugPrint('downSwipped');
                                         // },
-                                        onTap:
-                                            () =>
-                                                _model
-                                                        .unfocusNode
-                                                        .canRequestFocus
-                                                    ? FocusScope.of(
-                                                      context,
-                                                    ).requestFocus(
-                                                      _model.unfocusNode,
-                                                    )
-                                                    : FocusScope.of(
-                                                      context,
-                                                    ).unfocus(),
+                                        onTap: () =>
+                                            _model.unfocusNode.canRequestFocus
+                                            ? FocusScope.of(
+                                                context,
+                                              ).requestFocus(_model.unfocusNode)
+                                            : FocusScope.of(context).unfocus(),
                                         child: Padding(
                                           padding: MediaQuery.viewInsetsOf(
                                             context,
@@ -2380,8 +2378,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                   height:
                                       MediaQuery.of(context).size.height * 0.4,
                                   decoration: BoxDecoration(
-                                    color:
-                                        context.appTheme.alternate,
+                                    color: context.appTheme.alternate,
                                     borderRadius: BorderRadius.circular(24.0),
                                   ),
                                   child: Padding(
@@ -2398,8 +2395,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                       children: [
                                         Icon(
                                           Icons.payments,
-                                          color:
-                                              context.appTheme.primaryText,
+                                          color: context.appTheme.primaryText,
                                           size:
                                               MediaQuery.of(
                                                 context,
@@ -2417,14 +2413,15 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
                                           child: Text(
                                             'Payment',
                                             textAlign: TextAlign.center,
-                                            style: context.appTheme.displaySmall.override(
-                                              fontFamily: 'Outfit',
-                                              fontSize:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  0.05,
-                                            ),
+                                            style: context.appTheme.displaySmall
+                                                .override(
+                                                  fontFamily: 'Outfit',
+                                                  fontSize:
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      0.05,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -2552,8 +2549,10 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
 
-      List<Driver> profileData =
-          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      List<Driver> profileData = data
+          .map((item) => Driver.fromJson(item))
+          .cast<Driver>()
+          .toList();
       return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
@@ -2572,10 +2571,9 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
       );
       request.fields.addAll({
         'd_id': dId.toString(),
-        'status':
-            switchValue1 == false
-                ? 'Offline'
-                : 'Online', // Adjusted status based on the switch value
+        'status': switchValue1 == false
+            ? 'Offline'
+            : 'Online', // Adjusted status based on the switch value
       });
       print(request.fields);
 
@@ -2594,30 +2592,26 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
   Future<void> sendLocationData(double latitude, double longitude) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String driverId = prefs.getString('d_id') ?? '';
-    if (longitude != null) {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(ApiService.driverRealLocation),
-      );
-      request.fields.addAll({
-        'd_id': driverId.toString(),
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-      });
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiService.driverRealLocation),
+    );
+    request.fields.addAll({
+      'd_id': driverId.toString(),
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+    });
 
-      request.fields.forEach((key, value) {
-        print('$key: $value');
-      });
+    request.fields.forEach((key, value) {
+      print('$key: $value');
+    });
 
-      http.StreamedResponse response = await request.send();
+    http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-      } else {
-        print(response.reasonPhrase);
-      }
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
     } else {
-      print("Some fields are empty or invalid.");
+      print(response.reasonPhrase);
     }
   }
 
@@ -2703,8 +2697,10 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''];
 
-      List<Driver> profileData =
-          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
+      List<Driver> profileData = data
+          .map((item) => Driver.fromJson(item))
+          .cast<Driver>()
+          .toList();
       return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
