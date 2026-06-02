@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:glowy_borders/glowy_borders.dart';
@@ -13,8 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:vibration/vibration.dart';
 import '../Model/jobDetails.dart';
-import '../components/upcommingjob_Accepted_widget.dart';
-import '../components/upcommingjob_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

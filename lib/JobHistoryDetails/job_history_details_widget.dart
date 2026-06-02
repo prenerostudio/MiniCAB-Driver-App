@@ -2,14 +2,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:new_minicab_driver/JobHistoryDetails/contact_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/components/customer_details_widget.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'job_history_details_model.dart';
 export 'job_history_details_model.dart';

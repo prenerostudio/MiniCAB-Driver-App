@@ -15,8 +15,6 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class CompleteWidget extends StatefulWidget {
@@ -58,7 +56,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   String pickUplocation = '--';
   String dropOflocation = '--';
 
-  getCompleteViewData() async {
+  Future<void> getCompleteViewData() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     await sp.setInt('isRideStart', 3);
     time = sp.getString('timerValue') ?? '';
@@ -168,7 +166,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
   }
 
   final JobController myController = Get.put(JobController());
-  completeJob() async {
+  Future<void> completeJob() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {});
     _getCurrentTime();

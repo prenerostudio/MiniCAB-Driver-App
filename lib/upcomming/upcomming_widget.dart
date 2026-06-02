@@ -1,30 +1,18 @@
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
-
 import '../Model/jobDetails.dart';
-import '../home/home_widget.dart';
-import '/components/upcommingjob_widget.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'upcomming_model.dart';
 export 'upcomming_model.dart';
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:latlong2/latlong.dart' as latlong;
-import '../Model/myProfile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:new_minicab_driver/Data/api_service.dart';
+import 'dart:ui' as ui;
 
 class UpcommingWidget extends StatefulWidget {
   const UpcommingWidget({super.key});
@@ -35,28 +23,26 @@ class UpcommingWidget extends StatefulWidget {
 
 class _UpcommingWidgetState extends State<UpcommingWidget> {
   late UpcommingModel _model;
-  late GoogleMapController mapController;
+  GoogleMapController? mapController;
   // LocationData? currentLocation;
   Position? currentLocation;
   bool isLoading = false;
   // late Timer _timer;
-  final List<LatLng> _polylineCoordinates = [];
-  List<Marker> markers = [];
   double currentLatitude = 0.0;
   double currentLongitude = 0.0;
   double pickupLat = 0.0;
   double pickupLng = 0.0;
-  late CameraPosition _kGoogle;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late Position _currentPosition;
+  BitmapDescriptor? _driverMarkerIcon;
+  bool _isInitializingUpcomingMap = false;
+  bool _isFetchingCurrentLocation = false;
 
   @override
   void initState() {
     super.initState();
-    _getLocation();
-    _getCurrentLocation();
+    _model = createModel(context, () => UpcommingModel());
     // SchedulerBinding.instance.addPostFrameCallback((_) async {
     // await
     // showModalBottomSheet(
@@ -90,10 +76,8 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     // );
 
     // });
-    jobDetailsFuture();
     // DirectionsService.init('AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA');
-    _setupMarkersAndPolylines();
-    _model = createModel(context, () => UpcommingModel());
+    unawaited(_initializeUpcomingMap());
   }
 
   @override
@@ -103,25 +87,23 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     super.dispose();
   }
 
-  Future<void> _getLocation() async {
+  Future<void> _initializeUpcomingMap() async {
+    if (_isInitializingUpcomingMap) {
+      return;
+    }
+
+    _isInitializingUpcomingMap = true;
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
     try {
-      currentLocation = await Geolocator.getCurrentPosition();
-
-      if (currentLocation != null) {
-        mapController.animateCamera(
-          CameraUpdate.newLatLng(
-            LatLng(currentLocation!.latitude, currentLocation!.longitude),
-          ),
-        );
-      }
-
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print("Error getting location: $e");
+      await jobDetailsFuture();
+      await _setupMarkersAndPolylines();
+    } finally {
+      _isInitializingUpcomingMap = false;
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -146,12 +128,11 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       print(parsedResponse);
 
       if (parsedResponse['data'] is List) {
-        if (parsedResponse.containsKey('data')) {
-          pickup = parsedResponse['data'][0]['pickup'];
+        final jobs = parsedResponse['data'] as List;
+        if (jobs.isNotEmpty) {
+          pickup = jobs[0]['pickup'];
         }
-        return (parsedResponse['data'] as List)
-            .map((item) => Job.fromJson(item))
-            .toList();
+        return jobs.map((item) => Job.fromJson(item)).toList();
       }
     }
     return [];
@@ -170,9 +151,11 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     }
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
@@ -191,7 +174,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         },
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: context.appTheme.secondaryBackground,
+          backgroundColor: Colors.transparent,
 
           // appBar: AppBar(
           //   backgroundColor: context.appTheme.primaryBackground,
@@ -227,38 +210,18 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
           //   centerTitle: true,
           //   elevation: 2,
           // ),
-          body: SafeArea(
-            top: true,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: context.appTheme.secondaryBackground,
+          body: Stack(
+            children: [
+              Positioned.fill(child: buildMap()),
+              if (isLoading)
+                Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      context.appTheme.primary,
                     ),
-                    child: isLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                context.appTheme.primary,
-                              ),
-                            ),
-                          )
-                        : currentLocation != null
-                        ? buildMap()
-                        : Center(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                context.appTheme.primary,
-                              ),
-                            ),
-                          ),
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -266,17 +229,16 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   }
 
   Widget buildMap() {
+    final center = LatLng(
+      currentLocation?.latitude ?? 31.4064054,
+      currentLocation?.longitude ?? 73.0413076,
+    );
+
     return GoogleMap(
-      mapType: MapType.satellite, // Keep this as 'normal' (not satellite etc.)
+      mapType: MapType.normal,
       tiltGesturesEnabled: true,
-      initialCameraPosition: CameraPosition(
-        target: LatLng(
-          _currentPosition.latitude ?? 0.0,
-          _currentPosition.longitude ?? 0.0,
-        ),
-        zoom: 12,
-      ),
-      myLocationEnabled: true,
+      initialCameraPosition: CameraPosition(target: center, zoom: 15.5),
+      myLocationEnabled: false,
       myLocationButtonEnabled: false,
       compassEnabled: true,
       rotateGesturesEnabled: true,
@@ -287,23 +249,20 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       zoomControlsEnabled: false,
       zoomGesturesEnabled: true,
       onMapCreated: _onMapCreated,
-      markers: Set<Marker>.of(markers),
-      polylines: <Polyline>{
-        Polyline(
-          polylineId: PolylineId('route'),
-          color: Colors.blue,
-          width: 5,
-          points: _polylineCoordinates,
-        ),
-      },
+      markers: _markers,
+      polylines: _polylines,
     );
   }
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
-    await _getCurrentLocation();
     setState(() {
       mapController = controller;
     });
+    if (currentLocation == null) {
+      await _initializeUpcomingMap();
+    } else {
+      await _moveCameraToCurrentLocation();
+    }
 
     // final directionsService = DirectionsService();
     // final request = DirectionsRequest(
@@ -439,67 +398,195 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     }
   }
 
+  Future<bool> _ensureLocationPermission() async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    return permission != LocationPermission.denied &&
+        permission != LocationPermission.deniedForever;
+  }
+
+  Future<void> _moveCameraToCurrentLocation() async {
+    final location = currentLocation;
+    final controller = mapController;
+    if (location == null || controller == null) {
+      return;
+    }
+
+    await controller.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(location.latitude, location.longitude),
+        15.8,
+      ),
+    );
+  }
+
   Future<void> _getCurrentLocation() async {
+    if (_isFetchingCurrentLocation) {
+      return;
+    }
+
+    _isFetchingCurrentLocation = true;
     try {
+      final hasPermission = await _ensureLocationPermission();
+      if (!hasPermission) {
+        return;
+      }
+
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
-      setState(() {
-        _currentPosition = position;
-        currentLatitude = position.latitude;
-        currentLongitude = position.longitude;
-        print('locat  $_currentPosition');
-      });
+      if (mounted) {
+        setState(() {
+          currentLocation = position;
+          currentLatitude = position.latitude;
+          currentLongitude = position.longitude;
+          print('locat  $position');
+        });
+      }
+      await _moveCameraToCurrentLocation();
     } catch (e) {
       print("Error getting current location: $e");
+    } finally {
+      _isFetchingCurrentLocation = false;
     }
   }
 
   Future<void> _setupMarkersAndPolylines() async {
-    setState(() {
-      isLoading = true;
-    });
+    final routeColor = context.appTheme.primary;
 
     await _getCurrentLocation();
-
-    _kGoogle = CameraPosition(
-      target: LatLng(currentLatitude, currentLongitude),
-      zoom: 14,
-    );
-
     await getLocationFromAddress();
+    await _loadMarkerIcons();
 
-    List<LatLng> latLen = [
-      LatLng(currentLatitude, currentLongitude),
-      LatLng(pickupLat, pickupLng),
-    ];
-
-    for (int i = 0; i < latLen.length; i++) {
-      _markers.add(
-        Marker(
-          markerId: MarkerId(i.toString()),
-          position: latLen[i],
-          infoWindow: InfoWindow(
-            title: i == 0 ? 'Your Location' : 'Pickup Location',
+    final points = <LatLng>[];
+    if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+      final currentPoint = LatLng(currentLatitude, currentLongitude);
+      points.add(currentPoint);
+      _markers
+        ..removeWhere((marker) => marker.markerId.value == 'current-location')
+        ..add(
+          Marker(
+            markerId: const MarkerId('current-location'),
+            position: currentPoint,
+            anchor: const Offset(0.5, 1),
+            infoWindow: const InfoWindow(title: 'Your Location'),
+            icon: _driverMarkerIcon ?? BitmapDescriptor.defaultMarker,
           ),
-          icon: BitmapDescriptor.defaultMarker,
+        );
+    }
+
+    if (pickupLat != 0.0 && pickupLng != 0.0) {
+      final pickupPoint = LatLng(pickupLat, pickupLng);
+      points.add(pickupPoint);
+      _markers
+        ..removeWhere((marker) => marker.markerId.value == 'pickup-location')
+        ..add(
+          Marker(
+            markerId: const MarkerId('pickup-location'),
+            position: pickupPoint,
+            infoWindow: const InfoWindow(title: 'Pickup Location'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueGreen,
+            ),
+          ),
+        );
+    }
+
+    _polylines.clear();
+    if (points.length > 1) {
+      _polylines.add(
+        Polyline(
+          polylineId: const PolylineId('route'),
+          points: points,
+          color: routeColor,
+          width: 5,
         ),
       );
     }
 
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId('1'),
-        points: latLen,
-        color: context.appTheme.primary,
-        // Colors.deepOrange,
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _loadMarkerIcons() async {
+    _driverMarkerIcon ??= BitmapDescriptor.fromBytes(
+      await _buildDriverMarkerBytes(),
+    );
+  }
+
+  Future<Uint8List> _buildDriverMarkerBytes() async {
+    const markerWidth = 96;
+    const markerHeight = 116;
+    const center = Offset(markerWidth / 2, 44);
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    final pinPath =
+        Path()
+          ..moveTo(markerWidth / 2, markerHeight - 7)
+          ..cubicTo(40, 98, 14, 76, 14, 44)
+          ..cubicTo(14, 22, 30, 7, markerWidth / 2, 7)
+          ..cubicTo(66, 7, 82, 22, 82, 44)
+          ..cubicTo(82, 76, 56, 98, markerWidth / 2, markerHeight - 7)
+          ..close();
+
+    canvas.drawPath(
+      pinPath.shift(const Offset(0, 4)),
+      Paint()
+        ..color = const Color(0x33000000)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 7),
+    );
+    canvas.drawPath(pinPath, Paint()..color = Colors.white);
+    canvas.drawPath(
+      pinPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4
+        ..color = context.appTheme.primary,
+    );
+
+    canvas.drawCircle(center, 28, Paint()..color = context.appTheme.primary);
+
+    const carIcon = Icons.local_taxi_rounded;
+    final iconPainter = TextPainter(
+      text: TextSpan(
+        text: String.fromCharCode(carIcon.codePoint),
+        style: TextStyle(
+          color: Colors.white,
+          fontFamily: carIcon.fontFamily,
+          package: carIcon.fontPackage,
+          fontSize: 35,
+          height: 1,
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+    iconPainter.paint(
+      canvas,
+      Offset(
+        center.dx - iconPainter.width / 2,
+        center.dy - iconPainter.height / 2,
       ),
     );
 
-    setState(() {
-      isLoading = false;
-    });
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(markerWidth, markerHeight);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
+    picture.dispose();
+    return byteData!.buffer.asUint8List();
   }
 
   Future<void> getLocationFromAddress() async {

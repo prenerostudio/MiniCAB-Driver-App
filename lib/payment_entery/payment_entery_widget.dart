@@ -1,24 +1,19 @@
-import 'package:get/get.dart';
-import 'package:new_minicab_driver/home/home_view_controller.dart';
-import 'package:new_minicab_driver/payment_entery/complete.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:new_minicab_driver/Data/api_service.dart';
+import 'package:new_minicab_driver/payment_entery/complete.dart';
+import 'package:new_minicab_driver/theme/app_theme.dart';
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/jobDetails.dart';
-import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'payment_entery_model.dart';
+
 export 'payment_entery_model.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:new_minicab_driver/Data/api_service.dart';
 
 class PaymentEnteryWidget extends StatefulWidget {
   const PaymentEnteryWidget({
@@ -33,122 +28,139 @@ class PaymentEnteryWidget extends StatefulWidget {
   final String? did;
 
   @override
-  _PaymentEnteryWidgetState createState() => _PaymentEnteryWidgetState();
+  State<PaymentEnteryWidget> createState() => _PaymentEnteryWidgetState();
 }
 
 class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
   late PaymentEnteryModel _model;
-  String? CarParking;
-  String? Waiting;
-  String? Tolls;
-  String? Extra;
-
-  TextEditingController journeyController = TextEditingController();
-  TextEditingController extraWaitingController = TextEditingController();
-  TextEditingController parkingController = TextEditingController();
-  TextEditingController tollsController = TextEditingController();
-  TextEditingController watingController = TextEditingController();
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  final extraWaitingController = TextEditingController(text: '0');
+  final parkingController = TextEditingController(text: '0');
+  final tollsController = TextEditingController(text: '0');
+  final watingController = TextEditingController(text: '0');
+
+  static const _ink = Color(0xFF101820);
+  static const _muted = Color(0xFF6E7A73);
+  static const _surface = Color(0xFFF4F7F5);
+  static const _line = Color(0xFFE1E7E3);
+  static const _gold = Color(0xFFE2A84F);
+  static const _success = Color(0xFF1D8F5A);
+
+  String? _carParking;
+  String? _waiting;
+  String? _tolls;
+  String? _extra;
+
+  String extra = '0';
+  String parking = '0';
+  String waiting = '0';
+  String tolls = '0';
+
+  int isExcapted = 0;
+  bool _isLoadingFareData = true;
+  bool _isSubmittingFares = false;
 
   @override
   void initState() {
     super.initState();
-    jobDetailsFuture();
-    // myhomeController.jobDetails();
-    getFares();
-    pushercallbg();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _model = createModel(context, () => PaymentEnteryModel());
-    extraWaitingController = TextEditingController(text: Extra ?? '0');
-    parkingController = TextEditingController(text: CarParking ?? '0');
-    tollsController = TextEditingController(text: Tolls ?? '0');
-    watingController = TextEditingController(text: Waiting ?? '0');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 4), () {
-        setState(() {
-          watingController.text =
-              Waiting ?? '0'; // Replace 'Waiting' with your actual value
-        });
-      });
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 4), () {
-        setState(() {
-          tollsController.text =
-              Tolls ?? '0'; // Replace 'Waiting' with your actual value
-        });
-      });
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 4), () {
-        setState(() {
-          parkingController.text =
-              CarParking ?? '0'; // Replace 'Waiting' with your actual value
-        });
-      });
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(seconds: 4), () {
-        setState(() {
-          extraWaitingController.text =
-              Extra ?? '0'; // Replace 'Waiting' with your actual value
-        });
-      });
-    });
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    _wireFareListeners();
+    _loadInitialFareData();
+    pushercallbg();
   }
 
   @override
   void dispose() {
-    _model.dispose();
     extraWaitingController.dispose();
     parkingController.dispose();
     tollsController.dispose();
     watingController.dispose();
+    _model.dispose();
     super.dispose();
   }
 
-  JobController myhomeController = Get.put(JobController());
+  void _wireFareListeners() {
+    extraWaitingController.addListener(_refreshTotals);
+    parkingController.addListener(_refreshTotals);
+    tollsController.addListener(_refreshTotals);
+    watingController.addListener(_refreshTotals);
+  }
+
+  void _refreshTotals() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _loadInitialFareData() async {
+    try {
+      await getFares();
+      await jobDetailsFuture();
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingFareData = false);
+      }
+    }
+  }
+
   Future<List<Job>> jobDetailsFuture() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? dId = prefs.getString('d_id');
-    print(dId);
+    final prefs = await SharedPreferences.getInstance();
+    final dId = prefs.getString('d_id');
+    debugPrint('Driver id for payment fares: $dId');
 
     final response = await http.post(
       Uri.parse(ApiService.driverUpcomingJobs),
       body: {'d_id': dId.toString()},
     );
 
-    if (response.statusCode == 200) {
-      final parsedResponse = json.decode(response.body);
-      print(parsedResponse);
-
-      if (parsedResponse['data'] is List) {
-        if (parsedResponse.containsKey('data')) {
-          CarParking = parsedResponse['data'][0]['car_parking'];
-          Waiting = parsedResponse['data'][0]['waiting'];
-          Tolls = parsedResponse['data'][0]['tolls'];
-          Extra = parsedResponse['data'][0]['extra'];
-          print(CarParking);
-          print(Waiting);
-          print(Tolls);
-          print(Extra);
-        }
-
-        return (parsedResponse['data'] as List)
-            .map((item) => Job.fromJson(item))
-            .toList();
-      }
+    if (response.statusCode != 200) {
+      return [];
     }
 
-    // Return an empty list or handle the error in a way that fits your use case.
-    return [];
+    final parsedResponse = json.decode(response.body);
+    final data = parsedResponse['data'];
+    if (data is! List) {
+      return [];
+    }
+
+    if (data.isNotEmpty && data.first is Map<String, dynamic>) {
+      final firstJob = data.first as Map<String, dynamic>;
+      _carParking = firstJob['car_parking']?.toString();
+      _waiting = firstJob['waiting']?.toString();
+      _tolls = firstJob['tolls']?.toString();
+      _extra = firstJob['extra']?.toString();
+      _applyFetchedFareValues();
+    }
+
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map((item) => Job.fromJson(item))
+        .toList();
   }
 
-  int isExcapted = 0;
-  pushercallbg() async {
+  void _applyFetchedFareValues() {
+    _setControllerValue(extraWaitingController, _extra);
+    _setControllerValue(parkingController, _carParking);
+    _setControllerValue(tollsController, _tolls);
+    _setControllerValue(watingController, _waiting);
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _setControllerValue(TextEditingController controller, String? value) {
+    final normalised = _normaliseFare(value);
+    if (controller.text != normalised) {
+      controller.text = normalised;
+    }
+  }
+
+  Future<void> pushercallbg() async {
     try {
-      var pusher = PusherClient(
+      final pusher = PusherClient(
         'ef80ba163503f394d9c3',
         PusherOptions(
           host: ApiService.driverCheckFareStatus,
@@ -158,107 +170,107 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
       );
       pusher.connect();
 
-      var channel = pusher.subscribe('jobs-channel');
-
-      // Listen for new events
+      final channel = pusher.subscribe('jobs-channel');
       channel.bind('fare-approved', (event) {
-        Map<String, dynamic> jsonMap = json.decode(event!.data!);
-        print('the message is ${jsonMap['message']}');
-        if (jsonMap['message'] == 'Fares have been approved by controller.') {
-          isExcapted = 2;
-          extraWaitingController.text = jsonMap['details']['extras'].toString();
-          parkingController.text = jsonMap['details']['car_parking'].toString();
-          tollsController.text = jsonMap['details']['tolls'].toString();
-          watingController.text = jsonMap['details']['waiting'].toString();
+        final payload = event?.data;
+        if (payload == null) {
+          return;
+        }
 
-          print('the message is ${jsonMap['total_fee']}');
-          saveData(
-            jsonMap['details']['journey_fare'].toString(),
-            jsonMap['details']['car_parking'].toString(),
-            jsonMap['details']['extras'].toString(),
-            jsonMap['details']['waiting'].toString(),
-            jsonMap['details']['tolls'].toString(),
-            jsonMap['total_fee'].toString(),
-          );
-          setState(() {});
+        final jsonMap = json.decode(payload);
+        debugPrint('Fare approval message: ${jsonMap['message']}');
+        if (jsonMap['message'] != 'Fares have been approved by controller.') {
+          return;
+        }
+
+        final details = jsonMap['details'];
+        if (details is! Map<String, dynamic>) {
+          return;
+        }
+
+        final approvedExtra = details['extras'].toString();
+        final approvedParking = details['car_parking'].toString();
+        final approvedTolls = details['tolls'].toString();
+        final approvedWaiting = details['waiting'].toString();
+
+        extraWaitingController.text = approvedExtra;
+        parkingController.text = approvedParking;
+        tollsController.text = approvedTolls;
+        watingController.text = approvedWaiting;
+
+        saveData(
+          details['journey_fare'].toString(),
+          approvedParking,
+          approvedExtra,
+          approvedWaiting,
+          approvedTolls,
+          jsonMap['total_fee'].toString(),
+        );
+
+        if (mounted) {
+          setState(() => isExcapted = 2);
         }
       });
     } catch (e) {
-      print('the exception is $e');
+      debugPrint('Pusher fare approval exception: $e');
     }
   }
 
-  saveData(
+  Future<void> saveData(
     String jfare,
     String carparking,
-    String extra,
-    String waiting,
-    String tolls,
+    String extraFare,
+    String waitingFare,
+    String tollFare,
     String totalFee,
   ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setString('journey_fare', jfare);
     await prefs.setString('car_parking', carparking);
-    await prefs.setString('extra', extra);
-    await prefs.setString('waiting', waiting);
-    await prefs.setString('tolls', tolls);
+    await prefs.setString('extra', extraFare);
+    await prefs.setString('waiting', waitingFare);
+    await prefs.setString('tolls', tollFare);
     await prefs.setString('totalFee', totalFee);
-    setState(() {});
+
+    if (mounted) {
+      setState(() {
+        extra = extraFare;
+        parking = carparking;
+        waiting = waitingFare;
+        tolls = tollFare;
+      });
+    }
   }
-  // Future fetchFareData() async {
-  //   try {
-  //     final uri = Uri.parse(
-  //         ApiService.driverCheckFareStatus);
-  //     final response = await http.post(uri, body: {'fare_id': ' '});
 
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = jsonDecode(response.body);
-  //       print(jsonResponse);
-  //       isExcapted = 1;
-  //       // setState(() {});
-  //       final List<dynamic> data = jsonResponse['data'];
-  //     } else {
-  //       print('Error: ${response.reasonPhrase}');
-  //       return [];
-  //     }
-  //   } catch (e) {
-  //     print('the exception is $e');
-  //     return [];
-  //   }
-  // }
+  Future<void> getFares() async {
+    final sp = await SharedPreferences.getInstance();
+    final savedExtra = sp.getString('extra') ?? '0';
+    final savedParking = sp.getString('car_parking') ?? '0';
+    final savedTolls = sp.getString('tolls') ?? '0';
+    final savedWaiting = sp.getString('waiting') ?? '0';
 
-  String extra = '';
-  String parking = '';
-  String waiting = '';
-  String tolls = '';
-  getFares() async {
-    setState(() {});
-    SharedPreferences sp = await SharedPreferences.getInstance();
-    extraWaitingController.text = sp.getString('extra') ?? '0';
-    parkingController.text = sp.getString('car_parking') ?? '0';
-    tollsController.text = sp.getString('tolls') ?? '0';
-    watingController.text = sp.getString('waiting') ?? '0';
+    extraWaitingController.text = savedExtra;
+    parkingController.text = savedParking;
+    tollsController.text = savedTolls;
+    watingController.text = savedWaiting;
 
-    extra = sp.getString('extra') ?? '0';
-    parking = sp.getString('car_parking') ?? '0';
-    tolls = sp.getString('tolls') ?? '0';
-    waiting = sp.getString('waiting') ?? '0';
-    print("the waiting fare is ${extraWaitingController.text}");
+    if (mounted) {
+      setState(() {
+        extra = savedExtra;
+        parking = savedParking;
+        tolls = savedTolls;
+        waiting = savedWaiting;
+      });
+    }
   }
 
   Future<void> addFares() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? dId = prefs.getString('d_id');
-      print(dId);
-      print('d_id not found in shared preferences.${widget.jobid}');
-      print('d_id not found in shared preferences.$dId');
-      print('d_id not found in shared preferences.${parkingController.text}');
-      print('d_id not found in shared preferences.${tollsController.text}');
-      print('d_id not found in shared preferences.${watingController.text}');
+      final prefs = await SharedPreferences.getInstance();
+      final dId = prefs.getString('d_id');
+      debugPrint('Submitting fares for job ${widget.jobid}, driver $dId');
 
-      if (dId == null) {}
-      var request = http.MultipartRequest(
+      final request = http.MultipartRequest(
         'POST',
         Uri.parse(ApiService.driverAddFares),
       );
@@ -271,17 +283,18 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
         'journey_fare': '${widget.fare}',
         'waiting': watingController.text,
       });
-      http.StreamedResponse response = await request.send();
-      if (response.statusCode == 200) {
-        print(await response.stream.bytesToString());
-        // await fetchFareData();
 
-        print('done');
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        debugPrint(await response.stream.bytesToString());
+        if (mounted) {
+          setState(() => isExcapted = 1);
+        }
       } else {
-        print('Failed to add fares: ${response.reasonPhrase}');
+        debugPrint('Failed to add fares: ${response.reasonPhrase}');
       }
     } catch (error) {
-      print('Error: $error');
+      debugPrint('Add fares error: $error');
     }
   }
 
@@ -295,678 +308,630 @@ class _PaymentEnteryWidgetState extends State<PaymentEnteryWidget> {
         ),
       );
     }
-    getFares();
+
     return GestureDetector(
       onTap:
           () =>
               _model.unfocusNode.canRequestFocus
                   ? FocusScope.of(context).requestFocus(_model.unfocusNode)
                   : FocusScope.of(context).unfocus(),
-      child: WillPopScope(
-        onWillPop: () async => true,
-        child: Scaffold(
-          key: scaffoldKey,
-          backgroundColor: context.appTheme.secondaryBackground,
-          body: SafeArea(
-            top: true,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                // TextButton(
-                //     onPressed: () {
-                //       getFares();
-                //     },
-                //     child: Text('data')),
-                Expanded(
-                  flex: 8,
-                  child: Container(
-                    width: 100.0,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: context.appTheme.secondaryBackground,
-                    ),
-                    alignment: AlignmentDirectional(0.00, -1.00),
-                    child: SingleChildScrollView(
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: _surface,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 560),
                       child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: double.infinity,
-                            height: 140.0,
-                            decoration: BoxDecoration(
-                              color:
-                                  context.appTheme.secondaryBackground,
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(16.0),
-                                bottomRight: Radius.circular(16.0),
-                                topLeft: Radius.circular(0.0),
-                                topRight: Radius.circular(0.0),
-                              ),
-                            ),
-                            alignment: AlignmentDirectional(-1.00, 0.00),
-                          ),
-                          Align(
-                            alignment: AlignmentDirectional(0.00, 0.00),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                32.0,
-                                32.0,
-                                32.0,
-                                32.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Enter Charges',
-                                    style:
-                                        context.appTheme.displaySmall,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      12.0,
-                                      0.0,
-                                      24.0,
-                                    ),
-                                    child: Text(
-                                      'Let\'s get filling out the form below.',
-                                      style:
-                                          context.appTheme.labelMedium,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      16.0,
-                                    ),
-                                    child: SizedBox(
-                                      width: 370.0,
-                                      child: TextFormField(
-                                        controller: extraWaitingController,
-                                        focusNode: _model.extraWaitingFocusNode,
-                                        autofocus: true,
-                                        // autofillHints: [AutofillHints.email],
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          labelText: 'Extra',
-                                          labelStyle: context.appTheme.labelMedium.override(
-                                            fontFamily: 'Open Sans',
-                                            fontSize: 18,
-                                          ),
-                                          // hintText: 'Extra',
-                                          hintStyle:
-                                              context.appTheme.labelMedium,
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.alternate,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.primary,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.error,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color:
-                                                      context.appTheme.error,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                        ),
-                                        style:
-                                            context.appTheme.bodyMedium,
-                                        keyboardType: TextInputType.phone,
-                                        validator: _model
-                                            .extraWaitingControllerValidator
-                                            .asValidator(context),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      16.0,
-                                    ),
-                                    child: SizedBox(
-                                      width: 370.0,
-                                      child: TextFormField(
-                                        controller: parkingController,
-                                        autofocus: true,
-                                        // autofillHints: [AutofillHints.email],
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          labelText: 'Parking',
-                                          labelStyle: context.appTheme.labelMedium.override(
-                                            fontFamily: 'Open Sans',
-                                            fontSize: 18,
-                                          ),
-                                          // hintText: 'Parking',
-                                          hintStyle:
-                                              context.appTheme.labelMedium,
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.alternate,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.primary,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.error,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color:
-                                                      context.appTheme.error,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                        ),
-                                        style:
-                                            context.appTheme.bodyMedium,
-                                        keyboardType: TextInputType.phone,
-                                        validator: _model
-                                            .parkingControllerValidator
-                                            .asValidator(context),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      16.0,
-                                    ),
-                                    child: SizedBox(
-                                      width: 370.0,
-                                      child: TextFormField(
-                                        controller: watingController,
-                                        autofocus: true,
-                                        // autofillHints: [AutofillHints.email],
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          labelText: 'Waiting',
-                                          labelStyle: context.appTheme.labelMedium.override(
-                                            fontFamily: 'Open Sans',
-                                            fontSize: 18,
-                                          ),
-                                          // hintText: 'Waiting',
-                                          hintStyle:
-                                              context.appTheme.labelMedium,
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.alternate,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.primary,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.error,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color:
-                                                      context.appTheme.error,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                        ),
-                                        style:
-                                            context.appTheme.bodyMedium,
-                                        keyboardType: TextInputType.phone,
-                                        validator: _model
-                                            .parkingControllerValidator
-                                            .asValidator(context),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      16.0,
-                                    ),
-                                    child: SizedBox(
-                                      width: 370.0,
-                                      child: TextFormField(
-                                        controller: tollsController,
-                                        focusNode: _model.emailAddressFocusNode,
-                                        autofocus: true,
-                                        // autofillHints: [AutofillHints.email],
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          labelText: 'Tolls',
-                                          labelStyle: context.appTheme.labelMedium.override(
-                                            fontFamily: 'Open Sans',
-                                            fontSize: 18,
-                                          ),
-                                          // hintText: 'Tolls',
-                                          hintStyle:
-                                              context.appTheme.labelMedium,
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.alternate,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.primary,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color:
-                                                  context.appTheme.error,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color:
-                                                      context.appTheme.error,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                        ),
-                                        style:
-                                            context.appTheme.bodyMedium,
-                                        keyboardType: TextInputType.phone,
-                                        validator: _model
-                                            .emailAddressControllerValidator
-                                            .asValidator(context),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      16.0,
-                                    ),
-                                    child: FFButtonWidget(
-                                      onPressed: () async {
-                                        SharedPreferences prefs =
-                                            await SharedPreferences.getInstance();
-                                        // prefs.setInt('isRideStart', 4);
-                                        if (extra ==
-                                                extraWaitingController.text &&
-                                            parking == parkingController.text &&
-                                            tolls == tollsController.text &&
-                                            waiting == watingController.text) {
-                                          print('process with same');
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) => CompleteWidget(
-                                                    isfromfare: true,
-                                                  ),
-                                            ),
-                                          );
-                                        } else {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return DailogForFare(
-                                                addFares: addFares(),
-                                              );
-                                            },
-                                          );
-                                          print('dialog');
-                                        }
-
-                                        setState(() {});
-                                        // if (isExcapted == 2) {
-                                        //   Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //           builder: (context) =>
-                                        //               CompleteWidget()));
-                                        // } else {
-                                        //   addFares();
-                                        //   isExcapted = 1;
-                                        // }
-                                      },
-                                      text: 'Proceed',
-                                      options: FFButtonOptions(
-                                        width: 370.0,
-                                        height: 44.0,
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0,
-                                          0.0,
-                                          0.0,
-                                          0.0,
-                                        ),
-                                        iconPadding:
-                                            EdgeInsetsDirectional.fromSTEB(
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                            ),
-                                        color:
-                                            context.appTheme.primary,
-                                        textStyle: context.appTheme.titleSmall.override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                        ),
-                                        elevation: 3.0,
-                                        borderSide: BorderSide(
-                                          color: Colors.transparent,
-                                          width: 1.0,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          12.0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  // Padding(
-                                  //   padding: EdgeInsetsDirectional.fromSTEB(
-                                  //       0.0, 0.0, 0.0, 16.0),
-                                  //   child: FFButtonWidget(
-                                  //     onPressed: () async {
-                                  //       if (extra ==
-                                  //               extraWaitingController.text &&
-                                  //           parking == parkingController.text &&
-                                  //           tolls == tollsController.text &&
-                                  //           waiting == watingController.text) {
-                                  //         print('process with same');
-                                  //         Navigator.push(
-                                  //             context,
-                                  //             MaterialPageRoute(
-                                  //                 builder: (context) =>
-                                  //                     CompleteWidget()));
-                                  //       } else {
-                                  //         showDialog(
-                                  //             context: context,
-                                  //             builder: (context) {
-                                  //               return DailogForFare();
-                                  //             });
-                                  //         print('dialog');
-                                  //       }
-
-                                  //       setState(() {});
-                                  //       // if (isExcapted == 2) {
-                                  //       //   Navigator.push(
-                                  //       //       context,
-                                  //       //       MaterialPageRoute(
-                                  //       //           builder: (context) =>
-                                  //       //               CompleteWidget()));
-                                  //       // } else {
-                                  //       //   addFares();
-                                  //       //   isExcapted = 1;
-                                  //       // }
-                                  //     },
-                                  //     text: isExcapted == 0
-                                  //         ? 'Correct'
-                                  //         : isExcapted == 1
-                                  //             ? 'Waiting for approval'
-                                  //             : 'Proceed to complete',
-                                  //     options: FFButtonOptions(
-                                  //       width: 370.0,
-                                  //       height: 44.0,
-                                  //       padding: EdgeInsetsDirectional.fromSTEB(
-                                  //           0.0, 0.0, 0.0, 0.0),
-                                  //       iconPadding:
-                                  //           EdgeInsetsDirectional.fromSTEB(
-                                  //               0.0, 0.0, 0.0, 0.0),
-                                  //       color: isExcapted == 0
-                                  //           ? context.appTheme
-                                  //               .primary
-                                  //           : isExcapted == 1
-                                  //               ? context.appTheme
-                                  //                   .primary
-                                  //                   .withOpacity(0.3)
-                                  //               : context.appTheme
-                                  //                   .primary,
-                                  //       textStyle: context.appTheme
-                                  //           .titleSmall
-                                  //           .override(
-                                  //             fontFamily: 'Readex Pro',
-                                  //             color: Colors.white,
-                                  //           ),
-                                  //       elevation: 3.0,
-                                  //       borderSide: BorderSide(
-                                  //         color: Colors.transparent,
-                                  //         width: 1.0,
-                                  //       ),
-                                  //       borderRadius:
-                                  //           BorderRadius.circular(12.0),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          _buildHeader(context),
+                          const SizedBox(height: 16),
+                          _buildPaymentSummary(context),
+                          const SizedBox(height: 12),
+                          _buildChargePanel(context),
+                          const SizedBox(height: 12),
+                          _buildFareBreakdown(context),
                         ],
                       ),
                     ),
                   ),
                 ),
-                if (responsiveVisibility(
-                  context: context,
-                  phone: false,
-                  tablet: false,
-                ))
-                  Expanded(
-                    flex: 6,
-                    child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                        16.0,
-                        16.0,
-                        16.0,
-                        16.0,
-                      ),
-                      child: Container(
-                        width: 100.0,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          color:
-                              context.appTheme.secondaryBackground,
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: CachedNetworkImageProvider(
-                              'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1380&q=80',
-                            ),
-                          ),
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
+              ),
+              _buildBottomAction(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: _line),
+          ),
+          child: const Icon(Icons.payments_rounded, color: _ink, size: 24),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Payment',
+                style: context.appTheme.titleLarge.copyWith(
+                  color: _ink,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Review cash collection and job charges',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.appTheme.bodySmall.copyWith(
+                  color: _muted,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          tooltip: 'Back',
+          onPressed: () => Navigator.maybePop(context),
+          icon: const Icon(Icons.arrow_back_rounded),
+          style: IconButton.styleFrom(
+            foregroundColor: _muted,
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentSummary(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _line),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x10101820),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pay by cash',
+                      style: context.appTheme.bodyMedium.copyWith(
+                        color: _muted,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0,
                       ),
                     ),
-                  ),
-              ],
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatMoney(_currentTotal),
+                      style: context.appTheme.headlineMedium.copyWith(
+                        color: _ink,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Client pays total amount',
+                      style: context.appTheme.bodySmall.copyWith(
+                        color: _muted,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildStatusPill(context),
+            ],
+          ),
+          if (_isLoadingFareData) ...[
+            const SizedBox(height: 14),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: const LinearProgressIndicator(
+                minHeight: 5,
+                backgroundColor: _surface,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusPill(BuildContext context) {
+    final hasChanges = !_savedValuesMatch;
+    final Color color;
+    final IconData icon;
+    final String label;
+
+    if (isExcapted == 2) {
+      color = _success;
+      icon = Icons.verified_rounded;
+      label = 'Approved';
+    } else if (isExcapted == 1 || hasChanges) {
+      color = _gold;
+      icon = Icons.pending_actions_rounded;
+      label = isExcapted == 1 ? 'Waiting' : 'Approval';
+    } else {
+      color = _success;
+      icon = Icons.check_circle_rounded;
+      label = 'Ready';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.32)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 17),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: context.appTheme.bodySmall.copyWith(
+              color: color,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChargePanel(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Additional charges',
+            style: context.appTheme.titleSmall.copyWith(
+              color: _ink,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Update only the charges that apply to this journey.',
+            style: context.appTheme.bodySmall.copyWith(
+              color: _muted,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 14),
+          _buildChargeInput(
+            context,
+            controller: extraWaitingController,
+            icon: Icons.add_card_rounded,
+            label: 'Extra',
+          ),
+          const SizedBox(height: 10),
+          _buildChargeInput(
+            context,
+            controller: watingController,
+            icon: Icons.timer_rounded,
+            label: 'Waiting',
+          ),
+          const SizedBox(height: 10),
+          _buildChargeInput(
+            context,
+            controller: parkingController,
+            icon: Icons.local_parking_rounded,
+            label: 'Parking',
+          ),
+          const SizedBox(height: 10),
+          _buildChargeInput(
+            context,
+            controller: tollsController,
+            icon: Icons.toll_rounded,
+            label: 'Tolls',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChargeInput(
+    BuildContext context, {
+    required TextEditingController controller,
+    required IconData icon,
+    required String label,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      textInputAction: TextInputAction.next,
+      style: context.appTheme.bodyMedium.copyWith(
+        color: _ink,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: context.appTheme.bodySmall.copyWith(
+          color: _muted,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0,
+        ),
+        prefixIcon: Icon(icon, color: _muted, size: 20),
+        prefixText: '£ ',
+        prefixStyle: context.appTheme.bodyMedium.copyWith(
+          color: _ink,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0,
+        ),
+        filled: true,
+        fillColor: _surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 15,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: _line),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: _ink, width: 1.4),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFareBreakdown(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _line),
+      ),
+      child: Column(
+        children: [
+          _buildBreakdownRow(
+            context,
+            label: 'Journey fare',
+            amount: _baseFare,
+            isStrong: true,
+          ),
+          const Divider(height: 22, color: _line),
+          _buildBreakdownRow(
+            context,
+            label: 'Extra',
+            amount: _amountFromText(extraWaitingController.text),
+          ),
+          const SizedBox(height: 8),
+          _buildBreakdownRow(
+            context,
+            label: 'Waiting',
+            amount: _amountFromText(watingController.text),
+          ),
+          const SizedBox(height: 8),
+          _buildBreakdownRow(
+            context,
+            label: 'Parking',
+            amount: _amountFromText(parkingController.text),
+          ),
+          const SizedBox(height: 8),
+          _buildBreakdownRow(
+            context,
+            label: 'Tolls',
+            amount: _amountFromText(tollsController.text),
+          ),
+          const Divider(height: 22, color: _line),
+          _buildBreakdownRow(
+            context,
+            label: 'Total cash due',
+            amount: _currentTotal,
+            isStrong: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBreakdownRow(
+    BuildContext context, {
+    required String label,
+    required double amount,
+    bool isStrong = false,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: context.appTheme.bodyMedium.copyWith(
+              color: isStrong ? _ink : _muted,
+              fontWeight: isStrong ? FontWeight.w900 : FontWeight.w700,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+        Text(
+          _formatMoney(amount),
+          style: context.appTheme.bodyMedium.copyWith(
+            color: _ink,
+            fontWeight: isStrong ? FontWeight.w900 : FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomAction(BuildContext context) {
+    final canProceedDirectly = _savedValuesMatch;
+    final buttonText =
+        _isSubmittingFares
+            ? 'Sending...'
+            : canProceedDirectly
+            ? 'Proceed to complete'
+            : 'Send for approval';
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        12 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: _line)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x10101820),
+            blurRadius: 18,
+            offset: Offset(0, -8),
+          ),
+        ],
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: SizedBox(
+            height: 52,
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isSubmittingFares ? null : _handleProceed,
+              icon:
+                  _isSubmittingFares
+                      ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : Icon(
+                        canProceedDirectly
+                            ? Icons.check_circle_rounded
+                            : Icons.verified_user_rounded,
+                        size: 20,
+                      ),
+              label: Text(buttonText),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _ink,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: _muted,
+                disabledForegroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                textStyle: context.appTheme.titleSmall.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
   }
-}
 
-class DailogForFare extends StatefulWidget {
-  Future addFares;
-  DailogForFare({super.key, required this.addFares});
+  Future<void> _handleProceed() async {
+    FocusScope.of(context).unfocus();
 
-  @override
-  State<DailogForFare> createState() => _DailogForFareState();
-}
-
-class _DailogForFareState extends State<DailogForFare> {
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        height: 200,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+    if (_savedValuesMatch) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CompleteWidget(isfromfare: true),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Text(
-                'Confirmation',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Your fares need approval from controller.',
-                style: TextStyle(fontSize: 17),
-                textAlign: TextAlign.center,
-              ),
-              Spacer(),
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 10.0),
-                child: FFButtonWidget(
-                  onPressed: () async {
-                    widget.addFares;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CompleteWidget(isfromfare: true),
+      );
+      return;
+    }
+
+    setState(() => _isSubmittingFares = true);
+    await addFares();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _isSubmittingFares = false);
+    await _showFareApprovalDialog();
+  }
+
+  Future<void> _showFareApprovalDialog() {
+    return showDialog<void>(
+      context: context,
+      builder:
+          (dialogContext) => Dialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: _gold.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.pending_actions_rounded,
+                          color: _gold,
+                          size: 22,
+                        ),
                       ),
-                    );
-                    setState(() {});
-                    // if (isExcapted == 2) {
-                    //   Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //           builder: (context) =>
-                    //               CompleteWidget()));
-                    // } else {
-
-                    //   isExcapted = 1;
-                    // }
-                  },
-                  text: 'Click Here To Proceed',
-                  options: FFButtonOptions(
-                    width: 370.0,
-                    height: 44.0,
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    iconPadding: EdgeInsetsDirectional.fromSTEB(
-                      0.0,
-                      0.0,
-                      0.0,
-                      0.0,
-                    ),
-                    color: context.appTheme.primary,
-                    textStyle: context.appTheme.titleSmall.override(
-                      fontFamily: 'Readex Pro',
-                      color: Colors.white,
-                    ),
-                    elevation: 3.0,
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(12.0),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Controller approval',
+                          style: context.appTheme.titleMedium.copyWith(
+                            color: _ink,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Your updated fares have been sent for controller approval.',
+                    style: context.appTheme.bodyMedium.copyWith(
+                      color: _muted,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => CompleteWidget(isfromfare: true),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _ink,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        textStyle: context.appTheme.titleSmall.copyWith(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                      child: const Text('Continue'),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
+  }
+
+  bool get _savedValuesMatch =>
+      _normaliseFare(extra) == _normaliseFare(extraWaitingController.text) &&
+      _normaliseFare(parking) == _normaliseFare(parkingController.text) &&
+      _normaliseFare(tolls) == _normaliseFare(tollsController.text) &&
+      _normaliseFare(waiting) == _normaliseFare(watingController.text);
+
+  double get _baseFare => _amountFromText(widget.fare);
+
+  double get _currentTotal =>
+      _baseFare +
+      _amountFromText(extraWaitingController.text) +
+      _amountFromText(watingController.text) +
+      _amountFromText(parkingController.text) +
+      _amountFromText(tollsController.text);
+
+  double _amountFromText(String? value) {
+    final cleaned = (value ?? '').replaceAll(RegExp(r'[^0-9.\-]'), '');
+    return double.tryParse(cleaned) ?? 0;
+  }
+
+  String _formatMoney(double value) {
+    final hasPennies = value.truncateToDouble() != value;
+    return '£${value.toStringAsFixed(hasPennies ? 2 : 0)}';
+  }
+
+  String _normaliseFare(String? value) {
+    final trimmed = (value ?? '').trim();
+    if (trimmed.isEmpty) {
+      return '0';
+    }
+
+    final amount = _amountFromText(trimmed);
+    if (amount == 0 && !trimmed.contains(RegExp(r'[1-9]'))) {
+      return '0';
+    }
+    return amount.toStringAsFixed(amount.truncateToDouble() == amount ? 0 : 2);
   }
 }

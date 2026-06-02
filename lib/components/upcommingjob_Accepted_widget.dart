@@ -1,30 +1,20 @@
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:new_minicab_driver/Data/Alart.dart';
 
 // import 'package:mini_cab/components/upcommingjob_Accepted_model.dart';
-import 'package:pdf/pdf.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/components/notes_widget.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'customer_details_widget.dart';
-import 'onway_widget.dart';
 // import 'Upcommingjob_Accepted_model.dart';
 // export 'Upcommingjob_Accepted_model.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../Model/jobDetails.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class UpcommingjobAcceptedWidget extends StatefulWidget {

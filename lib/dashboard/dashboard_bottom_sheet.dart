@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:isolate';
-import 'dart:ui';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:new_minicab_driver/Acount%20Statements/accounts_bottomSheet.dart';
 import 'package:new_minicab_driver/bids/bids_bottom_sheet.dart';
@@ -204,7 +203,7 @@ class _DashboardBottomSheetState extends State<DashboardBottomSheet> {
   }
 
   int? SwitchStatus;
-  _loadSwitchStatus() async {
+  Future<void> _loadSwitchStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int savedIndex = prefs.getInt('switchValue') ?? 0;
     setState(() {

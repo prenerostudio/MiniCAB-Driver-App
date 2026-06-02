@@ -11,8 +11,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class DocumentsUploadView extends StatefulWidget {
   String parameter;
@@ -271,7 +269,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
   }
 
   bool isloading = false;
-  _uploadImage() async {
+  Future<void> _uploadImage() async {
     setState(() {});
     SharedPreferences sp = await SharedPreferences.getInstance();
     String did = sp.getString('d_id') ?? '';
@@ -327,7 +325,7 @@ class _DocumentsUploadViewState extends State<DocumentsUploadView> {
     }
   }
 
-  getFront() async {
+  Future<void> getFront() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String dId = prefs.getString('d_id') ?? '';
     var request = http.MultipartRequest('POST', Uri.parse(widget.getUrl));

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
@@ -15,12 +16,10 @@ import 'package:new_minicab_driver/Data/links.dart';
 import 'package:new_minicab_driver/home/home_screen_alert.dart';
 import 'package:new_minicab_driver/home/home_view_controller.dart';
 import 'package:new_minicab_driver/home/notifier.dart';
-import 'package:new_minicab_driver/on_way/dummy_goglemap.dart';
 
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
 // import 'package:root_checker_plus/root_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 import '../Model/jobDetails.dart';
 import '../components/notes_widget.dart';
@@ -32,10 +31,8 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'home_model.dart';
 export 'home_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../Model/myProfile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:glowy_borders/glowy_borders.dart';
@@ -52,9 +49,7 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
-  static const _ink = Color(0xFF101820);
   static const _green = Color(0xFF0E7C66);
-  static const _surface = Color(0xFFF4F7F5);
   static const _gold = Color(0xFFE2A84F);
   static const _pusherAppKey = 'ef80ba163503f394d9c3';
   static const _pusherCluster = 'ap2';
@@ -73,6 +68,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   String locationMessage = "";
   Timer? locationTimer;
   Timer? userSession;
+  Timer? _dispatchPollingTimer;
   bool status = false;
   final ScrollController _scrollController = ScrollController();
   String? pickup;
@@ -91,11 +87,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   Uint8List? _driverMarkerImage;
   Uint8List? _destinationMarkerImage;
   bool _mapboxStyleReady = false;
+  bool _isFetchingCurrentLocation = false;
   // bool isPeriodicVisible = false;
   // Timer? _timer;
   // Timer? _timerVisible;
   // bool visiblecontainer = false;
   final controller = MyController(); // Or use a globally provided instance
+  String? _lastAlertedDispatchId;
 
   Map<String, dynamic> _decodePusherEvent(dynamic event) {
     final rawData = event?.data;
@@ -142,14 +140,24 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     return '';
   }
 
+  String _normalizeDriverId(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return '';
+    }
+
+    final numeric = int.tryParse(trimmed);
+    return numeric?.toString() ?? trimmed;
+  }
+
   bool _isPusherJobForCurrentDriver(
     Map<String, dynamic> data,
     SharedPreferences prefs,
   ) {
-    final currentDriverId = prefs.getString('d_id') ?? '';
+    final currentDriverId = _normalizeDriverId(prefs.getString('d_id') ?? '');
     final target = _pusherText(data, ['target']).toLowerCase();
 
-    if (target == 'all-drivers') {
+    if (target == 'all-drivers' || target == 'all_drivers') {
       return true;
     }
 
@@ -160,7 +168,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       '00000000002',
     ]);
 
-    return currentDriverId.isNotEmpty && pushedDriverId == currentDriverId;
+    return currentDriverId.isNotEmpty &&
+        _normalizeDriverId(pushedDriverId) == currentDriverId;
   }
 
   Job _jobFromPusherData(Map<String, dynamic> data) {
@@ -223,18 +232,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   ) {
     final data = _pusherJobData(eventData);
     if (!_isPusherJobForCurrentDriver(data, prefs)) {
+      debugPrint(
+        'Ignored dispatch for driver ${_pusherText(data, ['assigned_driver_id', 'target_driver_id', 'd_id'])}; current driver is ${prefs.getString('d_id') ?? ''}',
+      );
       return;
     }
 
-    startRingtoneAndVibrateLoop();
-    prefs.setBool('jobDispatched', true);
-    listFromPusher.clear();
-    listFromPusher.add(_jobFromPusherData(data));
-    myController.jobPusherContainer.value = true;
-    controller.toggleVariable(
-      myController.jobPusherContainer.value,
-      listFromPusher,
-    );
+    debugPrint('Dispatch accepted by app: ${jsonEncode(data)}');
+    _publishDispatchedJob(_jobFromPusherData(data), prefs, playAlert: true);
   }
 
   void _handleWithdrawnPusherJob(dynamic event, SharedPreferences prefs) {
@@ -246,17 +251,333 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     }
   }
 
-  pushercallbg() async {
+  Future<void> _startDispatchPolling() async {
+    _dispatchPollingTimer?.cancel();
+    await jobDetailsFuture(playAlertForNewJob: true);
+    _dispatchPollingTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      jobDetailsFuture(playAlertForNewJob: true);
+    });
+  }
+
+  Future<void> _publishDispatchedJob(
+    Job job,
+    SharedPreferences prefs, {
+    required bool playAlert,
+  }) async {
+    final dispatchId = job.jobId.isNotEmpty ? job.jobId : job.bookId;
+    final isNewDispatch =
+        dispatchId.isEmpty || dispatchId != _lastAlertedDispatchId;
+
+    await prefs.setBool('jobDispatched', true);
+    if (job.jobId.isNotEmpty) {
+      await prefs.setString('jobId', job.jobId);
+    }
+    if (job.bookId.isNotEmpty) {
+      await prefs.setString('bookingid', job.bookId);
+    }
+
+    listFromPusher
+      ..clear()
+      ..add(job);
+    myController.listFromPusher
+      ..clear()
+      ..add(job);
+
+    if (playAlert && isNewDispatch) {
+      _lastAlertedDispatchId = dispatchId;
+      startRingtoneAndVibrateLoop();
+    }
+
+    myController.jobPusherContainer.value = false;
+    myController.jobPusherContainer.value = true;
+    controller.toggleVariable(
+      myController.jobPusherContainer.value,
+      listFromPusher,
+    );
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Widget _buildAcceptedJobOverlay(BuildContext context) {
+    final job = myController.listFromPusher.first;
+    final distance = double.tryParse(job.journeyDistance);
+    final distanceText =
+        distance == null
+            ? '${job.journeyDistance} miles'
+            : '${(distance * 0.621371).toStringAsFixed(2)} miles';
+
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: context.appTheme.secondaryBackground,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 18,
+              color: Color(0x33000000),
+              offset: Offset(0, 8),
+            ),
+          ],
+          border: Border.all(color: context.appTheme.lineColor),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '\u00A3${job.journeyFare}',
+                        style: context.appTheme.headlineMedium.override(
+                          fontFamily: 'Outfit',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${job.pickDate} at ${job.pickTime}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.appTheme.bodySmall.override(
+                          fontFamily: 'Plus Jakarta Sans',
+                          color: context.appTheme.secondaryText,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                FFButtonWidget(
+                  onPressed: () async {
+                    await _openStartNavigationDialog(context);
+                  },
+                  text: 'Start Now',
+                  icon: const Icon(Icons.east, size: 15),
+                  options: FFButtonOptions(
+                    height: 40,
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                    color: context.appTheme.primary,
+                    textStyle: context.appTheme.titleSmall.override(
+                      fontFamily: 'Open Sans',
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                    elevation: 0,
+                    borderSide: const BorderSide(
+                      color: Colors.transparent,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildJobLocationLine(
+              context,
+              label: 'A',
+              text: job.pickup,
+              color: context.appTheme.success,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.route_rounded,
+                  color: context.appTheme.secondaryText,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '$distanceText ${job.journeyType}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.appTheme.bodySmall.override(
+                      fontFamily: 'Plus Jakarta Sans',
+                      color: context.appTheme.secondaryText,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _buildJobLocationLine(
+              context,
+              label: 'B',
+              text: job.destination,
+              color: context.appTheme.error,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJobLocationLine(
+    BuildContext context, {
+    required String label,
+    required String text,
+    required Color color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: context.appTheme.bodySmall.override(
+              fontFamily: 'Open Sans',
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: context.appTheme.bodyMedium.override(
+              fontFamily: 'Plus Jakarta Sans',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openStartNavigationDialog(BuildContext context) async {
+    if (myController.listFromPusher.isEmpty) {
+      return;
+    }
+
+    final job = myController.listFromPusher.first;
+    final sp = await SharedPreferences.getInstance();
+    _getCurrentTime();
+    await sp.setString('jobStartTime', formattedTime);
+
+    if (!mounted) {
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Start navigation'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: Image.asset('assets/images/google.png'),
+                ),
+                title: const Text('Open Google Maps'),
+                onTap: () async {
+                  await getLatLngFromAddress(job.pickup);
+                  await sp.setInt('isRideStart', 1);
+                  myController.visiblecontainer.value = false;
+                  startRideTracking(
+                    latitudeforGooglmap.toString(),
+                    lngforGooglmap.toString(),
+                  );
+                  await startTracking(latitudeforGooglmap, lngforGooglmap);
+                  if (Navigator.of(dialogContext).canPop()) {
+                    Navigator.pop(dialogContext);
+                  }
+                  await MapUtils.navigateTo(
+                    latitudeforGooglmap,
+                    lngforGooglmap,
+                  );
+                },
+              ),
+              ListTile(
+                leading: SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: Image.asset('assets/driver-app-icon.jpg'),
+                ),
+                title: const Text('Use in-app Mapbox route'),
+                onTap: () async {
+                  Navigator.pop(dialogContext);
+                  if (myController.initialLabelIndex.value == 1) {
+                    await sp.setBool('show', false);
+                    await sp.setInt('isRideStart', 1);
+                    myController.visiblecontainer.value = false;
+                    if (!mounted) {
+                      return;
+                    }
+                    await showModalBottomSheet(
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      enableDrag: false,
+                      context: context,
+                      builder: (context) {
+                        return Padding(
+                          padding: MediaQuery.viewInsetsOf(context),
+                          child: NotesWidget(
+                            dId: job.dId,
+                            jobId: job.jobId,
+                            pickTime: job.pickTime,
+                            pickDate: job.pickDate,
+                            passenger: job.passenger,
+                            pickup: job.pickup,
+                            dropoff: job.destination,
+                            luggage: job.luggage,
+                            cName: job.cName,
+                            cnumber: job.cPhone,
+                            cemail: job.cEmail,
+                            note: job.note,
+                            fare: job.journeyFare,
+                            distance: job.journeyDistance,
+                          ),
+                        );
+                      },
+                    ).then((value) => safeSetState(() {}));
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: "Please be online before starting the ride.",
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pushercallbg() async {
     myController.timer?.cancel();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       var pusher = PusherClient(
         _pusherAppKey,
-        PusherOptions(
-          host: ApiService.driverJobsUpcomingJobs,
-          cluster: _pusherCluster,
-          encrypted: false,
-        ),
+        PusherOptions(cluster: _pusherCluster, encrypted: true),
       );
       pusher.connect();
 
@@ -278,18 +599,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     } catch (e) {}
   }
 
-  timeSlotPusher() async {
+  Future<void> timeSlotPusher() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       // await prefs.remove('ts_id');
 
       var pusher = PusherClient(
         _pusherAppKey,
-        PusherOptions(
-          host: ApiService.driverTimeslotsFetchTimeSlot,
-          cluster: _pusherCluster,
-          encrypted: false,
-        ),
+        PusherOptions(cluster: _pusherCluster, encrypted: true),
       );
       pusher.connect();
 
@@ -309,20 +626,20 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
             'ts_id',
             jsonMap['details'][0]['ts_id'].toString(),
           );
-          myController.timeSlotid.value = jsonMap['details'][0]['ts_id']
-              .toString();
-          myController.timeSlotDate.value = jsonMap['details'][0]['ts_date']
-              .toString();
+          myController.timeSlotid.value =
+              jsonMap['details'][0]['ts_id'].toString();
+          myController.timeSlotDate.value =
+              jsonMap['details'][0]['ts_date'].toString();
           myController.timeSlotStarttime.value =
               jsonMap['details'][0]['start_time'].toString();
           _startTime = jsonMap['details'][0]['start_time'].toString();
           await prefs.remove('accepted');
           myController.isTimeSlotAccepted.value =
               prefs.getBool('accepted') ?? false;
-          _endTime = jsonMap['details'][0]['end_time']
-              .toString(); // e.g., "15:00:00"
-          myController.timeSlotEndTime.value = jsonMap['details'][0]['end_time']
-              .toString();
+          _endTime =
+              jsonMap['details'][0]['end_time'].toString(); // e.g., "15:00:00"
+          myController.timeSlotEndTime.value =
+              jsonMap['details'][0]['end_time'].toString();
           myController.timeSloPricePerhour.value =
               jsonMap['details'][0]['price_hour'].toString();
           myController.timeSlottotalPay.value =
@@ -413,6 +730,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     getTimeSlotFroApi();
 
     callAp();
+    _startDispatchPolling();
     fetchJobStatus();
 
     _loadSwitchStatus();
@@ -449,7 +767,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     );
   }
 
-  checkId() async {
+  Future<void> checkId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String st = '';
     st = prefs.getString('d_id') ?? '';
@@ -549,7 +867,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   List<Job> listFromPusher = [];
 
-  showNotification() async {
+  Future<void> showNotification() async {
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
@@ -642,52 +960,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   bool isjobAvailable = false;
-  checkJob() async {
+  Future<void> checkJob() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     isjobAvailable = sp.getBool('jobDispatched') ?? false;
     setState(() {});
   }
 
-  Future<void> _openDriverDrawer() async {
-    await checkJob();
-    if (isjobAvailable == false) {
-      scaffoldKey.currentState?.openDrawer();
-    } else {
-      Fluttertoast.showToast(msg: 'Complete Job First');
-    }
-  }
-
-  Future<void> _toggleDriverStatus() async {
-    await checkVehicleDocuments();
-    await checkJob();
-
-    if (myController.initialLabelIndex.value == 1 && isjobAvailable == true) {
-      Fluttertoast.showToast(msg: 'Complete Job First');
-      return;
-    }
-
-    final nextStatus = myController.initialLabelIndex.value == 1 ? 0 : 1;
-    final service = FlutterBackgroundService();
-
-    await saveSwitchStatus(nextStatus);
-    myController.initialLabelIndex.value = nextStatus;
-    makeBeep();
-    sendOnlineStatus();
-
-    if (nextStatus == 1) {
-      sendLocationDataPeriodically();
-      service.startService();
-    } else {
-      stopLocationDataPeriodicUpdates();
-      service.invoke("stopService");
-    }
-
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  callAp() async {
+  Future<void> callAp() async {
     checkJob();
     await jobDetailsFuture().then((_) {
       periodicStatus = true;
@@ -700,17 +979,15 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   void dispose() {
     myController.mapController.value?.dispose();
     myController.mapController.value = null;
+    _dispatchPollingTimer?.cancel();
+    userSession?.cancel();
+    locationTrackingTimer?.cancel();
     _timer?.cancel();
     super.dispose();
   }
 
   void _initMapAndLocation() {
-    if (myController.mapController.value != null) {
-      _getLocation();
-    } else {
-      // Delay until the map is ready
-      Future.delayed(Duration(milliseconds: 100), _initMapAndLocation);
-    }
+    unawaited(_getLocation());
   }
 
   @override
@@ -728,9 +1005,11 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     //     : '');
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
@@ -751,92 +1030,119 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         },
         child: Scaffold(
           drawerEnableOpenDragGesture: false,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
+          extendBody: true,
           key: scaffoldKey,
           drawer: DrawerWidget(),
-          body: SafeArea(
-            top: true,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: context.appTheme.secondaryBackground,
-                    ),
-                    child: Stack(
-                      children: [
-                        // Obx(() => )
-                        buildMap(),
-                        Positioned(
-                          top: 0,
-                          left: 16,
-                          right: 16,
-                          child: Obx(
-                            () => _DriverHomeHeader(
-                              isOnline:
-                                  myController.initialLabelIndex.value == 1,
-                              routeDistance: myController.routeDistance.value,
-                              routeDuration: myController.routeDuration.value,
-                              nextInstruction:
-                                  myController.nextInstruction.value,
-                              hasRoute:
-                                  myController.convertedLat.value != 0.0 &&
-                                  myController.convertedLng.value != 0.0,
-                              onMenu: _openDriverDrawer,
-                              onToggleStatus: _toggleDriverStatus,
-                            ),
-                          ),
-                        ),
-
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 150.0),
-                        //   child: TextButton(
-                        //       onPressed: () {
-                        //         Navigator.push(
-                        //             context,
-                        //             MaterialPageRoute(
-                        //                 builder: (context) => Dummy3View()));
-                        //       },
-                        //       child: Text('Navigation')),
-                        // ),
-                        Align(
-                          alignment: const AlignmentDirectional(0, 0),
-                          child: Obx(
-                            () => Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
+          body: Stack(
+            children: [
+              Positioned.fill(child: buildMap()),
+              SafeArea(
+                top: true,
+                bottom: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: Colors.transparent),
+                        child: Stack(
+                          children: [
+                            // Obx(() => )
+                            const SizedBox.expand(),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(top: 150.0),
+                            //   child: TextButton(
+                            //       onPressed: () {
+                            //         Navigator.push(
+                            //             context,
+                            //             MaterialPageRoute(
+                            //                 builder: (context) => Dummy3View()));
+                            //       },
+                            //       child: Text('Navigation')),
+                            // ),
+                            Align(
+                              alignment: const AlignmentDirectional(0, 0),
+                              child: Obx(
+                                () => Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            context.appTheme.primary,
-                                            context.appTheme.secondary,
-                                          ],
-                                          stops: [0, 1],
-                                          begin: const AlignmentDirectional(
-                                            1,
-                                            -0.98,
+                                    Column(
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                context.appTheme.primary,
+                                                context.appTheme.secondary,
+                                              ],
+                                              stops: [0, 1],
+                                              begin: const AlignmentDirectional(
+                                                1,
+                                                -0.98,
+                                              ),
+                                              end: const AlignmentDirectional(
+                                                -1,
+                                                0.98,
+                                              ),
+                                            ),
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                  bottomLeft: Radius.circular(
+                                                    30,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    30,
+                                                  ),
+                                                  topLeft: Radius.circular(0),
+                                                  topRight: Radius.circular(0),
+                                                ),
                                           ),
-                                          end: const AlignmentDirectional(
-                                            -1,
-                                            0.98,
+                                          child: InkWell(
+                                            onTap: () {},
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional.fromSTEB(
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                  ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    myController
+                                                                .initialLabelIndex
+                                                                .value !=
+                                                            1
+                                                        ? 'Offline'
+                                                        : 'Online',
+                                                    style: context
+                                                        .appTheme
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily:
+                                                              'Open Sans',
+                                                          fontSize: 18,
+                                                          color:
+                                                              context
+                                                                  .appTheme
+                                                                  .info,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                        borderRadius: const BorderRadius.only(
-                                          bottomLeft: Radius.circular(30),
-                                          bottomRight: Radius.circular(30),
-                                          topLeft: Radius.circular(0),
-                                          topRight: Radius.circular(0),
-                                        ),
-                                      ),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Padding(
+                                        Padding(
                                           padding:
                                               const EdgeInsetsDirectional.fromSTEB(
                                                 0,
@@ -845,278 +1151,267 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                 0,
                                               ),
                                           child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            // mainAxisSize: MainAxisSize.max,
+                                            // mainAxisAlignment:
+                                            //     MainAxisAlignment.center,
                                             children: [
-                                              Text(
-                                                myController
-                                                            .initialLabelIndex
-                                                            .value !=
-                                                        1
-                                                    ? 'Offline'
-                                                    : 'Online',
-                                                style: context
-                                                    .appTheme
-                                                    .bodyMedium
-                                                    .override(
-                                                      fontFamily: 'Open Sans',
-                                                      fontSize: 18,
-                                                      color:
-                                                          context.appTheme.info,
+                                              SizedBox(width: 15),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional.fromSTEB(
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
                                                     ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                            0,
-                                            0,
-                                            0,
-                                            0,
-                                          ),
-                                      child: Row(
-                                        // mainAxisSize: MainAxisSize.max,
-                                        // mainAxisAlignment:
-                                        //     MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(width: 15),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                  0,
-                                                  0,
-                                                  0,
-                                                  0,
-                                                ),
-                                            child: InkWell(
-                                              splashColor: Colors.transparent,
-                                              focusColor: Colors.transparent,
-                                              hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
-                                              onTap: () async {
-                                                setState(() {});
-                                                print(
-                                                  'the value is ${myController.jobPusherContainer.value}',
-                                                );
-                                                await checkJob();
-                                                if (isjobAvailable == false) {
-                                                  scaffoldKey.currentState!
-                                                      .openDrawer();
-                                                } else {
-                                                  Fluttertoast.showToast(
-                                                    msg: 'Complete Job First',
-                                                  );
-                                                }
-                                              },
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                elevation: 4,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                ),
-                                                child: Container(
-                                                  width: 45,
-                                                  height: 45,
-                                                  decoration: BoxDecoration(
-                                                    color: context
-                                                        .appTheme
-                                                        .secondaryBackground,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          50,
+                                                child: InkWell(
+                                                  splashColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  highlightColor:
+                                                      Colors.transparent,
+                                                  onTap: () async {
+                                                    setState(() {});
+                                                    print(
+                                                      'the value is ${myController.jobPusherContainer.value}',
+                                                    );
+                                                    await checkJob();
+                                                    if (isjobAvailable ==
+                                                        false) {
+                                                      scaffoldKey.currentState!
+                                                          .openDrawer();
+                                                    } else {
+                                                      Fluttertoast.showToast(
+                                                        msg:
+                                                            'Complete Job First',
+                                                      );
+                                                    }
+                                                  },
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    elevation: 4,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            50,
+                                                          ),
+                                                    ),
+                                                    child: Container(
+                                                      width: 45,
+                                                      height: 45,
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            context
+                                                                .appTheme
+                                                                .secondaryBackground,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              50,
+                                                            ),
+                                                        border: Border.all(
+                                                          color:
+                                                              context
+                                                                  .appTheme
+                                                                  .secondaryBackground,
                                                         ),
-                                                    border: Border.all(
-                                                      color: context
-                                                          .appTheme
-                                                          .secondaryBackground,
-                                                    ),
-                                                  ),
-                                                  alignment:
-                                                      const AlignmentDirectional(
-                                                        0,
-                                                        0,
                                                       ),
-                                                  child: FaIcon(
-                                                    FontAwesomeIcons.listUl,
-                                                    color: context
-                                                        .appTheme
-                                                        .secondaryText,
-                                                    size: 20,
+                                                      alignment:
+                                                          const AlignmentDirectional(
+                                                            0,
+                                                            0,
+                                                          ),
+                                                      child: FaIcon(
+                                                        FontAwesomeIcons.listUl,
+                                                        color:
+                                                            context
+                                                                .appTheme
+                                                                .secondaryText,
+                                                        size: 20,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 15),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsetsDirectional.fromSTEB(
-                                                  0,
-                                                  0,
-                                                  0,
-                                                  0,
-                                                ),
-                                            child: AnimatedGradientBorder(
-                                              borderSize: 4,
-                                              glowSize: 0,
-                                              gradientColors: [
-                                                Colors.transparent,
-                                                Colors.transparent,
-                                                Colors.transparent,
-                                                if (myController
-                                                        .initialLabelIndex
-                                                        .value ==
-                                                    1)
-                                                  context.appTheme.primary
-                                                else
-                                                  Colors.red,
-                                              ],
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                    Radius.circular(999),
-                                                  ),
-                                              child: SizedBox(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                          Radius.circular(999),
-                                                        ),
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondaryContainer,
-                                                  ),
-                                                  child: ToggleSwitch(
-                                                    minWidth:
-                                                        MediaQuery.sizeOf(
-                                                          context,
-                                                        ).width *
-                                                        0.30,
-                                                    minHeight: 50,
-                                                    initialLabelIndex:
-                                                        myController
+                                              SizedBox(width: 15),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional.fromSTEB(
+                                                      0,
+                                                      0,
+                                                      0,
+                                                      0,
+                                                    ),
+                                                child: AnimatedGradientBorder(
+                                                  borderSize: 4,
+                                                  glowSize: 0,
+                                                  gradientColors: [
+                                                    Colors.transparent,
+                                                    Colors.transparent,
+                                                    Colors.transparent,
+                                                    if (myController
                                                             .initialLabelIndex
-                                                            .value,
-                                                    cornerRadius: 30.0,
-                                                    activeFgColor: Colors.white,
-                                                    inactiveBgColor:
-                                                        Colors.grey,
-                                                    inactiveFgColor:
-                                                        Colors.white,
-                                                    totalSwitches: 2,
-                                                    labels: [
-                                                      'Offline',
-                                                      'Online',
-                                                    ],
-                                                    icons: [
-                                                      FontAwesomeIcons.powerOff,
-                                                      FontAwesomeIcons
-                                                          .dotCircle,
-                                                    ],
-                                                    activeBgColors: [
-                                                      [context.appTheme.error],
-                                                      [
-                                                        context
-                                                            .appTheme
-                                                            .primary,
-                                                      ],
-                                                    ],
-                                                    onToggle: (index) async {
-                                                      setState(() {});
-                                                      await checkVehicleDocuments();
-
-                                                      await checkJob();
-                                                      if (myController
-                                                                  .initialLabelIndex
-                                                                  .value ==
-                                                              1 &&
-                                                          isjobAvailable ==
-                                                              true) {
-                                                        Fluttertoast.showToast(
-                                                          msg:
-                                                              'Complete Job First',
-                                                        );
-                                                      } else {
-                                                        debugPrint(
-                                                          'the selection is $status',
-                                                        );
-                                                        final service =
-                                                            FlutterBackgroundService();
-                                                        fetchJobStatus();
-                                                        if (rootedCheck &&
-                                                            jailbreak &&
-                                                            devMode) {
-                                                          showToast(
-                                                            "Device is rooted",
-                                                          );
-                                                          showToast(
-                                                            "Device is jailbreak",
-                                                          );
-                                                        } else {
-                                                          var stb = true;
-                                                          if (true == true) {
-                                                            await saveSwitchStatus(
-                                                              index!,
-                                                            );
+                                                            .value ==
+                                                        1)
+                                                      context.appTheme.primary
+                                                    else
+                                                      Colors.red,
+                                                  ],
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                        Radius.circular(999),
+                                                      ),
+                                                  child: SizedBox(
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            const BorderRadius.all(
+                                                              Radius.circular(
+                                                                999,
+                                                              ),
+                                                            ),
+                                                        color:
+                                                            Theme.of(context)
+                                                                .colorScheme
+                                                                .secondaryContainer,
+                                                      ),
+                                                      child: ToggleSwitch(
+                                                        minWidth:
+                                                            MediaQuery.sizeOf(
+                                                              context,
+                                                            ).width *
+                                                            0.30,
+                                                        minHeight: 50,
+                                                        initialLabelIndex:
                                                             myController
-                                                                    .initialLabelIndex
-                                                                    .value =
-                                                                index;
-                                                            if (!jobStatus) {
-                                                              if (index == 1) {
-                                                                print(
-                                                                  'its online',
-                                                                );
-                                                                makeBeep();
-                                                                // startRingtoneAndVibrateLoop();
-                                                                sendOnlineStatus();
-                                                                sendLocationDataPeriodically();
-                                                                service
-                                                                    .startService();
-                                                                await Future.delayed(
-                                                                  const Duration(
-                                                                    seconds: 5,
-                                                                  ),
-                                                                );
-                                                              } else if (index ==
-                                                                  0) {
-                                                                makeBeep();
-                                                                // startRingtoneAndVibrateLoop();
-                                                                sendOnlineStatus();
-                                                                stopLocationDataPeriodicUpdates();
-                                                                service.invoke(
-                                                                  "stopService",
-                                                                );
-                                                                await Future.delayed(
-                                                                  const Duration(
-                                                                    seconds: 5,
-                                                                  ),
-                                                                );
-                                                              } else {}
-                                                            } else {
-                                                              // Fluttertoast
-                                                              //     .showToast(
-                                                              //   msg:
-                                                              //       "You Can't Go Offline.  You Go offline to Contact Support.",
-                                                              // );
-                                                            }
-                                                            if (mounted) {
-                                                              setState(() {
-                                                                // Update your state here
-                                                              });
-                                                            }
+                                                                .initialLabelIndex
+                                                                .value,
+                                                        cornerRadius: 30.0,
+                                                        activeFgColor:
+                                                            Colors.white,
+                                                        inactiveBgColor:
+                                                            Colors.grey,
+                                                        inactiveFgColor:
+                                                            Colors.white,
+                                                        totalSwitches: 2,
+                                                        labels: [
+                                                          'Offline',
+                                                          'Online',
+                                                        ],
+                                                        icons: [
+                                                          FontAwesomeIcons
+                                                              .powerOff,
+                                                          FontAwesomeIcons
+                                                              .dotCircle,
+                                                        ],
+                                                        activeBgColors: [
+                                                          [
+                                                            context
+                                                                .appTheme
+                                                                .error,
+                                                          ],
+                                                          [
+                                                            context
+                                                                .appTheme
+                                                                .primary,
+                                                          ],
+                                                        ],
+                                                        onToggle: (
+                                                          index,
+                                                        ) async {
+                                                          setState(() {});
+                                                          await checkVehicleDocuments();
+
+                                                          await checkJob();
+                                                          if (myController
+                                                                      .initialLabelIndex
+                                                                      .value ==
+                                                                  1 &&
+                                                              isjobAvailable ==
+                                                                  true) {
+                                                            Fluttertoast.showToast(
+                                                              msg:
+                                                                  'Complete Job First',
+                                                            );
                                                           } else {
-                                                            showDialog(
-                                                              context: context,
-                                                              builder:
-                                                                  (
+                                                            debugPrint(
+                                                              'the selection is $status',
+                                                            );
+                                                            final service =
+                                                                FlutterBackgroundService();
+                                                            fetchJobStatus();
+                                                            if (rootedCheck &&
+                                                                jailbreak &&
+                                                                devMode) {
+                                                              showToast(
+                                                                "Device is rooted",
+                                                              );
+                                                              showToast(
+                                                                "Device is jailbreak",
+                                                              );
+                                                            } else {
+                                                              var stb = true;
+                                                              if (true ==
+                                                                  true) {
+                                                                await saveSwitchStatus(
+                                                                  index!,
+                                                                );
+                                                                myController
+                                                                    .initialLabelIndex
+                                                                    .value = index;
+                                                                if (!jobStatus) {
+                                                                  if (index ==
+                                                                      1) {
+                                                                    print(
+                                                                      'its online',
+                                                                    );
+                                                                    makeBeep();
+                                                                    // startRingtoneAndVibrateLoop();
+                                                                    sendOnlineStatus();
+                                                                    sendLocationDataPeriodically();
+                                                                    service
+                                                                        .startService();
+                                                                    await Future.delayed(
+                                                                      const Duration(
+                                                                        seconds:
+                                                                            5,
+                                                                      ),
+                                                                    );
+                                                                  } else if (index ==
+                                                                      0) {
+                                                                    makeBeep();
+                                                                    // startRingtoneAndVibrateLoop();
+                                                                    sendOnlineStatus();
+                                                                    stopLocationDataPeriodicUpdates();
+                                                                    service.invoke(
+                                                                      "stopService",
+                                                                    );
+                                                                    await Future.delayed(
+                                                                      const Duration(
+                                                                        seconds:
+                                                                            5,
+                                                                      ),
+                                                                    );
+                                                                  } else {}
+                                                                } else {
+                                                                  // Fluttertoast
+                                                                  //     .showToast(
+                                                                  //   msg:
+                                                                  //       "You Can't Go Offline.  You Go offline to Contact Support.",
+                                                                  // );
+                                                                }
+                                                                if (mounted) {
+                                                                  setState(() {
+                                                                    // Update your state here
+                                                                  });
+                                                                }
+                                                              } else {
+                                                                showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder: (
                                                                     BuildContext
                                                                     context,
                                                                   ) {
@@ -1128,7 +1423,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                           const Text(
                                                                             'You are not Online. Uploading vehicle documents is required before switching to the Online state.',
                                                                           ),
-                                                                      actions: <Widget>[
+                                                                      actions: <
+                                                                        Widget
+                                                                      >[
                                                                         TextButton(
                                                                           child: const Text(
                                                                             'Cancel',
@@ -1155,337 +1452,383 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                       ],
                                                                     );
                                                                   },
-                                                            );
+                                                                );
+                                                              }
+                                                            }
                                                           }
-                                                        }
-                                                      }
-                                                    },
+                                                        },
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
 
-                                    // TextButton(
-                                    //   onPressed: () {
-                                    //     Navigator.push(
-                                    //       context,
-                                    //       MaterialPageRoute(
-                                    //         builder:
-                                    //             (context) => DummyViewMap(),
-                                    //       ),
-                                    //     );
-                                    //   },
-                                    //   child: Text('Map Testing'),
-                                    // ),
-                                    Obx(
-                                      () =>
-                                          myController
-                                              .isTimeSlotDispatched
-                                              .value
-                                          ? Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                              ),
-                                              width: double.infinity,
-                                              child: Column(
-                                                children: [
-                                                  SizedBox(height: 10),
-                                                  Text(
-                                                    _formatTime(_seconds),
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                        // TextButton(
+                                        //   onPressed: () {
+                                        //     Navigator.push(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //         builder:
+                                        //             (context) => DummyViewMap(),
+                                        //       ),
+                                        //     );
+                                        //   },
+                                        //   child: Text('Map Testing'),
+                                        // ),
+                                        Obx(
+                                          () =>
+                                              myController
+                                                      .isTimeSlotDispatched
+                                                      .value
+                                                  ? Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
                                                     ),
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      Text(
-                                                        'TimeSlot-Date :',
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        myController
-                                                            .timeSlotDate
-                                                            .value,
-                                                        style: TextStyle(),
-                                                      ),
-                                                      Container(
-                                                        height: 15,
-                                                        width: 1,
-                                                        color: Colors.grey,
-                                                      ),
-                                                      Text(
-                                                        'Start time :',
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        myController
-                                                            .timeSlotStarttime
-                                                            .value,
-                                                        style: TextStyle(),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      Text(
-                                                        'End time :',
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        myController
-                                                            .timeSlotEndTime
-                                                            .value,
-                                                        style: TextStyle(),
-                                                      ),
-                                                      Container(
-                                                        height: 15,
-                                                        width: 1,
-                                                        color: Colors.grey,
-                                                      ),
-                                                      Text(
-                                                        'Price per hour :',
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        '£${myController.timeSloPricePerhour.value}',
-                                                        style: TextStyle(),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            '  Total pay : £${myController.timeSlottotalPay.value}',
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
+                                                    width: double.infinity,
+                                                    child: Column(
+                                                      children: [
+                                                        SizedBox(height: 10),
+                                                        Text(
+                                                          _formatTime(_seconds),
+                                                          style: TextStyle(
+                                                            fontSize: 22,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
-                                                        ],
-                                                      ),
-                                                      myController
-                                                                  .isTimeSlotAccepted
-                                                                  .value ==
-                                                              false
-                                                          ? InkWell(
-                                                              onTap: () async {
-                                                                await FlutterRingtonePlayer()
-                                                                    .stop();
+                                                        ),
+                                                        SizedBox(height: 10),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceAround,
+                                                          children: [
+                                                            Text(
+                                                              'TimeSlot-Date :',
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              myController
+                                                                  .timeSlotDate
+                                                                  .value,
+                                                              style:
+                                                                  TextStyle(),
+                                                            ),
+                                                            Container(
+                                                              height: 15,
+                                                              width: 1,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                            Text(
+                                                              'Start time :',
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              myController
+                                                                  .timeSlotStarttime
+                                                                  .value,
+                                                              style:
+                                                                  TextStyle(),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        SizedBox(height: 10),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceAround,
+                                                          children: [
+                                                            Text(
+                                                              'End time :',
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              myController
+                                                                  .timeSlotEndTime
+                                                                  .value,
+                                                              style:
+                                                                  TextStyle(),
+                                                            ),
+                                                            Container(
+                                                              height: 15,
+                                                              width: 1,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                            Text(
+                                                              'Price per hour :',
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '£${myController.timeSloPricePerhour.value}',
+                                                              style:
+                                                                  TextStyle(),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        SizedBox(height: 10),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceAround,
+                                                          children: [
+                                                            Column(
+                                                              children: [
+                                                                Text(
+                                                                  '  Total pay : £${myController.timeSlottotalPay.value}',
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            myController
+                                                                        .isTimeSlotAccepted
+                                                                        .value ==
+                                                                    false
+                                                                ? InkWell(
+                                                                  onTap: () async {
+                                                                    await FlutterRingtonePlayer()
+                                                                        .stop();
 
-                                                                await Vibration.cancel();
-                                                                acceptTimeSlot();
-                                                                // _startTimer();
-                                                                // getTimeSlotFroApi();
-                                                                // timeSlotPusher();
-                                                              },
-                                                              child: Container(
-                                                                height: 40,
-                                                                width: 90,
-                                                                decoration: BoxDecoration(
-                                                                  color: context
-                                                                      .appTheme
-                                                                      .primary,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        8,
+                                                                    await Vibration.cancel();
+                                                                    acceptTimeSlot();
+                                                                    // _startTimer();
+                                                                    // getTimeSlotFroApi();
+                                                                    // timeSlotPusher();
+                                                                  },
+                                                                  child: Container(
+                                                                    height: 40,
+                                                                    width: 90,
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          context
+                                                                              .appTheme
+                                                                              .primary,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            8,
+                                                                          ),
+                                                                    ),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        'Accept',
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
                                                                       ),
-                                                                ),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    'Accept',
-                                                                    style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : Container(),
-                                                      myController
-                                                                  .isTimeSlotAccepted
-                                                                  .value ==
-                                                              false
-                                                          ? GestureDetector(
-                                                              onTap: () async {
-                                                                await FlutterRingtonePlayer()
-                                                                    .stop();
-                                                                await Vibration.cancel();
-                                                                rejectTimeSlot();
-                                                                // _stopTimer();
-                                                              },
-                                                              child: Container(
-                                                                height: 40,
-                                                                width: 90,
-                                                                decoration: BoxDecoration(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        8,
+                                                                )
+                                                                : Container(),
+                                                            myController
+                                                                        .isTimeSlotAccepted
+                                                                        .value ==
+                                                                    false
+                                                                ? GestureDetector(
+                                                                  onTap: () async {
+                                                                    await FlutterRingtonePlayer()
+                                                                        .stop();
+                                                                    await Vibration.cancel();
+                                                                    rejectTimeSlot();
+                                                                    // _stopTimer();
+                                                                  },
+                                                                  child: Container(
+                                                                    height: 40,
+                                                                    width: 90,
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          Colors
+                                                                              .red,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            8,
+                                                                          ),
+                                                                    ),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        'Reject',
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
                                                                       ),
-                                                                ),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    'Reject',
-                                                                    style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          : Container(),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 5),
-                                                ],
-                                              ),
-                                            )
-                                          : Container(),
+                                                                )
+                                                                : Container(),
+                                                          ],
+                                                        ),
+                                                        SizedBox(height: 5),
+                                                      ],
+                                                    ),
+                                                  )
+                                                  : Container(),
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                            0,
+                                            0,
+                                            20,
+                                            0,
+                                          ),
+                                      child: Align(
+                                        alignment: const AlignmentDirectional(
+                                          1,
+                                          1,
+                                        ),
+                                        child: InkWell(
+                                          onTap: _animateToCurrentLocation,
+                                          child: Icon(
+                                            Icons.my_location,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            size: 27,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0,
-                                    0,
-                                    20,
-                                    0,
-                                  ),
-                                  child: Align(
-                                    alignment: const AlignmentDirectional(1, 1),
-                                    child: InkWell(
-                                      onTap: _animateToCurrentLocation,
-                                      child: Icon(
-                                        Icons.my_location,
-                                        color: Theme.of(context).primaryColor,
-                                        size: 27,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 300.0,
-                            right: 20,
-                            left: 20,
-                          ),
-                          child: Obx(
-                            () => myController.isJobDetailDone.value
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      color: context.appTheme.primaryBackground,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    height: 80,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 14.0,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            height: 30,
-                                            width: 30,
-                                            child:
-                                                const CircularProgressIndicator(
-                                                  color: Colors.green,
-                                                ),
-                                          ),
-                                          const SizedBox(width: 20),
-                                          Text(
-                                            'Please wait...',
-                                            style: TextStyle(
-                                              color:
-                                                  context.appTheme.primaryText,
-                                              fontFamily: 'Satoshi',
-                                              fontSize: 15,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 300.0,
+                                right: 20,
+                                left: 20,
+                              ),
+                              child: Obx(
+                                () =>
+                                    myController.isJobDetailDone.value
+                                        ? Container(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                context
+                                                    .appTheme
+                                                    .primaryBackground,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : Container(),
-                          ),
+                                          height: 80,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14.0,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child:
+                                                      const CircularProgressIndicator(
+                                                        color: Colors.green,
+                                                      ),
+                                                ),
+                                                const SizedBox(width: 20),
+                                                Text(
+                                                  'Please wait...',
+                                                  style: TextStyle(
+                                                    color:
+                                                        context
+                                                            .appTheme
+                                                            .primaryText,
+                                                    fontFamily: 'Satoshi',
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                        : Container(),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Obx(
+                                () =>
+                                    myController.jobPusherContainer.value ==
+                                            true
+                                        ? AnimatedGradientBorder(
+                                          glowSize: 0,
+                                          gradientColors: [
+                                            Colors.transparent,
+                                            Colors.transparent,
+                                            Colors.transparent,
+                                            if (myController
+                                                    .initialLabelIndex
+                                                    .value ==
+                                                1)
+                                              context.appTheme.primary
+                                            else
+                                              Colors.transparent,
+                                          ],
+                                          borderRadius: const BorderRadius.all(
+                                            Radius.circular(8),
+                                          ),
+                                          child: HomeScreenAlert(
+                                            isfromUi: true,
+                                            height:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.height *
+                                                0.44,
+                                            st:
+                                                myController.listFromPusher
+                                                    .toList(),
+                                          ),
+                                        )
+                                        : SizedBox.shrink(),
+                              ),
+                            ),
+                            Positioned(
+                              left: 16,
+                              right: 16,
+                              bottom:
+                                  MediaQuery.viewPaddingOf(context).bottom +
+                                  104,
+                              child: Obx(
+                                () =>
+                                    myController.visiblecontainer.value ==
+                                                true &&
+                                            myController
+                                                .listFromPusher
+                                                .isNotEmpty
+                                        ? _buildAcceptedJobOverlay(context)
+                                        : const SizedBox.shrink(),
+                              ),
+                            ),
+                          ],
                         ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Obx(
-                            () => myController.jobPusherContainer.value == true
-                                ? AnimatedGradientBorder(
-                                    glowSize: 0,
-                                    gradientColors: [
-                                      Colors.transparent,
-                                      Colors.transparent,
-                                      Colors.transparent,
-                                      if (myController
-                                              .initialLabelIndex
-                                              .value ==
-                                          1)
-                                        context.appTheme.primary
-                                      else
-                                        Colors.transparent,
-                                    ],
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(8),
-                                    ),
-                                    child: HomeScreenAlert(
-                                      isfromUi: true,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                          0.44,
-                                      st: listFromPusher,
-                                    ),
-                                  )
-                                : SizedBox.shrink(),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                Obx(
-                  () => Column(
-                    children: [
-                      myController.visiblecontainer.value == true
-                          ? Container(
+                    Column(
+                      children: [
+                        false &&
+                                myController.visiblecontainer.value == true &&
+                                myController.listFromPusher.isNotEmpty
+                            ? Container(
                               // height: 580,
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
@@ -1535,9 +1878,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                             .override(
                                                               fontFamily:
                                                                   'Outfit',
-                                                              color: context
-                                                                  .appTheme
-                                                                  .primaryText,
+                                                              color:
+                                                                  context
+                                                                      .appTheme
+                                                                      .primaryText,
                                                               fontSize: 32,
                                                               fontWeight:
                                                                   FontWeight
@@ -1552,16 +1896,19 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                             .override(
                                                               fontFamily:
                                                                   'Montserrat',
-                                                              color: context
-                                                                  .appTheme
-                                                                  .primaryText,
+                                                              color:
+                                                                  context
+                                                                      .appTheme
+                                                                      .primaryText,
                                                               fontSize: 14,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w500,
                                                             ),
                                                       ),
-                                                    ].divide(const SizedBox(height: 1)),
+                                                    ].divide(
+                                                      const SizedBox(height: 1),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -1591,9 +1938,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                           height: 30,
                                                           child: VerticalDivider(
                                                             thickness: 2,
-                                                            color: context
-                                                                .appTheme
-                                                                .secondaryText,
+                                                            color:
+                                                                context
+                                                                    .appTheme
+                                                                    .secondaryText,
                                                           ),
                                                         ),
                                                       ),
@@ -1699,7 +2047,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                       ),
                                                     ],
                                                   ),
-                                                ].divide(const SizedBox(width: 16)),
+                                                ].divide(
+                                                  const SizedBox(width: 16),
+                                                ),
                                               ),
                                             ),
                                             Padding(
@@ -1727,8 +2077,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 BorderRadius.circular(
                                                                   50,
                                                                 ),
-                                                            shape: BoxShape
-                                                                .rectangle,
+                                                            shape:
+                                                                BoxShape
+                                                                    .rectangle,
                                                             border: Border.all(
                                                               color:
                                                                   const Color(
@@ -1746,9 +2097,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                   .override(
                                                                     fontFamily:
                                                                         'Open Sans',
-                                                                    color: context
-                                                                        .appTheme
-                                                                        .secondaryBackground,
+                                                                    color:
+                                                                        context
+                                                                            .appTheme
+                                                                            .secondaryBackground,
                                                                     fontSize:
                                                                         18,
                                                                     fontWeight:
@@ -1797,8 +2149,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                         0,
                                                                         0.0,
                                                                       ),
-                                                                  shape: BoxShape
-                                                                      .circle,
+                                                                  shape:
+                                                                      BoxShape
+                                                                          .circle,
                                                                 ),
                                                               ),
                                                             ),
@@ -1830,9 +2183,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                 .override(
                                                                   fontFamily:
                                                                       'Open Sans',
-                                                                  color: context
-                                                                      .appTheme
-                                                                      .secondaryBackground,
+                                                                  color:
+                                                                      context
+                                                                          .appTheme
+                                                                          .secondaryBackground,
                                                                   fontSize: 18,
                                                                   fontWeight:
                                                                       FontWeight
@@ -1873,9 +2227,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                       .override(
                                                                         fontFamily:
                                                                             'Readex Pro',
-                                                                        color: context
-                                                                            .appTheme
-                                                                            .secondaryText,
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
                                                                         fontSize:
                                                                             15,
                                                                       ),
@@ -1916,9 +2269,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                       .override(
                                                                         fontFamily:
                                                                             'Open Sans',
-                                                                        color: context
-                                                                            .appTheme
-                                                                            .secondaryText,
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
                                                                         fontSize:
                                                                             15,
                                                                       ),
@@ -1946,9 +2298,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                       .override(
                                                                         fontFamily:
                                                                             'Readex Pro',
-                                                                        color: context
-                                                                            .appTheme
-                                                                            .secondaryText,
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
                                                                         fontSize:
                                                                             15,
                                                                       ),
@@ -1988,7 +2339,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
                                                     showDialog(
                                                       context: context,
-                                                      builder: (BuildContext context) {
+                                                      builder: (
+                                                        BuildContext context,
+                                                      ) {
                                                         return AlertDialog(
                                                           title: Text(
                                                             'Start navigation',
@@ -2015,6 +2368,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                         .listFromPusher[0]
                                                                         .pickup,
                                                                   );
+                                                                  await sp.setInt(
+                                                                    'isRideStart',
+                                                                    1,
+                                                                  );
+                                                                  myController
+                                                                      .visiblecontainer
+                                                                      .value = false;
                                                                   // first background
                                                                   startRideTracking(
                                                                     latitudeforGooglmap
@@ -2064,6 +2424,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                       'isRideStart',
                                                                       1,
                                                                     );
+                                                                    myController
+                                                                        .visiblecontainer
+                                                                        .value = false;
                                                                     await showModalBottomSheet(
                                                                       isScrollControlled:
                                                                           true,
@@ -2074,7 +2437,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                                           false,
                                                                       context:
                                                                           context,
-                                                                      builder: (context) {
+                                                                      builder: (
+                                                                        context,
+                                                                      ) {
                                                                         return Padding(
                                                                           padding: MediaQuery.viewInsetsOf(
                                                                             context,
@@ -2158,9 +2523,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                           0,
                                                           0,
                                                         ),
-                                                    color: context
-                                                        .appTheme
-                                                        .primary,
+                                                    color:
+                                                        context
+                                                            .appTheme
+                                                            .primary,
                                                     textStyle: context
                                                         .appTheme
                                                         .titleSmall
@@ -2173,8 +2539,9 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                                     elevation: 3,
                                                     borderSide:
                                                         const BorderSide(
-                                                          color: Colors
-                                                              .transparent,
+                                                          color:
+                                                              Colors
+                                                                  .transparent,
                                                           width: 1,
                                                         ),
                                                     borderRadius:
@@ -2193,12 +2560,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
                                 ],
                               ),
                             )
-                          : SizedBox.shrink(),
-                    ],
-                  ),
+                            : SizedBox.shrink(),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -2221,23 +2589,27 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       final destinationLat = myController.convertedLat.value;
       final destinationLng = myController.convertedLng.value;
       final routeCount = myController.decodedPoints.length;
+      final currentLatitude =
+          latitude != 0.0
+              ? latitude
+              : myController.currentLocation?.latitude ?? 0.0;
+      final currentLongitude =
+          longitude != 0.0
+              ? longitude
+              : myController.currentLocation?.longitude ?? 0.0;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _syncMapboxAnnotations(
-          latitude: latitude,
-          longitude: longitude,
+          latitude: currentLatitude,
+          longitude: currentLongitude,
           destinationLat: destinationLat,
           destinationLng: destinationLng,
           routeCount: routeCount,
         );
       });
 
-      final centerLat = latitude != 0.0
-          ? latitude
-          : myController.currentLocation?.latitude ?? 51.5074;
-      final centerLng = longitude != 0.0
-          ? longitude
-          : myController.currentLocation?.longitude ?? -0.1278;
+      final centerLat = currentLatitude != 0.0 ? currentLatitude : 51.5074;
+      final centerLng = currentLongitude != 0.0 ? currentLongitude : -0.1278;
 
       return mapbox.MapWidget(
         key: const ValueKey('home-mapbox-map'),
@@ -2251,8 +2623,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         onStyleLoadedListener: (_) async {
           _mapboxStyleReady = true;
           await _syncMapboxAnnotations(
-            latitude: latitude,
-            longitude: longitude,
+            latitude: currentLatitude,
+            longitude: currentLongitude,
             destinationLat: destinationLat,
             destinationLng: destinationLng,
             routeCount: routeCount,
@@ -2268,18 +2640,19 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
   Future<void> _onMapboxMapCreated(mapbox.MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
-    _mapPointManager = await mapboxMap.annotations
-        .createPointAnnotationManager();
-    _mapPolylineManager = await mapboxMap.annotations
-        .createPolylineAnnotationManager();
+    _mapPointManager =
+        await mapboxMap.annotations.createPointAnnotationManager();
+    _mapPolylineManager =
+        await mapboxMap.annotations.createPolylineAnnotationManager();
 
     await mapboxMap.location.updateSettings(
       mapbox.LocationComponentSettings(
-        enabled: true,
-        pulsingEnabled: true,
-        puckBearingEnabled: true,
+        enabled: false,
+        pulsingEnabled: false,
+        puckBearingEnabled: false,
       ),
     );
+    unawaited(_getLocation());
   }
 
   Future<void> _syncMapboxAnnotations({
@@ -2295,7 +2668,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       return;
     }
 
-    _driverMarkerImage ??= await _loadMarkerBytes('assets/images/car.png');
+    _driverMarkerImage ??= await _buildDriverMarkerBytes();
     _destinationMarkerImage ??= await _loadMarkerBytes(
       'assets/images/userg.png',
     );
@@ -2307,8 +2680,8 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         mapbox.PointAnnotationOptions(
           geometry: _mapboxPoint(longitude, latitude),
           image: _driverMarkerImage,
-          iconSize: 0.68,
-          iconAnchor: mapbox.IconAnchor.CENTER,
+          iconSize: 0.52,
+          iconAnchor: mapbox.IconAnchor.BOTTOM,
           symbolSortKey: 2,
         ),
       );
@@ -2334,9 +2707,10 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
 
     await _mapPolylineManager!.deleteAll();
     if (routeCount > 1) {
-      final coordinates = myController.decodedPoints
-          .map((point) => mapbox.Position(point.longitude, point.latitude))
-          .toList();
+      final coordinates =
+          myController.decodedPoints
+              .map((point) => mapbox.Position(point.longitude, point.latitude))
+              .toList();
       await _mapPolylineManager!.create(
         mapbox.PolylineAnnotationOptions(
           geometry: mapbox.LineString(coordinates: coordinates),
@@ -2348,6 +2722,83 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         ),
       );
     }
+  }
+
+  Future<Uint8List> _buildDriverMarkerBytes() async {
+    const markerWidth = 112;
+    const markerHeight = 136;
+    const center = Offset(markerWidth / 2, 52);
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    final pinPath =
+        Path()
+          ..moveTo(markerWidth / 2, markerHeight - 8)
+          ..cubicTo(47, 116, 16, 90, 16, 52)
+          ..cubicTo(16, 26, 34, 8, markerWidth / 2, 8)
+          ..cubicTo(78, 8, 96, 26, 96, 52)
+          ..cubicTo(96, 90, 65, 116, markerWidth / 2, markerHeight - 8)
+          ..close();
+
+    canvas.drawPath(
+      pinPath.shift(const Offset(0, 5)),
+      Paint()
+        ..color = const Color(0x33000000)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 8),
+    );
+    canvas.drawPath(pinPath, Paint()..color = Colors.white);
+    canvas.drawPath(
+      pinPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4
+        ..color = _green,
+    );
+
+    canvas.drawCircle(center, 34, Paint()..color = _green);
+    canvas.drawCircle(
+      center,
+      27,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = const Color(0x26FFFFFF),
+    );
+
+    final carIcon = Icons.local_taxi_rounded;
+    final iconPainter = TextPainter(
+      text: TextSpan(
+        text: String.fromCharCode(carIcon.codePoint),
+        style: TextStyle(
+          color: Colors.white,
+          fontFamily: carIcon.fontFamily,
+          package: carIcon.fontPackage,
+          fontSize: 42,
+          height: 1,
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+    iconPainter.paint(
+      canvas,
+      Offset(
+        center.dx - iconPainter.width / 2,
+        center.dy - iconPainter.height / 2,
+      ),
+    );
+
+    canvas.drawCircle(
+      const Offset(markerWidth / 2, markerHeight - 13),
+      4,
+      Paint()..color = _gold,
+    );
+
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(markerWidth, markerHeight);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
+    picture.dispose();
+    return byteData!.buffer.asUint8List();
   }
 
   Future<Uint8List> _loadMarkerBytes(String assetPath) async {
@@ -2386,12 +2837,14 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   void _animateToCurrentLocation() {
-    final latitude = myController.latitude.value != 0.0
-        ? myController.latitude.value
-        : myController.currentLocation?.latitude;
-    final longitude = myController.longitude.value != 0.0
-        ? myController.longitude.value
-        : myController.currentLocation?.longitude;
+    final latitude =
+        myController.latitude.value != 0.0
+            ? myController.latitude.value
+            : myController.currentLocation?.latitude;
+    final longitude =
+        myController.longitude.value != 0.0
+            ? myController.longitude.value
+            : myController.currentLocation?.longitude;
 
     if (latitude == null || longitude == null) {
       return;
@@ -2684,7 +3137,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     } else {}
   }
 
-  Future jobDetailsFuture() async {
+  Future<void> jobDetailsFuture({bool playAlertForNewJob = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
 
@@ -2697,64 +3150,25 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         final jsonMap = json.decode(response.body);
 
-        bool status = jsonMap['status'];
+        final status = jsonMap['status'] == true;
 
-        if (status == true) {
+        if (status == true &&
+            jsonMap['data'] is List &&
+            (jsonMap['data'] as List).isNotEmpty) {
           periodicStatus = true;
 
-          listFromPusher.clear();
-
-          listFromPusher.add(
-            Job(
-              jobId: jsonMap['data'][0]['job_id'].toString() ?? "",
-              bookId: jsonMap['data'][0]['book_id'].toString() ?? '',
-              cId: jsonMap['data'][0]['00000003'].toString() ?? "",
-              dId: jsonMap['data'][0]['00000000002'].toString() ?? '',
-              jobNote: jsonMap['data'][0]['job_note'].toString() ?? '',
-              journeyFare: jsonMap['data'][0]['journey_fare'].toString() ?? '',
-              bookingFee: jsonMap['data'][0]['booking_fee'].toString() ?? "",
-              carParking: jsonMap['data'][0]['car_parking'].toString() ?? '',
-              waiting: jsonMap['data'][0]['waiting'].toString() ?? '',
-              tolls: jsonMap['data'][0]['tolls'].toString() ?? '',
-              extra: jsonMap['data'][0]['extra'].toString() ?? '',
-              jobStatus: jsonMap['data'][0]['job_status'].toString() ?? '',
-              dateJobAdd: jsonMap['data'][0]['date_job_add'].toString() ?? '',
-              cName: jsonMap['data'][0]['c_name'].toString() ?? '',
-              cEmail: jsonMap['data'][0]['c_email'].toString() ?? '',
-              cPhone: jsonMap['data'][0]['c_phone'].toString() ?? '',
-              cAddress: jsonMap['data'][0]['c_address'].toString() ?? '',
-              dName: jsonMap['data'][0]['d_name'].toString() ?? '',
-              dEmail: jsonMap['data'][0]['d_email'].toString() ?? '',
-              dPhone: jsonMap['data'][0]['d_phone'].toString() ?? '',
-              bTypeId: jsonMap['data'][0]['b_type_id'].toString() ?? '',
-              pickup: jsonMap['data'][0]['pickup'].toString() ?? '',
-              destination: jsonMap['data'][0]['destination'].toString() ?? '',
-              address: jsonMap['data'][0]['address'].toString() ?? '',
-              postalCode: jsonMap['data'][0]['postal_code'].toString() ?? '',
-              passenger: jsonMap['data'][0]['passenger'].toString() ?? '',
-              pickDate: jsonMap['data'][0]['pick_date'].toString() ?? '',
-              pickTime: jsonMap['data'][0]['pick_time'].toString() ?? '',
-              journeyType: jsonMap['data'][0]['journey_type'].toString() ?? '',
-              vId: jsonMap['data'][0]['v_id'].toString() ?? '',
-              luggage: jsonMap['data'][0]['luggage'].toString() ?? '',
-              childSeat: jsonMap['data'][0]['child_seat'].toString() ?? '',
-              flightNumber:
-                  jsonMap['data'][0]['flight_number'].toString() ?? '',
-              delayTime: jsonMap['data'][0]['delay_time'].toString() ?? '',
-              note: jsonMap['data'][0]['note'].toString() ?? '',
-              journeyDistance:
-                  jsonMap['data'][0]['journey_distance'].toString() ?? '',
-              bookingStatus:
-                  jsonMap['data'][0]['booking_status'].toString() ?? '',
-              bidStatus: jsonMap['data'][0]['bid_status'].toString() ?? '',
-              bidNote: jsonMap['data'][0]['bid_note'].toString() ?? '',
-              bookAddDate: jsonMap['data'][0]['bid_status'].toString() ?? '',
-            ),
+          final firstJob = Map<String, dynamic>.from(
+            (jsonMap['data'] as List).first as Map,
           );
-          myController.jobPusherContainer.value = true;
-          // showAlert();
+          await _publishDispatchedJob(
+            _jobFromPusherData(firstJob),
+            prefs,
+            playAlert: playAlertForNewJob,
+          );
         } else {
           periodicStatus = false;
+          myController.jobPusherContainer.value = false;
+          listFromPusher.clear();
         }
 
         // // Process and return jobs if available
@@ -2772,13 +3186,12 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
         throw Exception('Failed to load jobs');
       }
     } catch (e) {
-      // Handle exceptions here
-      // Re-throw the exception to propagate it further if needed
+      debugPrint('Dispatch polling failed: $e');
     }
   }
 
   AudioPlayer player = AudioPlayer();
-  makeBeep() async {
+  Future<void> makeBeep() async {
     player.setReleaseMode(ReleaseMode.stop);
 
     // Start the player as soon as the app is displayed.
@@ -2789,14 +3202,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
   }
 
   void startRingtoneAndVibrateLoop() {
-    FlutterRingtonePlayer().playRingtone();
-    // FlutterRingtonePlayer.play(
-    //   android: AndroidSounds.notification,
-    //   ios: IosSounds.glass,
-    //   looping: true,
-    //   volume: 1.0,
-    // );
-    Vibration.vibrate(duration: 1000);
+    FlutterRingtonePlayer().play(
+      android: AndroidSounds.alarm,
+      ios: IosSounds.alarm,
+      looping: true,
+      volume: 1.0,
+    );
+    Vibration.vibrate(duration: 3000);
 
     Timer(const Duration(seconds: 34), () {
       FlutterRingtonePlayer().stop();
@@ -2855,7 +3267,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     await prefs.setBool('isLogin', true);
   }
 
-  _loadSwitchStatus() async {
+  Future<void> _loadSwitchStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int savedIndex = prefs.getInt('switchValue') ?? 0;
     setState(() {
@@ -2863,7 +3275,7 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     });
   }
 
-  saveSwitchStatus(int index) async {
+  Future<void> saveSwitchStatus(int index) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt('switchValue', index);
   }
@@ -2932,20 +3344,69 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
     locationTimer = null;
   }
 
-  Future<void> _getLocation() async {
-    try {
-      myController.currentLocation = await Geolocator.getCurrentPosition();
+  Future<bool> _ensureLocationPermission() async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Fluttertoast.showToast(msg: 'Please enable location services.');
+      return false;
+    }
 
-      if (myController.currentLocation != null) {
-        myController.mapController.value!.animateCamera(
-          CameraUpdate.newLatLng(
-            LatLng(
-              myController.currentLocation!.latitude,
-              myController.currentLocation!.longitude,
-            ),
-          ),
-        );
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      Fluttertoast.showToast(msg: 'Location permission is required.');
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _getLocation() async {
+    if (_isFetchingCurrentLocation) {
+      return;
+    }
+
+    _isFetchingCurrentLocation = true;
+    try {
+      final hasPermission = await _ensureLocationPermission();
+      if (!hasPermission) {
+        return;
       }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+      myController.currentLocation = position;
+      myController.latitude.value = position.latitude;
+      myController.longitude.value = position.longitude;
+
+      final currentLatLng = LatLng(position.latitude, position.longitude);
+      _mapboxMap?.flyTo(
+        mapbox.CameraOptions(
+          center: _mapboxPoint(position.longitude, position.latitude),
+          zoom: 16.2,
+          pitch: 54,
+        ),
+        mapbox.MapAnimationOptions(duration: 700),
+      );
+      myController.mapController.value?.animateCamera(
+        CameraUpdate.newLatLngZoom(currentLatLng, 16.2),
+      );
+
+      await _syncMapboxAnnotations(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        destinationLat: myController.convertedLat.value,
+        destinationLng: myController.convertedLng.value,
+        routeCount: myController.decodedPoints.length,
+      );
+
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -2957,192 +3418,13 @@ class _HomeWidgetState extends State<HomeWidget> with WidgetsBindingObserver {
           isLoading = false;
         });
       }
+    } finally {
+      _isFetchingCurrentLocation = false;
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
-  }
-}
-
-class _DriverHomeHeader extends StatelessWidget {
-  const _DriverHomeHeader({
-    required this.isOnline,
-    required this.routeDistance,
-    required this.routeDuration,
-    required this.nextInstruction,
-    required this.hasRoute,
-    required this.onMenu,
-    required this.onToggleStatus,
-  });
-
-  final bool isOnline;
-  final String routeDistance;
-  final String routeDuration;
-  final String nextInstruction;
-  final bool hasRoute;
-  final VoidCallback onMenu;
-  final VoidCallback onToggleStatus;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE1E7E3)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x1A101820),
-              blurRadius: 24,
-              offset: Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  IconButton.filledTonal(
-                    tooltip: 'Menu',
-                    onPressed: onMenu,
-                    icon: const Icon(Icons.menu_rounded),
-                    style: IconButton.styleFrom(
-                      backgroundColor: _HomeWidgetState._surface,
-                      foregroundColor: _HomeWidgetState._ink,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Driver cockpit',
-                          style: context.appTheme.titleSmall.copyWith(
-                            color: _HomeWidgetState._ink,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          hasRoute ? 'Mapbox route ready' : 'Waiting for jobs',
-                          overflow: TextOverflow.ellipsis,
-                          style: context.appTheme.bodySmall.copyWith(
-                            color: const Color(0xFF65736C),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: onToggleStatus,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isOnline
-                            ? const Color(0xFFE7F5EF)
-                            : const Color(0xFFFDECEC),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isOnline
-                              ? const Color(0xFFB7DEC9)
-                              : const Color(0xFFF2C4C4),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.power_settings_new_rounded,
-                            size: 18,
-                            color: isOnline
-                                ? _HomeWidgetState._green
-                                : const Color(0xFFE65454),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            isOnline ? 'Online' : 'Offline',
-                            style: context.appTheme.bodySmall.copyWith(
-                              color: isOnline
-                                  ? _HomeWidgetState._green
-                                  : const Color(0xFFE65454),
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (hasRoute) const SizedBox(height: 12),
-              if (hasRoute)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _HomeWidgetState._surface,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: _HomeWidgetState._gold,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.navigation_rounded,
-                          color: _HomeWidgetState._ink,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              nextInstruction,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.appTheme.bodyMedium.copyWith(
-                                color: _HomeWidgetState._ink,
-                                fontWeight: FontWeight.w700,
-                                height: 1.25,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '$routeDistance | $routeDuration',
-                              style: context.appTheme.bodySmall.copyWith(
-                                color: const Color(0xFF65736C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
-import 'package:glowy_borders/glowy_borders.dart';
 import 'package:new_minicab_driver/Model/jobDetails.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import 'package:new_minicab_driver/flutter_flow/flutter_flow_util.dart';
@@ -20,11 +18,7 @@ import 'package:new_minicab_driver/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:http/http.dart' as http;
-import 'dart:ui';
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
 
-import 'package:flutter/services.dart';
 export 'home_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:convert';
@@ -41,13 +35,13 @@ class HomeScreenAlert extends StatefulWidget {
 }
 
 class _HomeScreenAlertState extends State<HomeScreenAlert> {
-  Future acceptJob(String jobId, String bookId) async {
+  Future<bool> acceptJob(Job job) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       String? dId = prefs.getString('d_id');
       var fields = {
-        'job_id': jobId.toString(),
-        'book_id': bookId.toString(),
+        'job_id': job.jobId.toString(),
+        'book_id': job.bookId.toString(),
         'd_id': dId.toString(),
       };
       var uri = Uri.parse(ApiService.driverAcceptJob);
@@ -56,20 +50,26 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
-        // Navigator.pop(context);
         print('Job accepted successfully');
-        Timer(Duration(seconds: 1), () {
-          print('now timer start');
-          myController.jobDetails();
-        });
+        await prefs.setBool('jobDispatched', true);
+        await prefs.setString('jobId', job.jobId);
+        await prefs.setString('bookingid', job.bookId);
+
+        myController.listFromPusher
+          ..clear()
+          ..add(job);
+        myController.visiblecontainer.value = true;
+        myController.jobPusherContainer.value = false;
         myController.isJobDetailDone.value = false;
+
         print('object0');
-        print('object ${jsonData['data'][0]['pickup']}');
-        await getCoordinatesFromAddress(jsonData['data'][0]['pickup']);
+        final acceptedPickup =
+            jsonData['data'] is List && jsonData['data'].isNotEmpty
+                ? jsonData['data'][0]['pickup']?.toString()
+                : null;
+        await getCoordinatesFromAddress(acceptedPickup ?? job.pickup);
 
-        // myController.visiblecontainer.value = true;
-
-        // closeOverlay();
+        return true;
       } else {
         print('Failed to accept job. Status Code: ${response.statusCode}');
         print('Reason: ${response.reasonPhrase}');
@@ -77,6 +77,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
     } catch (e) {
       print('Error during HTTP request: $e');
     }
+    return false;
   }
 
   Future _getPolyline(double destinationLat, double desLng) async {
@@ -306,8 +307,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                 height: 50,
                                 child: VerticalDivider(
                                   thickness: 2,
-                                  color:
-                                      context.appTheme.secondaryText,
+                                  color: context.appTheme.secondaryText,
                                 ),
                               ),
                             ),
@@ -338,10 +338,11 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                         ),
                                     child: Text(
                                       'Date',
-                                      style: context.appTheme.bodyMedium.override(
-                                        fontFamily: 'Roboto',
-                                        fontSize: 16,
-                                      ),
+                                      style: context.appTheme.bodyMedium
+                                          .override(
+                                            fontFamily: 'Roboto',
+                                            fontSize: 16,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -373,10 +374,11 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                     ),
                                     child: Text(
                                       jobItem.pickDate,
-                                      style: context.appTheme.bodyMedium.override(
-                                        fontFamily: 'Roboto',
-                                        fontSize: 16,
-                                      ),
+                                      style: context.appTheme.bodyMedium
+                                          .override(
+                                            fontFamily: 'Roboto',
+                                            fontSize: 16,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -501,12 +503,15 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                       ),
                                       child: Text(
                                         jobItem.pickup,
-                                        style: context.appTheme.labelMedium.override(
-                                          fontFamily: 'Readex Pro',
-                                          color:
-                                              context.appTheme.secondaryText,
-                                          fontSize: 14,
-                                        ),
+                                        style: context.appTheme.labelMedium
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color:
+                                                  context
+                                                      .appTheme
+                                                      .secondaryText,
+                                              fontSize: 14,
+                                            ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                       ),
@@ -528,12 +533,13 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                       '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${jobItem.journeyType}',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
-                                      style: context.appTheme.bodyMedium.override(
-                                        fontFamily: 'Open Sans',
-                                        color:
-                                            context.appTheme.secondaryText,
-                                        fontSize: 15,
-                                      ),
+                                      style: context.appTheme.bodyMedium
+                                          .override(
+                                            fontFamily: 'Open Sans',
+                                            color:
+                                                context.appTheme.secondaryText,
+                                            fontSize: 15,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -548,12 +554,15 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                       ),
                                       child: Text(
                                         jobItem.destination,
-                                        style: context.appTheme.labelMedium.override(
-                                          fontFamily: 'Readex Pro',
-                                          color:
-                                              context.appTheme.secondaryText,
-                                          fontSize: 15,
-                                        ),
+                                        style: context.appTheme.labelMedium
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color:
+                                                  context
+                                                      .appTheme
+                                                      .secondaryText,
+                                              fontSize: 15,
+                                            ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                       ),
@@ -620,10 +629,12 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                           await sp.setString('jobAcceptedTime', formattedTime);
                           // myController.visiblecontainer.value = true;
                           myController.isJobDetailDone.value = true;
-                          await acceptJob(
-                            jobItem.jobId,
-                            jobItem.bookId,
-                          ).then((s) {});
+                          final accepted = await acceptJob(jobItem);
+                          if (accepted) {
+                            myController.visiblecontainer.value = true;
+                            myController.jobPusherContainer.value = false;
+                            myController.isJobDetailDone.value = false;
+                          }
                           // isOverlayClosed = true;
                           FlutterRingtonePlayer().stop();
                           Vibration.cancel();

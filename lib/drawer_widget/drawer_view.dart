@@ -417,7 +417,7 @@ class _Avatar extends StatelessWidget {
                   imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder:
-                      (_, __, ___) => Image.asset(
+                      (_, _, _) => Image.asset(
                         'assets/images/user.png',
                         fit: BoxFit.cover,
                       ),

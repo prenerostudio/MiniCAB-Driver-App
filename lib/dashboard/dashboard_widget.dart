@@ -1,5 +1,4 @@
 import 'dart:isolate';
-import 'dart:ui';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:new_minicab_driver/Acount%20Statements/accounts_bottomSheet.dart';
 import 'package:new_minicab_driver/bids/bids_bottom_sheet.dart';
@@ -206,7 +205,7 @@ class _DashboardWidgetState extends State<DashboardWidget>
   }
 
   int? SwitchStatus;
-  _loadSwitchStatus() async {
+  Future<void> _loadSwitchStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int savedIndex = prefs.getInt('switchValue') ?? 0;
     setState(() {
@@ -255,9 +254,11 @@ class _DashboardWidgetState extends State<DashboardWidget>
     }
     DateTime? lastBackPressed;
     return GestureDetector(
-      onTap: () => _model.unfocusNode.canRequestFocus
-          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
-          : FocusScope.of(context).unfocus(),
+      onTap:
+          () =>
+              _model.unfocusNode.canRequestFocus
+                  ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                  : FocusScope.of(context).unfocus(),
       child: WillPopScope(
         onWillPop: () async {
           if (lastBackPressed == null ||
@@ -288,9 +289,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
                   width: MediaQuery.sizeOf(context).width,
                   height: MediaQuery.sizeOf(context).height * 1.0,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? context.appTheme.primaryBackground
-                        : context.appTheme.primaryBackground,
+                    color:
+                        Theme.of(context).brightness == Brightness.light
+                            ? context.appTheme.primaryBackground
+                            : context.appTheme.primaryBackground,
                     boxShadow: [
                       BoxShadow(
                         blurRadius: 4.0,
@@ -328,156 +330,155 @@ class _DashboardWidgetState extends State<DashboardWidget>
                                     children: [
                                       FutureBuilder<List<Driver>>(
                                         future: myProfile(),
-                                        builder:
-                                            (
-                                              BuildContext context,
-                                              AsyncSnapshot<List<Driver>>
-                                              snapshot,
-                                            ) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return CircularProgressIndicator(
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                        Color
-                                                      >(Colors.blueAccent),
-                                                );
-                                              } else if (snapshot.hasError) {
-                                                return Text(
-                                                  'Error: ${snapshot.error}',
-                                                );
-                                              } else {
-                                                final driverData =
-                                                    snapshot.data;
-                                                return Column(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional.fromSTEB(
-                                                            0.0,
-                                                            15.0,
-                                                            0.0,
-                                                            8.0,
-                                                          ),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional.fromSTEB(
-                                                                  10.0,
-                                                                  0.0,
-                                                                  10.0,
-                                                                  0.0,
-                                                                ),
-                                                            child: Container(
-                                                              width: 70.0,
-                                                              height: 70.0,
-                                                              clipBehavior: Clip
-                                                                  .antiAlias,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                    shape: BoxShape
+                                        builder: (
+                                          BuildContext context,
+                                          AsyncSnapshot<List<Driver>> snapshot,
+                                        ) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Colors.blueAccent,
+                                                  ),
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                              'Error: ${snapshot.error}',
+                                            );
+                                          } else {
+                                            final driverData = snapshot.data;
+                                            return Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsetsDirectional.fromSTEB(
+                                                        0.0,
+                                                        15.0,
+                                                        0.0,
+                                                        8.0,
+                                                      ),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional.fromSTEB(
+                                                              10.0,
+                                                              0.0,
+                                                              10.0,
+                                                              0.0,
+                                                            ),
+                                                        child: Container(
+                                                          width: 70.0,
+                                                          height: 70.0,
+                                                          clipBehavior:
+                                                              Clip.antiAlias,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                shape:
+                                                                    BoxShape
                                                                         .circle,
-                                                                  ),
-                                                              child: Image.network(
-                                                                'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
+                                                              ),
+                                                          child: Image.network(
+                                                            'https://atiqramzan.online/img/drivers/${driverData![0].dPic}',
+                                                            width: 100.0,
+                                                            height: 100.0,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
+                                                              return Image.asset(
+                                                                'assets/images/user.png',
                                                                 width: 100.0,
                                                                 height: 100.0,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                errorBuilder:
-                                                                    (
-                                                                      context,
-                                                                      error,
-                                                                      stackTrace,
-                                                                    ) {
-                                                                      return Image.asset(
-                                                                        'assets/images/user.png',
-                                                                        width:
-                                                                            100.0,
-                                                                        height:
-                                                                            100.0,
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      );
-                                                                    },
-                                                              ),
-                                                            ),
+                                                                fit:
+                                                                    BoxFit
+                                                                        .cover,
+                                                              );
+                                                            },
                                                           ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional.fromSTEB(
-                                                                  4.0,
-                                                                  0.0,
-                                                                  0.0,
-                                                                  0.0,
-                                                                ),
-                                                            child: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  driverData[0]
-                                                                          .dName ??
-                                                                      "",
-                                                                  style: context
-                                                                      .appTheme
-                                                                      .bodyMedium
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Plus Jakarta Sans',
-                                                                        color: context
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional.fromSTEB(
+                                                              4.0,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                            ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              driverData[0]
+                                                                      .dName ??
+                                                                  "",
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Plus Jakarta Sans',
+                                                                    color:
+                                                                        context
                                                                             .appTheme
                                                                             .primary,
-                                                                        fontSize:
-                                                                            14.0,
-                                                                      ),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      EdgeInsetsDirectional.fromSTEB(
-                                                                        0.0,
-                                                                        10.0,
-                                                                        0.0,
-                                                                        0.0,
-                                                                      ),
-                                                                  child: Text(
-                                                                    driverData[0]
-                                                                            .dPhone ??
-                                                                        "",
-                                                                    style: context.appTheme.bodySmall.override(
+                                                                    fontSize:
+                                                                        14.0,
+                                                                  ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional.fromSTEB(
+                                                                    0.0,
+                                                                    10.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                  ),
+                                                              child: Text(
+                                                                driverData[0]
+                                                                        .dPhone ??
+                                                                    "",
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodySmall
+                                                                    .override(
                                                                       fontFamily:
                                                                           'Plus Jakarta Sans',
-                                                                      color: context
-                                                                          .appTheme
-                                                                          .primary,
+                                                                      color:
+                                                                          context
+                                                                              .appTheme
+                                                                              .primary,
                                                                       fontSize:
                                                                           12.0,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .w500,
                                                                     ),
-                                                                  ),
-                                                                ),
-                                                              ],
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                );
-                                              }
-                                            },
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                        },
                                       ),
                                     ],
                                   ),
@@ -1574,684 +1575,444 @@ class _DashboardWidgetState extends State<DashboardWidget>
               ),
             ),
           ),
-          body: SafeArea(
-            top: true,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(
-                      30.0,
-                      5.0,
-                      50.0,
-                      5.0,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                            10.0,
-                            10.0,
-                            10.0,
-                            10.0,
-                          ),
-                          child: FlutterFlowIconButton(
-                            borderColor: context.appTheme.secondaryBackground,
-                            borderWidth: 1.0,
-                            buttonSize: 40.0,
-                            fillColor: context.appTheme.secondaryBackground,
-                            icon: Icon(
-                              Icons.menu,
-                              color: context.appTheme.primaryText,
-                              size: 30,
-                            ),
-                            onPressed: () async {
-                              scaffoldKey.currentState!.openDrawer();
-                            },
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            print('Showing overlay...');
+          body: SafeArea(top: true, child: _buildDashboardBody(context)),
+        ),
+      ),
+    );
+  }
 
-                            print('Overlay shown');
-                          },
-                          child: Text(
-                            'Dashboard',
-                            style: context.appTheme.bodyMedium.override(
-                              fontFamily: 'Readex Pro',
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.05,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 5.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ToggleSwitch(
-                          minWidth: MediaQuery.sizeOf(context).width,
-                          minHeight: 50,
-                          initialLabelIndex: 0,
-                          cornerRadius: 30.0,
-                          activeFgColor: Colors.white,
-                          inactiveBgColor: Colors.grey,
-                          inactiveFgColor: Colors.white,
-                          totalSwitches: 2,
-                          labels: ['Back To Online', 'Break time'],
-                          icons: [
-                            FontAwesomeIcons.dotCircle,
-                            FontAwesomeIcons.powerOff,
-                          ],
-                          activeBgColors: [
-                            [context.appTheme.primary],
-                            [Colors.yellow],
-                          ],
-                          onToggle: (index) async {
-                            if (SwitchStatus == 1) {
-                              if (index == 1) {
-                                startBreak();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BreakTimeWidget(),
-                                  ),
-                                );
-                                // context.pushNamed('BreakTime');
-                              } else {
-                                print('the break press');
-                                // SharedPreferences prefs =
-                                //     await SharedPreferences.getInstance();
-                                // String? dId = prefs.getString('d_id');
-                                // var request = http.MultipartRequest(
-                                //     'POST',
-                                //     Uri.parse(
-                                //         ApiService.driverEndBreak));
-                                // request.fields.addAll({
-                                //   'bt_id': '${breakId}',
-                                //   'd_id': dId.toString()
-                                // });
-                                // print(request.fields);
-                                // http.StreamedResponse response =
-                                //     await request.send();
-                                // if (response.statusCode == 200) {
-                                //   print(await response.stream.bytesToString());
-                                //   Fluttertoast.showToast(
-                                //     msg: "Switched to Online",
-                                //   );
-                                // } else {
-                                //   print(response.reasonPhrase);
-                                // }
-                              }
-                            } else {
-                              Fluttertoast.showToast(
-                                msg:
-                                    "You're not online. You can't go to break.",
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(
-                      16.0,
-                      12.0,
-                      16.0,
-                      12.0,
-                    ),
-                    child: GridView(
-                      padding: EdgeInsets.zero,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10.0,
-                        mainAxisSpacing: 10.0,
-                        childAspectRatio: 1.0,
-                      ),
-                      primary: false,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      children: [
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            context.pushNamed('Home');
-                          },
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            decoration: BoxDecoration(
-                              color: context.appTheme.primary,
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0,
-                                0.0,
-                                12.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.home,
-                                    color: context.appTheme.info,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: Text(
-                                      'Home',
-                                      textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            color: context.appTheme.info,
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.05,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              enableDrag: false,
-                              context: context,
-                              builder: (context) {
-                                return GestureDetector(
-                                  onVerticalDragUpdate: (details) {
-                                    if (details.primaryDelta! > 20) {
-                                      // Close the BottomSheet on a downward swipe
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                  // onVerticalDragDown: (details) {
-                                  //   Navigator.pop(context);
-                                  //   debugPrint('downSwipped');
-                                  // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                      ? FocusScope.of(
-                                          context,
-                                        ).requestFocus(_model.unfocusNode)
-                                      : FocusScope.of(context).unfocus(),
-                                  child: Padding(
-                                    padding: MediaQuery.viewInsetsOf(context),
-                                    child: UpcommingjobWidget(dId: ''),
-                                  ),
-                                );
-                              },
-                            ).then((value) => safeSetState(() {}));
+  Widget _buildDashboardBody(BuildContext context) {
+    final isOnline = SwitchStatus == 1;
 
-                            // context.pushNamed('Upcomming');
-                          },
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            decoration: BoxDecoration(
-                              color: context.appTheme.alternate,
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0,
-                                0.0,
-                                12.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.directions_car_outlined,
-                                    color: context.appTheme.primaryText,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: Text(
-                                      'Upcoming Jobs',
-                                      textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            color: context.appTheme.primaryText,
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.05,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              enableDrag: false,
-                              context: context,
-                              builder: (context) {
-                                return GestureDetector(
-                                  onVerticalDragUpdate: (details) {
-                                    if (details.primaryDelta! > 2) {
-                                      // Close the BottomSheet on a downward swipe
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                  // onVerticalDragDown: (details) {
-                                  //   Navigator.pop(context);
-                                  //   debugPrint('downSwipped');
-                                  // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                      ? FocusScope.of(
-                                          context,
-                                        ).requestFocus(_model.unfocusNode)
-                                      : FocusScope.of(context).unfocus(),
-                                  child: Padding(
-                                    padding: MediaQuery.viewInsetsOf(context),
-                                    child: JobHistorySheet(
-                                      // did: '',
-                                    ),
-                                  ),
-                                );
-                              },
-                            ).then((value) => safeSetState(() {}));
+    return SingleChildScrollView(
+      padding: const EdgeInsetsDirectional.fromSTEB(18.0, 10.0, 18.0, 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          const SizedBox(height: 18.0),
+          _buildHeroCard(context, isOnline),
+          const SizedBox(height: 16.0),
+          _buildBreakControl(context),
+          const SizedBox(height: 24.0),
+          Text(
+            'Quick actions',
+            style: context.appTheme.titleLarge.override(
+              fontFamily: 'Outfit',
+              fontSize: 20.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 14.0),
+          _buildActionGrid(context),
+        ],
+      ),
+    );
+  }
 
-                            // context.pushNamed('jobshistory');
-                          },
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            decoration: BoxDecoration(
-                              color: context.appTheme.alternate,
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0,
-                                0.0,
-                                12.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.checklist_rtl,
-                                    color: context.appTheme.primaryText,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: Text(
-                                      'Job History',
-                                      textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.05,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ).animateOnPageLoad(
-                          animationsMap['containerOnPageLoadAnimation2']!,
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              enableDrag: false,
-                              context: context,
-                              builder: (context) {
-                                return GestureDetector(
-                                  onVerticalDragUpdate: (details) {
-                                    if (details.primaryDelta! > 20) {
-                                      // Close the BottomSheet on a downward swipe
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                  // onVerticalDragDown: (details) {
-                                  //   Navigator.pop(context);
-                                  //   debugPrint('downSwipped');
-                                  // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                      ? FocusScope.of(
-                                          context,
-                                        ).requestFocus(_model.unfocusNode)
-                                      : FocusScope.of(context).unfocus(),
-                                  child: Padding(
-                                    padding: MediaQuery.viewInsetsOf(context),
-                                    child: BidsBottomSheet(),
-                                  ),
-                                );
-                              },
-                            ).then((value) => safeSetState(() {}));
-
-                            // context.pushNamed('Bids');
-                          },
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            decoration: BoxDecoration(
-                              color: context.appTheme.alternate,
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0,
-                                0.0,
-                                12.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FaIcon(
-                                    FontAwesomeIcons.clipboardList,
-                                    color: context.appTheme.primaryText,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: Text(
-                                      'Bids ',
-                                      textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.05,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ).animateOnPageLoad(
-                          animationsMap['containerOnPageLoadAnimation4']!,
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              enableDrag: false,
-                              context: context,
-                              builder: (context) {
-                                return GestureDetector(
-                                  onVerticalDragUpdate: (details) {
-                                    if (details.primaryDelta! > 20) {
-                                      // Close the BottomSheet on a downward swipe
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                  // onVerticalDragDown: (details) {
-                                  //   Navigator.pop(context);
-                                  //   debugPrint('downSwipped');
-                                  // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                      ? FocusScope.of(
-                                          context,
-                                        ).requestFocus(_model.unfocusNode)
-                                      : FocusScope.of(context).unfocus(),
-                                  child: Padding(
-                                    padding: MediaQuery.viewInsetsOf(context),
-                                    child: ZoneBottomsheet(),
-                                  ),
-                                );
-                              },
-                            ).then((value) => safeSetState(() {}));
-
-                            // context.pushNamed('Zones');
-                          },
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            decoration: BoxDecoration(
-                              color: context.appTheme.alternate,
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0,
-                                0.0,
-                                12.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.location_on,
-                                    color: context.appTheme.primaryText,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: Text(
-                                      'Zones',
-                                      textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.05,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ).animateOnPageLoad(
-                          animationsMap['containerOnPageLoadAnimation5']!,
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              enableDrag: false,
-                              context: context,
-                              builder: (context) {
-                                return GestureDetector(
-                                  onVerticalDragUpdate: (details) {
-                                    if (details.primaryDelta! > 20) {
-                                      // Close the BottomSheet on a downward swipe
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                  // onVerticalDragDown: (details) {
-                                  //   Navigator.pop(context);
-                                  //   debugPrint('downSwipped');
-                                  // },
-                                  onTap: () =>
-                                      _model.unfocusNode.canRequestFocus
-                                      ? FocusScope.of(
-                                          context,
-                                        ).requestFocus(_model.unfocusNode)
-                                      : FocusScope.of(context).unfocus(),
-                                  child: Padding(
-                                    padding: MediaQuery.viewInsetsOf(context),
-                                    child: AccountsBottomsheet(),
-                                  ),
-                                );
-                              },
-                            ).then((value) => safeSetState(() {}));
-
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) => NavBarPage(
-                            //               initialPage: "AccountStatement",
-                            //             )));
-                          },
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.4,
-                            decoration: BoxDecoration(
-                              color: context.appTheme.alternate,
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0,
-                                0.0,
-                                12.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.payments,
-                                    color: context.appTheme.primaryText,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                      0.0,
-                                    ),
-                                    child: Text(
-                                      'Payment',
-                                      textAlign: TextAlign.center,
-                                      style: context.appTheme.displaySmall
-                                          .override(
-                                            fontFamily: 'Outfit',
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.05,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ).animateOnPageLoad(
-                          animationsMap['containerOnPageLoadAnimation6']!,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      children: [
+        FlutterFlowIconButton(
+          borderColor: context.appTheme.lineColor,
+          borderWidth: 1.0,
+          buttonSize: 46.0,
+          fillColor: context.appTheme.secondaryBackground,
+          icon: Icon(
+            Icons.menu_rounded,
+            color: context.appTheme.primaryText,
+            size: 24.0,
+          ),
+          onPressed: () async {
+            scaffoldKey.currentState!.openDrawer();
+          },
+        ),
+        const SizedBox(width: 14.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Dashboard',
+                style: context.appTheme.headlineMedium.override(
+                  fontFamily: 'Outfit',
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
+              const SizedBox(height: 2.0),
+              Text(
+                'Manage your day from one place',
+                style: context.appTheme.bodySmall.override(
+                  fontFamily: 'Plus Jakarta Sans',
+                  color: context.appTheme.secondaryText,
+                  fontSize: 12.0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroCard(BuildContext context, bool isOnline) {
+    final statusColor =
+        isOnline ? context.appTheme.success : context.appTheme.warning;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 18.0),
+      decoration: BoxDecoration(
+        color: context.appTheme.primary,
+        borderRadius: BorderRadius.circular(18.0),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 18.0,
+            color: Color(0x22000000),
+            offset: Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44.0,
+                height: 44.0,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: const Icon(
+                  Icons.local_taxi_rounded,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isOnline ? 'Ready for jobs' : 'Currently offline',
+                      style: context.appTheme.titleMedium.override(
+                        fontFamily: 'Outfit',
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      isOnline
+                          ? 'You are available to receive bookings'
+                          : 'Go online to receive bookings',
+                      style: context.appTheme.bodySmall.override(
+                        fontFamily: 'Plus Jakarta Sans',
+                        color: Colors.white.withOpacity(0.72),
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsetsDirectional.fromSTEB(
+                  10.0,
+                  6.0,
+                  10.0,
+                  6.0,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(100.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7.0,
+                      height: 7.0,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6.0),
+                    Text(
+                      isOnline ? 'Online' : 'Offline',
+                      style: context.appTheme.bodySmall.override(
+                        fontFamily: 'Plus Jakarta Sans',
+                        color: Colors.white,
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22.0),
+          Container(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              14.0,
+              12.0,
+              14.0,
+              12.0,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: Colors.white.withOpacity(0.12)),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: context.appTheme.secondary,
+                  size: 22.0,
+                ),
+                const SizedBox(width: 10.0),
+                Expanded(
+                  child: Text(
+                    'Available earnings',
+                    style: context.appTheme.bodySmall.override(
+                      fontFamily: 'Plus Jakarta Sans',
+                      color: Colors.white.withOpacity(0.72),
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
+                Text(
+                  '£${dueBalance ?? '00.00'}',
+                  style: context.appTheme.titleMedium.override(
+                    fontFamily: 'Outfit',
+                    color: Colors.white,
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBreakControl(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: context.appTheme.secondaryBackground,
+        borderRadius: BorderRadius.circular(18.0),
+        border: Border.all(color: context.appTheme.lineColor),
+      ),
+      child: ToggleSwitch(
+        minWidth: MediaQuery.sizeOf(context).width,
+        minHeight: 48.0,
+        initialLabelIndex: 0,
+        cornerRadius: 12.0,
+        activeFgColor: Colors.white,
+        inactiveBgColor: Colors.transparent,
+        inactiveFgColor: context.appTheme.secondaryText,
+        totalSwitches: 2,
+        labels: const ['Back Online', 'Break Time'],
+        icons: const [FontAwesomeIcons.circleDot, FontAwesomeIcons.powerOff],
+        activeBgColors: [
+          [context.appTheme.success],
+          [context.appTheme.warning],
+        ],
+        onToggle: (index) async {
+          if (SwitchStatus == 1) {
+            if (index == 1) {
+              startBreak();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BreakTimeWidget()),
+              );
+            } else {
+              print('the break press');
+            }
+          } else {
+            Fluttertoast.showToast(
+              msg: "You're not online. You can't go to break.",
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildActionGrid(BuildContext context) {
+    final actions = <_DashboardAction>[
+      _DashboardAction(
+        title: 'Home',
+        subtitle: 'Live jobs',
+        icon: Icons.home_rounded,
+        color: context.appTheme.primary,
+        onTap: () async => context.pushNamed('Home'),
+      ),
+      _DashboardAction(
+        title: 'Upcoming',
+        subtitle: 'Booked trips',
+        icon: Icons.directions_car_filled_rounded,
+        color: const Color(0xFF249689),
+        onTap: () async => _showDashboardSheet(UpcommingjobWidget(dId: '')),
+      ),
+      _DashboardAction(
+        title: 'History',
+        subtitle: 'Past jobs',
+        icon: Icons.checklist_rtl_rounded,
+        color: const Color(0xFF6374E8),
+        onTap: () async => _showDashboardSheet(JobHistorySheet()),
+      ),
+      _DashboardAction(
+        title: 'Bids',
+        subtitle: 'Offers',
+        icon: FontAwesomeIcons.clipboardList,
+        color: const Color(0xFFC96F46),
+        onTap: () async => _showDashboardSheet(BidsBottomSheet()),
+      ),
+      _DashboardAction(
+        title: 'Zones',
+        subtitle: 'Coverage',
+        icon: Icons.location_on_rounded,
+        color: const Color(0xFF39A7D2),
+        onTap: () async => _showDashboardSheet(ZoneBottomsheet()),
+      ),
+      _DashboardAction(
+        title: 'Payment',
+        subtitle: 'Statements',
+        icon: Icons.payments_rounded,
+        color: context.appTheme.secondary,
+        onTap: () async => _showDashboardSheet(AccountsBottomsheet()),
+      ),
+    ];
+
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 12.0,
+        childAspectRatio: 1.08,
+      ),
+      primary: false,
+      shrinkWrap: true,
+      itemCount: actions.length,
+      itemBuilder: (context, index) {
+        return _buildActionTile(context, actions[index]).animateOnPageLoad(
+          animationsMap['containerOnPageLoadAnimation${(index % 6) + 1}']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildActionTile(BuildContext context, _DashboardAction action) {
+    final foreground =
+        action.color == context.appTheme.secondary
+            ? context.appTheme.primary
+            : Colors.white;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18.0),
+        onTap: action.onTap,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: context.appTheme.secondaryBackground,
+            borderRadius: BorderRadius.circular(18.0),
+            border: Border.all(color: context.appTheme.lineColor),
+            boxShadow: const [
+              BoxShadow(
+                blurRadius: 14.0,
+                color: Color(0x12000000),
+                offset: Offset(0.0, 8.0),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              16.0,
+              16.0,
+              16.0,
+              14.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 46.0,
+                  height: 46.0,
+                  decoration: BoxDecoration(
+                    color: action.color,
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                  child: Icon(action.icon, color: foreground, size: 22.0),
+                ),
+                const Spacer(),
+                Text(
+                  action.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.appTheme.titleLarge.override(
+                    fontFamily: 'Outfit',
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4.0),
+                Text(
+                  action.subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.appTheme.bodySmall.override(
+                    fontFamily: 'Plus Jakarta Sans',
+                    color: context.appTheme.secondaryText,
+                    fontSize: 12.0,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _showDashboardSheet(Widget child) async {
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: false,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if ((details.primaryDelta ?? 0) > 20) {
+              Navigator.pop(context);
+            }
+          },
+          onTap:
+              () =>
+                  _model.unfocusNode.canRequestFocus
+                      ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+                      : FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: MediaQuery.viewInsetsOf(context),
+            child: child,
+          ),
+        );
+      },
+    ).then((value) => safeSetState(() {}));
   }
 
   Future<void> startBreak() async {
@@ -2357,10 +2118,8 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse['data'] ?? [];
 
-      List<Driver> profileData = data
-          .map((item) => Driver.fromJson(item))
-          .cast<Driver>()
-          .toList();
+      List<Driver> profileData =
+          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
       return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
@@ -2379,9 +2138,10 @@ class _DashboardWidgetState extends State<DashboardWidget>
       );
       request.fields.addAll({
         'd_id': dId.toString(),
-        'status': switchValue1 == false
-            ? 'Offline'
-            : 'Online', // Adjusted status based on the switch value
+        'status':
+            switchValue1 == false
+                ? 'Offline'
+                : 'Online', // Adjusted status based on the switch value
       });
       print(request.fields);
 
@@ -2505,14 +2265,28 @@ class _DashboardWidgetState extends State<DashboardWidget>
       final jsonResponse = jsonDecode(response.body);
       final List<dynamic> data = jsonResponse[''];
 
-      List<Driver> profileData = data
-          .map((item) => Driver.fromJson(item))
-          .cast<Driver>()
-          .toList();
+      List<Driver> profileData =
+          data.map((item) => Driver.fromJson(item)).cast<Driver>().toList();
       return profileData;
     } else {
       print('Error: ${response.reasonPhrase}');
       return []; // Return an empty list in case of an error.
     }
   }
+}
+
+class _DashboardAction {
+  const _DashboardAction({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final Future<void> Function() onTap;
 }

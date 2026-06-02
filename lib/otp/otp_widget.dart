@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:new_minicab_driver/login/login_widget.dart';
@@ -11,14 +10,8 @@ import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'otp_model.dart';
 export 'otp_model.dart';
 import 'package:new_minicab_driver/Data/api_service.dart';
 

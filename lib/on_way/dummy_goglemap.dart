@@ -8,7 +8,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/services.dart';
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class DummyViewMap extends StatefulWidget {

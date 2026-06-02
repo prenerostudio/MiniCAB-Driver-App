@@ -359,26 +359,13 @@ class _AddcardWidgetState extends State<AddcardWidget> {
                                 Expanded(
                                   child: FFButtonWidget(
                                     onPressed: () async {
-                                      if (NumberController.text == null) {
-                                        Fluttertoast.showToast(
-                                          msg: "Card Number field is empty",
-                                          fontSize: 16.0,
-                                        );
-                                        return;
-                                      } else if (expiryController.text ==
-                                          null) {
-                                        Fluttertoast.showToast(
-                                          msg: "Expiry field is empty",
-                                          fontSize: 16.0,
-                                        );
-                                        return;
-                                      } else if (cvcController.text == null) {
-                                        Fluttertoast.showToast(
-                                          msg: "CVC field is empty",
-                                          fontSize: 16.0,
-                                        );
-                                        return;
-                                      }
+                                      if (cvcController.text == null) {
+                                    Fluttertoast.showToast(
+                                      msg: "CVC field is empty",
+                                      fontSize: 16.0,
+                                    );
+                                    return;
+                                  }
                                       try {
                                         final prefs =
                                             await SharedPreferences.getInstance();

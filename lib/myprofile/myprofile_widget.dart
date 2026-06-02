@@ -1,18 +1,12 @@
-import '../flutter_flow/flutter_flow_icon_button.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'myprofile_model.dart';
 export 'myprofile_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/myProfile.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class MyprofileWidget extends StatefulWidget {

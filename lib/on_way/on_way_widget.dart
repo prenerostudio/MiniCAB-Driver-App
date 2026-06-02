@@ -119,7 +119,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   final JobController myController = Get.put(JobController());
   TimerClass timerclass = TimerClass();
 
-  getlocation() async {
+  Future<void> getlocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
@@ -184,7 +184,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   StreamSubscription<Position>? _positionStreamSubscription;
   //  String distance = '';
   String address = '';
-  _getpolylines() async {
+  Future<void> _getpolylines() async {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       googleApiKey: "AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA",
       request: PolylineRequest(
@@ -431,7 +431,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     });
   }
 
-  showNotification(String title, String subtitle) async {
+  Future<void> showNotification(String title, String subtitle) async {
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
@@ -486,7 +486,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     });
   }
 
-  recive_jobidid() async {
+  Future<void> recive_jobidid() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     jobId = jobid.toString();
@@ -550,7 +550,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     }
   }
 
-  pushercallbg() async {
+  Future<void> pushercallbg() async {
     var pusher = PusherClient(
       'ef80ba163503f394d9c3',
       const PusherOptions(

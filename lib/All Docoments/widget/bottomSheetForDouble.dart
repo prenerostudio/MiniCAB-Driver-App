@@ -539,7 +539,7 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
 
   TextEditingController numberController = TextEditingController();
   bool isloading = false;
-  _uploadImage() async {
+  Future<void> _uploadImage() async {
     // print('the date choosen ${_formatDate(_selectedDate!)}');
     setState(() {});
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -620,7 +620,7 @@ class _DoubleDocumentBottomSheetState extends State<DoubleDocumentBottomSheet> {
     }
   }
 
-  getFront() async {
+  Future<void> getFront() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String dId = prefs.getString('d_id') ?? '';

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_swipe_button/flutter_swipe_button.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
@@ -643,7 +642,7 @@ class _PobWidgetState extends State<PobWidget> {
 
   String distanceKm = '';
   String address = '';
-  _getpolylines() async {
+  Future<void> _getpolylines() async {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       googleApiKey: "AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA",
       request: PolylineRequest(
@@ -901,7 +900,7 @@ class _PobWidgetState extends State<PobWidget> {
     } catch (error) {}
   }
 
-  pushercallbg() async {
+  Future<void> pushercallbg() async {
     var pusher = PusherClient(
       'ef80ba163503f394d9c3',
       const PusherOptions(

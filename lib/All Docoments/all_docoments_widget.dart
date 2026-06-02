@@ -1,15 +1,10 @@
-import 'package:get/get.dart';
 import 'package:new_minicab_driver/All%20Docoments/widget/bottomSheetForDouble.dart';
 import 'package:new_minicab_driver/All%20Docoments/widget/bottom_sheet_widget.dart';
 
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';

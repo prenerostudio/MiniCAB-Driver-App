@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'zones_model.dart';
 export 'zones_model.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class ZonesWidget extends StatefulWidget {

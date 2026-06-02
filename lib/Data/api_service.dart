@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   ApiService._();
 
-  static const String siteBaseUrl = 'https://www.minicaboffice.com/';
+  static const String siteBaseUrl = 'https://minicaboffice.com';
   static const String apiBaseUrl = '$siteBaseUrl/api';
   static const String driverBaseUrl = '$apiBaseUrl/driver';
   static const String bookerBaseUrl = '$apiBaseUrl/booker';

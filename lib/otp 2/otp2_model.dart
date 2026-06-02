@@ -1,16 +1,6 @@
-import '/flutter_flow/flutter_flow_animations.dart';
-import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'otp2_widget.dart' show Otp2Widget;
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class Otp2Model extends FlutterFlowModel<Otp2Widget> {
   final unfocusNode = FocusNode();

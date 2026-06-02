@@ -43,7 +43,7 @@ class AccpetingOrderViewModel extends GetxController {
     super.onClose();
   }
 
-  setMapController(GoogleMapController controller) {
+  void setMapController(GoogleMapController controller) {
     mapController.value = controller;
   }
 

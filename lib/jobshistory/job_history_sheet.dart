@@ -1,9 +1,12 @@
+// ignore_for_file: avoid_print, avoid_unnecessary_containers
+
 import '/flutter_flow/flutter_flow_button_tabbar.dart';
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'jobshistory_model.dart';
+import 'jobshistory_model.dart';
 import '../Model/resentJobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -137,17 +140,14 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                           child: FlutterFlowButtonTabBar(
                             useToggleButtonStyle: true,
                             isScrollable: true,
-                            labelStyle:
-                                context.appTheme.titleMedium,
+                            labelStyle: context.appTheme.titleMedium,
                             unselectedLabelStyle: TextStyle(),
                             labelColor: context.appTheme.info,
                             unselectedLabelColor:
                                 context.appTheme.primaryBackground,
-                            unselectedBackgroundColor:
-                                context.appTheme.primary,
+                            unselectedBackgroundColor: context.appTheme.primary,
                             backgroundColor: Colors.black,
-                            borderColor:
-                                context.appTheme.secondaryText,
+                            borderColor: context.appTheme.secondaryText,
                             borderWidth: 1.0,
                             borderRadius: 12.0,
                             elevation: 0.0,
@@ -327,12 +327,17 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   ),
                                                               child: Text(
                                                                 ' Job Id #${bookingData.jobId}',
-                                                                style: context.appTheme.bodyLarge.override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  color:
-                                                                      context.appTheme.secondaryText,
-                                                                ),
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodyLarge
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Readex Pro',
+                                                                      color:
+                                                                          context
+                                                                              .appTheme
+                                                                              .secondaryText,
+                                                                    ),
                                                               ),
                                                             ),
                                                             Padding(
@@ -345,12 +350,17 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   ),
                                                               child: Text(
                                                                 ' ${bookingData.status}',
-                                                                style: context.appTheme.bodyLarge.override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  color:
-                                                                      context.appTheme.primary,
-                                                                ),
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodyLarge
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Readex Pro',
+                                                                      color:
+                                                                          context
+                                                                              .appTheme
+                                                                              .primary,
+                                                                    ),
                                                               ),
                                                             ),
                                                           ],
@@ -372,7 +382,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 FontAwesomeIcons
                                                                     .clock,
                                                                 color:
-                                                                    context.appTheme.secondaryText,
+                                                                    context
+                                                                        .appTheme
+                                                                        .secondaryText,
                                                                 size: 18.0,
                                                               ),
                                                               Padding(
@@ -386,7 +398,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 child: Text(
                                                                   '${bookingData.bookTime}',
                                                                   style:
-                                                                      context.appTheme.labelMedium,
+                                                                      context
+                                                                          .appTheme
+                                                                          .labelMedium,
                                                                 ),
                                                               ),
                                                               Padding(
@@ -400,7 +414,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 child: Text(
                                                                   '${bookingData.bookDate}',
                                                                   style:
-                                                                      context.appTheme.labelMedium,
+                                                                      context
+                                                                          .appTheme
+                                                                          .labelMedium,
                                                                 ),
                                                               ),
                                                               SizedBox(
@@ -409,7 +425,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   thickness:
                                                                       1.0,
                                                                   color:
-                                                                      context.appTheme.secondaryText,
+                                                                      context
+                                                                          .appTheme
+                                                                          .secondaryText,
                                                                 ),
                                                               ),
                                                               Padding(
@@ -423,7 +441,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                 child: Text(
                                                                   'cash',
                                                                   style:
-                                                                      context.appTheme.labelLarge,
+                                                                      context
+                                                                          .appTheme
+                                                                          .labelLarge,
                                                                 ),
                                                               ),
                                                             ],
@@ -440,7 +460,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   Icons
                                                                       .arrow_circle_up,
                                                                   color:
-                                                                      context.appTheme.primary,
+                                                                      context
+                                                                          .appTheme
+                                                                          .primary,
                                                                   size:
                                                                       MediaQuery.sizeOf(
                                                                         context,
@@ -491,7 +513,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   Icons
                                                                       .arrow_circle_down,
                                                                   color:
-                                                                      context.appTheme.primary,
+                                                                      context
+                                                                          .appTheme
+                                                                          .primary,
                                                                   size:
                                                                       MediaQuery.sizeOf(
                                                                         context,
@@ -534,7 +558,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                         Divider(
                                                           thickness: 1.0,
                                                           color:
-                                                              context.appTheme.secondaryText,
+                                                              context
+                                                                  .appTheme
+                                                                  .secondaryText,
                                                         ),
                                                       ],
                                                     ),
@@ -705,12 +731,15 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                     ),
                                                                 child: Text(
                                                                   'Job Id #${bookingData.jobId}',
-                                                                  style: context.appTheme.bodyLarge.override(
-                                                                    fontFamily:
-                                                                        'Readex Pro',
-                                                                    color:
-                                                                        context.appTheme.secondaryText,
-                                                                  ),
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .bodyLarge
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                      ),
                                                                 ),
                                                               ),
                                                               Padding(
@@ -723,12 +752,15 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                     ),
                                                                 child: Text(
                                                                   ' ${bookingData.status}',
-                                                                  style: context.appTheme.bodyLarge.override(
-                                                                    fontFamily:
-                                                                        'Readex Pro',
-                                                                    color:
-                                                                        context.appTheme.primary,
-                                                                  ),
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .bodyLarge
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.primary,
+                                                                      ),
                                                                 ),
                                                               ),
                                                             ],
@@ -750,7 +782,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   FontAwesomeIcons
                                                                       .clock,
                                                                   color:
-                                                                      context.appTheme.secondaryText,
+                                                                      context
+                                                                          .appTheme
+                                                                          .secondaryText,
                                                                   size: 18.0,
                                                                 ),
                                                                 Padding(
@@ -764,7 +798,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   child: Text(
                                                                     '${bookingData.bookTime}',
                                                                     style:
-                                                                        context.appTheme.labelMedium,
+                                                                        context
+                                                                            .appTheme
+                                                                            .labelMedium,
                                                                   ),
                                                                 ),
                                                                 Padding(
@@ -778,7 +814,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   child: Text(
                                                                     '${bookingData.bookDate}',
                                                                     style:
-                                                                        context.appTheme.labelMedium,
+                                                                        context
+                                                                            .appTheme
+                                                                            .labelMedium,
                                                                   ),
                                                                 ),
                                                                 SizedBox(
@@ -787,7 +825,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                     thickness:
                                                                         1.0,
                                                                     color:
-                                                                        context.appTheme.secondaryText,
+                                                                        context
+                                                                            .appTheme
+                                                                            .secondaryText,
                                                                   ),
                                                                 ),
                                                                 Padding(
@@ -801,7 +841,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                   child: Text(
                                                                     'cash',
                                                                     style:
-                                                                        context.appTheme.labelLarge,
+                                                                        context
+                                                                            .appTheme
+                                                                            .labelLarge,
                                                                   ),
                                                                 ),
                                                               ],
@@ -818,7 +860,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                     Icons
                                                                         .arrow_circle_up,
                                                                     color:
-                                                                        context.appTheme.primary,
+                                                                        context
+                                                                            .appTheme
+                                                                            .primary,
                                                                     size:
                                                                         MediaQuery.sizeOf(
                                                                           context,
@@ -868,7 +912,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                                     Icons
                                                                         .arrow_circle_down,
                                                                     color:
-                                                                        context.appTheme.primary,
+                                                                        context
+                                                                            .appTheme
+                                                                            .primary,
                                                                     size:
                                                                         MediaQuery.sizeOf(
                                                                           context,
@@ -909,7 +955,9 @@ class _JobHistorySheetState extends State<JobHistorySheet>
                                                           Divider(
                                                             thickness: 1.0,
                                                             color:
-                                                                context.appTheme.secondaryText,
+                                                                context
+                                                                    .appTheme
+                                                                    .secondaryText,
                                                           ),
                                                         ],
                                                       ),

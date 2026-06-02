@@ -1,13 +1,6 @@
-import '/flutter_flow/flutter_flow_button_tabbar.dart';
-import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'jobshistory_widget.dart' show JobshistoryWidget;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class JobshistoryModel extends FlutterFlowModel<JobshistoryWidget> {
   ///  State fields for stateful widgets in this page.

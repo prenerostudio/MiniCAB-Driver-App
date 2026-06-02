@@ -546,7 +546,7 @@ class FFParameters {
   Future<bool> completeFutures() => Future.wait(
     state.allParams.entries.where(isAsyncParam).map((param) async {
       final doc = await asyncParams[param.key]!(param.value).onError(
-        (_, __) => null,
+        (_, _) => null,
       );
       if (doc != null) {
         futureParamValues[param.key] = doc;
@@ -554,7 +554,7 @@ class FFParameters {
       }
       return false;
     }),
-  ).onError((_, __) => [false]).then((v) => v.every((e) => e));
+  ).onError((_, _) => [false]).then((v) => v.every((e) => e));
 
   dynamic getParam<T>(String paramName, ParamType type, [bool isList = false]) {
     if (futureParamValues.containsKey(paramName)) {

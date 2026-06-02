@@ -85,7 +85,7 @@ class JobController extends GetxController {
   var dropLocation = ''.obs; // Reactive variable for 'data' (booking ID)
   final mapController = ValueNotifier<GoogleMapController?>(null);
   Timer? timer;
-  setMapController(GoogleMapController controller) {
+  void setMapController(GoogleMapController controller) {
     mapController.value = controller;
   }
 

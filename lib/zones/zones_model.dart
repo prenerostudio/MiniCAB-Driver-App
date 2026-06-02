@@ -1,12 +1,6 @@
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import 'zones_widget.dart' show ZonesWidget;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class ZonesModel extends FlutterFlowModel<ZonesWidget> {
   ///  State fields for stateful widgets in this page.
