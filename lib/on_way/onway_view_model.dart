@@ -1,25 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:new_minicab_driver/mapbox/mapbox_route_map.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'dart:ui' as ui;
 
 class AccpetingOrderViewModel extends GetxController {
   final mapTheme = ''.obs;
   Rx<bool> isRecenterPressed = false.obs;
-  RxSet<Polyline> polylines = <Polyline>{}.obs;
-  Rx<BitmapDescriptor> sourceicon = BitmapDescriptor.defaultMarker.obs;
-  Rx<BitmapDescriptor> destinationicon = BitmapDescriptor.defaultMarker.obs;
-  Rx<BitmapDescriptor> currenticon = BitmapDescriptor.defaultMarker.obs;
-  Rx<CameraPosition> kGoogleplay =
-      const CameraPosition(target: LatLng(0, 0), zoom: 15).obs;
   RxBool isOnline = false.obs;
   final longitude = 0.0.obs;
   final latitude = 0.0.obs;
   final isMapInitialized = false.obs;
   final userListResponse = [].obs;
   final instructions = [].obs;
-  final mapController = ValueNotifier<GoogleMapController?>(null);
   final isridestart = false.obs;
   final convertedLat = 0.0.obs;
   final convertedLng = 0.0.obs;
@@ -35,16 +26,6 @@ class AccpetingOrderViewModel extends GetxController {
   void launchDialer(String phoneNumber) async {
     final url = 'tel:$phoneNumber';
     await launch(url);
-  }
-
-  @override
-  void onClose() {
-    mapController.value?.dispose();
-    super.onClose();
-  }
-
-  void setMapController(GoogleMapController controller) {
-    mapController.value = controller;
   }
 
   void _launchDialer(String phoneNumber) async {

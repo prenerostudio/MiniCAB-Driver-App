@@ -53,11 +53,20 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
   }
 
   void _loadJobs() {
-    _upcomingJobsFuture = _fetchJobs(ApiService.driverAcceptedJobs);
-    _nextWeekJobsFuture = _fetchJobs(ApiService.driverUpcomingNextWeek);
+    _upcomingJobsFuture = _fetchJobs([
+      ApiService.driverAcceptedJobs,
+      ApiService.driverJobsAcceptedJobsToday,
+      ApiService.driverAcceptedJobsToday,
+      ApiService.driverJobsUpcomingJobs,
+    ]);
+    _nextWeekJobsFuture = _fetchJobs([
+      ApiService.driverUpcomingNextWeek,
+      ApiService.driverJobsUpcomingJobs,
+      ApiService.driverUpcomingJobs,
+    ]);
   }
 
-  Future<List<Job>> _fetchJobs(String endpoint) async {
+  Future<List<Job>> _fetchJobs(List<String> endpoints) async {
     final prefs = await SharedPreferences.getInstance();
     final savedDriverId = prefs.getString('d_id');
     final driverId =
@@ -65,25 +74,38 @@ class _UpcommingjobWidgetState extends State<UpcommingjobWidget>
             ? widget.dId!.trim()
             : savedDriverId;
 
-    final response = await http.post(
-      Uri.parse(endpoint),
-      body: {'d_id': driverId.toString()},
-    );
+    for (final endpoint in endpoints.toSet()) {
+      try {
+        final response = await http.post(
+          Uri.parse(endpoint),
+          body: {'d_id': driverId.toString()},
+        );
 
-    if (response.statusCode != 200) {
-      throw Exception('Could not load jobs');
+        if (response.statusCode != 200) {
+          debugPrint(
+            'Upcoming jobs endpoint failed: $endpoint (${response.statusCode})',
+          );
+          continue;
+        }
+
+        final parsedResponse = json.decode(response.body);
+        final data = parsedResponse['data'];
+        if (data is List) {
+          return data
+              .whereType<Map>()
+              .map((item) => Job.fromJson(Map<String, dynamic>.from(item)))
+              .toList();
+        }
+
+        if (data is Map) {
+          return [Job.fromJson(Map<String, dynamic>.from(data))];
+        }
+      } catch (error) {
+        debugPrint('Upcoming jobs endpoint error: $endpoint $error');
+      }
     }
 
-    final parsedResponse = json.decode(response.body);
-    final data = parsedResponse['data'];
-    if (data is! List) {
-      return [];
-    }
-
-    return data
-        .whereType<Map<String, dynamic>>()
-        .map((item) => Job.fromJson(item))
-        .toList();
+    return [];
   }
 
   @override

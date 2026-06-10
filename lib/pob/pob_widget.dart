@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:new_minicab_driver/home/home_view_controller.dart';
+import 'package:new_minicab_driver/mapbox/mapbox_route_map.dart';
 import 'package:new_minicab_driver/pob/pob_dropOff_veiewModel.dart';
 
 import 'package:pusher_client_fixed/pusher_client_fixed.dart';
@@ -17,17 +18,13 @@ import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart';
 import 'pob_model.dart';
 export 'pob_model.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 import 'dart:async';
-import 'dart:ui' as ui;
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class PobWidget extends StatefulWidget {
@@ -73,15 +70,11 @@ class _PobWidgetState extends State<PobWidget> {
 
   String distanceText = '';
   String durationText = '';
-  // late GoogleMapController _mapController;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  // Completer<GoogleMapController> _controller = Completer();
 
-  late Timer _locationTimer;
+  Timer? _locationTimer;
 
-  // final LatLng _currentPosition = LatLng(37.7749, -122.4194);
-  // late Position _currentPosition;
   bool isLoading = false;
   double dropffLat = 0;
   double dropffLng = 0;
@@ -89,19 +82,10 @@ class _PobWidgetState extends State<PobWidget> {
   // double currentLongitude = 0;
   String distance = '';
 
-  // List<Marker> markers = [];
-  // List<LatLng> _polylineCoordinates = [];
-
-  CameraPosition initialCameraPosition = CameraPosition(
-    target: LatLng(31.234234, -122.234234),
-  );
-  Set<Marker> markers = {};
-  Set<Polyline> polyline = {};
   LatLng? originlatlng;
-  LatLng? destlatlng;
-  // LatLngBounds latLngBounds=LatLngBounds(southwest: southwest, northeast: northeast)
   List<LatLng> polylineCoordinate = [];
-  PolylinePoints polylinePoints = PolylinePoints();
+  Uint8List? _driverMarkerImage;
+  Uint8List? _destinationMarkerImage;
   @override
   void initState() {
     super.initState();
@@ -110,14 +94,6 @@ class _PobWidgetState extends State<PobWidget> {
     sendOnRideRequest();
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    // dropOffViewModel.getLatLngFromCurrentLocation().then((value) {
-    //   dropOffViewModel.kGoogleplay.value = CameraPosition(
-    //       target: LatLng(dropOffViewModel.latitude.value,
-    //           dropOffViewModel.longitude.value),
-    //       zoom: 17);
-    // });
-    // dropOffViewModel.setcustommarkeritem();
-
     _model = createModel(context, () => PobModel());
   }
 
@@ -171,7 +147,8 @@ class _PobWidgetState extends State<PobWidget> {
   @override
   void dispose() {
     _model.dispose();
-    _locationTimer.cancel();
+    _locationTimer?.cancel();
+    _positionStreamSubscription?.cancel();
     super.dispose();
   }
 
@@ -239,8 +216,7 @@ class _PobWidgetState extends State<PobWidget> {
                                 height:
                                     MediaQuery.sizeOf(context).height * 0.30,
                                 decoration: BoxDecoration(
-                                  color:
-                                      context.appTheme.primaryBackground,
+                                  color: context.appTheme.primaryBackground,
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -319,8 +295,7 @@ class _PobWidgetState extends State<PobWidget> {
                                                   ),
                                               child: Icon(
                                                 Icons.pin_drop_outlined,
-                                                color:
-                                                    context.appTheme.primary,
+                                                color: context.appTheme.primary,
                                                 size: 25,
                                               ),
                                             ),
@@ -335,13 +310,19 @@ class _PobWidgetState extends State<PobWidget> {
                                                     ),
                                                 child: Text(
                                                   dropoff,
-                                                  style: context.appTheme.labelMedium.override(
-                                                    fontFamily: 'Readex Pro',
-                                                    color:
-                                                        context.appTheme.secondaryText,
-                                                    fontSize: 20.0,
-                                                    letterSpacing: 1.5,
-                                                  ),
+                                                  style: context
+                                                      .appTheme
+                                                      .labelMedium
+                                                      .override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        color:
+                                                            context
+                                                                .appTheme
+                                                                .secondaryText,
+                                                        fontSize: 20.0,
+                                                        letterSpacing: 1.5,
+                                                      ),
                                                   overflow:
                                                       TextOverflow
                                                           .ellipsis, // Handle text overflow with ellipsis
@@ -374,7 +355,9 @@ class _PobWidgetState extends State<PobWidget> {
                                             icon: FaIcon(
                                               FontAwesomeIcons.ellipsisH,
                                               color:
-                                                  context.appTheme.secondaryBackground,
+                                                  context
+                                                      .appTheme
+                                                      .secondaryBackground,
                                               size: 24,
                                             ),
                                             onPressed: () async {
@@ -459,12 +442,14 @@ class _PobWidgetState extends State<PobWidget> {
                                                     0,
                                                     0,
                                                   ),
-                                              color:
-                                                  context.appTheme.primary,
-                                              textStyle: context.appTheme.titleSmall.override(
-                                                fontFamily: 'Open Sans',
-                                                color: Colors.white,
-                                              ),
+                                              color: context.appTheme.primary,
+                                              textStyle: context
+                                                  .appTheme
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Open Sans',
+                                                    color: Colors.white,
+                                                  ),
                                               elevation: 3,
                                               borderSide: BorderSide(
                                                 color: Colors.transparent,
@@ -488,8 +473,7 @@ class _PobWidgetState extends State<PobWidget> {
                                         thumbPadding: EdgeInsets.all(3),
                                         thumb: Icon(
                                           Icons.chevron_right,
-                                          color:
-                                              context.appTheme.primary,
+                                          color: context.appTheme.primary,
                                         ),
                                         elevationThumb: 2,
                                         elevationTrack: 2,
@@ -502,7 +486,9 @@ class _PobWidgetState extends State<PobWidget> {
                                           'AT DROP OFF'.toUpperCase(),
                                           style: TextStyle(
                                             color:
-                                                context.appTheme.primaryBackground,
+                                                context
+                                                    .appTheme
+                                                    .primaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -641,40 +627,22 @@ class _PobWidgetState extends State<PobWidget> {
   }
 
   String distanceKm = '';
-  String address = '';
-  Future<void> _getpolylines() async {
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: "AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA",
-      request: PolylineRequest(
-        origin: PointLatLng(originlatlng!.latitude, originlatlng!.longitude),
-        destination: PointLatLng(
-          dropOffViewModel.convertedLat.value,
-          dropOffViewModel.convertedLng.value,
-        ),
-        mode: TravelMode.driving,
-      ),
-    );
-    polylineCoordinate.clear();
 
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinate.add(LatLng(point.latitude, point.longitude));
-      }
+  Future<void> _refreshMapboxRoute() async {
+    final origin = originlatlng;
+    final destinationLat = dropOffViewModel.convertedLat.value;
+    final destinationLng = dropOffViewModel.convertedLng.value;
+    if (origin == null || destinationLat == 0.0 || destinationLng == 0.0) {
+      return;
     }
-    double distanceinKm = result.totalDistanceValue! / 1600;
-    distanceKm = "${distanceinKm.toStringAsFixed(1)} miles";
-    address = result.endAddress.toString();
-    polyline.add(
-      Polyline(
-        polylineId: PolylineId('polyline'),
-        color: Colors.blue,
-        width: 10,
-        points: polylineCoordinate,
-      ),
+
+    final destinationPoint = LatLng(destinationLat, destinationLng);
+    final route = await fetchMapboxRoute(
+      origin: origin,
+      destination: destinationPoint,
     );
-    googleMapController.animateCamera(
-      CameraUpdate.newLatLngZoom(originlatlng!, 16),
-    );
+    polylineCoordinate = route?.points ?? [origin, destinationPoint];
+    distanceKm = route?.distanceText ?? distanceKm;
     setState(() {});
   }
 
@@ -693,41 +661,22 @@ class _PobWidgetState extends State<PobWidget> {
     saveRouteToStorage(userRoute);
   }
 
-  Set<Circle> geofenceCircles = {}; // Set for geofence circles
-  void addGeofenceCircle() {
-    // Add a circle around the destination
-    geofenceCircles.add(
-      Circle(
-        circleId: CircleId('destination_geofence'),
-        center: originlatlng!, // Destination LatLng
-        radius: 100, // Radius in meters
-        strokeWidth: 2, // Border width
-        strokeColor: Colors.blue.withOpacity(0.5), // Border color
-        fillColor: Colors.blue.withOpacity(0.2), // Fill color
-      ),
-    );
-    setState(() {});
-  }
-
   List<LatLng> userRoute = [];
   StreamSubscription<Position>? _positionStreamSubscription;
   Future getLiveLocationAndlistner() async {
+    await _positionStreamSubscription?.cancel();
     userRoute.clear(); // Clear old routes if any
     _positionStreamSubscription = Geolocator.getPositionStream().listen((
       position,
-    ) {
+    ) async {
       setState(() {});
 
       originlatlng = LatLng(position.latitude, position.longitude);
       LatLng currentPosition = LatLng(position.latitude, position.longitude);
       userRoute.add(currentPosition);
       // print("the user route is ${userRoute}");
-      initialCameraPosition = CameraPosition(target: originlatlng!, zoom: 15);
-      setCustomMarkerForCurrent();
-      // if (destlatlng != null) {
-      _getpolylines();
-      // }
-      addGeofenceCircle();
+      await setCustomMarkerForCurrent();
+      await _refreshMapboxRoute();
 
       // Check proximity to destination
       double distanceInMeters = Geolocator.distanceBetween(
@@ -743,108 +692,61 @@ class _PobWidgetState extends State<PobWidget> {
         //   _showArrivalAlert(); // Show alert if within 200 meters
         // }
       }
-      markers.removeWhere(
-        (element) => element.mapsId.value.compareTo('origin') == 0,
-      );
-      markers.add(
-        Marker(
-          markerId: MarkerId('origin'),
-          position: originlatlng!,
-          icon: sourceicon,
-        ),
-      );
-      markers.add(
-        Marker(
-          markerId: MarkerId('destination'),
-          position: LatLng(
-            dropOffViewModel.convertedLat.value,
-            dropOffViewModel.convertedLng.value,
-          ),
-          icon: destination,
-        ),
-      );
     });
   }
 
-  BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
-  BitmapDescriptor destination = BitmapDescriptor.defaultMarker;
-  void setCustomMarkerForCurrent() async {
-    sourceicon = await _resizeAndCreateBitmapDescriptor(
+  Future<void> setCustomMarkerForCurrent() async {
+    _driverMarkerImage ??= await loadResizedAssetBytes(
       "assets/images/car2.png",
       width: 120, // Set desired width
       height: 120, // Set desired height
     );
 
-    destination = await _resizeAndCreateBitmapDescriptor(
+    _destinationMarkerImage ??= await loadResizedAssetBytes(
       "assets/images/userg.png",
       width: 70,
       height: 70,
     );
   }
 
-  Future<BitmapDescriptor> _resizeAndCreateBitmapDescriptor(
-    String imagePath, {
-    required int width,
-    required int height,
-  }) async {
-    final ByteData data = await rootBundle.load(imagePath);
-    final Uint8List bytes = data.buffer.asUint8List();
-
-    // Decode and resize the image
-    final img.Image? originalImage = img.decodeImage(bytes);
-    if (originalImage == null) throw Exception("Failed to decode image");
-    final img.Image resizedImage = img.copyResize(
-      originalImage,
-      width: width,
-      height: height,
-    );
-
-    // Convert resized image back to Uint8List
-    final Uint8List resizedBytes = Uint8List.fromList(
-      img.encodePng(resizedImage),
-    );
-
-    // Convert to BitmapDescriptor
-    final ui.Codec codec = await ui.instantiateImageCodec(resizedBytes);
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    final ByteData? byteData = await frameInfo.image.toByteData(
-      format: ui.ImageByteFormat.png,
-    );
-
-    return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
-  }
-
-  late GoogleMapController googleMapController;
   Widget buildMap() {
-    return
-    //  initialCameraPosition == null
-    //     ? Center(
-    //         child: CircularProgressIndicator(),
-    //       )
-    //     :
-    GoogleMap(
-      // circles: geofenceCircles,
-      initialCameraPosition: initialCameraPosition,
-      myLocationEnabled: false,
-      myLocationButtonEnabled: false,
-      mapType: MapType.satellite, // Keep this as 'normal' (not satellite etc.)
-      tiltGesturesEnabled: true,
-      compassEnabled: true,
-      rotateGesturesEnabled: true,
-
-      buildingsEnabled: true, // 3D buildings dikhayein
-      scrollGesturesEnabled: true,
-      zoomControlsEnabled: false,
-      zoomGesturesEnabled: true,
-      // onCameraMove: _onCameraMove,
-      onMapCreated: (controller) {
-        googleMapController = controller;
-        setState(() {});
-        // dropOffViewModel.setMapController(controller);
-      },
-      markers: markers,
-      // markers: Set<Marker>.of(markers),
-      polylines: polyline,
+    return MapboxRouteMap(
+      center:
+          originlatlng ??
+          LatLng(
+            dropOffViewModel.latitude.value != 0.0
+                ? dropOffViewModel.latitude.value
+                : 51.5074,
+            dropOffViewModel.longitude.value != 0.0
+                ? dropOffViewModel.longitude.value
+                : -0.1278,
+          ),
+      route: polylineCoordinate,
+      initialZoom: 15,
+      fitRoute: polylineCoordinate.length > 1,
+      followCenter: polylineCoordinate.length <= 1,
+      routeColor: Colors.blue,
+      markers: [
+        if (originlatlng != null)
+          MapboxRouteMarker(
+            id: 'origin',
+            point: originlatlng!,
+            image: _driverMarkerImage,
+            color: context.appTheme.primary,
+            iconSize: 0.58,
+          ),
+        if (dropOffViewModel.convertedLat.value != 0.0 &&
+            dropOffViewModel.convertedLng.value != 0.0)
+          MapboxRouteMarker(
+            id: 'destination',
+            point: LatLng(
+              dropOffViewModel.convertedLat.value,
+              dropOffViewModel.convertedLng.value,
+            ),
+            image: _destinationMarkerImage,
+            color: const Color(0xFF1F7A5B),
+          ),
+      ],
     );
   }
 
@@ -857,15 +759,19 @@ class _PobWidgetState extends State<PobWidget> {
         setState(() {});
         dropOffViewModel.convertedLat.value = locations.first.latitude;
         dropOffViewModel.convertedLng.value = locations.first.longitude;
+        final currentLatLng =
+            await dropOffViewModel.getLatLngFromCurrentLocation();
+        if (currentLatLng != null) {
+          originlatlng = currentLatLng;
+          await setCustomMarkerForCurrent();
+          await _refreshMapboxRoute();
+        }
         await dropOffViewModel.mapApicall().then((s) {
           Future.delayed(Duration(seconds: 2)).then((s) {
             setState(() {});
           });
         });
         await getLiveLocationAndlistner();
-        // setcustommarkeritem();
-
-        // _getPolyline(locations.first.latitude, locations.first.longitude);
       }
     } catch (e) {}
   }
@@ -880,11 +786,6 @@ class _PobWidgetState extends State<PobWidget> {
   String estDistance = 'Calculating...';
   String duration = 'Calculating...';
   String arrivalTime = 'Calculating...';
-  final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
-
-  List<LatLng> decodedPoints = <LatLng>[];
-  // BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
-  // BitmapDescriptor destinationicon = BitmapDescriptor.defaultMarker;
   Future<void> sendOnRideRequest() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -943,7 +844,7 @@ class _PobWidgetState extends State<PobWidget> {
           prefs.remove("isRideStart");
           setState(() {});
           myController.visiblecontainer.value = false;
-          myController.polylines.clear();
+          myController.clearNavigationRoute();
           context.pushNamed('Home');
         } else {
           // Handle the job details as normal

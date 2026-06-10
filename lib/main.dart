@@ -593,14 +593,108 @@ Future<bool> checkApiStatus() async {
   if (response.statusCode == 200) {
     final parsedResponse = json.decode(response.body);
     if (parsedResponse['status'] == true) {
-      // print('New job available: ${DateTime.now()}');
-      return true;
+      final data = parsedResponse['data'];
+      final jobs = _backgroundJobMaps(data);
+
+      if (jobs.isEmpty) {
+        return false;
+      }
+
+      return jobs.any((job) => !_isBackgroundJobAlreadyHandled(job, prefs));
     }
   } else {
     // print("API check failed with status code: ${response.statusCode}");
     throw Exception('API Check Failed');
   }
   // print("No new jobs found.");
+  return false;
+}
+
+List<Map<String, dynamic>> _backgroundJobMaps(dynamic data) {
+  if (data is List) {
+    return data
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: false);
+  }
+
+  if (data is Map) {
+    return [Map<String, dynamic>.from(data)];
+  }
+
+  return const [];
+}
+
+String _backgroundText(Map<String, dynamic> data, List<String> keys) {
+  for (final key in keys) {
+    final value = data[key];
+    if (value == null) {
+      continue;
+    }
+
+    final text = value.toString().trim();
+    if (text.isNotEmpty && text != 'null') {
+      return text;
+    }
+  }
+  return '';
+}
+
+List<String> _backgroundDispatchKeysForIds({
+  required String jobId,
+  required String bookId,
+}) {
+  final keys = <String>[];
+  if (jobId.isNotEmpty && jobId != '--') {
+    keys.add('job:$jobId');
+  }
+  if (bookId.isNotEmpty && bookId != '--') {
+    keys.add('book:$bookId');
+  }
+  return keys;
+}
+
+bool _prefsContainAnyDispatchKey(
+  SharedPreferences prefs,
+  String prefsKey,
+  Iterable<String> dispatchKeys,
+) {
+  final storedKeys = prefs.getStringList(prefsKey) ?? const <String>[];
+  return dispatchKeys.any(storedKeys.contains);
+}
+
+bool _isBackgroundJobAlreadyHandled(
+  Map<String, dynamic> job,
+  SharedPreferences prefs,
+) {
+  final jobId = _backgroundText(job, ['job_id', 'jobId', 'j_id']);
+  final bookId = _backgroundText(job, [
+    'book_id',
+    'bookId',
+    'booking_id',
+    'bookingId',
+  ]);
+  final dispatchKeys = _backgroundDispatchKeysForIds(
+    jobId: jobId,
+    bookId: bookId,
+  );
+
+  if (_prefsContainAnyDispatchKey(prefs, 'acceptedJobKeys', dispatchKeys) ||
+      _prefsContainAnyDispatchKey(prefs, 'completedJobKeys', dispatchKeys) ||
+      _prefsContainAnyDispatchKey(prefs, 'rejectedJobKeys', dispatchKeys)) {
+    return true;
+  }
+
+  final storedJobId = (prefs.getString('jobId') ?? '').trim();
+  final storedBookId = (prefs.getString('bookingid') ?? '').trim();
+  final hasSavedAcceptedJob = prefs.getBool('jobDispatched') ?? false;
+
+  if (hasSavedAcceptedJob &&
+      ((storedJobId.isNotEmpty && storedJobId == jobId) ||
+          (storedBookId.isNotEmpty && storedBookId == bookId))) {
+    return true;
+  }
+
   return false;
 }
 

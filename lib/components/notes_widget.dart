@@ -196,69 +196,12 @@ class _NotesWidgetState extends State<NotesWidget> {
                   padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
                   child: FFButtonWidget(
                     onPressed: () async {
-                      context.pushNamed(
-                        'onWay',
-                        queryParameters:
-                            {
-                              'did': serializeParam(
-                                '${widget.dId}',
-                                ParamType.String,
-                              ),
-                              'jobid': serializeParam(
-                                '${widget.jobId}',
-                                ParamType.String,
-                              ),
-                              'pickup': serializeParam(
-                                '${widget.pickup}',
-                                ParamType.String,
-                              ),
-                              'dropoff': serializeParam(
-                                '${widget.dropoff}',
-                                ParamType.String,
-                              ),
-                              'cName': serializeParam(
-                                '${widget.cName}',
-                                ParamType.String,
-                              ),
-                              'cnumber': serializeParam(
-                                '${widget.cnumber}',
-                                ParamType.String,
-                              ),
-                              'cemail': serializeParam(
-                                '${widget.cemail}',
-                                ParamType.String,
-                              ),
-                              'luggage': serializeParam(
-                                '${widget.luggage}',
-                                ParamType.String,
-                              ),
-                              'note': serializeParam(
-                                '${widget.note}',
-                                ParamType.String,
-                              ),
-                              'fare': serializeParam(
-                                '${widget.fare}',
-                                ParamType.String,
-                              ),
-                              'distance': serializeParam(
-                                '${widget.distance}',
-                                ParamType.String,
-                              ),
-
-                              'pickTime': serializeParam(
-                                '${widget.pickTime}',
-                                ParamType.String,
-                              ),
-                              'pickDate': serializeParam(
-                                '${widget.pickDate}',
-                                ParamType.String,
-                              ),
-                              'passenger': serializeParam(
-                                '${widget.passenger}',
-                                ParamType.String,
-                              ),
-                            }.withoutNulls,
-                      );
+                      final navigator = Navigator.of(context);
+                      if (navigator.canPop()) {
+                        navigator.pop();
+                      } else {
+                        context.goNamed('Home');
+                      }
                     },
                     text: 'ACKNOWLEDGE',
                     options: FFButtonOptions(

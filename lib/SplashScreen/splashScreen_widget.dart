@@ -72,7 +72,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     bool? isLogin = prefs.getBool('isLogin');
     // prefs.setInt('isRideStart', 0);
     setState(() {});
-    int? isRideStart = prefs.getInt('isRideStart');
+    final isRideStart = prefs.getInt('isRideStart') ?? 0;
 
     if (isLogin == true && isRideStart == 0) {
       // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
@@ -83,12 +83,12 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
       // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
       //   // checkUserSession();
       // });
-      context.pushNamed('onWay');
+      context.pushNamed('Home');
     } else if (isLogin == true && isRideStart == 2) {
       // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
       //   // checkUserSession();
       // });
-      context.pushNamed('Pob');
+      context.pushNamed('Home');
     } else if (isLogin == true && isRideStart == 3) {
       // usersessionTimer = Timer.periodic(Duration(seconds: 4), (s) {
       //   // checkUserSession();

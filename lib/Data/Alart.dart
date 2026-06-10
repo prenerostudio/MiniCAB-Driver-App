@@ -120,8 +120,7 @@ class Alarts {
                             child: Container(
                               height: MediaQuery.of(context).size.height * 0.6,
                               decoration: BoxDecoration(
-                                color:
-                                    context.appTheme.secondaryBackground,
+                                color: context.appTheme.secondaryBackground,
                                 boxShadow: [
                                   const BoxShadow(
                                     blurRadius: 4.0,
@@ -183,26 +182,39 @@ class Alarts {
                                                         '£${jobItem.journeyFare}',
                                                         textAlign:
                                                             TextAlign.end,
-                                                        style: context.appTheme.displaySmall.override(
-                                                          fontFamily: 'Outfit',
-                                                          color:
-                                                              context.appTheme.primaryText,
-                                                          fontSize: 32,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
+                                                        style: context
+                                                            .appTheme
+                                                            .displaySmall
+                                                            .override(
+                                                              fontFamily:
+                                                                  'Outfit',
+                                                              color:
+                                                                  context
+                                                                      .appTheme
+                                                                      .primaryText,
+                                                              fontSize: 32,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
                                                       ),
                                                       Text(
                                                         '(Estimated maximum value)',
-                                                        style: context.appTheme.labelMedium.override(
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          color:
-                                                              context.appTheme.primaryText,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
+                                                        style: context
+                                                            .appTheme
+                                                            .labelMedium
+                                                            .override(
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              color:
+                                                                  context
+                                                                      .appTheme
+                                                                      .primaryText,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
                                                       ),
                                                     ].divide(
                                                       const SizedBox(height: 4),
@@ -237,7 +249,9 @@ class Alarts {
                                                           child: VerticalDivider(
                                                             thickness: 2,
                                                             color:
-                                                                context.appTheme.secondaryText,
+                                                                context
+                                                                    .appTheme
+                                                                    .secondaryText,
                                                           ),
                                                         ),
                                                       ),
@@ -255,7 +269,9 @@ class Alarts {
                                                           children: [
                                                             Text(
                                                               'Time',
-                                                              style: context.appTheme.bodyMedium
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
                                                                   .override(
                                                                     fontFamily:
                                                                         'Roboto',
@@ -273,7 +289,9 @@ class Alarts {
                                                                   ),
                                                               child: Text(
                                                                 'Date',
-                                                                style: context.appTheme.bodyMedium
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodyMedium
                                                                     .override(
                                                                       fontFamily:
                                                                           'Roboto',
@@ -299,7 +317,9 @@ class Alarts {
                                                           children: [
                                                             Text(
                                                               jobItem.pickTime,
-                                                              style: context.appTheme.bodyMedium
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
                                                                   .override(
                                                                     fontFamily:
                                                                         'Roboto',
@@ -318,7 +338,9 @@ class Alarts {
                                                               child: Text(
                                                                 jobItem
                                                                     .pickDate,
-                                                                style: context.appTheme.bodyMedium
+                                                                style: context
+                                                                    .appTheme
+                                                                    .bodyMedium
                                                                     .override(
                                                                       fontFamily:
                                                                           'Roboto',
@@ -376,16 +398,22 @@ class Alarts {
                                                           child: Center(
                                                             child: Text(
                                                               'A',
-                                                              style: context.appTheme.bodyMedium.override(
-                                                                fontFamily:
-                                                                    'Open Sans',
-                                                                color:
-                                                                    context.appTheme.secondaryBackground,
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                              ),
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Open Sans',
+                                                                    color:
+                                                                        context
+                                                                            .appTheme
+                                                                            .secondaryBackground,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
                                                             ),
                                                           ),
                                                         ),
@@ -463,16 +491,22 @@ class Alarts {
                                                           child: Center(
                                                             child: Text(
                                                               'B',
-                                                              style: context.appTheme.bodyMedium.override(
-                                                                fontFamily:
-                                                                    'Open Sans',
-                                                                color:
-                                                                    context.appTheme.secondaryBackground,
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                              ),
+                                                              style: context
+                                                                  .appTheme
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Open Sans',
+                                                                    color:
+                                                                        context
+                                                                            .appTheme
+                                                                            .secondaryBackground,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
                                                             ),
                                                           ),
                                                         ),
@@ -501,14 +535,17 @@ class Alarts {
                                                                 child: Text(
                                                                   jobItem
                                                                       .pickup,
-                                                                  style: context.appTheme.labelMedium.override(
-                                                                    fontFamily:
-                                                                        'Readex Pro',
-                                                                    color:
-                                                                        context.appTheme.secondaryText,
-                                                                    fontSize:
-                                                                        15,
-                                                                  ),
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .labelMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            15,
+                                                                      ),
                                                                   overflow:
                                                                       TextOverflow
                                                                           .ellipsis,
@@ -544,14 +581,17 @@ class Alarts {
                                                                       TextOverflow
                                                                           .ellipsis,
                                                                   maxLines: 1,
-                                                                  style: context.appTheme.bodyMedium.override(
-                                                                    fontFamily:
-                                                                        'Open Sans',
-                                                                    color:
-                                                                        context.appTheme.secondaryText,
-                                                                    fontSize:
-                                                                        16,
-                                                                  ),
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Open Sans',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            16,
+                                                                      ),
                                                                 ),
                                                               ),
                                                             ],
@@ -571,14 +611,17 @@ class Alarts {
                                                                 child: Text(
                                                                   jobItem
                                                                       .destination,
-                                                                  style: context.appTheme.labelMedium.override(
-                                                                    fontFamily:
-                                                                        'Readex Pro',
-                                                                    color:
-                                                                        context.appTheme.secondaryText,
-                                                                    fontSize:
-                                                                        15,
-                                                                  ),
+                                                                  style: context
+                                                                      .appTheme
+                                                                      .labelMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color:
+                                                                            context.appTheme.secondaryText,
+                                                                        fontSize:
+                                                                            15,
+                                                                      ),
                                                                   overflow:
                                                                       TextOverflow
                                                                           .ellipsis,
@@ -631,8 +674,10 @@ class Alarts {
                                                           0,
                                                         ),
                                                     color: Colors.red,
-                                                    textStyle:
-                                                        context.appTheme.titleSmall.override(
+                                                    textStyle: context
+                                                        .appTheme
+                                                        .titleSmall
+                                                        .override(
                                                           fontFamily:
                                                               'Open Sans',
                                                           color: Colors.white,
@@ -663,6 +708,7 @@ class Alarts {
                                                         .value = true;
                                                     await acceptJob(
                                                       jobItem.jobId,
+                                                      jobItem.bookId,
                                                       closeOverlay,
                                                       context,
                                                     ).then((s) {
@@ -699,9 +745,13 @@ class Alarts {
                                                           0,
                                                         ),
                                                     color:
-                                                        context.appTheme.primary,
-                                                    textStyle:
-                                                        context.appTheme.titleSmall.override(
+                                                        context
+                                                            .appTheme
+                                                            .primary,
+                                                    textStyle: context
+                                                        .appTheme
+                                                        .titleSmall
+                                                        .override(
                                                           fontFamily:
                                                               'Open Sans',
                                                           color: Colors.white,
@@ -778,13 +828,18 @@ class Alarts {
 
   Future<void> acceptJob(
     String jobId,
+    String bookId,
     Function closeOverlay,
     BuildContext context,
   ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       String? dId = prefs.getString('d_id');
-      var fields = {'job_id': jobId.toString(), 'd_id': dId.toString()};
+      var fields = {
+        'job_id': jobId.toString(),
+        'book_id': bookId.toString(),
+        'd_id': dId.toString(),
+      };
       var uri = Uri.parse(ApiService.driverAcceptJob);
 
       var response = await http.post(uri, body: fields);
@@ -792,6 +847,24 @@ class Alarts {
       if (response.statusCode == 200) {
         // Navigator.pop(context);
         print('Job accepted successfully');
+
+        final currentRideState = prefs.getInt('isRideStart') ?? 0;
+        await prefs.setBool('jobDispatched', true);
+        if (jobId.trim().isNotEmpty) {
+          await prefs.setString('jobId', jobId.trim());
+        }
+        if (bookId.trim().isNotEmpty) {
+          await prefs.setString('bookingid', bookId.trim());
+        }
+        if (currentRideState == 0) {
+          await prefs.setInt('isRideStart', 0);
+          await prefs.setString('jobFlowStage', 'accepted');
+        }
+        final acceptedKeys = <String>{
+          ...?prefs.getStringList('acceptedJobKeys'),
+          ...myController.dispatchKeysForIds(jobId: jobId, bookId: bookId),
+        };
+        await prefs.setStringList('acceptedJobKeys', acceptedKeys.toList());
 
         myController.visiblecontainer.value = true;
         print('object0');

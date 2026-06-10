@@ -9,12 +9,6 @@ class ApiService {
   static const String apiBaseUrl = '$siteBaseUrl/api';
   static const String driverBaseUrl = '$apiBaseUrl/driver';
   static const String bookerBaseUrl = '$apiBaseUrl/booker';
-  static const String googleMapsApiBaseUrl =
-      'https://maps.googleapis.com/maps/api';
-  static const String googleDirectionsEndpoint =
-      '$googleMapsApiBaseUrl/directions/json';
-  static const String googleGeocodeEndpoint =
-      '$googleMapsApiBaseUrl/geocode/json';
   static const String mapboxDrivingTrafficEndpoint =
       'https://api.mapbox.com/directions/v5/mapbox/driving-traffic';
 
@@ -48,44 +42,23 @@ class ApiService {
     return http.MultipartRequest(method, uri(endpoint));
   }
 
-  static Uri googleGeocodeUri({
-    required String address,
-    required String apiKey,
-  }) {
-    return uri(
-      googleGeocodeEndpoint,
-    ).replace(queryParameters: {'address': address, 'key': apiKey});
-  }
-
-  static String googleDirectionsUrl({
-    required String origin,
-    required String destination,
-    required String apiKey,
-    bool alternatives = false,
-  }) {
-    return uri(googleDirectionsEndpoint)
-        .replace(
-          queryParameters: {
-            'origin': origin,
-            'destination': destination,
-            if (alternatives) 'alternatives': 'true',
-            'key': apiKey,
-          },
-        )
-        .toString();
-  }
-
-  static String googleMapsSearchUrl(double lat, double lng) {
-    return Uri.https('www.google.com', '/maps/search/', {
-      'api': '1',
-      'query': '$lat,$lng',
+  static String mapboxMapPreviewUrl(double lat, double lng) {
+    return Uri.https('www.mapbox.com', '/mapbox-gl-js/example/simple-map/', {
+      'center': '$lng,$lat',
+      'zoom': '14',
     }).toString();
   }
 
-  static String googleMapsNavigationUrl(double lat, double lng) {
-    return Uri.https('www.google.com', '/maps/dir/', {
-      'api': '1',
-      'destination': '$lat,$lng',
+  static String mapboxDirectionsWebUrl({
+    required double destinationLat,
+    required double destinationLng,
+    required double currentLat,
+    required double currentLng,
+  }) {
+    return Uri.https('www.mapbox.com', '/directions/', {
+      'origin': '$currentLng,$currentLat',
+      'destination': '$destinationLng,$destinationLat',
+      'profile': 'driving',
     }).toString();
   }
 

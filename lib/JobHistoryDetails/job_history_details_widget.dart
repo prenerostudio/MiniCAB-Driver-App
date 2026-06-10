@@ -1,10 +1,9 @@
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:new_minicab_driver/JobHistoryDetails/contact_form.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
+import 'package:new_minicab_driver/mapbox/mapbox_route_map.dart';
 
 import 'job_history_details_model.dart';
 export 'job_history_details_model.dart';
@@ -82,11 +81,9 @@ class JobHistoryDetailsWidget extends StatefulWidget {
 class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late JobHistoryDetailsModel _model;
-  GoogleMapController? mapController;
   List<LatLng> routePoints = [];
 
   Future<void> loadRouteFromStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     String rawData = widget.ridePath ?? '';
 
     // Remove spaces and split by comma
@@ -97,75 +94,17 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
 
     List<LatLng> points = [];
 
-    for (int i = 0; i < routeData.length; i += 2) {
-      double lat = double.parse(routeData[i]);
-      double lng = double.parse(routeData[i + 1]);
-      points.add(LatLng(lat, lng));
+    for (int i = 0; i + 1 < routeData.length; i += 2) {
+      final lat = double.tryParse(routeData[i]);
+      final lng = double.tryParse(routeData[i + 1]);
+      if (lat != null && lng != null) {
+        points.add(LatLng(lat, lng));
+      }
     }
 
     setState(() {
       routePoints = points;
     });
-
-    if (routePoints.isNotEmpty && mapController != null) {
-      mapController?.animateCamera(
-        CameraUpdate.newLatLngBounds(_getLatLngBounds(routePoints), 50),
-      );
-    }
-  }
-
-  //   Future<void> loadRouteFromStorage() async {
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     String rawData = widget.ridePath ?? '';
-
-  //     List<String>? routeData2 = prefs.getStringList('user_route');
-
-  // // Remove spaces and split by comma
-  //     List<String> routeData = rawData.replaceAll(" ", "").split(",");
-  //     // print('the saved routes minLat 1 ${widget.ridePath}');
-  //     print('the saved routes minLat ${routeData}');
-  //     print('the saved routes minLat2 ${routeData2}');
-
-  //     // print(routeData);
-  //     if (routeData == null) return;
-
-  //     List<LatLng> points = routeData.map((point) {
-  //       List<String> latLng = point.split(',');
-  //       return LatLng(double.parse(latLng[0]), double.parse(latLng[1]));
-  //     }).toList();
-
-  //     setState(() {
-  //       routePoints = points;
-  //     });
-
-  //     if (routePoints.isNotEmpty && mapController != null) {
-  //       mapController?.animateCamera(
-  //         CameraUpdate.newLatLngBounds(
-  //           _getLatLngBounds(routePoints),
-  //           50,
-  //         ),
-  //       );
-  //     }
-  //   }
-
-  LatLngBounds _getLatLngBounds(List<LatLng> points) {
-    double minLat = points
-        .map((p) => p.latitude)
-        .reduce((a, b) => a < b ? a : b);
-    double minLng = points
-        .map((p) => p.longitude)
-        .reduce((a, b) => a < b ? a : b);
-    double maxLat = points
-        .map((p) => p.latitude)
-        .reduce((a, b) => a > b ? a : b);
-    double maxLng = points
-        .map((p) => p.longitude)
-        .reduce((a, b) => a > b ? a : b);
-
-    return LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
   }
 
   @override
@@ -266,13 +205,16 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                                         ),
                                         child: Text(
                                           'Back',
-                                          style: context.appTheme.titleMedium.override(
-                                            fontFamily: 'Open Sans',
-                                            color:
-                                                context.appTheme.primaryText,
-                                            letterSpacing: 0,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          style: context.appTheme.titleMedium
+                                              .override(
+                                                fontFamily: 'Open Sans',
+                                                color:
+                                                    context
+                                                        .appTheme
+                                                        .primaryText,
+                                                letterSpacing: 0,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                       ),
                                     ],
@@ -674,56 +616,30 @@ class _JobHistoryDetailsWidgetState extends State<JobHistoryDetailsWidget> {
                     // Text('the routepoints are ${routePoints.first}'),
                     SizedBox(
                       height: 200,
-                      child: GoogleMap(
-                        mapType:
-                            MapType
-                                .satellite, // Keep this as 'normal' (not satellite etc.)
-                        tiltGesturesEnabled: true,
-                        initialCameraPosition: CameraPosition(
-                          target:
-                              routePoints.isNotEmpty
-                                  ? routePoints.first
-                                  : LatLng(0, 0),
-                          zoom: 14,
-                        ),
-                        polylines: {
-                          if (routePoints.isNotEmpty)
-                            Polyline(
-                              polylineId: PolylineId('ride_route'),
-                              points: routePoints,
-                              color: Colors.blue,
-                              width: 5,
+                      child: MapboxRouteMap(
+                        center:
+                            routePoints.isNotEmpty
+                                ? routePoints.first
+                                : const LatLng(51.5074, -0.1278),
+                        route: routePoints,
+                        initialZoom: 13,
+                        fitRoute: routePoints.length > 1,
+                        followCenter: routePoints.length <= 1,
+                        routeColor: Colors.blue,
+                        markers: [
+                          if (routePoints.length > 1) ...[
+                            MapboxRouteMarker(
+                              id: 'start_point',
+                              point: routePoints.first,
+                              color: const Color(0xFF1F7A5B),
                             ),
-                        },
-                        markers: {
-                          if (routePoints.isNotEmpty) ...{
-                            Marker(
-                              markerId: MarkerId('start_point'),
-                              position: routePoints.first,
-                              infoWindow: InfoWindow(title: 'Start Point'),
+                            MapboxRouteMarker(
+                              id: 'end_point',
+                              point: routePoints.last,
+                              color: const Color(0xFFE04444),
                             ),
-                            Marker(
-                              markerId: MarkerId('end_point'),
-                              position: routePoints.last,
-                              infoWindow: InfoWindow(title: 'End Point'),
-                            ),
-                          },
-                        },
-                        zoomControlsEnabled:
-                            true, // Allow zoom controls on the map
-                        myLocationEnabled: false,
-                        myLocationButtonEnabled: false,
-                        onMapCreated: (GoogleMapController controller) {
-                          mapController = controller;
-                          if (routePoints.isNotEmpty) {
-                            mapController?.animateCamera(
-                              CameraUpdate.newLatLngBounds(
-                                _getLatLngBounds(routePoints),
-                                50,
-                              ),
-                            );
-                          }
-                        },
+                          ],
+                        ],
                       ),
                     ),
                     SizedBox(height: 10),

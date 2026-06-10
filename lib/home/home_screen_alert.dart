@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
@@ -20,8 +19,6 @@ import 'package:vibration/vibration.dart';
 import 'package:http/http.dart' as http;
 
 export 'home_model.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:convert';
 import 'package:new_minicab_driver/Data/api_service.dart';
 
 class HomeScreenAlert extends StatefulWidget {
@@ -35,8 +32,27 @@ class HomeScreenAlert extends StatefulWidget {
 }
 
 class _HomeScreenAlertState extends State<HomeScreenAlert> {
+  String _distanceText(Job job) {
+    final distance = double.tryParse(job.journeyDistance);
+    final journeyType =
+        job.journeyType.trim().isEmpty ? '' : ' ${job.journeyType}';
+
+    if (distance == null) {
+      final rawDistance = job.journeyDistance.trim();
+      return rawDistance.isEmpty
+          ? journeyType.trim()
+          : '$rawDistance$journeyType';
+    }
+
+    return '${(distance * 0.621371).toStringAsFixed(2)} Miles$journeyType';
+  }
+
   Future<bool> acceptJob(Job job) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    final previouslyStickyJob =
+        myController.listFromPusher.isNotEmpty
+            ? myController.listFromPusher.first
+            : null;
     try {
       String? dId = prefs.getString('d_id');
       var fields = {
@@ -49,25 +65,75 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
       var response = await http.post(uri, body: fields);
 
       if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body);
         print('Job accepted successfully');
+        final currentRideState = prefs.getInt('isRideStart') ?? 0;
         await prefs.setBool('jobDispatched', true);
+        if (currentRideState == 0) {
+          await prefs.setInt('isRideStart', 0);
+          await prefs.setString('jobFlowStage', 'accepted');
+        }
         await prefs.setString('jobId', job.jobId);
         await prefs.setString('bookingid', job.bookId);
+        await prefs.setString('c_id', job.cId);
+        await prefs.setString('d_id_for_job', job.dId);
+        await prefs.setString('journey_fare', job.journeyFare);
+        await prefs.setString('booking_fee', job.bookingFee);
+        await prefs.setString('car_parking', job.carParking);
+        await prefs.setString('extra', job.extra);
+        await prefs.setString('waiting', job.waiting);
+        await prefs.setString('tolls', job.tolls);
+        await prefs.setString('pickDate', job.pickDate);
+        await prefs.setString('pickTime', job.pickTime);
+        await prefs.setString('pickLocation', job.pickup);
+        await prefs.setString('dropLocation', job.destination);
+        await prefs.setString('totalFee', job.totalFee ?? '');
+        await prefs.setString('job_note', job.jobNote);
+        await prefs.setString('job_status', job.jobStatus);
+        await prefs.setString('date_job_add', job.dateJobAdd);
+        await prefs.setString('c_name', job.cName);
+        await prefs.setString('c_email', job.cEmail);
+        await prefs.setString('c_phone', job.cPhone);
+        await prefs.setString('c_address', job.cAddress);
+        await prefs.setString('d_name', job.dName);
+        await prefs.setString('d_email', job.dEmail);
+        await prefs.setString('d_phone', job.dPhone);
+        await prefs.setString('b_type_id', job.bTypeId);
+        await prefs.setString('address', job.address);
+        await prefs.setString('postal_code', job.postalCode);
+        await prefs.setString('passenger', job.passenger);
+        await prefs.setString('journey_type', job.journeyType);
+        await prefs.setString('v_id', job.vId);
+        await prefs.setString('luggage', job.luggage);
+        await prefs.setString('child_seat', job.childSeat);
+        await prefs.setString('flight_number', job.flightNumber);
+        await prefs.setString('delay_time', job.delayTime);
+        await prefs.setString('note', job.note);
+        await prefs.setString('journey_distance', job.journeyDistance);
+        await prefs.setString('booking_status', job.bookingStatus);
+        await prefs.setString('bid_status', job.bidStatus);
+        await prefs.setString('bid_note', job.bidNote);
+        await prefs.setString('book_add_date', job.bookAddDate);
 
-        myController.listFromPusher
-          ..clear()
-          ..add(job);
-        myController.visiblecontainer.value = true;
+        await myController.rememberAcceptedJob(job);
+        myController.pendingDispatchJobs.clear();
         myController.jobPusherContainer.value = false;
         myController.isJobDetailDone.value = false;
+        myController.clearNavigationRoute();
 
         print('object0');
-        final acceptedPickup =
-            jsonData['data'] is List && jsonData['data'].isNotEmpty
-                ? jsonData['data'][0]['pickup']?.toString()
-                : null;
-        await getCoordinatesFromAddress(acceptedPickup ?? job.pickup);
+        await myController.jobDetails();
+        if (myController.listFromPusher.isEmpty) {
+          final fallbackJob =
+              myController.earliestAcceptedJob([
+                if (previouslyStickyJob != null) previouslyStickyJob,
+                job,
+              ]) ??
+              job;
+          myController.listFromPusher
+            ..clear()
+            ..add(fallbackJob);
+          myController.visiblecontainer.value = true;
+        }
 
         return true;
       } else {
@@ -80,108 +146,28 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
     return false;
   }
 
-  Future _getPolyline(double destinationLat, double desLng) async {
-    print('tapped');
-    var origin =
-        '${myController.currentLocation?.latitude},${myController.currentLocation?.longitude}'; // Replace with your source coordinates
-    var destination =
-        // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-        '$destinationLat,$desLng';
-    // var destination =
-    // // '31.414050,73.0613070'; // Replace with your destination coordinates // Replace with your destination coordinates
-    // '${31.3637197},${73.0553336}';
+  Future<void> _refreshMapboxRoute(double destinationLat, double desLng) async {
     try {
-      final response = await http.post(
-        Uri.parse(
-          ApiService.googleDirectionsUrl(
-            origin: origin,
-            destination: destination,
-            apiKey: apiKey,
-          ),
-        ),
+      final originLat =
+          myController.currentLocation?.latitude ?? myController.latitude.value;
+      final originLng =
+          myController.currentLocation?.longitude ??
+          myController.longitude.value;
+      if (originLat == 0.0 || originLng == 0.0) {
+        return;
+      }
+      await myController.getdistanceandtime(
+        destinationLat,
+        desLng,
+        originLat: originLat,
+        originLng: originLng,
       );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        if (data.containsKey('routes') && data['routes'].isNotEmpty) {
-          final route = data['routes'][0];
-          if (route.containsKey('legs') && route['legs'].isNotEmpty) {
-            final leg = route['legs'][0];
-
-            if (leg.containsKey('distance')) {
-              // distance.value = leg['distance']['text'];
-              // time.value = leg['duration']['text'];
-
-              final points = route['overview_polyline']['points'];
-              print('the point of poly line $points');
-              // Decode polyline points and add them to the map
-              //         final json = jsonDecode(response.body);
-              // final String encodedPolyline =
-              //     json['routes'][0]['overview_polyline']['points'];
-              // final List<LatLng> points = decodePolyline(encodedPolyline);
-              decodedPoints =
-                  PolylinePoints()
-                      .decodePolyline(points)
-                      .map((point) => LatLng(point.latitude, point.longitude))
-                      .toList();
-
-              if (mounted) {
-                setState(() {
-                  myController.polylines.add(
-                    Polyline(
-                      polylineId: PolylineId('poly'),
-                      visible: true,
-                      points: decodedPoints,
-                      width: 4,
-                      color: Colors.blue,
-                    ),
-                  );
-                });
-              }
-            }
-          }
-        }
-      } else {
-        print('the point of poly line ');
+      if (mounted) {
+        setState(() {});
       }
     } catch (e) {
-      print('the point of poly line $e');
+      print('route update failed: $e');
     }
-  }
-
-  final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
-
-  List<LatLng> decodedPoints = <LatLng>[];
-
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> polyline = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-      lng += dlng;
-
-      polyline.add(LatLng(lat / 1E5, lng / 1E5));
-    }
-
-    return polyline;
   }
 
   Future getCoordinatesFromAddress(String address) async {
@@ -193,7 +179,10 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
         print(
           'convert Latitude: ${myController.convertedLat.value}, convert longitude: ${myController.convertedLng.value}',
         );
-        _getPolyline(locations.first.latitude, locations.first.longitude);
+        _refreshMapboxRoute(
+          locations.first.latitude,
+          locations.first.longitude,
+        );
       }
     } catch (e) {
       print('Error occurred: $e');
@@ -201,6 +190,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
   }
 
   Future<void> rejectJob(String jobId, String bookId) async {
+    final navigator = Navigator.of(context);
     SharedPreferences sp = await SharedPreferences.getInstance();
     try {
       var url = Uri.parse(ApiService.driverCancelBooking);
@@ -209,9 +199,35 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
         body: {'book_id': bookId.toString(), 'job_id': jobId.toString()},
       );
       if (response.statusCode == 200) {
-        myController.jobPusherContainer.value = false;
-        await sp.remove('jobDispatched');
-        Navigator.pop(context);
+        final rejectedJobId = jobId.trim();
+        final rejectedBookId = bookId.trim();
+        await myController.rememberRejectedJobByIds(
+          jobId: rejectedJobId,
+          bookId: rejectedBookId,
+        );
+        myController.pendingDispatchJobs.removeWhere((pendingJob) {
+          final sameJobId =
+              rejectedJobId.isNotEmpty &&
+              pendingJob.jobId.trim() == rejectedJobId;
+          final sameBookId =
+              rejectedBookId.isNotEmpty &&
+              pendingJob.bookId.trim() == rejectedBookId;
+          return sameJobId || sameBookId;
+        });
+        myController.jobPusherContainer.value =
+            myController.pendingDispatchJobs.isNotEmpty;
+
+        final storedJobId = (sp.getString('jobId') ?? '').trim();
+        final storedBookId = (sp.getString('bookingid') ?? '').trim();
+        final rejectedAcceptedJob =
+            (storedJobId.isNotEmpty && storedJobId == rejectedJobId) ||
+            (storedBookId.isNotEmpty && storedBookId == rejectedBookId);
+        if (rejectedAcceptedJob) {
+          await sp.remove('jobDispatched');
+        }
+        if (widget.isfromUi != true && navigator.canPop()) {
+          navigator.pop();
+        }
         print(response.body);
       } else {
         print(response.reasonPhrase);
@@ -224,6 +240,10 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
   final JobController myController = Get.put(JobController());
   @override
   Widget build(BuildContext context) {
+    if (widget.st.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       margin: EdgeInsets.all(8),
       width: double.infinity,
@@ -530,7 +550,7 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                                     ),
                                     SizedBox(width: 10),
                                     Text(
-                                      '${(double.parse(jobItem.journeyDistance) * 0.621371).toStringAsFixed(2)} Miles ${jobItem.journeyType}',
+                                      _distanceText(jobItem),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: context.appTheme.bodyMedium
@@ -584,7 +604,6 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                           // Navigator.pop(context);
                           FlutterRingtonePlayer().stop();
                           Vibration.cancel();
-                          myController.visiblecontainer.value = false;
 
                           rejectJob(jobItem.jobId, jobItem.bookId);
                         },
@@ -620,6 +639,9 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                       ),
                       FFButtonWidget(
                         onPressed: () async {
+                          FlutterRingtonePlayer().stop();
+                          Vibration.cancel();
+                          final navigator = Navigator.of(context);
                           SharedPreferences sp =
                               await SharedPreferences.getInstance();
                           // await sp.setBool('show', true);
@@ -636,8 +658,6 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                             myController.isJobDetailDone.value = false;
                           }
                           // isOverlayClosed = true;
-                          FlutterRingtonePlayer().stop();
-                          Vibration.cancel();
                           if (widget.isfromUi == true) {
                             // Navigator.pop(context);
                             // Navigator.push(
@@ -648,9 +668,10 @@ class _HomeScreenAlertState extends State<HomeScreenAlert> {
                             //               page: HomeWidget(),
                             //             )));
                           } else {
-                            // Navigator.pop(context);
-                            Navigator.push(
-                              context,
+                            if (navigator.canPop()) {
+                              navigator.pop();
+                            }
+                            await navigator.push(
                               MaterialPageRoute(
                                 builder:
                                     (context) => NavBarPage(

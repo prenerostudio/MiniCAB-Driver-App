@@ -6,7 +6,7 @@ class MapUtils {
   MapUtils();
 
   static Future<void> openMap(double lat, double lng) async {
-    String pickupLocation = ApiService.googleMapsSearchUrl(lat, lng);
+    String pickupLocation = ApiService.mapboxMapPreviewUrl(lat, lng);
 
     if (await canLaunch(pickupLocation)) {
       await launch(pickupLocation);
@@ -16,7 +16,15 @@ class MapUtils {
   }
 
   static Future<void> navigateTo(double Lat, double Lng) async {
-    String navigationUrl = ApiService.googleMapsNavigationUrl(Lat, Lng);
+    Position currentPosition = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    String navigationUrl = ApiService.mapboxDirectionsWebUrl(
+      destinationLat: Lat,
+      destinationLng: Lng,
+      currentLat: currentPosition.latitude,
+      currentLng: currentPosition.longitude,
+    );
 
     if (await canLaunch(navigationUrl)) {
       await launch(navigationUrl);

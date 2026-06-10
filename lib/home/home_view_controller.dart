@@ -1,45 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:new_minicab_driver/Model/jobDetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'dart:ui' as ui;
 import 'package:new_minicab_driver/Data/api_service.dart';
-
-const _defaultMapboxAccessToken =
-    'pk.eyJ1IjoicHJlbmVyb3N0dWRpb3MiLCJhIjoiY21vdTAxbDF0MDl5ZzJ0c2h1OWU5cXlvZyJ9.r18j8yamEjiEAmIsBwRnBw';
-const _mapboxAccessToken = String.fromEnvironment(
-  'MAPBOX_ACCESS_TOKEN',
-  defaultValue: '',
-);
-const _legacyMapboxAccessToken = String.fromEnvironment(
-  'ACCESS_TOKEN',
-  defaultValue: '',
-);
-
-String get _resolvedMapboxAccessToken =>
-    _mapboxAccessToken.isNotEmpty
-        ? _mapboxAccessToken
-        : _legacyMapboxAccessToken.isNotEmpty
-        ? _legacyMapboxAccessToken
-        : _defaultMapboxAccessToken;
+import 'package:new_minicab_driver/mapbox/mapbox_route_map.dart';
 
 class JobController extends GetxController {
   var isPeriodicVisible = false.obs;
   final isscreenHome = false.obs;
   var isJobDetailDone = false.obs;
-  Rx<CameraPosition> kGoogleplay =
-      const CameraPosition(
-        target: LatLng(31.4064054, 73.0413076),
-        zoom: 12.4746,
-      ).obs;
   var visiblecontainer = false.obs;
   var jobPusherContainer = false.obs;
   var currentLoggedInid = ''.obs;
@@ -54,20 +29,19 @@ class JobController extends GetxController {
   final timeSlottotalPay = '--'.obs;
   final timeSlotid = '--'.obs;
   RxList<Job> listFromPusher = <Job>[].obs;
+  RxList<Job> pendingDispatchJobs = <Job>[].obs;
   RxDouble convertedLat = 0.0.obs;
   RxList<LatLng> decodedPoints = <LatLng>[].obs;
   final routeDuration = '--'.obs;
   final routeDistance = '--'.obs;
   final nextInstruction = ''.obs;
+  final navigationRouteActive = false.obs;
   Position? currentLocation;
   RxDouble convertedLng = 0.0.obs;
-  RxSet<Polyline> polylines = <Polyline>{}.obs;
   final longitude = 0.0.obs;
   final latitude = 0.0.obs;
   RxInt initialLabelIndex = 0.obs;
 
-  Rx<BitmapDescriptor> sourceicon = BitmapDescriptor.defaultMarker.obs;
-  Rx<BitmapDescriptor> destinationicon = BitmapDescriptor.defaultMarker.obs;
   var parsedResponse = RxMap<String, dynamic>(
     {},
   ); // Reactive map for parsed response
@@ -83,22 +57,303 @@ class JobController extends GetxController {
   var pickuptime = ''.obs; // Reactive variable for 'data' (booking ID)
   var pickupLocatoin = ''.obs; // Reactive variable for 'data' (booking ID)
   var dropLocation = ''.obs; // Reactive variable for 'data' (booking ID)
-  final mapController = ValueNotifier<GoogleMapController?>(null);
   Timer? timer;
-  void setMapController(GoogleMapController controller) {
-    mapController.value = controller;
+
+  List<String> acceptedDispatchKeysFor(Job job) {
+    return dispatchKeysForIds(jobId: job.jobId, bookId: job.bookId);
+  }
+
+  List<String> dispatchKeysForIds({String? jobId, String? bookId}) {
+    final keys = <String>[];
+    final normalizedJobId = jobId?.trim() ?? '';
+    final normalizedBookId = bookId?.trim() ?? '';
+    if (normalizedJobId.isNotEmpty && normalizedJobId != '--') {
+      keys.add('job:$normalizedJobId');
+    }
+    if (normalizedBookId.isNotEmpty && normalizedBookId != '--') {
+      keys.add('book:$normalizedBookId');
+    }
+    return keys;
+  }
+
+  bool hasAcceptedDispatchKey(Job job, SharedPreferences prefs) {
+    final acceptedKeys =
+        prefs.getStringList('acceptedJobKeys') ?? const <String>[];
+    return acceptedDispatchKeysFor(
+      job,
+    ).any((key) => acceptedKeys.contains(key));
+  }
+
+  bool hasCompletedDispatchKey(Job job, SharedPreferences prefs) {
+    final completedKeys =
+        prefs.getStringList('completedJobKeys') ?? const <String>[];
+    return acceptedDispatchKeysFor(
+      job,
+    ).any((key) => completedKeys.contains(key));
+  }
+
+  bool hasAlertedDispatchKey(Job job, SharedPreferences prefs) {
+    final alertedKeys =
+        prefs.getStringList('alertedDispatchKeys') ?? const <String>[];
+    return acceptedDispatchKeysFor(job).any((key) => alertedKeys.contains(key));
+  }
+
+  bool hasRejectedDispatchKey(Job job, SharedPreferences prefs) {
+    final rejectedKeys =
+        prefs.getStringList('rejectedDispatchKeys') ?? const <String>[];
+    return acceptedDispatchKeysFor(
+      job,
+    ).any((key) => rejectedKeys.contains(key));
+  }
+
+  Future<void> rememberAcceptedJob(Job job) async {
+    final prefs = await SharedPreferences.getInstance();
+    await _rememberAcceptedJobs([job], prefs);
+  }
+
+  Future<void> rememberAlertedJob(Job job) async {
+    final prefs = await SharedPreferences.getInstance();
+    await _rememberDispatchKeys(
+      'alertedDispatchKeys',
+      acceptedDispatchKeysFor(job),
+      prefs,
+    );
+  }
+
+  Future<void> rememberRejectedJobByIds({String? jobId, String? bookId}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await _rememberDispatchKeys(
+      'rejectedDispatchKeys',
+      dispatchKeysForIds(jobId: jobId, bookId: bookId),
+      prefs,
+    );
+  }
+
+  Future<void> rememberCompletedJobByIds({
+    String? jobId,
+    String? bookId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await _rememberDispatchKeys(
+      'completedJobKeys',
+      dispatchKeysForIds(jobId: jobId, bookId: bookId),
+      prefs,
+    );
+  }
+
+  Future<void> _rememberDispatchKeys(
+    String prefsKey,
+    Iterable<String> keys,
+    SharedPreferences prefs,
+  ) async {
+    final dispatchKeys = keys.where((key) => key.trim().isNotEmpty).toList();
+    if (dispatchKeys.isEmpty) {
+      return;
+    }
+
+    final rememberedKeys = <String>[
+      ...?prefs.getStringList(prefsKey),
+      ...dispatchKeys,
+    ];
+    await prefs.setStringList(
+      prefsKey,
+      rememberedKeys
+          .toSet()
+          .toList()
+          .reversed
+          .take(100)
+          .toList()
+          .reversed
+          .toList(),
+    );
+  }
+
+  Future<void> _rememberAcceptedJobs(
+    Iterable<Job> jobs,
+    SharedPreferences prefs,
+  ) async {
+    final acceptedKeys = <String>{
+      ...?prefs.getStringList('acceptedJobKeys'),
+      for (final job in jobs) ...acceptedDispatchKeysFor(job),
+    };
+    await prefs.setStringList('acceptedJobKeys', acceptedKeys.toList());
+  }
+
+  Job _jobFromAcceptedMap(Map<String, dynamic> acceptedJob) {
+    String value(String key) => acceptedJob[key]?.toString() ?? '';
+
+    return Job(
+      jobId: value('job_id'),
+      bookId: value('book_id'),
+      cId: value('c_id'),
+      dId: value('d_id'),
+      jobNote: value('job_note'),
+      journeyFare: value('journey_fare'),
+      bookingFee: value('booking_fee'),
+      carParking: value('car_parking'),
+      waiting: value('waiting'),
+      tolls: value('tolls'),
+      extra: value('extra'),
+      jobStatus: value('job_status'),
+      dateJobAdd: value('date_job_add'),
+      cName: value('c_name'),
+      cEmail: value('c_email'),
+      cPhone: value('c_phone'),
+      cAddress: value('c_address'),
+      dName: value('d_name'),
+      dEmail: value('d_email'),
+      dPhone: value('d_phone'),
+      bTypeId: value('b_type_id'),
+      pickup: value('pickup'),
+      destination: value('destination'),
+      address: value('address'),
+      postalCode: value('postal_code'),
+      passenger: value('passenger'),
+      pickDate: value('pick_date'),
+      pickTime: value('pick_time'),
+      journeyType: value('journey_type'),
+      vId: value('v_id'),
+      luggage: value('luggage'),
+      totalFee: value('totalFee'),
+      childSeat: value('child_seat'),
+      flightNumber: value('flight_number'),
+      delayTime: value('delay_time'),
+      note: value('note'),
+      journeyDistance: value('journey_distance'),
+      bookingStatus: value('booking_status'),
+      bidStatus: value('bid_status'),
+      bidNote: value('bid_note'),
+      bookAddDate: value('book_add_date'),
+    );
+  }
+
+  DateTime? _pickupDateTime(Job job) {
+    final date = job.pickDate.trim();
+    final time = job.pickTime.trim();
+    final combined =
+        [date, time].where((part) => part.isNotEmpty).join(' ').trim();
+    if (combined.isEmpty) {
+      return null;
+    }
+
+    final normalized = combined.replaceAll('/', '-').replaceAll(',', '');
+    final parsedIso = DateTime.tryParse(normalized);
+    if (parsedIso != null) {
+      return parsedIso;
+    }
+
+    final formats = [
+      'yyyy-MM-dd HH:mm:ss',
+      'yyyy-MM-dd HH:mm',
+      'yyyy-MM-dd hh:mm a',
+      'dd-MM-yyyy HH:mm:ss',
+      'dd-MM-yyyy HH:mm',
+      'dd-MM-yyyy hh:mm a',
+      'MM-dd-yyyy HH:mm:ss',
+      'MM-dd-yyyy HH:mm',
+      'MM-dd-yyyy hh:mm a',
+      'MMMM d yyyy HH:mm',
+      'MMMM d yyyy hh:mm a',
+      'MMM d yyyy HH:mm',
+      'MMM d yyyy hh:mm a',
+    ];
+
+    for (final pattern in formats) {
+      try {
+        return DateFormat(pattern).parseStrict(normalized);
+      } catch (_) {}
+    }
+
+    return null;
+  }
+
+  int _comparePickupDateTime(Job first, Job second) {
+    final firstPickup = _pickupDateTime(first);
+    final secondPickup = _pickupDateTime(second);
+    if (firstPickup != null && secondPickup != null) {
+      return firstPickup.compareTo(secondPickup);
+    }
+    if (firstPickup != null) {
+      return -1;
+    }
+    if (secondPickup != null) {
+      return 1;
+    }
+    return first.bookAddDate.compareTo(second.bookAddDate);
+  }
+
+  Job? earliestAcceptedJob(Iterable<Job> jobs) {
+    final sortedJobs = jobs.toList()..sort(_comparePickupDateTime);
+    return sortedJobs.isEmpty ? null : sortedJobs.first;
+  }
+
+  Future<void> _saveAcceptedJobToPrefs(
+    Job acceptedJob,
+    SharedPreferences prefs,
+  ) async {
+    data.value = acceptedJob.bookId;
+    jobId.value = acceptedJob.jobId;
+    cid.value = acceptedJob.cId;
+    journeryFare.value = acceptedJob.journeyFare;
+    carParking.value = acceptedJob.carParking;
+    extra.value = acceptedJob.extra;
+    waiting.value = acceptedJob.waiting;
+    tolls.value = acceptedJob.tolls;
+    pickUpdate.value = acceptedJob.pickDate;
+    pickuptime.value = acceptedJob.pickTime;
+    pickupLocatoin.value = acceptedJob.pickup;
+    dropLocation.value = acceptedJob.destination;
+
+    await prefs.setBool('jobDispatched', true);
+    await prefs.setString('bookingid', acceptedJob.bookId);
+    await prefs.setString('jobId', acceptedJob.jobId);
+    await prefs.setString('c_id', acceptedJob.cId);
+    await prefs.setString('journey_fare', acceptedJob.journeyFare);
+    await prefs.setString('booking_fee', acceptedJob.bookingFee);
+    await prefs.setString('car_parking', acceptedJob.carParking);
+    await prefs.setString('extra', acceptedJob.extra);
+    await prefs.setString('waiting', acceptedJob.waiting);
+    await prefs.setString('tolls', acceptedJob.tolls);
+    await prefs.setString('pickDate', acceptedJob.pickDate);
+    await prefs.setString('totalFee', acceptedJob.totalFee ?? '');
+    await prefs.setString('pickTime', acceptedJob.pickTime);
+    await prefs.setString('pickLocation', acceptedJob.pickup);
+    await prefs.setString('dropLocation', acceptedJob.destination);
+    await prefs.setString('job_note', acceptedJob.jobNote);
+    await prefs.setString('job_status', acceptedJob.jobStatus);
+    await prefs.setString('date_job_add', acceptedJob.dateJobAdd);
+    await prefs.setString('c_name', acceptedJob.cName);
+    await prefs.setString('c_email', acceptedJob.cEmail);
+    await prefs.setString('c_phone', acceptedJob.cPhone);
+    await prefs.setString('c_address', acceptedJob.cAddress);
+    await prefs.setString('d_id_for_job', acceptedJob.dId);
+    await prefs.setString('d_name', acceptedJob.dName);
+    await prefs.setString('d_email', acceptedJob.dEmail);
+    await prefs.setString('d_phone', acceptedJob.dPhone);
+    await prefs.setString('b_type_id', acceptedJob.bTypeId);
+    await prefs.setString('address', acceptedJob.address);
+    await prefs.setString('postal_code', acceptedJob.postalCode);
+    await prefs.setString('passenger', acceptedJob.passenger);
+    await prefs.setString('journey_type', acceptedJob.journeyType);
+    await prefs.setString('v_id', acceptedJob.vId);
+    await prefs.setString('luggage', acceptedJob.luggage);
+    await prefs.setString('child_seat', acceptedJob.childSeat);
+    await prefs.setString('flight_number', acceptedJob.flightNumber);
+    await prefs.setString('delay_time', acceptedJob.delayTime);
+    await prefs.setString('note', acceptedJob.note);
+    await prefs.setString('journey_distance', acceptedJob.journeyDistance);
+    await prefs.setString('booking_status', acceptedJob.bookingStatus);
+    await prefs.setString('bid_status', acceptedJob.bidStatus);
+    await prefs.setString('bid_note', acceptedJob.bidNote);
+    await prefs.setString('book_add_date', acceptedJob.bookAddDate);
   }
 
   Future jobDetails() async {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      listFromPusher.clear();
-    });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
-    String? jobid = prefs.getString('jobId');
 
     final response = await http.post(
-      Uri.parse(ApiService.driverAcceptedJobsToday),
+      Uri.parse(ApiService.driverAcceptedJobs),
       body: {'d_id': dId.toString()},
     );
     print('before if condition');
@@ -107,92 +362,56 @@ class JobController extends GetxController {
       print('inside if condition');
       if (parsedResponse['status'] == true) {
         print('status is true');
-        data.value = parsedResponse['book_id'].toString();
-        jobId.value = parsedResponse['data'][0]['job_id'].toString();
-        cid.value = parsedResponse['data'][0]['c_id'].toString();
-        journeryFare.value =
-            parsedResponse['data'][0]['journey_fare'].toString();
-        carParking.value = parsedResponse['data'][0]['car_parking'].toString();
-        extra.value = parsedResponse['data'][0]['extra'].toString();
-        waiting.value = parsedResponse['data'][0]['waiting'].toString();
-        tolls.value = parsedResponse['data'][0]['tolls'].toString();
-        pickUpdate.value = parsedResponse['data'][0]['pick_date'].toString();
-        pickuptime.value = parsedResponse['data'][0]['pick_time'].toString();
-        pickupLocatoin.value = parsedResponse['data'][0]['pickup'].toString();
-        dropLocation.value =
-            parsedResponse['data'][0]['destination'].toString();
-        await prefs.setString('bookingid', data.value);
-        await prefs.setString('jobId', jobId.value);
-        await prefs.setString('c_id', cid.value);
-        await prefs.setString('journey_fare', journeryFare.value);
-        await prefs.setString('car_parking', carParking.value);
-        await prefs.setString('extra', extra.value);
-        await prefs.setString('waiting', waiting.value);
-        await prefs.setString('tolls', tolls.value);
-        await prefs.setString('pickDate', pickUpdate.value);
-        await prefs.setString(
-          'totalFee',
-          parsedResponse['data'][0]['totalFee'] ?? '',
-        );
-        await prefs.setString('pickTime', pickuptime.value);
-        await prefs.setString('pickLocation', pickupLocatoin.value);
-        await prefs.setString('dropLocation', dropLocation.value);
-        listFromPusher.add(
-          Job(
-            jobId: parsedResponse['data'][0]['job_id'].toString() ?? "",
-            bookId: parsedResponse['data'][0]['book_id'].toString() ?? '',
-            cId: parsedResponse['data'][0]['00000003'].toString() ?? "",
-            dId: parsedResponse['data'][0]['00000000002'].toString() ?? '',
-            jobNote: parsedResponse['data'][0]['job_note'].toString() ?? '',
-            journeyFare:
-                parsedResponse['data'][0]['journey_fare'].toString() ?? '',
-            bookingFee:
-                parsedResponse['data'][0]['booking_fee'].toString() ?? "",
-            carParking:
-                parsedResponse['data'][0]['car_parking'].toString() ?? '',
-            waiting: parsedResponse['data'][0]['waiting'].toString(),
-            tolls: parsedResponse['data'][0]['tolls'].toString() ?? '',
-            extra: parsedResponse['data'][0]['extra'].toString() ?? '',
-            jobStatus: parsedResponse['data'][0]['job_status'].toString() ?? '',
-            dateJobAdd:
-                parsedResponse['data'][0]['date_job_add'].toString() ?? '',
-            cName: parsedResponse['data'][0]['c_name'].toString() ?? '',
-            cEmail: parsedResponse['data'][0]['c_email'].toString() ?? '',
-            cPhone: parsedResponse['data'][0]['c_phone'].toString() ?? '',
-            cAddress: parsedResponse['data'][0]['c_address'].toString() ?? '',
-            dName: parsedResponse['data'][0]['d_name'].toString() ?? '',
-            dEmail: parsedResponse['data'][0]['d_email'].toString() ?? '',
-            dPhone: parsedResponse['data'][0]['d_phone'].toString() ?? '',
-            bTypeId: parsedResponse['data'][0]['b_type_id'].toString() ?? '',
-            pickup: parsedResponse['data'][0]['pickup'].toString() ?? '',
-            destination:
-                parsedResponse['data'][0]['destination'].toString() ?? '',
-            address: parsedResponse['data'][0]['address'].toString() ?? '',
-            postalCode:
-                parsedResponse['data'][0]['postal_code'].toString() ?? '',
-            passenger: parsedResponse['data'][0]['passenger'].toString() ?? '',
-            pickDate: parsedResponse['data'][0]['pick_date'].toString() ?? '',
-            pickTime: parsedResponse['data'][0]['pick_time'].toString() ?? '',
-            journeyType:
-                parsedResponse['data'][0]['journey_type'].toString() ?? '',
-            vId: parsedResponse['data'][0]['v_id'].toString() ?? '',
-            luggage: parsedResponse['data'][0]['luggage'].toString() ?? '',
-            childSeat: parsedResponse['data'][0]['child_seat'].toString() ?? '',
-            flightNumber:
-                parsedResponse['data'][0]['flight_number'].toString() ?? '',
-            delayTime: parsedResponse['data'][0]['delay_time'].toString() ?? '',
-            note: parsedResponse['data'][0]['note'].toString() ?? '',
-            journeyDistance:
-                parsedResponse['data'][0]['journey_distance'].toString() ?? '',
-            bookingStatus:
-                parsedResponse['data'][0]['booking_status'].toString() ?? '',
-            bidStatus: parsedResponse['data'][0]['bid_status'].toString() ?? '',
-            bidNote: parsedResponse['data'][0]['bid_note'].toString() ?? '',
-            bookAddDate:
-                parsedResponse['data'][0]['bid_status'].toString() ?? '',
-          ),
-        );
-        getCoordinatesFromAddress(listFromPusher[0].pickup);
+        final acceptedJobs = parsedResponse['data'];
+        if (acceptedJobs is! List || acceptedJobs.isEmpty) {
+          visiblecontainer.value = false;
+          listFromPusher.clear();
+          clearNavigationRoute();
+          await prefs.remove('jobDispatched');
+          await prefs.remove('acceptedJobKeys');
+          return;
+        }
+
+        final jobs =
+            acceptedJobs
+                .whereType<Map>()
+                .map(
+                  (job) => _jobFromAcceptedMap(Map<String, dynamic>.from(job)),
+                )
+                .where((job) => !hasCompletedDispatchKey(job, prefs))
+                .toList()
+              ..sort(_comparePickupDateTime);
+        if (jobs.isEmpty) {
+          visiblecontainer.value = false;
+          listFromPusher.clear();
+          clearNavigationRoute();
+          await prefs.remove('jobDispatched');
+          await prefs.remove('acceptedJobKeys');
+          return;
+        }
+
+        final acceptedJob = earliestAcceptedJob(jobs)!;
+        await _rememberAcceptedJobs(jobs, prefs);
+        await _saveAcceptedJobToPrefs(acceptedJob, prefs);
+
+        listFromPusher
+          ..clear()
+          ..add(acceptedJob);
+        final rideState = prefs.getInt('isRideStart') ?? 0;
+        final flowStage = prefs.getString('jobFlowStage') ?? 'accepted';
+        if (flowStage == 'accepted' || rideState > 2) {
+          clearNavigationRoute();
+        } else if (flowStage == 'pobRouteReady') {
+          getCoordinatesFromAddress(
+            acceptedJob.destination,
+            drawRoute: true,
+            routeOriginAddress: acceptedJob.pickup,
+          );
+        } else if (flowStage == 'rideToDropoff' || rideState == 2) {
+          getCoordinatesFromAddress(acceptedJob.destination, drawRoute: true);
+        } else {
+          getCoordinatesFromAddress(acceptedJob.pickup, drawRoute: true);
+        }
         visiblecontainer.value = true;
         isJobDetailDone.value = false;
         //        if (mounted) {
@@ -207,18 +426,16 @@ class JobController extends GetxController {
         //   );
         // }
       } else {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          getCoordinatesFromAddress('');
-          print('staus is false');
-          visiblecontainer.value = false;
-          listFromPusher.clear();
-        });
+        getCoordinatesFromAddress('');
+        print('staus is false');
+        visiblecontainer.value = false;
+        listFromPusher.clear();
+        await prefs.remove('jobDispatched');
+        await prefs.remove('acceptedJobKeys');
       }
     } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        print('200 condition is false');
-        isJobDetailDone.value = false;
-      });
+      print('200 condition is false');
+      isJobDetailDone.value = false;
 
       // Failed to load jobs, handle it appropriately
       return null;
@@ -242,23 +459,34 @@ class JobController extends GetxController {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? dId = prefs.getString('d_id');
-      String? jobId = prefs.getString('jobId');
+      final storedJobId = (prefs.getString('jobId') ?? '').trim();
+      final storedBookId = (prefs.getString('bookingid') ?? '').trim();
 
       final response = await http.post(
         Uri.parse(ApiService.driverAcceptedJobDetails),
-        body: {'d_id': dId.toString(), 'job_id': jobId.toString()},
+        body: {
+          'd_id': dId.toString(),
+          'job_id': storedJobId.isNotEmpty ? storedJobId : storedBookId,
+          'book_id': storedBookId,
+        },
       );
 
       if (response.statusCode == 200) {
         parsedResponse.value = json.decode(response.body);
-        data.value = parsedResponse['book_id'].toString();
-        prefs.setString('bookingid', data.value);
+        final bookId = parsedResponse['book_id']?.toString();
+        if (bookId != null && bookId.trim().isNotEmpty && bookId != 'null') {
+          data.value = bookId;
+          await prefs.setString('bookingid', data.value);
+        }
 
         if (parsedResponse['status'] == true) {
           isPeriodicVisible.value = true;
-          if (parsedResponse['data'] is List &&
-              parsedResponse['data'].isNotEmpty) {
-            return Job.fromJson(parsedResponse['data'].first);
+          final details = parsedResponse['data'];
+          if (details is List && details.isNotEmpty && details.first is Map) {
+            return Job.fromJson(Map<String, dynamic>.from(details.first));
+          }
+          if (details is Map) {
+            return Job.fromJson(Map<String, dynamic>.from(details));
           } else {
             isPeriodicVisible.value = false;
             // No jobs found, return null
@@ -302,124 +530,41 @@ class JobController extends GetxController {
 
   Future<void> getdistanceandtime(
     double destinationLat,
-    double destinationLng,
-  ) async {
-    final response = await http.get(
-      ApiService.mapboxDrivingTrafficUri(
-        originLat: latitude.value,
-        originLng: longitude.value,
-        destinationLat: destinationLat,
-        destinationLng: destinationLng,
-        accessToken: _resolvedMapboxAccessToken,
-      ),
+    double destinationLng, {
+    double? originLat,
+    double? originLng,
+  }) async {
+    final route = await fetchMapboxRoute(
+      origin: LatLng(originLat ?? latitude.value, originLng ?? longitude.value),
+      destination: LatLng(destinationLat, destinationLng),
     );
-
-    if (response.statusCode == 200) {
-      // Parse the JSON response
-      final data = jsonDecode(response.body);
-      if (data.containsKey('routes') && data['routes'].isNotEmpty) {
-        final route = data['routes'][0];
-        final coordinates =
-            route['geometry']?['coordinates'] is List
-                ? route['geometry']['coordinates'] as List
-                : const [];
-        decodedPoints.value =
-            coordinates
-                .whereType<List>()
-                .where((point) => point.length >= 2)
-                .map(
-                  (point) => LatLng(
-                    (point[1] as num).toDouble(),
-                    (point[0] as num).toDouble(),
-                  ),
-                )
-                .toList();
-
-        routeDistance.value = _formatMiles(route['distance']);
-        routeDuration.value = _formatDuration(route['duration']);
-
-        final legs = route['legs'];
-        final steps =
-            legs is List && legs.isNotEmpty && legs.first['steps'] is List
-                ? legs.first['steps'] as List
-                : const [];
-        if (steps.isNotEmpty) {
-          nextInstruction.value =
-              steps.first['maneuver']?['instruction']?.toString() ??
-              'Continue to route';
-        } else {
-          nextInstruction.value = 'Route ready';
-        }
-
-        polylines.clear(); // Clear previous polyline
-        polylines.add(
-          Polyline(
-            polylineId: const PolylineId('route'),
-            color: Colors.blue,
-            width: 5,
-            points: decodedPoints,
-          ),
-        );
-      }
+    if (route == null) {
+      return;
     }
+    decodedPoints.value = route.points;
+    routeDistance.value = route.distanceText;
+    routeDuration.value = route.durationText;
+    nextInstruction.value = route.nextInstruction;
   }
 
-  String _formatMiles(dynamic meters) {
-    if (meters is! num) {
-      return '--';
-    }
-    return '${(meters / 1609.344).toStringAsFixed(1)} mi';
+  void clearNavigationRoute() {
+    navigationRouteActive.value = false;
+    decodedPoints.clear();
+    routeDistance.value = '--';
+    routeDuration.value = '--';
+    nextInstruction.value = '';
   }
 
-  String _formatDuration(dynamic seconds) {
-    if (seconds is! num) {
-      return '--';
-    }
-    if (seconds < 60) {
-      return '${seconds.round()} sec';
-    }
-    return '${(seconds / 60).ceil()} min';
-  }
-
-  Future<Uint8List> getbytesfromimages(
-    String path,
-    int width,
-    int height,
-  ) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: width,
-      targetHeight: height,
-    );
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(
-      format: ui.ImageByteFormat.png,
-    ))!.buffer.asUint8List();
-  }
-
-  void setcustommarkeritem() async {
-    final Uint8List sourceImage = await getbytesfromimages(
-      'assets/images/car.png',
-      80,
-      80,
-    );
-    final Uint8List destinationImage = await getbytesfromimages(
-      'assets/images/userg.png',
-      80,
-      80,
-    );
-
-    sourceicon.value = BitmapDescriptor.fromBytes(sourceImage);
-    destinationicon.value = BitmapDescriptor.fromBytes(destinationImage);
-  }
-
-  Future getCoordinatesFromAddress(String address) async {
+  Future getCoordinatesFromAddress(
+    String address, {
+    bool drawRoute = true,
+    String? routeOriginAddress,
+  }) async {
     try {
       if (address.isEmpty) {
         print('if getCoordinatesFromAddress');
-        // Reset polylines and markers when the pickup address is empty
-        polylines.clear();
+        // Reset route state when the pickup address is empty.
+        clearNavigationRoute();
         convertedLat.value = 0.0;
         convertedLng.value = 0.0;
         return;
@@ -429,39 +574,69 @@ class JobController extends GetxController {
         if (locations.isNotEmpty) {
           convertedLat.value = locations.first.latitude;
           convertedLng.value = locations.first.longitude;
+          navigationRouteActive.value = drawRoute;
 
-          getLatLngFromCurrentLocation().then((value) {
-            getdistanceandtime(
-              locations.first.latitude,
-              locations.first.longitude,
-            );
+          if (!drawRoute) {
+            decodedPoints.clear();
+            routeDistance.value = '--';
+            routeDuration.value = '--';
+            nextInstruction.value = '';
+            return;
+          }
 
-            kGoogleplay.value = CameraPosition(
-              target: LatLng(latitude.value, longitude.value),
-              zoom: 12.4746,
-            );
-            setcustommarkeritem();
-          });
+          double? routeOriginLat;
+          double? routeOriginLng;
+          final originAddress = routeOriginAddress?.trim() ?? '';
+          if (originAddress.isNotEmpty) {
+            try {
+              final originLocations = await locationFromAddress(originAddress);
+              if (originLocations.isNotEmpty) {
+                routeOriginLat = originLocations.first.latitude;
+                routeOriginLng = originLocations.first.longitude;
+              }
+            } catch (_) {
+              routeOriginLat = null;
+              routeOriginLng = null;
+            }
+          }
+
+          final currentLatLng = await getLatLngFromCurrentLocation();
+          if (currentLatLng == null && routeOriginLat == null) {
+            return;
+          }
+
+          await getdistanceandtime(
+            locations.first.latitude,
+            locations.first.longitude,
+            originLat: routeOriginLat,
+            originLng: routeOriginLng,
+          );
         }
       }
     } catch (e) {
-      print("polylines updation exception $e");
+      print("route update exception $e");
     }
   }
 
   Future<void> updatePolyline() async {
     try {
+      if (!navigationRouteActive.value ||
+          convertedLat.value == 0.0 ||
+          convertedLng.value == 0.0) {
+        return;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getString('jobFlowStage') == 'pobRouteReady') {
+        return;
+      }
+
       // Get destination coordinates
       final destinationLat = convertedLat.value;
       final destinationLng = convertedLng.value;
 
       // Recalculate distance and polyline with the new current location
       await getdistanceandtime(destinationLat, destinationLng);
-
-      // Optionally, move the camera to the new current location
-      mapController.value?.animateCamera(
-        CameraUpdate.newLatLng(LatLng(latitude.value, longitude.value)),
-      );
     } catch (e) {}
   }
 
@@ -503,6 +678,7 @@ class JobController extends GetxController {
       locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
     ).listen((Position position) {
       // Update current location variables
+      currentLocation = position;
       latitude.value = position.latitude;
       longitude.value = position.longitude;
       // currentLocation.latitude = position.latitude;

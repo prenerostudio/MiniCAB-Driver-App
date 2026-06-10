@@ -6,13 +6,13 @@ import 'package:flutter/services.dart';
 import 'upcomming_model.dart';
 export 'upcomming_model.dart';
 import 'dart:async';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:new_minicab_driver/Data/api_service.dart';
-import 'dart:ui' as ui;
+import 'package:new_minicab_driver/mapbox/mapbox_route_map.dart';
 
 class UpcommingWidget extends StatefulWidget {
   const UpcommingWidget({super.key});
@@ -23,7 +23,6 @@ class UpcommingWidget extends StatefulWidget {
 
 class _UpcommingWidgetState extends State<UpcommingWidget> {
   late UpcommingModel _model;
-  GoogleMapController? mapController;
   // LocationData? currentLocation;
   Position? currentLocation;
   bool isLoading = false;
@@ -32,10 +31,9 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   double currentLongitude = 0.0;
   double pickupLat = 0.0;
   double pickupLng = 0.0;
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {};
+  List<LatLng> _routePoints = [];
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  BitmapDescriptor? _driverMarkerIcon;
+  Uint8List? _driverMarkerImage;
   bool _isInitializingUpcomingMap = false;
   bool _isFetchingCurrentLocation = false;
 
@@ -76,7 +74,6 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     // );
 
     // });
-    // DirectionsService.init('AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA');
     unawaited(_initializeUpcomingMap());
   }
 
@@ -101,7 +98,7 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
 
     try {
       await jobDetailsFuture();
-      await _setupMarkersAndPolylines();
+      await _setupMapboxRoute();
     } finally {
       _isInitializingUpcomingMap = false;
       if (mounted) {
@@ -131,12 +128,115 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         final jobs = parsedResponse['data'] as List;
         if (jobs.isNotEmpty) {
           pickup = jobs[0]['pickup'];
+          return jobs.map((item) => Job.fromJson(item)).toList();
         }
-        return jobs.map((item) => Job.fromJson(item)).toList();
       }
     }
+
+    final acceptedJob = await _fetchSavedAcceptedJob(prefs);
+    if (acceptedJob != null) {
+      pickup = acceptedJob.pickup;
+      return [acceptedJob];
+    }
+
     return [];
     // throw Exception('App Check Now');
+  }
+
+  Future<Job?> _fetchSavedAcceptedJob(SharedPreferences prefs) async {
+    final hasAcceptedJob = prefs.getBool('jobDispatched') ?? false;
+    final storedJobId = (prefs.getString('jobId') ?? '').trim();
+    final storedBookId = (prefs.getString('bookingid') ?? '').trim();
+    if (!hasAcceptedJob || (storedJobId.isEmpty && storedBookId.isEmpty)) {
+      return null;
+    }
+
+    try {
+      final dId = prefs.getString('d_id');
+      final response = await http.post(
+        Uri.parse(ApiService.driverAcceptedJobDetails),
+        body: {
+          'd_id': dId.toString(),
+          'job_id': storedJobId.isNotEmpty ? storedJobId : storedBookId,
+          'book_id': storedBookId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final parsedResponse = json.decode(response.body);
+        if (parsedResponse['status'] == true) {
+          final details = parsedResponse['data'];
+          if (details is List && details.isNotEmpty && details.first is Map) {
+            return Job.fromJson(Map<String, dynamic>.from(details.first));
+          }
+          if (details is Map) {
+            return Job.fromJson(Map<String, dynamic>.from(details));
+          }
+        }
+      }
+    } catch (error) {
+      print('Accepted upcoming fallback error: $error');
+    }
+
+    return _jobFromSavedAcceptedPrefs(prefs);
+  }
+
+  Job? _jobFromSavedAcceptedPrefs(SharedPreferences prefs) {
+    final jobId = (prefs.getString('jobId') ?? '').trim();
+    final bookId = (prefs.getString('bookingid') ?? '').trim();
+    final savedPickup = (prefs.getString('pickLocation') ?? '').trim();
+    final savedDestination = (prefs.getString('dropLocation') ?? '').trim();
+
+    if (jobId.isEmpty &&
+        bookId.isEmpty &&
+        savedPickup.isEmpty &&
+        savedDestination.isEmpty) {
+      return null;
+    }
+
+    return Job(
+      jobId: jobId.isNotEmpty ? jobId : bookId,
+      bookId: bookId,
+      cId: prefs.getString('c_id') ?? '',
+      dId: prefs.getString('d_id_for_job') ?? prefs.getString('d_id') ?? '',
+      jobNote: prefs.getString('job_note') ?? '',
+      totalFee: prefs.getString('totalFee') ?? '',
+      journeyFare: prefs.getString('journey_fare') ?? '',
+      bookingFee: prefs.getString('booking_fee') ?? '',
+      carParking: prefs.getString('car_parking') ?? '',
+      waiting: prefs.getString('waiting') ?? '',
+      tolls: prefs.getString('tolls') ?? '',
+      extra: prefs.getString('extra') ?? '',
+      jobStatus: prefs.getString('job_status') ?? '',
+      dateJobAdd: prefs.getString('date_job_add') ?? '',
+      cName: prefs.getString('c_name') ?? '',
+      cEmail: prefs.getString('c_email') ?? '',
+      cPhone: prefs.getString('c_phone') ?? '',
+      cAddress: prefs.getString('c_address') ?? '',
+      dName: prefs.getString('d_name') ?? '',
+      dEmail: prefs.getString('d_email') ?? '',
+      dPhone: prefs.getString('d_phone') ?? '',
+      bTypeId: prefs.getString('b_type_id') ?? '',
+      pickup: savedPickup,
+      destination: savedDestination,
+      address: prefs.getString('address') ?? '',
+      postalCode: prefs.getString('postal_code') ?? '',
+      passenger: prefs.getString('passenger') ?? '',
+      pickDate: prefs.getString('pickDate') ?? '',
+      pickTime: prefs.getString('pickTime') ?? '',
+      journeyType: prefs.getString('journey_type') ?? '',
+      vId: prefs.getString('v_id') ?? '',
+      luggage: prefs.getString('luggage') ?? '',
+      childSeat: prefs.getString('child_seat') ?? '',
+      flightNumber: prefs.getString('flight_number') ?? '',
+      delayTime: prefs.getString('delay_time') ?? '',
+      note: prefs.getString('note') ?? '',
+      journeyDistance: prefs.getString('journey_distance') ?? '',
+      bookingStatus: prefs.getString('booking_status') ?? '',
+      bidStatus: prefs.getString('bid_status') ?? '',
+      bidNote: prefs.getString('bid_note') ?? '',
+      bookAddDate: prefs.getString('book_add_date') ?? '',
+    );
   }
 
   @override
@@ -234,111 +334,30 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
       currentLocation?.longitude ?? 73.0413076,
     );
 
-    return GoogleMap(
-      mapType: MapType.normal,
-      tiltGesturesEnabled: true,
-      initialCameraPosition: CameraPosition(target: center, zoom: 15.5),
-      myLocationEnabled: false,
-      myLocationButtonEnabled: false,
-      compassEnabled: true,
-      rotateGesturesEnabled: true,
-
-      // tiltGesturesEnabled: true,
-      buildingsEnabled: true, // 3D buildings dikhayein
-      scrollGesturesEnabled: true,
-      zoomControlsEnabled: false,
-      zoomGesturesEnabled: true,
-      onMapCreated: _onMapCreated,
-      markers: _markers,
-      polylines: _polylines,
+    return MapboxRouteMap(
+      center: center,
+      initialZoom: 15.5,
+      route: _routePoints,
+      routeColor: context.appTheme.primary,
+      fitRoute: _routePoints.length > 1,
+      followCenter: _routePoints.length <= 1,
+      markers: [
+        if (currentLatitude != 0.0 && currentLongitude != 0.0)
+          MapboxRouteMarker(
+            id: 'current-location',
+            point: LatLng(currentLatitude, currentLongitude),
+            image: _driverMarkerImage,
+            color: context.appTheme.primary,
+            iconSize: 0.52,
+          ),
+        if (pickupLat != 0.0 && pickupLng != 0.0)
+          MapboxRouteMarker(
+            id: 'pickup-location',
+            point: LatLng(pickupLat, pickupLng),
+            color: const Color(0xFF1F7A5B),
+          ),
+      ],
     );
-  }
-
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    setState(() {
-      mapController = controller;
-    });
-    if (currentLocation == null) {
-      await _initializeUpcomingMap();
-    } else {
-      await _moveCameraToCurrentLocation();
-    }
-
-    // final directionsService = DirectionsService();
-    // final request = DirectionsRequest(
-    //   origin: '${_currentPosition?.latitude} ,${_currentPosition?.longitude}',
-    //   destination: '${pickup}',
-    // );
-    // print(request);
-    // directionsService.route(request,
-    //     (DirectionsResult? response, DirectionsStatus? status) {
-    //   if (status == DirectionsStatus.ok && response != null) {
-    //     setState(() {
-    //       final encodedPolyline = response.routes![0]?.overviewPolyline?.points;
-    //       print('encoded    ${encodedPolyline}');
-    //       if (encodedPolyline != null) {
-    //         _polylineCoordinates = decodePolyline(encodedPolyline)!;
-    //         print('polylineCoordinates ${_polylineCoordinates}');
-
-    //         markers.add(
-    //           Marker(
-    //             markerId: MarkerId('origin'),
-    //             position: LatLng(
-    //               response.routes![0]!.legs![0].startLocation!.latitude,
-    //               response.routes![0]!.legs![0].startLocation!.longitude,
-    //             ),
-    //           ),
-    //         );
-    //         markers.add(
-    //           Marker(
-    //             markerId: MarkerId('destination'),
-    //             position: LatLng(
-    //               response.routes![0]!.legs![0].endLocation!.latitude,
-    //               response.routes![0]!.legs![0].endLocation!.longitude,
-    //             ),
-    //             icon: BitmapDescriptor.defaultMarkerWithHue(
-    //                 BitmapDescriptor.hueGreen),
-    //           ),
-    //         );
-    //       }
-    //     });
-    //   } else {
-    //     print('Failed to fetch directions: $status');
-    //   }
-    // });
-  }
-
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> points = [];
-    int index = 0;
-    int lat = 0, lng = 0;
-
-    while (index < encoded.length) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1F) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      double latitude = lat / 1E5;
-      double longitude = lng / 1E5;
-      points.add(LatLng(latitude, longitude));
-      print('lati $latitude');
-    }
-    return points;
   }
 
   Future<void> waitingPassanger() async {
@@ -413,21 +432,6 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
         permission != LocationPermission.deniedForever;
   }
 
-  Future<void> _moveCameraToCurrentLocation() async {
-    final location = currentLocation;
-    final controller = mapController;
-    if (location == null || controller == null) {
-      return;
-    }
-
-    await controller.animateCamera(
-      CameraUpdate.newLatLngZoom(
-        LatLng(location.latitude, location.longitude),
-        15.8,
-      ),
-    );
-  }
-
   Future<void> _getCurrentLocation() async {
     if (_isFetchingCurrentLocation) {
       return;
@@ -454,7 +458,6 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
           print('locat  $position');
         });
       }
-      await _moveCameraToCurrentLocation();
     } catch (e) {
       print("Error getting current location: $e");
     } finally {
@@ -462,58 +465,28 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
     }
   }
 
-  Future<void> _setupMarkersAndPolylines() async {
-    final routeColor = context.appTheme.primary;
-
+  Future<void> _setupMapboxRoute() async {
     await _getCurrentLocation();
     await getLocationFromAddress();
     await _loadMarkerIcons();
 
     final points = <LatLng>[];
     if (currentLatitude != 0.0 && currentLongitude != 0.0) {
-      final currentPoint = LatLng(currentLatitude, currentLongitude);
-      points.add(currentPoint);
-      _markers
-        ..removeWhere((marker) => marker.markerId.value == 'current-location')
-        ..add(
-          Marker(
-            markerId: const MarkerId('current-location'),
-            position: currentPoint,
-            anchor: const Offset(0.5, 1),
-            infoWindow: const InfoWindow(title: 'Your Location'),
-            icon: _driverMarkerIcon ?? BitmapDescriptor.defaultMarker,
-          ),
-        );
+      points.add(LatLng(currentLatitude, currentLongitude));
     }
 
     if (pickupLat != 0.0 && pickupLng != 0.0) {
-      final pickupPoint = LatLng(pickupLat, pickupLng);
-      points.add(pickupPoint);
-      _markers
-        ..removeWhere((marker) => marker.markerId.value == 'pickup-location')
-        ..add(
-          Marker(
-            markerId: const MarkerId('pickup-location'),
-            position: pickupPoint,
-            infoWindow: const InfoWindow(title: 'Pickup Location'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueGreen,
-            ),
-          ),
-        );
+      points.add(LatLng(pickupLat, pickupLng));
     }
 
-    _polylines.clear();
-    if (points.length > 1) {
-      _polylines.add(
-        Polyline(
-          polylineId: const PolylineId('route'),
-          points: points,
-          color: routeColor,
-          width: 5,
-        ),
-      );
-    }
+    final route =
+        points.length > 1
+            ? await fetchMapboxRoute(
+              origin: points.first,
+              destination: points.last,
+            )
+            : null;
+    _routePoints = route?.points ?? points;
 
     if (mounted) {
       setState(() {});
@@ -521,97 +494,19 @@ class _UpcommingWidgetState extends State<UpcommingWidget> {
   }
 
   Future<void> _loadMarkerIcons() async {
-    _driverMarkerIcon ??= BitmapDescriptor.fromBytes(
-      await _buildDriverMarkerBytes(),
-    );
-  }
-
-  Future<Uint8List> _buildDriverMarkerBytes() async {
-    const markerWidth = 96;
-    const markerHeight = 116;
-    const center = Offset(markerWidth / 2, 44);
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-
-    final pinPath =
-        Path()
-          ..moveTo(markerWidth / 2, markerHeight - 7)
-          ..cubicTo(40, 98, 14, 76, 14, 44)
-          ..cubicTo(14, 22, 30, 7, markerWidth / 2, 7)
-          ..cubicTo(66, 7, 82, 22, 82, 44)
-          ..cubicTo(82, 76, 56, 98, markerWidth / 2, markerHeight - 7)
-          ..close();
-
-    canvas.drawPath(
-      pinPath.shift(const Offset(0, 4)),
-      Paint()
-        ..color = const Color(0x33000000)
-        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 7),
-    );
-    canvas.drawPath(pinPath, Paint()..color = Colors.white);
-    canvas.drawPath(
-      pinPath,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 4
-        ..color = context.appTheme.primary,
-    );
-
-    canvas.drawCircle(center, 28, Paint()..color = context.appTheme.primary);
-
-    const carIcon = Icons.local_taxi_rounded;
-    final iconPainter = TextPainter(
-      text: TextSpan(
-        text: String.fromCharCode(carIcon.codePoint),
-        style: TextStyle(
-          color: Colors.white,
-          fontFamily: carIcon.fontFamily,
-          package: carIcon.fontPackage,
-          fontSize: 35,
-          height: 1,
-        ),
-      ),
-      textDirection: ui.TextDirection.ltr,
-    )..layout();
-    iconPainter.paint(
-      canvas,
-      Offset(
-        center.dx - iconPainter.width / 2,
-        center.dy - iconPainter.height / 2,
-      ),
-    );
-
-    final picture = recorder.endRecording();
-    final image = await picture.toImage(markerWidth, markerHeight);
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
-    picture.dispose();
-    return byteData!.buffer.asUint8List();
+    _driverMarkerImage ??= await buildDriverMarkerBytes();
   }
 
   Future<void> getLocationFromAddress() async {
-    final apiKey = 'AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA';
     final address = pickup ?? '';
-    final response = await http.post(
-      ApiService.googleGeocodeUri(address: address, apiKey: apiKey),
-    );
-
-    if (response.statusCode == 200) {
-      final decodedData = json.decode(response.body);
-
-      if (decodedData['status'] == 'OK') {
-        final results = decodedData['results'][0];
-        final geometry = results['geometry'];
-        final location = geometry['location'];
-        pickupLat = location['lat'];
-        pickupLng = location['lng'];
-        print('Latitude pickup: $pickupLat');
-        print('Longitude pickup: $pickupLng');
-      } else {
-        print('Error: ${decodedData['status']}');
-      }
-    } else {
-      print('HTTP Request Error: ${response.statusCode}');
+    if (address.trim().isEmpty) {
+      return;
     }
+    final locations = await locationFromAddress(address);
+    if (locations.isEmpty) {
+      return;
+    }
+    pickupLat = locations.first.latitude;
+    pickupLng = locations.first.longitude;
   }
 }

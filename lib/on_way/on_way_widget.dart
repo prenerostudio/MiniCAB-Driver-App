@@ -1,16 +1,17 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:image/image.dart' as img;
 import 'package:get/get.dart';
 import 'package:new_minicab_driver/Data/links.dart';
 import 'package:new_minicab_driver/components/customer_details_widget.dart';
 import 'package:new_minicab_driver/home/home_view_controller.dart';
 import 'package:new_minicab_driver/home/timer_class.dart';
+import 'package:new_minicab_driver/mapbox/mapbox_route_map.dart';
 import 'package:new_minicab_driver/on_way/onway_view_model.dart';
 import 'package:new_minicab_driver/pob/pob_widget.dart';
 
@@ -21,7 +22,6 @@ import '../components/clientnotes_widget.dart';
 import '../components/waydetails_widget.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_timer.dart';
-import 'dart:ui' as ui;
 import 'package:new_minicab_driver/theme/app_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -30,12 +30,10 @@ import 'package:flutter/services.dart';
 import 'on_way_model.dart';
 export 'on_way_model.dart';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:new_minicab_driver/Data/api_service.dart';
@@ -43,21 +41,36 @@ import 'package:new_minicab_driver/Data/api_service.dart';
 class OnWayWidget extends StatefulWidget {
   const OnWayWidget({
     super.key,
-    // this.did,
-    // this.jobid = '',
-    // this.pickup = '',
-    // this.dropoff = '',
-    // this.cName = '',
-    // this.fare = '',
-    // this.distance = '',
-    // this.note = '',
-    // this.pickTime = '',
-    // this.pickDate = '',
-    // this.passenger = '',
-    // this.luggage = '',
-    // this.cnumber = '',
-    // this.cemail = '',
+    this.did,
+    this.jobid,
+    this.pickup,
+    this.dropoff,
+    this.cName,
+    this.fare,
+    this.distance,
+    this.note,
+    this.pickTime,
+    this.pickDate,
+    this.passenger,
+    this.luggage,
+    this.cnumber,
+    this.cemail,
   });
+
+  final String? did;
+  final String? jobid;
+  final String? pickup;
+  final String? dropoff;
+  final String? cName;
+  final String? fare;
+  final String? distance;
+  final String? note;
+  final String? pickTime;
+  final String? pickDate;
+  final String? passenger;
+  final String? luggage;
+  final String? cnumber;
+  final String? cemail;
 
   @override
   _OnWayWidgetState createState() => _OnWayWidgetState();
@@ -85,10 +98,36 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   String? cnumber;
   String? cemail;
 
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+  String? _cleanText(String? value) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty || trimmed == 'null') {
+      return null;
+    }
+    return trimmed;
+  }
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  String? _fallbackText(String? primary, String? fallback) {
+    return _cleanText(primary) ?? _cleanText(fallback);
+  }
+
+  void _applyNavigationJobDetails() {
+    did = _fallbackText(did, widget.did);
+    jobid = _fallbackText(jobid, widget.jobid);
+    pickup = _fallbackText(pickup, widget.pickup);
+    dropoff = _fallbackText(dropoff, widget.dropoff);
+    cName = _fallbackText(cName, widget.cName);
+    fare = _fallbackText(fare, widget.fare);
+    distance = _fallbackText(distance, widget.distance);
+    note = _fallbackText(note, widget.note);
+    pickTime = _fallbackText(pickTime, widget.pickTime);
+    pickDate = _fallbackText(pickDate, widget.pickDate);
+    passenger = _fallbackText(passenger, widget.passenger);
+    luggage = _fallbackText(luggage, widget.luggage);
+    cnumber = _fallbackText(cnumber, widget.cnumber);
+    cemail = _fallbackText(cemail, widget.cemail);
+  }
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool isLoading = false;
   bool isWaiting = false;
@@ -126,26 +165,22 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       );
       currentLatitude = position.latitude;
       currentLongitude = position.longitude;
+      originlatlng = LatLng(position.latitude, position.longitude);
       // accpetingOrderViewModel.isMapInitialized.value = true;
       setState(() {
         // accpetingOrderViewModel. = position;
         // currentLatitude = position.latitude;
         // currentLongitude = position.longitude;
       });
+      await _refreshMapboxRoute();
     } catch (e) {}
     setState(() {});
   }
 
-  CameraPosition initialCameraPosition = CameraPosition(
-    target: LatLng(31.234234, -122.234234),
-  );
-  Set<Marker> markers = {};
-  Set<Polyline> polyline = {};
   LatLng? originlatlng;
-  LatLng? destlatlng;
-  // LatLngBounds latLngBounds=LatLngBounds(southwest: southwest, northeast: northeast)
   List<LatLng> polylineCoordinate = [];
-  PolylinePoints polylinePoints = PolylinePoints();
+  Uint8List? _driverMarkerImage;
+  Uint8List? _destinationMarkerImage;
 
   AccpetingOrderViewModel accpetingOrderViewModel = Get.put(
     AccpetingOrderViewModel(),
@@ -153,6 +188,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   @override
   void initState() {
     super.initState();
+    _applyNavigationJobDetails();
     _loadSavedTimer();
     getlocation();
 
@@ -163,16 +199,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     recive_jobidid;
     wayToPickup();
 
-    // accpetingOrderViewModel.getusercurrentlocation();
-    // // _getCurrentLocation();
-    // accpetingOrderViewModel.getLatLngFromCurrentLocation().then((value) {
-    //   // accpetingOrderViewModel.mapApicall();
-    //   accpetingOrderViewModel.kGoogleplay.value = CameraPosition(
-    //       target: LatLng(accpetingOrderViewModel.latitude.value,
-    //           accpetingOrderViewModel.longitude.value),
-    //       zoom: 17);
-    // });
-    // accpetingOrderViewModel.setcustommarkeritem();
     jobStatus();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
@@ -180,60 +206,39 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   }
 
   String distanceKm = '';
-  late GoogleMapController googleMapController;
   StreamSubscription<Position>? _positionStreamSubscription;
   //  String distance = '';
-  String address = '';
-  Future<void> _getpolylines() async {
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: "AIzaSyCgDZ47OHpMIZZXiXHe1DHnq9eX5m_HoeA",
-      request: PolylineRequest(
-        origin: PointLatLng(originlatlng!.latitude, originlatlng!.longitude),
-        destination: PointLatLng(
-          accpetingOrderViewModel.convertedLat.value,
-          accpetingOrderViewModel.convertedLng.value,
-        ),
-        mode: TravelMode.driving,
-      ),
-    );
-    polylineCoordinate.clear();
 
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinate.add(LatLng(point.latitude, point.longitude));
-      }
+  Future<void> _refreshMapboxRoute() async {
+    final origin = originlatlng;
+    final destinationLat = accpetingOrderViewModel.convertedLat.value;
+    final destinationLng = accpetingOrderViewModel.convertedLng.value;
+    if (origin == null || destinationLat == 0.0 || destinationLng == 0.0) {
+      return;
     }
-    double distanceinKm = result.totalDistanceValue! / 1600;
-    distanceKm = "${distanceinKm.toStringAsFixed(1)} miles";
-    address = result.endAddress.toString();
-    polyline.add(
-      Polyline(
-        polylineId: PolylineId('polyline'),
-        color: Colors.blue,
-        width: 10,
-        points: polylineCoordinate,
-      ),
+
+    final destinationPoint = LatLng(destinationLat, destinationLng);
+    final route = await fetchMapboxRoute(
+      origin: origin,
+      destination: destinationPoint,
     );
-    googleMapController.animateCamera(
-      CameraUpdate.newLatLngZoom(originlatlng!, 16),
-    );
+    polylineCoordinate = route?.points ?? [origin, destinationPoint];
+    distanceKm = route?.distanceText ?? distanceKm;
     setState(() {});
   }
 
   void getLiveLocationAndlistner() async {
+    await _positionStreamSubscription?.cancel();
     _positionStreamSubscription = Geolocator.getPositionStream().listen((
       position,
-    ) {
+    ) async {
       setState(() {});
       print("the position is $position");
       originlatlng = LatLng(position.latitude, position.longitude);
-      initialCameraPosition = CameraPosition(target: originlatlng!, zoom: 15);
-      setCustomMarkerForCurrent();
-      // if (destlatlng != null) {
-      _getpolylines();
-
-      // }
-      // addGeofenceCircle();
+      currentLatitude = position.latitude;
+      currentLongitude = position.longitude;
+      await setCustomMarkerForCurrent();
+      await _refreshMapboxRoute();
 
       // Check proximity to destination
       double distanceInMeters = Geolocator.distanceBetween(
@@ -249,59 +254,21 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         //   _showArrivalAlert(); // Show alert if within 200 meters
         // }
       }
-      markers.removeWhere(
-        (element) => element.mapsId.value.compareTo('origin') == 0,
-      );
-      markers.add(
-        Marker(
-          markerId: MarkerId('origin'),
-          position: originlatlng!,
-          icon: sourceicon,
-        ),
-      );
-      markers.add(
-        Marker(
-          markerId: MarkerId('destination'),
-          position: LatLng(
-            accpetingOrderViewModel.convertedLat.value,
-            accpetingOrderViewModel.convertedLng.value,
-          ),
-          icon: destination,
-        ),
-      );
     });
   }
 
-  BitmapDescriptor sourceicon = BitmapDescriptor.defaultMarker;
-  BitmapDescriptor destination = BitmapDescriptor.defaultMarker;
-  void setCustomMarkerForCurrent() async {
-    sourceicon = await _resizeAndCreateBitmapDescriptor(
+  Future<void> setCustomMarkerForCurrent() async {
+    _driverMarkerImage ??= await loadResizedAssetBytes(
       "assets/images/car2.png",
       width: 130, // Set desired width
       height: 130, // Set desired height
     );
 
-    destination = await _resizeAndCreateBitmapDescriptor(
+    _destinationMarkerImage ??= await loadResizedAssetBytes(
       "assets/images/userg.png",
       width: 70,
       height: 70,
     );
-  }
-
-  Set<Circle> geofenceCircles = {}; // Set for geofence circles
-  void addGeofenceCircle() {
-    // Add a circle around the destination
-    geofenceCircles.add(
-      Circle(
-        circleId: CircleId('destination_geofence'),
-        center: originlatlng!, // Destination LatLng
-        radius: 100, // Radius in meters
-        strokeWidth: 2, // Border width
-        strokeColor: Colors.blue.withOpacity(0.5), // Border color
-        fillColor: Colors.blue.withOpacity(0.2), // Fill color
-      ),
-    );
-    setState(() {});
   }
 
   void startJobStatusTimer() {
@@ -315,8 +282,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     // }
   }
 
-  double latitudeforGooglmap = 0;
-  double lngforGooglmap = 0;
+  double navigationLatitude = 0;
+  double navigationLongitude = 0;
   Future<void> getLatLngFromAddress(String address) async {
     try {
       // Geocode the address to get a list of locations
@@ -324,8 +291,8 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
       if (locations.isNotEmpty) {
         // The first location in the list will be the best match
-        latitudeforGooglmap = locations[0].latitude;
-        lngforGooglmap = locations[0].longitude;
+        navigationLatitude = locations[0].latitude;
+        navigationLongitude = locations[0].longitude;
         setState(() {});
       } else {}
     } catch (e) {}
@@ -458,6 +425,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   Future loadata() async {
     // myController.jobDetails();
     SharedPreferences sp = await SharedPreferences.getInstance();
+    _applyNavigationJobDetails();
     isWaiting = sp.getBool('isWaitingTrue') ?? false;
     isRideStarted = sp.getBool('arrivalDone') ?? false;
     print('user done arrival swipe');
@@ -479,6 +447,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         luggage = value.luggage;
         cnumber = value.cPhone;
         cemail = value.cEmail;
+        if (mounted) {
+          setState(() {});
+        }
         getCoordinatesFromAddress(pickup!);
       } else {
         // Handle the null case, e.g., show an error message, redirect, etc.
@@ -495,37 +466,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
   }
 
   String job = '';
-  Future<BitmapDescriptor> _resizeAndCreateBitmapDescriptor(
-    String imagePath, {
-    required int width,
-    required int height,
-  }) async {
-    final ByteData data = await rootBundle.load(imagePath);
-    final Uint8List bytes = data.buffer.asUint8List();
-
-    // Decode and resize the image
-    final img.Image? originalImage = img.decodeImage(bytes);
-    if (originalImage == null) throw Exception("Failed to decode image");
-    final img.Image resizedImage = img.copyResize(
-      originalImage,
-      width: width,
-      height: height,
-    );
-
-    // Convert resized image back to Uint8List
-    final Uint8List resizedBytes = Uint8List.fromList(
-      img.encodePng(resizedImage),
-    );
-
-    // Convert to BitmapDescriptor
-    final ui.Codec codec = await ui.instantiateImageCodec(resizedBytes);
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    final ByteData? byteData = await frameInfo.image.toByteData(
-      format: ui.ImageByteFormat.png,
-    );
-
-    return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
-  }
 
   void checkDriverProximity(
     double currentLatitude,
@@ -577,7 +517,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
     });
   }
 
-  // late GoogleMapController _mapController;
   Future<void> jobStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dId = prefs.getString('d_id');
@@ -594,7 +533,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
           prefs.remove("isRideStart");
           setState(() {});
           myController.visiblecontainer.value = false;
-          myController.polylines.clear();
+          myController.clearNavigationRoute();
           context.pushNamed('Home');
         } else {
           // Handle the job details as normal
@@ -709,47 +648,45 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                       SizedBox(
                         width: double.infinity,
                         height: MediaQuery.sizeOf(context).height * 0.7,
-                        child:
-                        //  initialCameraPosition == null
-                        //     ? Center(
-                        //         child: CircularProgressIndicator(),
-                        //       )
-                        //     :
-                        GoogleMap(
-                          mapType:
-                              MapType
-                                  .satellite, // Keep this as 'normal' (not satellite etc.)
-                          tiltGesturesEnabled: true,
-                          initialCameraPosition: initialCameraPosition,
-
-                          markers: markers,
-                          polylines: polyline,
-                          // markers: Set<Marker>.of(homeViewModel.list.value),
-                          // circles: geofenceCircles,
-                          myLocationEnabled: false,
-                          myLocationButtonEnabled: false,
-                          compassEnabled: true,
-
-                          buildingsEnabled: true, // 3D buildings dikhayein
-                          rotateGesturesEnabled: true,
-                          // tiltGesturesEnabled: true,
-                          scrollGesturesEnabled: true,
-                          zoomControlsEnabled: false,
-                          zoomGesturesEnabled: true,
-                          onTap: (argument) {
-                            setState(() {
-                              tappedLocation = argument;
-                            });
-                            // _getRouteFromTappedLocation();
-                            debugPrint('the selected lat lng $argument');
-                          },
-                          onMapCreated: (controller) {
-                            googleMapController = controller;
-                            setState(() {});
-                            // controller.setMapStyle(accpetingOrderViewModel.mapTheme.value);
-                            // accpetingOrderViewModel
-                            //     .setMapController(controller);
-                          },
+                        child: MapboxRouteMap(
+                          center:
+                              originlatlng ??
+                              LatLng(
+                                currentLatitude != 0.0
+                                    ? currentLatitude
+                                    : 51.5074,
+                                currentLongitude != 0.0
+                                    ? currentLongitude
+                                    : -0.1278,
+                              ),
+                          route: polylineCoordinate,
+                          initialZoom: 15,
+                          fitRoute: polylineCoordinate.length > 1,
+                          followCenter: polylineCoordinate.length <= 1,
+                          routeColor: Colors.blue,
+                          markers: [
+                            if (originlatlng != null)
+                              MapboxRouteMarker(
+                                id: 'origin',
+                                point: originlatlng!,
+                                image: _driverMarkerImage,
+                                color: context.appTheme.primary,
+                                iconSize: 0.58,
+                              ),
+                            if (accpetingOrderViewModel.convertedLat.value !=
+                                    0.0 &&
+                                accpetingOrderViewModel.convertedLng.value !=
+                                    0.0)
+                              MapboxRouteMarker(
+                                id: 'destination',
+                                point: LatLng(
+                                  accpetingOrderViewModel.convertedLat.value,
+                                  accpetingOrderViewModel.convertedLng.value,
+                                ),
+                                image: _destinationMarkerImage,
+                                color: const Color(0xFF1F7A5B),
+                              ),
+                          ],
                         ),
                       ),
                       // Padding(
@@ -787,8 +724,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                     width: 150,
                                     height: 50,
                                     decoration: BoxDecoration(
-                                      color:
-                                          context.appTheme.primary,
+                                      color: context.appTheme.primary,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Row(
@@ -798,8 +734,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                       children: [
                                         Icon(
                                           Icons.timer_sharp,
-                                          color:
-                                              context.appTheme.info,
+                                          color: context.appTheme.info,
                                           size: 24,
                                         ),
                                         Text(
@@ -814,17 +749,14 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                     ),
                                   ),
                                   FlutterFlowIconButton(
-                                    borderColor:
-                                        context.appTheme.info,
+                                    borderColor: context.appTheme.info,
                                     borderRadius: 20,
                                     borderWidth: 1,
                                     buttonSize: 40,
-                                    fillColor:
-                                        context.appTheme.info,
+                                    fillColor: context.appTheme.info,
                                     icon: Icon(
                                       Icons.menu,
-                                      color:
-                                          context.appTheme.primaryText,
+                                      color: context.appTheme.primaryText,
                                       size: 24,
                                     ),
                                     onPressed: () async {
@@ -863,8 +795,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                         builder: (context, scrollController) {
                           return Container(
                             decoration: BoxDecoration(
-                              color:
-                                  context.appTheme.primaryBackground,
+                              color: context.appTheme.primaryBackground,
                               borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(16),
                               ),
@@ -942,8 +873,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                           children: [
                                             Icon(
                                               Icons.pin_drop_outlined,
-                                              color:
-                                                  context.appTheme.primary,
+                                              color: context.appTheme.primary,
                                               size: 25,
                                             ),
                                             Flexible(
@@ -983,12 +913,15 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         ),
                                         Text(
                                           pickTime ?? '--',
-                                          style: context.appTheme.titleLarge.override(
-                                            fontFamily: 'Open Sans',
-                                            color:
-                                                context.appTheme.primaryText,
-                                            fontSize: 20,
-                                          ),
+                                          style: context.appTheme.titleLarge
+                                              .override(
+                                                fontFamily: 'Open Sans',
+                                                color:
+                                                    context
+                                                        .appTheme
+                                                        .primaryText,
+                                                fontSize: 20,
+                                              ),
                                         ),
                                         const Padding(
                                           padding:
@@ -1006,12 +939,15 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         ),
                                         Text(
                                           pickDate ?? '--',
-                                          style: context.appTheme.titleLarge.override(
-                                            fontFamily: 'Open Sans',
-                                            color:
-                                                context.appTheme.primaryText,
-                                            fontSize: 20,
-                                          ),
+                                          style: context.appTheme.titleLarge
+                                              .override(
+                                                fontFamily: 'Open Sans',
+                                                color:
+                                                    context
+                                                        .appTheme
+                                                        .primaryText,
+                                                fontSize: 20,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -1044,12 +980,15 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                           ),
                                           Text(
                                             luggage ?? '0',
-                                            style: context.appTheme.titleLarge.override(
-                                              fontFamily: 'Open Sans',
-                                              color:
-                                                  context.appTheme.primaryText,
-                                              fontSize: 20,
-                                            ),
+                                            style: context.appTheme.titleLarge
+                                                .override(
+                                                  fontFamily: 'Open Sans',
+                                                  color:
+                                                      context
+                                                          .appTheme
+                                                          .primaryText,
+                                                  fontSize: 20,
+                                                ),
                                           ),
                                           const SizedBox(
                                             height: 25,
@@ -1075,12 +1014,15 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                           ),
                                           Text(
                                             passenger ?? '--',
-                                            style: context.appTheme.titleLarge.override(
-                                              fontFamily: 'Open Sans',
-                                              color:
-                                                  context.appTheme.primaryText,
-                                              fontSize: 20,
-                                            ),
+                                            style: context.appTheme.titleLarge
+                                                .override(
+                                                  fontFamily: 'Open Sans',
+                                                  color:
+                                                      context
+                                                          .appTheme
+                                                          .primaryText,
+                                                  fontSize: 20,
+                                                ),
                                           ),
                                         ],
                                       ),
@@ -1092,8 +1034,7 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                         thumbPadding: const EdgeInsets.all(3),
                                         thumb: Icon(
                                           Icons.chevron_right,
-                                          color:
-                                              context.appTheme.primary,
+                                          color: context.appTheme.primary,
                                         ),
                                         elevationThumb: 2,
                                         elevationTrack: 2,
@@ -1111,7 +1052,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                   .toUpperCase(),
                                           style: TextStyle(
                                             color:
-                                                context.appTheme.primaryBackground,
+                                                context
+                                                    .appTheme
+                                                    .primaryBackground,
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1161,11 +1104,11 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                           width: 25,
                                                           height: 25,
                                                           child: Image.asset(
-                                                            'assets/images/google.png',
-                                                          ), // Replace 'your_image.png' with your image asset path
+                                                            'assets/driver-app-icon.jpg',
+                                                          ),
                                                         ),
                                                         title: const Text(
-                                                          'Open in Google Maps',
+                                                          'Open in Mapbox',
                                                         ),
                                                         onTap: () async {
                                                           // await sp.remove('isWaitingTrue');
@@ -1177,18 +1120,18 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                             context,
                                                           );
                                                           startRideTrackingthird(
-                                                            latitudeforGooglmap
+                                                            navigationLatitude
                                                                 .toString(),
-                                                            lngforGooglmap
+                                                            navigationLongitude
                                                                 .toString(),
                                                           );
                                                           await startTrackingfordropOf(
-                                                            latitudeforGooglmap,
-                                                            lngforGooglmap,
+                                                            navigationLatitude,
+                                                            navigationLongitude,
                                                           );
                                                           await MapUtils.navigateTo(
-                                                            latitudeforGooglmap,
-                                                            lngforGooglmap,
+                                                            navigationLatitude,
+                                                            navigationLongitude,
                                                           );
 
                                                           // start from here
@@ -1206,13 +1149,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                           'Using App',
                                                         ),
                                                         onTap: () async {
-                                                          // googleMapController
-                                                          //     .animateCamera(
-                                                          //         CameraUpdate
-                                                          //             .newLatLngZoom(
-                                                          //                 originlatlng!,
-                                                          //                 17));
-                                                          // Navigator.pop(context);
                                                           print(
                                                             'if condtion isridestarted is $isRideStarted',
                                                           );
@@ -1330,33 +1266,33 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                           width: 25,
                                                           height: 25,
                                                           child: Image.asset(
-                                                            'assets/images/google.png',
-                                                          ), // Replace 'your_image.png' with your image asset path
+                                                            'assets/driver-app-icon.jpg',
+                                                          ),
                                                         ),
                                                         title: const Text(
-                                                          'Open in Google Maps',
+                                                          'Open in Mapbox',
                                                         ),
                                                         onTap: () async {
                                                           await getLatLngFromAddress(
                                                             pickup!,
                                                           );
                                                           startRideTracking(
-                                                            latitudeforGooglmap
+                                                            navigationLatitude
                                                                 .toString(),
-                                                            lngforGooglmap
+                                                            navigationLongitude
                                                                 .toString(),
                                                           );
                                                           await startTrackingforpickUp(
-                                                            latitudeforGooglmap,
-                                                            lngforGooglmap,
+                                                            navigationLatitude,
+                                                            navigationLongitude,
                                                           );
 
                                                           Navigator.pop(
                                                             context,
                                                           );
                                                           await MapUtils.navigateTo(
-                                                            latitudeforGooglmap,
-                                                            lngforGooglmap,
+                                                            navigationLatitude,
+                                                            navigationLongitude,
                                                           );
 
                                                           // start from here
@@ -1474,7 +1410,9 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                             icon: FaIcon(
                                               FontAwesomeIcons.ellipsisH,
                                               color:
-                                                  context.appTheme.secondaryBackground,
+                                                  context
+                                                      .appTheme
+                                                      .secondaryBackground,
                                               size: 24,
                                             ),
                                             onPressed: () async {
@@ -1559,12 +1497,14 @@ class _OnWayWidgetState extends State<OnWayWidget> {
                                                     0,
                                                     0,
                                                   ),
-                                              color:
-                                                  context.appTheme.primary,
-                                              textStyle: context.appTheme.titleSmall.override(
-                                                fontFamily: 'Open Sans',
-                                                color: Colors.white,
-                                              ),
+                                              color: context.appTheme.primary,
+                                              textStyle: context
+                                                  .appTheme
+                                                  .titleSmall
+                                                  .override(
+                                                    fontFamily: 'Open Sans',
+                                                    color: Colors.white,
+                                                  ),
                                               elevation: 3,
                                               borderSide: const BorderSide(
                                                 color: Colors.transparent,
@@ -1597,8 +1537,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
 
   double distanceInMiles = 0;
 
-  List<LatLng> decodedPoints = <LatLng>[];
-
   Future getCoordinatesFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
@@ -1612,9 +1550,12 @@ class _OnWayWidgetState extends State<OnWayWidget> {
         //     setState(() {});
         //   });
         // });
+        if (originlatlng == null) {
+          await getlocation();
+        }
+        await _refreshMapboxRoute();
         if (isWaiting) {}
         getLiveLocationAndlistner();
-        // _getPolyline(locations.first.latitude, locations.first.longitude);
       }
       debugPrint(
         'the address is $isRideStarted ${accpetingOrderViewModel.convertedLat.value} ${accpetingOrderViewModel.convertedLng.value}',
@@ -1631,8 +1572,6 @@ class _OnWayWidgetState extends State<OnWayWidget> {
       formattedTime = formatter.format(now);
     });
   }
-
-  LatLng? tappedLocation;
 
   String stripHtmlTags(String html) {
     final regExp = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: false);
